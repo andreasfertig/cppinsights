@@ -1,0 +1,8 @@
+.tmp.cpp:49:20: error: member reference type 'const Foo' is not a pointer; did you mean to use '.'?
+             __this->Get();
+             ~~~~~~^~
+                   .
+.tmp.cpp:100:18: warning: expression result unused [-Wunused-value]
+                 [=]()->int
+                 ^~~~~~~~~~
+1 warning and 1 error generated.

@@ -1,0 +1,8 @@
+int main()
+{
+    char p[2];
+    auto __p4 = p;
+    char x = __p4[0];
+    char y = __p4[1];
+    
+}

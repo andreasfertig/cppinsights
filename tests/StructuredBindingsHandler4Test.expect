@@ -1,0 +1,21 @@
+int main()
+{
+    char p[2];
+    const auto __p4 = p;
+    const char x = __p4[0];
+    const char y = __p4[1];
+    
+
+
+    volatile char p2[2];
+    const auto __p28 = p2;
+    const volatile char x2 = __p28[0];
+    const volatile char y2 = __p28[1];
+    
+
+    char p3[2];
+    auto __p311 = p3;
+    char& x3 = __p311[0];
+    char& y3 = __p311[1];
+    
+}

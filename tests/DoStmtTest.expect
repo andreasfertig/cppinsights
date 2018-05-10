@@ -1,0 +1,17 @@
+int main()
+{
+
+     class __lambda_3
+     {
+       public: inline /*constexpr */ void operator()() const
+       {
+         int x = 1;
+         do {
+           ++x;
+         } while( true );
+       }
+       
+     };
+     
+         __lambda_3{}();
+}

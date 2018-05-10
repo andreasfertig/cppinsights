@@ -1,0 +1,159 @@
+#include <cstdio>
+#include <iostream>
+#include <string>
+#include <tuple>
+#include <utility>
+
+using namespace std;
+
+class Point;
+template<>
+struct std::tuple_size<Point> : std::integral_constant<size_t, 2>
+{
+};
+template<>
+struct std::tuple_element<0, Point>
+{
+    using type = double;
+};
+template<>
+struct std::tuple_element<1, Point>
+{
+    using type = double;
+};
+
+class Point
+{
+public:
+    constexpr Point(double x, double y) noexcept
+    : mX(x)
+    , mY(y)
+    {
+    }
+
+    constexpr double GetX() const noexcept { return mX; }
+    constexpr double GetY() const noexcept { return mY; }
+
+    constexpr void SetX(double x) noexcept { mX = x; }
+    constexpr void SetY(double y) noexcept { mY = y; }
+
+private:
+    double mX, mY;
+
+public:
+    template<size_t N>
+    constexpr decltype(auto) get() const noexcept
+    {
+        if constexpr(N == 1) {
+            return GetX();
+        } else if constexpr(N == 0) {
+            return mY;
+        }
+    }
+    
+    /* First instantiated from: StructuredBindingsHandler6Test.cpp:59 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline constexpr double get<0>() noexcept
+    {
+      if constexpr( 0ul == 1 ) ;
+      else /* constexpr */ {
+        if constexpr( 0ul == 0 ) {
+          return this->mY;
+        }
+        
+      }
+    }
+    #endif
+    
+    
+    /* First instantiated from: StructuredBindingsHandler6Test.cpp:59 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline constexpr double get<1>() noexcept
+    {
+      if constexpr( 1ul == 1 ) {
+        return this->GetX();
+      }
+    }
+    #endif
+    
+/* public: inline constexpr Point(const Point &) noexcept; */
+/* public: inline constexpr Point(Point &&); */
+/* public: inline ~Point() noexcept; */
+};
+
+int main()
+{
+#if 1
+    Point p     = Point{1, 2};
+    auto __p59 = Point(p);
+    std::tuple_element<0, Point>::type&& x = __p59.get<0>();
+    std::tuple_element<1, Point>::type&& y = __p59.get<1>();
+    
+
+    printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
+    printf("x:%lf y:%lf\n", x, y);
+#endif
+
+    char ar[2];
+    auto __ar66 = ar;
+    char a1 = __ar66[0];
+    char a2 = __ar66[1];
+    
+    auto __ar67 = ar;
+    char& a4 = __ar67[0];
+    char& a5 = __ar67[1];
+    
+
+    auto __ar69 = ar;
+    const char& a8 = __ar69[0];
+    const char& a9 = __ar69[1];
+    
+
+    const char aa[2]       = {1, 2};
+    auto __aa72 = aa;
+    const char& a18 = __aa72[0];
+    const char& a19 = __aa72[1];
+    
+
+    std::tuple<int, char, double> muple = std::make_tuple(1, 'a', 2.3);
+
+    // unpack the tuple into its individual components
+    auto __muple77 = muple;
+    std::tuple_element<0, std::tuple<int, char, double> >::type& i = get<0ul>(__muple77);
+    std::tuple_element<1, std::tuple<int, char, double> >::type& c = get<1ul>(__muple77);
+    std::tuple_element<2, std::tuple<int, char, double> >::type& d = get<2ul>(__muple77);
+    
+
+    auto __muple79 = std::tuple<int, char, double>(muple);
+    std::tuple_element<0, std::tuple<int, char, double> >::type&& ii = get<0ul>(__muple79);
+    std::tuple_element<1, std::tuple<int, char, double> >::type&& cc = get<1ul>(__muple79);
+    std::tuple_element<2, std::tuple<int, char, double> >::type&& dd = get<2ul>(__muple79);
+    
+
+#if 0
+    struct SP
+    {
+        int x;
+        int y;
+    };
+
+    SP sp{1, 2};
+
+    auto[sx, sy] = sp;
+#endif
+
+#if 0
+    class CP
+    {
+    public:
+        int x;
+        int y;
+    };
+
+    CP cp{1,2};
+
+    auto [ c1, c2 ] = cp;
+#endif
+}

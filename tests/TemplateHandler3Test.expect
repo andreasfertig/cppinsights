@@ -1,0 +1,21 @@
+template<int N, typename T>
+constexpr T min(const T& b)
+{
+    return N < b;
+}
+
+/* First instantiated from: TemplateHandler3Test.cpp:9 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int min<2, int>(const int & b)
+{
+  return static_cast<int>(2 < b);
+}
+#endif
+ 
+
+int main()
+{
+  int m = min<2>(3);
+}
+

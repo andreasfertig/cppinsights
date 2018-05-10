@@ -1,0 +1,130 @@
+#include <cstdio>
+#include <cstring>
+#include <new> // need this for after the transformation when a placement new is used
+
+class Singleton
+{
+public:
+    static Singleton& Instance();
+
+    int Get() const { return mX;}
+    void Set(int x) { mX = x;}
+
+private:
+    Singleton() = default;
+    ~Singleton(){}
+
+    int mX;
+
+/* private: inline Singleton() noexcept; */
+/* public: inline constexpr Singleton(const Singleton &); */
+};
+
+
+static size_t counter = 0;
+
+Singleton& Singleton::Instance()
+{
+  static bool __singletonB;
+  static char __singleton[sizeof(Singleton)];
+  
+  if( ! __singletonB )
+  {
+    new (&__singleton) Singleton;
+    __singletonB = true;
+  }
+  ;
+
+  static bool passed = true;
+
+  return *reinterpret_cast<Singleton*>(__singleton);
+}
+
+
+class Bingleton
+{
+public:
+
+    int Get() const { return mX;}
+    void Set(int x) { mX = x;}
+
+    Bingleton() = default;
+    ~Bingleton(){}
+
+private:
+    int mX;
+
+/* public: inline Bingleton() noexcept; */
+/* public: inline constexpr Bingleton(const Bingleton &); */
+};
+
+
+void B()
+{
+    static bool __bbB;
+    static char __bb[sizeof(Bingleton)];
+    
+    if( ! __bbB )
+    {
+      new (&__bb) Bingleton;
+      __bbB = true;
+    }
+    ;
+}
+
+Bingleton* B(bool c)
+{
+    static bool __bbB;
+    static char __bb[sizeof(Bingleton)];
+    
+    if( ! __bbB )
+    {
+      new (&__bb) Bingleton;
+      __bbB = true;
+    }
+    ;
+
+    if( c ) {
+       return nullptr;
+     }
+     
+
+    return &*reinterpret_cast<Bingleton*>(__bb);
+}
+
+
+Bingleton& BB(bool c)
+{
+    static bool __bbB;
+    static char __bb[sizeof(Bingleton)];
+    
+    if( ! __bbB )
+    {
+      new (&__bb) Bingleton;
+      __bbB = true;
+    }
+    ;
+
+    if( c ) {
+       return *reinterpret_cast<Bingleton*>(__bb);
+     }
+     
+
+    return *reinterpret_cast<Bingleton*>(__bb);
+}
+
+
+int main()
+{
+    Singleton& s = Singleton::Instance();
+
+    s.Set(22);
+
+    B();
+
+    Bingleton* bb = B(false);
+
+    Bingleton& b2 = BB(true);
+    
+    return s.Get();
+}

@@ -1,0 +1,55 @@
+class Foo
+{
+public:
+    Foo(int x) : mX{x} {    }
+
+     Foo(const char c) : mX{0} {
+        (*this).operator=(Foo(c));
+     }
+
+    bool operator==(const int& right) 
+    {
+        return false;
+    }
+
+    bool operator==(const long& right) 
+    {
+        return false;
+    }
+
+
+   template<int N>
+   constexpr decltype(auto) get() const  noexcept {
+     if      constexpr(N == 1) { return mX; } 
+     else if constexpr(N == 0) { return 2;   }
+   }
+   
+   /* First instantiated from: ClassOpInTemplateFunctionTest.cpp:37 */
+   #ifdef INSIGHTS_USE_TEMPLATE
+   template<>
+   inline constexpr int get<1>() noexcept
+   {
+     if constexpr( 1 == 1 ) {
+       return this->mX;
+     }
+   }
+   #endif
+   
+
+
+    int mX;
+/* public: inline Foo & operator=(const Foo &); */
+/* public: inline Foo & operator=(Foo &&) noexcept; */
+/* public: inline constexpr Foo(const Foo &); */
+/* public: inline constexpr Foo(Foo &&); */
+/* public: inline ~Foo() noexcept; */
+};
+
+
+int main()
+{
+    Foo f1{1};
+    Foo f2{2};
+
+    const bool b2 = f1.operator==(f2.get<1>());
+}

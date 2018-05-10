@@ -1,0 +1,25 @@
+#include <functional>
+#include <cstdio>
+
+void Func() {}
+
+template<typename T>
+void Test(T& t) 
+{
+}
+
+/* First instantiated from: StdFunctionTest.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Test<std::function<void ()> >(std::function<void ()> & t)
+{
+}
+#endif
+
+
+int main()
+{
+    std::function<void()> x = Func;
+
+  Test(x);
+}

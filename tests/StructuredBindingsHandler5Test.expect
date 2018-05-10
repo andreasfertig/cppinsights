@@ -1,0 +1,141 @@
+#include <cstdio>
+#include <type_traits>
+#include <utility>
+
+class Point;
+
+template<>
+struct std::tuple_size<Point> : std::integral_constant<size_t, 2>
+{
+};
+template<>
+struct std::tuple_element<0, Point>
+{
+    using type = double;
+};
+template<>
+struct std::tuple_element<1, Point>
+{
+    using type = double;
+};
+
+class Point
+{
+public:
+    constexpr Point(double x, double y) noexcept
+    : mX(x)
+    , mY(y)
+    {
+    }
+
+    constexpr double GetX() const noexcept { return mX; }
+    constexpr double GetY() const noexcept { return mY; }
+
+    constexpr void SetX(double x) noexcept { mX = x; }
+    constexpr void SetY(double y) noexcept { mY = y; }
+
+    template<size_t N>
+    constexpr decltype(auto) get() noexcept
+    {
+        if constexpr(N == 1) {
+            return GetX();
+        } else if constexpr(N == 0) {
+            return (mY);
+        }
+    }
+    
+    /* First instantiated from: StructuredBindingsHandler5Test.cpp:64 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline constexpr double & get<0>() noexcept
+    {
+      if constexpr( 0ul == 1 ) ;
+      else /* constexpr */ {
+        if constexpr( 0ul == 0 ) {
+          return (this->mY);
+        }
+        
+      }
+    }
+    #endif
+    
+    
+    /* First instantiated from: StructuredBindingsHandler5Test.cpp:64 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline constexpr double get<1>() noexcept
+    {
+      if constexpr( 1ul == 1 ) {
+        return this->GetX();
+      }
+    }
+    #endif
+    
+
+    template<size_t N>
+    constexpr decltype(auto) get() const noexcept
+    {
+        if constexpr(N == 1) {
+            return GetX();
+        } else if constexpr(N == 0) {
+            return (mY);
+        }
+    }
+    
+    /* First instantiated from: StructuredBindingsHandler5Test.cpp:72 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline constexpr const double & get<0>() noexcept
+    {
+      if constexpr( 0ul == 1 ) ;
+      else /* constexpr */ {
+        if constexpr( 0ul == 0 ) {
+          return (this->mY);
+        }
+        
+      }
+    }
+    #endif
+    
+    
+    /* First instantiated from: StructuredBindingsHandler5Test.cpp:72 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline constexpr double get<1>() noexcept
+    {
+      if constexpr( 1ul == 1 ) {
+        return this->GetX();
+      }
+    }
+    #endif
+    
+
+private:
+    double mX, mY;
+/* public: inline constexpr Point(const Point &); */
+/* public: inline constexpr Point(Point &&); */
+/* public: inline ~Point() noexcept; */
+};
+
+int main()
+{
+    Point p      = Point{1, 2};
+    auto __p64 = p;
+    std::tuple_element<0, Point>::type& x = __p64.get<0>();
+    std::tuple_element<1, Point>::type&& y = __p64.get<1>();
+    
+
+    printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
+    x++;
+    printf("x:%lf y:%lf\n", x, y);
+    printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
+
+    constexpr Point p2 = Point{3, 4};
+    auto __p272 = p2;
+    std::tuple_element<0, const Point>::type& x2 = __p272.get<0>();
+    std::tuple_element<1, const Point>::type&& y2 = __p272.get<1>();
+    
+
+    // error: decomposition declaration cannot be declared 'constexpr'
+    // constexpr auto [x3, y3] = p2;
+}

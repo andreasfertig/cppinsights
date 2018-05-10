@@ -1,0 +1,63 @@
+class CTest
+{
+    inline int Test() { return 22; }
+};
+
+int Test();
+
+// http://clang.llvm.org/extra/doxygen/TrailingReturnCheck_8cpp_source.html
+int Test()
+{
+    return 1;
+}
+
+int Best()
+{
+    return 1;
+}
+
+inline constexpr int CEBest()
+{
+    return 1;
+}
+
+char West()
+{
+    return 'c';
+}
+
+constexpr inline char CEWest()
+{
+    return 'c';
+}
+
+[[maybe_unused]] constexpr inline char MUCEWest()
+{
+    return 'c';
+}
+
+
+int main()
+{
+  int x = 2;
+  const char* p;
+  constexpr const int cei = 0;
+  constexpr const int cei2 = 0;
+  int i = 0;
+  int & xX = (i);
+  int * ii = &i;
+  int & ir = i;
+  int * ip = &i;
+  const int * cip = &i;
+  const char * pp = p;
+  const char * cp = p;
+  const volatile char * vcp = p;
+  float f = 1.0f;
+  char c = 'c';
+  unsigned int u = 0u;
+  unsigned int uu = u;
+
+  [[maybe_unused]] unsigned int mu = 0u;
+  [[maybe_unused]] unsigned int muu = u;
+}
+

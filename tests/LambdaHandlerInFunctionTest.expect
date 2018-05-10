@@ -1,0 +1,52 @@
+#include <cstdio>
+
+template<typename T>
+void Test(T&& t)
+{
+}
+
+/* First instantiated from: LambdaHandlerInFunctionTest.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Test<__lambda_10>(__lambda_10 && t)
+{
+}
+#endif
+
+
+/* First instantiated from: LambdaHandlerInFunctionTest.cpp:12 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Test<int>(int && t)
+{
+}
+#endif
+
+
+int main()
+{
+
+     class __lambda_10
+     {
+       public: inline /*constexpr */ void operator()() const
+       {
+         printf("Hello");
+       }
+       
+     };
+     
+         Test(__lambda_10{});
+    
+
+          class __lambda_12
+          {
+            public: inline /*constexpr */ int operator()() const
+            {
+              printf("Hello");
+              return 1;
+            }
+            
+          };
+          
+              Test(__lambda_12{}());
+}

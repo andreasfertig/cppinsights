@@ -1,0 +1,106 @@
+.tmp.cpp:10:39: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+        public: inline constexpr void operator()() const
+                                      ^
+.tmp.cpp:12:9: note: non-constexpr function 'printf' cannot be used in a constant expression
+        printf("%d\n", __this->a);
+        ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:35:35: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr void operator()() const
+                                  ^
+.tmp.cpp:37:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:52:35: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr void operator()() const
+                                  ^
+.tmp.cpp:54:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", 1);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:64:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()()
+                                 ^
+.tmp.cpp:66:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", ++foo);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:82:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()(int x) const
+                                 ^
+.tmp.cpp:84:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo + x);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:98:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()(const int x) const
+                                 ^
+.tmp.cpp:100:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo + x);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:114:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()(int & x, int b) const
+                                 ^
+.tmp.cpp:116:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo + x);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:130:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()(int & x, int b) const
+                                 ^
+.tmp.cpp:132:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo + x);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:154:25: error: calling a private constructor of class '__lambda71'
+        auto lambda71 = __lambda71{foo};
+                        ^
+.tmp.cpp:149:5: note: implicitly declared private here
+    __lambda71(int& _foo)
+    ^
+.tmp.cpp:158:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()(int & x, const int & b, const int c) const
+                                 ^
+.tmp.cpp:160:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo + x);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:175:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()(int & x, int b) const
+                                 ^
+.tmp.cpp:177:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo + x);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+.tmp.cpp:193:34: error: constexpr function never produces a constant expression [-Winvalid-constexpr]
+    public: inline constexpr int operator()(int & x, int b) const noexcept
+                                 ^
+.tmp.cpp:195:5: note: non-constexpr function 'printf' cannot be used in a constant expression
+    printf("%d\n", foo + x);
+    ^
+/usr/include/stdio.h:259:6: note: declared here
+int      printf(const char * __restrict, ...) __printflike(1, 2);
+         ^
+12 errors generated.

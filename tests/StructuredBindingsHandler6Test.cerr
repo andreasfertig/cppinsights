@@ -1,0 +1,10 @@
+.tmp.cpp:130:67: error: rvalue reference to type '__type_pack_element<...>' cannot bind to lvalue of type '__type_pack_element<...>'
+    std::tuple_element<0, std::tuple<int, char, double> >::type&& ii = get<0ul>(__muple79);
+                                                                  ^    ~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:131:67: error: rvalue reference to type '__type_pack_element<...>' cannot bind to lvalue of type '__type_pack_element<...>'
+    std::tuple_element<1, std::tuple<int, char, double> >::type&& cc = get<1ul>(__muple79);
+                                                                  ^    ~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:132:67: error: rvalue reference to type '__type_pack_element<...>' cannot bind to lvalue of type '__type_pack_element<...>'
+    std::tuple_element<2, std::tuple<int, char, double> >::type&& dd = get<2ul>(__muple79);
+                                                                  ^    ~~~~~~~~~~~~~~~~~~~
+3 errors generated.

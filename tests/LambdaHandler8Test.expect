@@ -1,0 +1,45 @@
+template<typename T>
+int Test(T&& t)
+{
+    return t();
+}
+
+/* First instantiated from: LambdaHandler8Test.cpp:9 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int Test<__lambda_9>(__lambda_9 && t)
+{
+  return t.operator()();
+}
+#endif
+
+
+int get(int& v){
+
+
+   class __lambda_9
+   {
+     public: inline /*constexpr */ int operator()() const
+     {
+       return v;
+     }
+     
+     private:
+     int & v;
+     
+     public: __lambda_9(int & _v)
+     : v{_v}
+     {}
+     
+   };
+   
+     int x = Test( __lambda_9{v});
+
+  return x;
+}
+
+
+int main(){
+    int x = 2;
+    return get(x);
+}

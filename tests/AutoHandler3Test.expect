@@ -1,0 +1,37 @@
+struct S { void f(); /* public: inline ~S() noexcept; */
+};
+struct T {/* public: inline ~T() noexcept; */
+};
+
+template <typename T>
+auto f(T, int) -> decltype(T{}.f()) {
+    //printf( "Has member function named f().\n");
+}
+
+/* First instantiated from: AutoHandler3Test.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void f<S>(S, int)
+{
+}
+#endif
+
+
+template <typename T>
+void f(T, ...) {
+    //printf( "No member function named f().\n");
+}
+
+/* First instantiated from: AutoHandler3Test.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void f<T>(T)
+{
+}
+#endif
+
+
+int main() {
+    f(S{}, 0);
+    f(T{}, 0);
+}

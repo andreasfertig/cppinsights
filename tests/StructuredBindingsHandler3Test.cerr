@@ -1,0 +1,119 @@
+.tmp.cpp:73:29: error: template argument ‘(long unsigned int)N’ involves template parameter(s)
+ template<int N> struct std::tuple_element<N, constant::Q> { typedef int type; };
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:78:39: error: invalid use of incomplete type ‘struct std::tuple_element<0, constant::Q>’
+   std::tuple_element<0, constant::Q>::type&& a = constant::get(constant::);
+                                       ^~~~
+.tmp.cpp:5:51: note: declaration of ‘struct std::tuple_element<0, constant::Q>’
+ namespace std { template<size_t, typename> struct tuple_element;
+                                                   ^~~~~~~~~~~~~
+.tmp.cpp:79:39: error: invalid use of incomplete type ‘struct std::tuple_element<1, constant::Q>’
+   std::tuple_element<1, constant::Q>::type&& b = constant::get(constant::);
+                                       ^~~~
+.tmp.cpp:5:51: note: declaration of ‘struct std::tuple_element<1, constant::Q>’
+ namespace std { template<size_t, typename> struct tuple_element;
+                                                   ^~~~~~~~~~~~~
+.tmp.cpp:80:39: error: invalid use of incomplete type ‘struct std::tuple_element<2, constant::Q>’
+   std::tuple_element<2, constant::Q>::type&& c = constant::get(constant::);
+                                       ^~~~
+.tmp.cpp:5:51: note: declaration of ‘struct std::tuple_element<2, constant::Q>’
+ namespace std { template<size_t, typename> struct tuple_element;
+                                                   ^~~~~~~~~~~~~
+.tmp.cpp: In function ‘constexpr bool constant::f()’:
+.tmp.cpp:85:5: error: incomplete type ‘std::tuple_element<0, constant::Q>’ used in nested name specifier
+     std::tuple_element<0, constant::Q>::type&& a = constant::get(__q20);
+     ^~~
+.tmp.cpp:85:48: error: ‘a’ was not declared in this scope
+     std::tuple_element<0, constant::Q>::type&& a = constant::get(__q20);
+                                                ^
+.tmp.cpp:85:71: error: no matching function for call to ‘get(constant::Q&)’
+     std::tuple_element<0, constant::Q>::type&& a = constant::get(__q20);
+                                                                       ^
+.tmp.cpp:40:33: note: candidate: template<int N> constexpr int constant::get(constant::Q&&)
+   template<int N> constexpr int get(Q &&) { return N * N; }
+                                 ^~~
+.tmp.cpp:40:33: note:   template argument deduction/substitution failed:
+.tmp.cpp:85:71: note:   couldn't deduce template parameter ‘N’
+     std::tuple_element<0, constant::Q>::type&& a = constant::get(__q20);
+                                                                       ^
+.tmp.cpp:86:5: error: incomplete type ‘std::tuple_element<1, constant::Q>’ used in nested name specifier
+     std::tuple_element<1, constant::Q>::type&& b = constant::get(__q20);
+     ^~~
+.tmp.cpp:86:48: error: ‘b’ was not declared in this scope
+     std::tuple_element<1, constant::Q>::type&& b = constant::get(__q20);
+                                                ^
+.tmp.cpp:86:71: error: no matching function for call to ‘get(constant::Q&)’
+     std::tuple_element<1, constant::Q>::type&& b = constant::get(__q20);
+                                                                       ^
+.tmp.cpp:40:33: note: candidate: template<int N> constexpr int constant::get(constant::Q&&)
+   template<int N> constexpr int get(Q &&) { return N * N; }
+                                 ^~~
+.tmp.cpp:40:33: note:   template argument deduction/substitution failed:
+.tmp.cpp:86:71: note:   couldn't deduce template parameter ‘N’
+     std::tuple_element<1, constant::Q>::type&& b = constant::get(__q20);
+                                                                       ^
+.tmp.cpp:87:5: error: incomplete type ‘std::tuple_element<2, constant::Q>’ used in nested name specifier
+     std::tuple_element<2, constant::Q>::type&& c = constant::get(__q20);
+     ^~~
+.tmp.cpp:87:48: error: ‘c’ was not declared in this scope
+     std::tuple_element<2, constant::Q>::type&& c = constant::get(__q20);
+                                                ^
+.tmp.cpp:87:71: error: no matching function for call to ‘get(constant::Q&)’
+     std::tuple_element<2, constant::Q>::type&& c = constant::get(__q20);
+                                                                       ^
+.tmp.cpp:40:33: note: candidate: template<int N> constexpr int constant::get(constant::Q&&)
+   template<int N> constexpr int get(Q &&) { return N * N; }
+                                 ^~~
+.tmp.cpp:40:33: note:   template argument deduction/substitution failed:
+.tmp.cpp:87:71: note:   couldn't deduce template parameter ‘N’
+     std::tuple_element<2, constant::Q>::type&& c = constant::get(__q20);
+                                                                       ^
+.tmp.cpp: In function ‘constexpr int constant::g()’:
+.tmp.cpp:96:7: error: incomplete type ‘std::tuple_element<0, constant::Q>’ used in nested name specifier
+       std::tuple_element<0, constant::Q>::type&& a = constant::get(__q27);
+       ^~~
+.tmp.cpp:96:50: error: ‘a’ was not declared in this scope
+       std::tuple_element<0, constant::Q>::type&& a = constant::get(__q27);
+                                                  ^
+.tmp.cpp:96:73: error: no matching function for call to ‘get(constant::Q&)’
+       std::tuple_element<0, constant::Q>::type&& a = constant::get(__q27);
+                                                                         ^
+.tmp.cpp:40:33: note: candidate: template<int N> constexpr int constant::get(constant::Q&&)
+   template<int N> constexpr int get(Q &&) { return N * N; }
+                                 ^~~
+.tmp.cpp:40:33: note:   template argument deduction/substitution failed:
+.tmp.cpp:96:73: note:   couldn't deduce template parameter ‘N’
+       std::tuple_element<0, constant::Q>::type&& a = constant::get(__q27);
+                                                                         ^
+.tmp.cpp:97:7: error: incomplete type ‘std::tuple_element<1, constant::Q>’ used in nested name specifier
+       std::tuple_element<1, constant::Q>::type&& b = constant::get(__q27);
+       ^~~
+.tmp.cpp:97:50: error: ‘b’ was not declared in this scope
+       std::tuple_element<1, constant::Q>::type&& b = constant::get(__q27);
+                                                  ^
+.tmp.cpp:97:73: error: no matching function for call to ‘get(constant::Q&)’
+       std::tuple_element<1, constant::Q>::type&& b = constant::get(__q27);
+                                                                         ^
+.tmp.cpp:40:33: note: candidate: template<int N> constexpr int constant::get(constant::Q&&)
+   template<int N> constexpr int get(Q &&) { return N * N; }
+                                 ^~~
+.tmp.cpp:40:33: note:   template argument deduction/substitution failed:
+.tmp.cpp:97:73: note:   couldn't deduce template parameter ‘N’
+       std::tuple_element<1, constant::Q>::type&& b = constant::get(__q27);
+                                                                         ^
+.tmp.cpp:98:7: error: incomplete type ‘std::tuple_element<2, constant::Q>’ used in nested name specifier
+       std::tuple_element<2, constant::Q>::type&& c = constant::get(__q27);
+       ^~~
+.tmp.cpp:98:50: error: ‘c’ was not declared in this scope
+       std::tuple_element<2, constant::Q>::type&& c = constant::get(__q27);
+                                                  ^
+.tmp.cpp:98:73: error: no matching function for call to ‘get(constant::Q&)’
+       std::tuple_element<2, constant::Q>::type&& c = constant::get(__q27);
+                                                                         ^
+.tmp.cpp:40:33: note: candidate: template<int N> constexpr int constant::get(constant::Q&&)
+   template<int N> constexpr int get(Q &&) { return N * N; }
+                                 ^~~
+.tmp.cpp:40:33: note:   template argument deduction/substitution failed:
+.tmp.cpp:98:73: note:   couldn't deduce template parameter ‘N’
+       std::tuple_element<2, constant::Q>::type&& c = constant::get(__q27);
+                                                                         ^

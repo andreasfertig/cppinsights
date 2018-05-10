@@ -1,0 +1,17 @@
+int main()
+{
+    {
+       char * ptr = nullptr;
+       if( ptr ) {
+       } else {
+         *ptr = 2;
+       }
+       
+     }
+     
+
+    const char* ptr2;
+    if( ptr2 ) {
+     }
+     
+}

@@ -1,0 +1,87 @@
+#include <utility>
+
+struct S
+{
+    int i;
+/* public: inline S(); */
+/* public: inline constexpr S(const S &) noexcept; */
+/* public: inline constexpr S(S &&) noexcept; */
+};
+
+struct SS
+{
+    int i;
+/* public: inline SS() noexcept; */
+/* public: inline constexpr SS(const SS &) noexcept; */
+/* public: inline constexpr SS(SS &&) noexcept; */
+/* public: inline constexpr SS & operator=(const SS &) noexcept; */
+/* public: inline constexpr SS & operator=(SS &&); */
+};
+
+
+class C
+{
+public:
+    int i;
+/* public: inline C(); */
+/* public: inline constexpr C(const C &) noexcept; */
+/* public: inline constexpr C(C &&) noexcept; */
+};
+
+class D
+{
+public:
+    int i;
+/* public: inline D() noexcept; */
+/* public: inline constexpr D(const D &) noexcept; */
+/* public: inline constexpr D(D &&) noexcept; */
+/* public: inline constexpr D & operator=(const D &) noexcept; */
+/* public: inline constexpr D & operator=(D &&); */
+/* public: inline ~D(); */
+};
+
+class E
+{
+public:
+    
+    E(int x): i{x} {}
+private:
+    int i;
+/* public: inline constexpr E(const E &); */
+/* public: inline constexpr E(E &&); */
+};
+
+int main()
+{
+    S s{1};
+
+    S s2 = s;
+    S s3 = std::move(s);
+
+    C c{2};
+
+    C c2 = c;
+    C c3 = std::move(c);
+
+
+    D d{2};
+
+    D d2 = d;
+    D d3 = std::move(d);
+    D d4;
+    d4.operator=(d2);
+
+    SS ss{2};
+
+    SS ss2 = ss;
+    SS ss3 = std::move(ss);
+    SS ss4;
+    ss4.operator=(ss2);
+
+    D* dd = new D{3};
+
+    delete dd;
+
+    E e{6};
+
+}

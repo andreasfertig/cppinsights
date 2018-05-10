@@ -1,0 +1,42 @@
+template<class... Ts> struct visitor: Ts... { using Ts::operator()...; };
+/* First instantiated from: VisitorTest.cpp:7 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class visitor<__lambda_8, __lambda_9>
+{
+  
+};
+
+#endif
+
+template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
+
+
+int main()
+{
+
+     class __lambda_8
+     {
+       public: inline /*constexpr */ void operator()(int value) const
+       {
+       }
+       
+     };
+     
+     
+     class __lambda_9
+     {
+       public: inline /*constexpr */ void operator()(const char * value) const
+       {
+       }
+       
+     };
+     
+         visitor<__lambda_8, __lambda_9> my_visitor = visitor{
+      __lambda_8{},
+      __lambda_9{},
+    };
+
+
+    static_cast<const __lambda_9&>(my_visitor).operator()("hello");
+    static_cast<const __lambda_8&>(my_visitor).operator()(2);
+}

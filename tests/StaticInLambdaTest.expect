@@ -1,0 +1,111 @@
+#include <cstdio>
+#include <cstring>
+#include <new> // need this for after the transformation when a placement new is used
+
+class Singleton
+{
+public:
+    static Singleton& Instance();
+
+    int Get() const { return mX;}
+    void Set(int x) { mX = x;}
+
+private:
+    Singleton() = default;
+    ~Singleton(){}
+
+    int mX;
+
+/* private: inline Singleton() noexcept; */
+/* public: inline constexpr Singleton(const Singleton &); */
+};
+
+
+static size_t counter = 0;
+
+Singleton& Singleton::Instance()
+{
+  static bool __singletonB;
+  static char __singleton[sizeof(Singleton)];
+  
+  if( ! __singletonB )
+  {
+    new (&__singleton) Singleton;
+    __singletonB = true;
+  }
+  ;
+
+  static bool passed = true;
+
+  return *reinterpret_cast<Singleton*>(__singleton);
+}
+
+
+class Bingleton
+{
+public:
+
+    int Get() const { return mX;}
+    void Set(int x) { mX = x;}
+
+    Bingleton() = default;
+    ~Bingleton(){}
+
+private:
+    int mX;
+
+/* public: inline Bingleton() noexcept; */
+/* public: inline constexpr Bingleton(const Bingleton &) noexcept; */
+};
+
+
+int main()
+{
+
+     class __lambda_52
+     {
+       public: inline Bingleton operator()(bool c) const
+       {
+         static bool __bbB;
+         static char __bb[sizeof(Bingleton)];
+         
+         if( ! __bbB )
+         {
+           new (&__bb) Bingleton;
+           __bbB = true;
+         }
+         if( c ) {
+           return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
+         }
+         return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
+       }
+       
+     };
+     
+         __lambda_52 x = __lambda_52{};
+
+
+
+     class __lambda_62
+     {
+       public: inline Bingleton * operator()(bool c) const
+       {
+         static bool __bbB;
+         static char __bb[sizeof(Bingleton)];
+         
+         if( ! __bbB )
+         {
+           new (&__bb) Bingleton;
+           __bbB = true;
+         }
+         if( c ) {
+           return &*reinterpret_cast<Bingleton*>(__bb);
+         }
+         return &*reinterpret_cast<Bingleton*>(__bb);
+       }
+       
+     };
+     
+         __lambda_62 y = __lambda_62{};
+}
+

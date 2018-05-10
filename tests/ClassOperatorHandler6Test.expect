@@ -1,0 +1,146 @@
+#include <typeinfo>
+#ifndef NULL
+#define NULL 0
+#endif
+
+#include <new>
+
+class Bar {/* public: inline constexpr Bar() noexcept; */
+/* public: inline constexpr Bar(const Bar &); */
+/* public: inline constexpr Bar(Bar &&); */
+/* public: inline constexpr Bar & operator=(const Bar &); */
+/* public: inline constexpr Bar & operator=(Bar &&); */
+/* public: inline ~Bar(); */
+};
+
+class Woo
+{
+public:
+    Woo(int x, char c) : mX{x} {    }
+
+    int mX;
+/* public: inline constexpr Woo(const Woo &); */
+/* public: inline constexpr Woo(Woo &&); */
+/* public: inline ~Woo() noexcept; */
+};
+
+
+
+class Foo : public Bar
+{
+public:
+    Foo(int x) : mX{x} {    }
+
+     Foo(const char c) : mX{0} {
+        (*this).operator=(c);
+     }
+
+    bool operator==(const Foo& right) 
+    {
+        return mX == right.mX;
+    }
+
+    bool operator==(const char* right) 
+    {
+        return false;
+    }
+
+    bool operator==(const Bar* right) 
+    {
+        return false;
+    }
+
+    bool operator==(const int& right) 
+    {
+        return false;
+    }
+
+    bool operator==(const long& right) 
+    {
+        return false;
+    }
+
+    bool operator==(const std::type_info& right) 
+    {
+        return false;
+    }
+
+    Foo& operator=(const char& ref)
+    {
+        mX = static_cast<int>(ref);
+
+        return *this;
+    }
+
+    bool operator==(const Woo* right) 
+    {
+        return mX == right->mX;
+    }
+
+    bool operator==(const Woo& right) 
+    {
+        return mX == right.mX;
+    }
+    
+    int mX;
+/* public: inline Foo & operator=(const Foo &); */
+/* public: inline Foo & operator=(Foo &&); */
+/* public: inline constexpr Foo(const Foo &); */
+/* public: inline constexpr Foo(Foo &&); */
+};
+
+
+
+int main()
+{
+    Foo f1{1};
+    Foo f2{2};
+
+    const bool b = f1.operator==(f2);
+    void *t;
+
+    if( b ) {
+       return 0;
+     } else {
+       return 1;
+     }
+     
+
+    // PredefinedExpr
+    const bool b2 = f1.operator==("main");
+
+    // CXXTypeidExpr
+    const bool b3 = f1.operator==(typeid(f2));
+
+    // GNUNullExpr
+    const bool b4 = f1.operator==(NULL);
+
+    // NullptrExpr
+    const bool b5 = f1.operator==(static_cast<const int>((t == nullptr)));
+
+    // CXXNamedCastExpr
+    unsigned long l = 2;
+    const bool b6 = f1.operator==(static_cast<int>(static_cast<int>(l)));
+
+    // CXXNamedCastExpr
+    const bool b7 = f1.operator==(dynamic_cast<Bar *>(&f2));
+    
+
+    // ExplicitCastExpr
+    const bool b8 = f1.operator==(reinterpret_cast<char *>(t));
+
+    // ExplicitCastExpr
+    const bool b9 = f1.operator==(new char[2]);
+    const bool b10 = f1.operator==(new char[2]{ 1, 2 });
+    
+    char buffer[1024];
+    const bool b11 = f1.operator==(new (static_cast<void *>(buffer))char[2]{ 1, 2 });
+
+    const bool b12 = f1.operator==(new Woo(1, 'a'));
+    
+    const bool b13 = f1.operator==(Woo(1, 'a'));
+
+    // thould trigger thisExpr
+    Foo f3{'c'};
+}
+

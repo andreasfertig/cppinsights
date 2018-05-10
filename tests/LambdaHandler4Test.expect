@@ -1,0 +1,106 @@
+class Foo
+{
+    Foo()
+    :mX{0}
+    {
+
+         class __lambda_6
+         {
+           public: inline /*constexpr */ void operator()() const
+           {
+             __this->Get();
+           }
+           
+           private:
+           Foo * __this;
+           
+           public: __lambda_6(Foo * ___this)
+           : __this{___this}
+           {}
+           
+         };
+         
+                 __lambda_6 f = __lambda_6{this};
+
+
+         class __lambda_10
+         {
+           public: inline /*constexpr */ void operator()() const
+           {
+             __this->Get();
+           }
+           
+           private:
+           Foo * __this;
+           
+           public: __lambda_10(Foo * ___this)
+           : __this{___this}
+           {}
+           
+         };
+         
+                 __lambda_10 g = __lambda_10{this};
+
+
+         class __lambda_14
+         {
+           public: inline /*constexpr */ void operator()() const
+           {
+             __this->Get();
+           }
+           
+           private:
+           Foo __this;
+           
+           public: __lambda_14(Foo ___this)
+           : __this{___this}
+           {}
+           
+         };
+         
+                 __lambda_14 h = __lambda_14{*this};
+        
+    }
+
+    int Get() const { return 22; }
+
+ private:
+    int mX;
+
+/* public: inline constexpr Foo(const Foo &) noexcept; */
+/* public: inline constexpr Foo(Foo &&); */
+/* public: inline ~Foo() noexcept; */
+};
+
+
+// http://en.cppreference.com/w/cpp/language/lambda
+struct X {
+    int x, y;
+    int operator()(int);
+    void f()
+    {
+        // the context of the following lambda is the member function X::f
+
+         class __lambda_35
+         {
+           public: inline /*constexpr */ int operator()() const
+           {
+             return __this->operator()(__this->x + __this->y);
+           }
+           
+           private:
+           X * __this;
+           
+           public: __lambda_35(X * ___this)
+           : __this{___this}
+           {}
+           
+         } __lambda_35{this};
+         
+                 [=]()->int
+        {
+            return operator()(this->x + y); // X::operator()(this->x + (*this).y)
+                                            // this has type X*
+        };
+    }
+};

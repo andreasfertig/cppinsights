@@ -1,0 +1,45 @@
+int main()
+{
+  // empty lambda directly invoked with empty body
+
+     class __lambda_4
+     {
+       public: inline /*constexpr */ void operator()() const
+       {
+       }
+       
+     };
+     
+         __lambda_4{}();
+
+
+
+     class __lambda_7
+     {
+       public: inline /*constexpr */ void operator()() const
+       {
+         1 * 2;
+       }
+       
+     };
+     
+         __lambda_7{}();
+
+
+    int a;
+    int b;
+
+
+     class __lambda_13
+     {
+       public: inline /*constexpr */ void operator()(int & x, int & y) const
+       {
+         x = x + y;
+       }
+       
+     };
+     
+         __lambda_13{}(a, b);
+    
+}
+

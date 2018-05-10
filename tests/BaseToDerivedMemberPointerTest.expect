@@ -1,0 +1,25 @@
+class Base
+{
+
+/* public: inline constexpr Base() noexcept; */
+/* public: inline ~Base(); */
+/* public: inline constexpr Base(const Base &); */
+/* public: inline constexpr Base(Base &&); */
+};
+
+class Derived : public Base
+{
+/* public: inline constexpr Derived() noexcept; */
+/* public: inline constexpr Derived(const Derived &); */
+/* public: inline constexpr Derived(Derived &&); */
+};
+
+
+int main()
+{
+    Derived* d{new Derived};
+
+    Base* b = static_cast<Base *>(d);
+
+    Base* bb{static_cast<Base *>(new Derived())};
+}

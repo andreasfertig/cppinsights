@@ -1,0 +1,21 @@
+#include <iostream>
+
+enum class Color{
+  red,
+  blue,
+  green
+};
+ 
+enum struct State: char {
+  on,
+  off,
+};
+
+int main(){
+
+  // UnaryExprOrTypeTraitExpr with Type
+  std::cout.operator<<(sizeof(Color)).operator<<(std::endl);  
+  std::cout.operator<<(sizeof(State)).operator<<(std::endl);
+
+}
+

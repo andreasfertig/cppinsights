@@ -1,0 +1,35 @@
+// https://mbevin.wordpress.com/2012/11/14/range-based-for/
+template<class T>
+class MyArrayWrapper {
+   T* data;
+   int size;
+
+public:
+   int* begin() { return size>0 ? &data[0] : nullptr; }
+   int* end()   { return size>0 ? &data[size-1] : nullptr; }
+};
+/* First instantiated from: RangeForStmtHandler4Test.cpp:14 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class MyArrayWrapper<int>
+{
+  
+};
+
+#endif
+
+
+
+int main() {
+    MyArrayWrapper<int> arr;
+    {
+       auto&& __range1 = arr;
+       int * __begin1 = __range1.begin();
+       int * __end1 = __range1.end();
+       
+       for( ; __begin1 != __end1; ++__begin1 )
+       {
+         int i = *__begin1;
+       }
+     }
+
+}

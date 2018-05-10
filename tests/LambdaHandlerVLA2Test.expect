@@ -1,0 +1,29 @@
+void Test(int n) 
+{
+    char buffer[n];
+
+
+
+     class __lambda_6
+     {
+       public: inline /*constexpr */ bool operator()(int i, int x) const
+       {
+         return static_cast<int>(buffer[i]) > static_cast<int>(buffer[x]);
+       }
+       
+       private:
+       char (&buffer)[n];
+       
+       public: __lambda_6(char (&_buffer)[n])
+       : buffer{_buffer}
+       {}
+       
+     };
+     
+         __lambda_6{buffer}(1, 2);
+}
+
+int main()
+{
+    Test(2);
+}

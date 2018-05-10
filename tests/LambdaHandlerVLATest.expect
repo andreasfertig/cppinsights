@@ -1,0 +1,78 @@
+#if 0
+int Test(int n) 
+{
+    char buffer[n];
+
+
+    [=]() mutable {
+        int x = buffer[0];
+    }();
+}
+
+int main()
+{
+    Test(2);
+}
+#endif
+
+
+template<unsigned int TA>
+struct SA
+{
+  SA (const int & PA);
+  int nt;
+};
+/* First instantiated from: LambdaHandlerVLATest.cpp:42 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class SA<2>
+{
+  
+};
+
+#endif
+
+
+template<typename TB>
+inline void test(TB aa)
+{
+}
+
+/* First instantiated from: LambdaHandlerVLATest.cpp:36 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline void test<__lambda_36>(__lambda_36 aa)
+{
+}
+#endif
+
+
+template<unsigned int TA>
+inline SA<TA>::SA(const int & PA)
+{
+  float e[nt];
+  
+
+   class __lambda_36
+   {
+     public: inline auto operator()(int i, int j) const
+     {
+       return e[i] < e[j];
+     }
+     
+     private:
+     float (&e)[this->nt];
+     
+     public: __lambda_36(float (&_e)[this->nt])
+     : e{_e}
+     {}
+     
+   };
+   
+     test(__lambda_36{e});
+}
+
+int main()
+{
+    int d;
+    SA<2> iso(d);
+}

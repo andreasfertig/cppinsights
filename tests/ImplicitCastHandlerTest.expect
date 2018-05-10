@@ -1,0 +1,18 @@
+int main()
+{
+    char c = 1;
+
+    if( static_cast<int>(c) == static_cast<int>(true) ) {
+       return 1;
+     }
+     
+
+    if( static_cast<int>(c) == 100 ) {
+       return 2;
+     }
+     
+
+    c++;
+
+    return static_cast<int>(c);
+}

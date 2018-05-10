@@ -1,0 +1,45 @@
+#include <iostream>
+using namespace std;
+
+class A
+    {
+    /* public: inline constexpr A() noexcept; */
+    /* public: inline constexpr A(const A &); */
+    /* public: inline constexpr A(A &&); */
+    /* public: inline ~A() noexcept; */
+    };
+
+class B
+    {
+    public:
+        operator A() const { return A(); }
+    /* public: inline constexpr B() noexcept; */
+    /* public: inline ~B() noexcept; */
+    /* public: inline constexpr B(const B &); */
+    /* public: inline constexpr B(B &&); */
+    };
+
+class C
+    : public B
+    {
+    /* public: inline constexpr C() noexcept; */
+    /* public: inline constexpr C(const C &); */
+    /* public: inline constexpr C(C &&); */
+    /* public: inline ~C() noexcept; */
+    };
+
+void foo( const A& )
+    {
+    std::operator<<(std::cout, "A").operator<<(std::endl);
+    }
+
+void foo( B& )
+    {
+    std::operator<<(std::cout, "B").operator<<(std::endl);
+    }
+
+int main()
+    {
+    foo( static_cast<A>(static_cast<const B&>(C()).operator A()));
+    } 
+

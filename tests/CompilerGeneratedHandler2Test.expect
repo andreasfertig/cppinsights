@@ -1,0 +1,46 @@
+#include <utility>
+
+
+class C
+{
+public:
+    int i;
+
+    virtual ~C() = default;
+/* public: inline virtual ~C() noexcept; */
+/* public: inline C & operator=(const C &); */
+/* public: inline constexpr C(const C &) noexcept; */
+/* public: inline C() noexcept; */
+};
+
+class C2
+{
+public:
+    const int i{2};
+
+    C2() noexcept = default;
+/* public: inline constexpr C2(); */
+};
+
+
+class D : public C
+{
+    public:
+        int x;
+/* public: inline constexpr D(const D &); */
+/* public: inline constexpr D(D &&); */
+/* public: inline D & operator=(const D &); */
+/* public: inline D & operator=(D &&); */
+/* public: inline virtual ~D() noexcept; */
+};
+
+
+int main()
+{
+    C c{};
+
+    C c2 = c;
+    C c3 = std::move(c);
+
+
+}

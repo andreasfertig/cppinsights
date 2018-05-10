@@ -1,0 +1,40 @@
+#include <string>
+
+std::string trim(const std::string& input)
+{
+    if( input.length() == 0 ) {
+       return std::basic_string<char>("");
+     }
+     
+
+    std::string final = input;
+
+    int i = 0;
+    while(i < (int)static_cast<int>(input.length()) && static_cast<int>(input.operator[](i)) <= static_cast<int>(' ')) {
+        i++;
+    }
+
+    if( i >= reinterpret_cast<int>(static_cast<int>(input.length())) ) {
+       return std::basic_string<char>("");
+     }
+     
+
+    if( i > 0 ) {
+       final.operator=(input.substr(static_cast<unsigned long>(i), input.length() - static_cast<unsigned long>(i)));
+     }
+     
+
+    i = (int)static_cast<int>(final.length()) - 1;
+    while(i >= 0 && static_cast<int>(final.operator[](i)) <= static_cast<int>(' ')) {
+        i--;
+    }
+
+    return final.substr(0, static_cast<unsigned long>(i + 1));
+}
+
+int main()
+{
+    std::string x{" ashj a a a aaa"};
+
+    std::string b = trim(x);
+}

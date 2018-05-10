@@ -1,0 +1,11 @@
+.tmp.cpp:8:110: error: unknown type name 'basic_string_view'
+  std::string_view strView = static_cast<std::basic_string_view<char, std::char_traits<char> >>(str.operator basic_string_view());
+                                                                                                             ^
+.tmp.cpp:10:62: error: no template named 'basic_string_view'; did you mean 'std::basic_string_view'?
+  std::operator<<(std::operator<<(std::cout, "strView  : "), basic_string_view<char, std::char_traits<char> >(strView)).operator<<(std::endl);
+                                                             ^~~~~~~~~~~~~~~~~
+                                                             std::basic_string_view
+/usr/local/clang-current/include/c++/v1/string_view:187:28: note: 'std::basic_string_view' declared here
+class _LIBCPP_TEMPLATE_VIS basic_string_view {
+                           ^
+2 errors generated.

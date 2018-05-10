@@ -1,0 +1,9 @@
+int foo(int a,int b){ return a+b; }
+
+int main(){
+  int (*add)(int,int)= foo;
+  // auto within a function pointer
+  using FuncPtr_6 = int (*)(int, int);
+ FuncPtr_6 add1= foo;         
+}
+

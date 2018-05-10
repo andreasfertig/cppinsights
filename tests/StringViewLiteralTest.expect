@@ -1,0 +1,12 @@
+#include <string_view>
+#include <iostream>
+ 
+int main()
+{
+    using namespace std::literals;
+ 
+    std::string_view s1 = "abc\0\0def";
+    std::string_view s2 = std::operator""sv("abc\000\000def", 8ul);
+    std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "s1: ").operator<<(s1.size()), " \""), std::basic_string_view<char, std::char_traits<char> >(s1)), "\"\n");
+    std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "s2: ").operator<<(s2.size()), " \""), std::basic_string_view<char, std::char_traits<char> >(s2)), "\"\n");
+}

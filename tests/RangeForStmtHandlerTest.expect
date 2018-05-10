@@ -1,0 +1,163 @@
+#include <cstdio>
+#include <algorithm>
+#include <vector>
+
+struct A
+{
+    A()
+    {
+        int i = 0;
+
+         class __lambda_10
+         {
+           public: inline /*constexpr */ int operator()() const
+           {
+             return ++i;
+           }
+           
+           private:
+           int& i;
+           
+           public: __lambda_10(int& _i)
+           : i{_i}
+           {}
+           
+         };
+         
+                 std::generate(&v[0], &v[10], __lambda_10{i});
+    }
+
+    int v[10];
+/* public: inline constexpr A(const A &); */
+/* public: inline constexpr A(A &&); */
+};
+
+
+struct B
+{
+    B()
+    {
+        int i = 0;
+
+         class __lambda_22
+         {
+           public: inline /*constexpr */ int operator()() const
+           {
+             return ++i;
+           }
+           
+           private:
+           int& i;
+           
+           public: __lambda_22(int& _i)
+           : i{_i}
+           {}
+           
+         };
+         
+                 std::generate(&v[0], &v[10], __lambda_22{i});
+    }
+
+    
+    bool operator!=(const B& rhs){
+        return this != &rhs;
+    }
+
+
+    int* begin()
+    {
+        return &v[0];
+    }
+
+    int* end()
+    {
+        return &v[10];
+    }
+
+
+    int v[10];
+/* public: inline constexpr B(const B &); */
+/* public: inline constexpr B(B &&); */
+};
+
+int* begin(A& v)
+{
+    return &v.v[0];
+}
+
+int* end(A& v)
+{
+    return &v.v[10];
+}
+
+int main()
+{
+    char arr[10]{2,4,6,8,10,12,14,16,18,20};
+
+    {
+       auto&& __range1 = arr;
+       char * __begin1 = __range1;
+       char * __end1 = __range1 + 10l;
+       
+       for( ; __begin1 != __end1; ++__begin1 )
+       {
+         char c = *__begin1;
+         printf("%#x\n", static_cast<int>(c));
+         c++;
+         printf("%#x\n", static_cast<int>(c));
+       }
+     }
+
+    std::vector<int> v{1, 2, 3, 5};
+
+    {
+       auto&& __range1 = v;
+       std::__wrap_iter<int *> __begin1 = __range1.begin();
+       std::__wrap_iter<int *> __end1 = __range1.end();
+       
+       for( ; std::operator!=(__begin1, __end1); __begin1.operator++() )
+       {
+         int & vv = __begin1.operator*();
+         printf("%d\n", vv);
+       }
+     }
+
+    {
+       auto&& __range1 = v;
+       std::__wrap_iter<int *> __begin1 = __range1.begin();
+       std::__wrap_iter<int *> __end1 = __range1.end();
+       
+       for( ; std::operator!=(__begin1, __end1); __begin1.operator++() )
+       {
+         int & v2 = __begin1.operator*();
+         printf("%d\n", v2);
+       }
+     };
+
+    A a;
+    {
+       auto&& __range1 = a;
+       int * __begin1 = begin(__range1);
+       int * __end1 = end(__range1);
+       
+       for( ; __begin1 != __end1; ++__begin1 )
+       {
+         int it = *__begin1;
+         printf("%d\n", it);
+       }
+     }
+
+    B b;
+    {
+       auto&& __range1 = b;
+       int * __begin1 = __range1.begin();
+       int * __end1 = __range1.end();
+       
+       for( ; __begin1 != __end1; ++__begin1 )
+       {
+         int bit = *__begin1;
+         printf("%d\n", bit);
+       }
+     }
+    
+}

@@ -1,0 +1,74 @@
+class Test
+{
+public:
+    Test(): mV{} {}
+
+    Test(int v)
+    : mV{v}
+    {}
+
+    Test(Test& v)
+    : mV{v.mV}
+    {}
+
+  
+    Test& operator=(const Test& other)
+    {
+        mV = other.mV;
+        return *this;
+    }
+
+    Test& operator++()
+    {
+        mV++;
+        return *this;
+    }
+
+    Test operator++(int)
+    {
+        Test tmp(*this) /* NRVO variable */;
+        operator++();
+        return tmp;  
+    }    
+
+    Test& operator+=(const Test& rhs) 
+  {              
+    mV += rhs.mV;
+    return *this; 
+  }
+ 
+  operator int() { return mV; }
+
+private:
+    int mV;
+/* public: inline ~Test() noexcept; */
+};
+
+
+struct S
+{
+    Test count;
+    
+/* public: inline S(S &); */
+/* public: inline S & operator=(S &&); */
+/* public: inline S() noexcept; */
+};
+
+int main()
+{
+    S s;
+	S s2;
+  
+    s.count.operator++(0);
+
+    Test t;
+  
+	char * raw = reinterpret_cast<char*>(&s+1);
+	Test * p =  reinterpret_cast<Test*>(&raw[static_cast<long>(static_cast<int>(s.count.operator int()))]); // missing the user-defined converion op here for s.count to int
+    (*p).operator=((t));
+    (*p).operator=(s2.count);
+  
+    s.count.operator+=(Test(static_cast<int>(sizeof(p))));
+    s.count.operator+=(Test(static_cast<int>(alignof(p))));
+    s.count.operator+=(Test(p ? 1 : 2));    
+}

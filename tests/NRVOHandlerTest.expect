@@ -1,0 +1,33 @@
+#include <cstdio>
+
+struct C
+{
+    C() = default;
+    C(const C&) { printf("Copy\n"); }
+/* public: inline constexpr C() noexcept; */
+/* public: inline ~C() noexcept; */
+};
+
+C f()
+{
+    C namedC{} /* NRVO variable */;
+    
+    return namedC;
+}
+
+C f2()
+{
+    C namedC{};
+    C namedC2{namedC} /* NRVO variable */;
+    
+    return namedC2;
+}
+
+
+int main()
+{
+    printf( "Hello\n");
+
+    C obj = f();    
+    C obj2 = f2();    
+}

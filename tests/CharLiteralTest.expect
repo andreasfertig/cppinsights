@@ -1,0 +1,91 @@
+template<typename BT>
+struct Foo
+{
+    BT raw;
+
+    Foo()             = default;
+    Foo(const Foo& v) = default;
+    constexpr Foo(BT v)
+    : BT(v)
+    {
+    }
+    constexpr operator BT() const { return this->raw; }
+    Foo&      operator=(const Foo& rhs) = default;
+
+    Foo& operator=(BT v)
+    {
+        this->raw = v;
+        return *this;
+    }
+    void operator=(BT v) volatile { this->raw = v; }
+};
+/* First instantiated from: CharLiteralTest.cpp:61 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Foo<int>
+{
+  
+};
+
+#endif
+
+/* First instantiated from: CharLiteralTest.cpp:60 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Foo<char>
+{
+  
+};
+
+#endif
+
+
+using Int  = Foo<int>;
+using Char = Foo<char>;
+
+class Test
+{
+public:
+    void Apply()
+    {
+        Char* data            = mData;
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\0');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\n');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\\');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\'');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\a');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\b');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\f');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\r');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\t');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\v');
+
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(L'\n'));
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(u8'\n');
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(u'\n'));
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(U'\n'));
+
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3u);
+
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ul);
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ull);
+
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ll);
+        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3l);
+    }
+
+    Int GetLength() const { return mLength; }
+
+private:
+    Char mData[1024];
+    Int  mLength;
+/* public: inline constexpr Test(const Test &); */
+/* public: inline constexpr Test(Test &&); */
+/* public: inline constexpr Test & operator=(Test &&); */
+/* public: inline Test() noexcept; */
+};
+
+int main()
+{
+    Test t;
+
+    t.Apply();
+}

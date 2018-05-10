@@ -1,0 +1,36 @@
+int main() 
+{
+    char buffer;
+
+     class __lambda_4
+     {
+       public: inline /*constexpr */ void operator()() const
+       {
+         __lambda_6.operator()();
+       }
+       
+       private:
+       char& buffer;
+       
+       public: __lambda_4(char& _buffer)
+       : buffer{_buffer}
+
+         class __lambda_6
+         {
+           public: inline /*constexpr */ void operator()() const
+           {
+             buffer = 2;
+           }
+           
+           private:
+           char& buffer;
+           
+           public: __lambda_6(char& _buffer)
+           : buffer{_buffer}
+           {}
+           
+         };
+         
+                {__lambda_6{buffer}_4{buffer}();
+
+}

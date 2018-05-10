@@ -1,0 +1,97 @@
+#include <cstdio>
+#include <string>
+template<typename T>
+static inline decltype(auto) Normalize(const T& arg)
+{
+  if constexpr(std::is_same_v<T, std::string>) {
+    return arg.c_str();
+  } else {
+    return arg;
+  }
+}
+
+/* First instantiated from: TemplateArgumentsTest.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline static char const (&)[8] Normalize<char [8]>(char const &[8] arg)
+{
+  if constexpr( std::is_same_v<char [8], std::basic_string<char>> ) ;
+  else /* constexpr */ {
+    return arg;
+  }
+}
+#endif
+
+
+/* First instantiated from: TemplateArgumentsTest.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline static const int & Normalize<int>(const int & arg)
+{
+  if constexpr( std::is_same_v<int, std::basic_string<char>> ) ;
+  else /* constexpr */ {
+    return arg;
+  }
+}
+#endif
+
+
+/* First instantiated from: TemplateArgumentsTest.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline static const char * Normalize<std::basic_string<char> >(std::basic_string<char> & arg)
+{
+  if constexpr( std::is_same_v<std::basic_string<char>, std::basic_string<char>> ) {
+    return arg.c_str();
+  }
+}
+#endif
+
+
+template<typename... Ts>
+void Log(const char* fmt, const Ts&... ts)
+{
+  printf(fmt, Normalize(ts)...);
+}
+
+/* First instantiated from: TemplateArgumentsTest.cpp:23 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Log<char [8]>(const char * fmt, char const &[8] ts)
+{
+  printf(fmt, Normalize(ts));
+}
+#endif
+
+
+/* First instantiated from: TemplateArgumentsTest.cpp:25 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Log<int>(const char * fmt, const int & ts)
+{
+  printf(fmt, Normalize(ts));
+}
+#endif
+
+
+/* First instantiated from: TemplateArgumentsTest.cpp:28 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Log<std::basic_string<char> >(const char * fmt, std::basic_string<char> & ts)
+{
+  printf(fmt, Normalize(ts));
+}
+#endif
+
+
+int main()
+{
+  int result = 0x22;
+
+  Log("Hello World %s\n", "nothing");
+
+  Log("And the number is %d\n", result);
+
+  std::string test{"Hello"};
+  Log("%s\n", test);
+}

@@ -1,0 +1,28 @@
+// https://mbevin.wordpress.com/2012/11/14/range-based-for/
+class MyArrayWrapper {
+   int* data;
+   int size;
+
+public:
+   int* begin() { return size>0 ? &data[0] : nullptr; }
+   int* end()   { return size>0 ? &data[size-1] : nullptr; }
+/* public: inline MyArrayWrapper() noexcept; */
+/* public: inline constexpr MyArrayWrapper(const MyArrayWrapper &); */
+/* public: inline constexpr MyArrayWrapper(MyArrayWrapper &&); */
+};
+
+
+int main() {
+    MyArrayWrapper arr;
+    {
+       auto&& __range1 = arr;
+       int * __begin1 = __range1.begin();
+       int * __end1 = __range1.end();
+       
+       for( ; __begin1 != __end1; ++__begin1 )
+       {
+         int i = *__begin1;
+       }
+     }
+
+}
