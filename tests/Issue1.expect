@@ -1,0 +1,25 @@
+template<typename T> T foo() {return T(42); }
+
+/* First instantiated from: Issue1.cpp:4 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int foo<int>()
+{
+  return int(42);
+}
+#endif
+ 
+template<typename T> T fooGood() {return T{42}; }
+
+/* First instantiated from: Issue1.cpp:5 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int fooGood<int>()
+{
+  return int{ 42 };
+}
+#endif
+ 
+
+int a = foo<int>();
+int b = fooGood<int>();
