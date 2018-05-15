@@ -2,7 +2,7 @@
 
 cd /home/builder/build_docker
 
-cmake -G Ninja -DINSIGHT_STATIC=Yes -DINSIGHT_LLVM_CONFIG=/usr/bin/llvm-config-7 ../clang/
+cmake -G Ninja -DINSIGHTS_STATIC=Yes -DINSIGHTS_LLVM_CONFIG=/usr/bin/llvm-config-7 ../clang/
 ninja
 
 
