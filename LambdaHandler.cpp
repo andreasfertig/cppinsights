@@ -224,11 +224,11 @@ void LambdaHandler::run(const MatchFinder::MatchResult& result)
         const std::string ctorVarTypeName = GetCaptureTypeNameAsParameter(varType, StrCat("_", varNamePlain));
 
         ctor.append(ctorVarTypeName);
-        inits.append(StrCat(((c.getCaptureKind() == LCK_StarThis) ? "*" : ""), varNamePlain));
 
         outputFormatHelper.Append(varTypeName);
 
-        switch(c.getCaptureKind()) {
+        const auto captureKind = c.getCaptureKind();
+        switch(captureKind) {
             case LCK_This: break;
             case LCK_StarThis: break;
             case LCK_ByCopy: break;
@@ -241,6 +241,17 @@ void LambdaHandler::run(const MatchFinder::MatchResult& result)
                     outputFormatHelper.Append("&");
                 }
                 break;
+        }
+
+        // If we initialize by copy we can assign a variable: [a=b[1]], get this assigned variable (b[1]) and not a in
+        // this case.
+        if(!c.capturesThis() && capturedVar->hasInit() && (captureKind == LCK_ByCopy)) {
+            OutputFormatHelper ofm;
+            CodeGenerator      codeGenerator{ofm};
+            codeGenerator.InsertArg(captureInit);
+            inits.append(ofm.GetString());
+        } else {
+            inits.append(StrCat(((c.getCaptureKind() == LCK_StarThis) ? "*" : ""), varNamePlain));
         }
 
         if(!varType->isArrayType()) {

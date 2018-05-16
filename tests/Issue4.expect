@@ -1,0 +1,27 @@
+#include <cstdio>
+//#include <vector>
+//#include <iostream>
+using namespace std;
+
+int main()
+{
+  	static const char arr[] = { 1,2,3 };
+
+  class __lambda_9
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("a: %c\n", static_cast<int>(uuu));
+    }
+    
+    private:
+    char uuu;
+    
+    public: __lambda_9(char _uuu)
+    : uuu{_uuu}
+    {}
+    
+  };
+  
+  	__lambda_9 && l=__lambda_9{arr[1]};
+}
