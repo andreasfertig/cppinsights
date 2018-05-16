@@ -795,12 +795,23 @@ void CodeGenerator::InsertArg(const CXXBindTemporaryExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXFunctionalCastExpr* stmt)
 {
+    const bool isConstructor = isa<CXXConstructExpr>(stmt->getSubExpr());
+    const bool needsParens   = !isConstructor && !stmt->isListInitialization();
+
     // If a constructor follows we do not need to insert the type name. This would insert it twice.
-    if(!isa<CXXConstructExpr>(stmt->getSubExpr())) {
+    if(!isConstructor) {
         mOutputFormatHelper.Append(GetName(stmt->getTypeAsWritten()));
     }
 
+    if(needsParens) {
+        mOutputFormatHelper.Append('(');
+    }
+
     InsertArg(stmt->getSubExpr());
+
+    if(needsParens) {
+        mOutputFormatHelper.Append(')');
+    }
 }
 //-----------------------------------------------------------------------------
 
