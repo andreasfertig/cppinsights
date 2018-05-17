@@ -55,7 +55,7 @@ void foo2() {
   template<int fp(void)> class testDecl { };
   /* First instantiated from: TemplateExpansionTest.cpp:45 */
   #ifdef INSIGHTS_USE_TEMPLATE
-  class testDecl</* INSIGHTS-TODO: CodeGenerator.cpp:927 stmt: Function */>
+  class testDecl</* INSIGHTS-TODO: CodeGenerator.cpp:931 stmt: Function */>
   {
     
   };

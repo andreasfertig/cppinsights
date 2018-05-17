@@ -281,6 +281,7 @@ add_clang_executable(insights
     RangeForStmtHandler.cpp
     StaticAssertHandler.cpp
     StaticHandler.cpp
+    StdInitializerListHandler.cpp
     StructuredBindingsHandler.cpp
     TemplateHandler.cpp
     UserDefinedLiteralHandler.cpp

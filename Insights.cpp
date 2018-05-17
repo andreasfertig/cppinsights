@@ -42,6 +42,7 @@
 #include "RangeForStmtHandler.h"
 #include "StaticAssertHandler.h"
 #include "StaticHandler.h"
+#include "StdInitializerListHandler.h"
 #include "StructuredBindingsHandler.h"
 #include "TemplateHandler.h"
 #include "UserDefinedLiteralHandler.h"
@@ -86,6 +87,7 @@ public:
     , mAutoStmtHandler{rewriter, mMatcher}
     , mNrvoHandler{rewriter, mMatcher}
     , mUserDefinedLiteralHandler{rewriter, mMatcher}
+    , mStdInitializerListHandler{rewriter, mMatcher}
     {
     }
 
@@ -106,6 +108,7 @@ private:
     AutoStmtHandler           mAutoStmtHandler;
     NRVOHandler               mNrvoHandler;
     UserDefinedLiteralHandler mUserDefinedLiteralHandler;
+    StdInitializerListHandler mStdInitializerListHandler;
 };
 //-----------------------------------------------------------------------------
 

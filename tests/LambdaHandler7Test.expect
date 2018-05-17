@@ -3,7 +3,7 @@
 
 int main()
 {
-  std::vector<int> myVec{1,2,3,4,5};
+  std::vector<int> myVec{ std::initializer_list<int>{ 1, 2, 3, 4, 5 } };
 
 
    class __lambda_8_57

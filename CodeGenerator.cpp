@@ -899,6 +899,9 @@ void CodeGenerator::InsertArg(const CXXDefaultArgExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 {
+    // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's are
+    // not allowed there.
+    mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
     InsertArg(stmt->getSubExpr());
 }
 //-----------------------------------------------------------------------------
