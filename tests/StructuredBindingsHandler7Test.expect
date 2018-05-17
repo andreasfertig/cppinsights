@@ -2,7 +2,7 @@ int main() {
     char buffer[2];
 
 
-     class __lambda_4
+     class __lambda_4_5
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -14,13 +14,13 @@ int main() {
        private:
        char (&buffer)[2];
        
-       public: __lambda_4(char (&_buffer)[2])
+       public: __lambda_4_5(char (&_buffer)[2])
        : buffer{_buffer}
        {}
        
      };
      
-         __lambda_4{buffer}();
+         __lambda_4_5{buffer}();
 }
 
 #if 0

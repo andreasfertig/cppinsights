@@ -6,7 +6,7 @@ class Bar
     : a{1}
     {
 
-         class __lambda_8
+         class __lambda_8_18
          {
            public: inline /*constexpr */ void operator()() const
            {
@@ -16,13 +16,13 @@ class Bar
            private:
            Bar * __this;
            
-           public: __lambda_8(Bar * ___this)
+           public: __lambda_8_18(Bar * ___this)
            : __this{___this}
            {}
            
          };
          
-                 __lambda_8 x = __lambda_8{this};
+                 __lambda_8_18 x = __lambda_8_18{this};
     }
 
     int a;
@@ -35,7 +35,7 @@ int main()
     int b = 4;
 
 
-     class __lambda_20
+     class __lambda_20_19
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -45,18 +45,18 @@ int main()
        private:
        int& foo;
        
-       public: __lambda_20(int& _foo)
+       public: __lambda_20_19(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_20 lambda = __lambda_20{foo};
+         __lambda_20_19 lambda = __lambda_20_19{foo};
 
     lambda.operator()();
 
 
-     class __lambda_24
+     class __lambda_24_20
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -65,12 +65,12 @@ int main()
        
      };
      
-         __lambda_24 lambda2 = __lambda_24{};
+         __lambda_24_20 lambda2 = __lambda_24_20{};
 
     lambda2.operator()();
 
 
-     class __lambda_28
+     class __lambda_28_20
      {
        public: inline /*constexpr */ int operator()()
        {
@@ -81,18 +81,18 @@ int main()
        private:
        int& foo;
        
-       public: __lambda_28(int& _foo)
+       public: __lambda_28_20(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_28 lambda3 = __lambda_28{foo};
+         __lambda_28_20 lambda3 = __lambda_28_20{foo};
 
     lambda3.operator()();
 
 
-     class __lambda_32
+     class __lambda_32_20
      {
        public: inline /*constexpr */ int operator()(int x) const
        {
@@ -103,16 +103,16 @@ int main()
        private:
        int& foo;
        
-       public: __lambda_32(int& _foo)
+       public: __lambda_32_20(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_32 lambda4 = __lambda_32{foo};
+         __lambda_32_20 lambda4 = __lambda_32_20{foo};
 
 
-     class __lambda_34
+     class __lambda_34_20
      {
        public: inline /*constexpr */ int operator()(const int x) const
        {
@@ -123,16 +123,16 @@ int main()
        private:
        int& foo;
        
-       public: __lambda_34(int& _foo)
+       public: __lambda_34_20(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_34 lambda5 = __lambda_34{foo};
+         __lambda_34_20 lambda5 = __lambda_34_20{foo};
 
 
-     class __lambda_36
+     class __lambda_36_20
      {
        public: inline /*constexpr */ int operator()(int & x, int b) const
        {
@@ -143,16 +143,16 @@ int main()
        private:
        int& foo;
        
-       public: __lambda_36(int& _foo)
+       public: __lambda_36_20(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_36 lambda6 = __lambda_36{foo};
+         __lambda_36_20 lambda6 = __lambda_36_20{foo};
 
 
-     class __lambda_38
+     class __lambda_38_20
      {
        public: inline /*constexpr */ int operator()(int & x, int b) const
        {
@@ -163,32 +163,32 @@ int main()
        private:
        int& foo;
        
-       public: __lambda_38(int& _foo)
+       public: __lambda_38_20(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_38 lambda7 = __lambda_38{foo};
+         __lambda_38_20 lambda7 = __lambda_38_20{foo};
     lambda7.operator()(foo, 2);
 
 
-     class __lambda_41
+     class __lambda_41_21
      {
        
        private:
        int& foo;
        
-       public: __lambda_41(int& _foo)
+       public: __lambda_41_21(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_41 lambda71 = __lambda_41{foo};
+         __lambda_41_21 lambda71 = __lambda_41_21{foo};
 
 
-     class __lambda_43
+     class __lambda_43_21
      {
        public: inline /*constexpr */ int operator()(int & x, const int & b, const int c) const
        {
@@ -199,17 +199,17 @@ int main()
        private:
        int& foo;
        
-       public: __lambda_43(int& _foo)
+       public: __lambda_43_21(int& _foo)
        : foo{_foo}
        {}
        
      };
      
-         __lambda_43 lambda73 = __lambda_43{foo};
+         __lambda_43_21 lambda73 = __lambda_43_21{foo};
     lambda73.operator()(foo, b, 44);
 
 
-     class __lambda_46
+     class __lambda_46_20
      {
        public: inline /*constexpr */ int operator()(int & x, int b) const
        {
@@ -221,17 +221,17 @@ int main()
        int foo;
        int b;
        
-       public: __lambda_46(int _foo, int _b)
+       public: __lambda_46_20(int _foo, int _b)
        : foo{_foo}
 , b{_b}
        {}
        
      };
      
-         __lambda_46 lambda8 = __lambda_46{foo, b};
+         __lambda_46_20 lambda8 = __lambda_46_20{foo, b};
 
 
-     class __lambda_48
+     class __lambda_48_20
      {
        public: inline /*constexpr */ int operator()(int & x, int b) const noexcept
        {
@@ -243,12 +243,12 @@ int main()
        int foo;
        int b;
        
-       public: __lambda_48(int _foo, int _b)
+       public: __lambda_48_20(int _foo, int _b)
        : foo{_foo}
 , b{_b}
        {}
        
      };
      
-         __lambda_48 lambda9 = __lambda_48{foo, b};
+         __lambda_48_20 lambda9 = __lambda_48_20{foo, b};
 }

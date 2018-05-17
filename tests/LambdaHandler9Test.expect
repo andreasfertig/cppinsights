@@ -3,7 +3,7 @@
 int main()
 {
 
-     class __lambda_5
+     class __lambda_5_14
      {
        public: inline void operator()() const
        {
@@ -23,12 +23,12 @@ int main()
        
      };
      
-         __lambda_5 l = __lambda_5{};
+         __lambda_5_14 l = __lambda_5_14{};
 
     l.operator()();
 
 
-     class __lambda_14
+     class __lambda_14_14
      {
        public: inline void operator()() const
        {
@@ -41,13 +41,13 @@ int main()
        
      };
      
-         __lambda_14 w = __lambda_14{};
+         __lambda_14_14 w = __lambda_14_14{};
 
     w.operator()();
 
 
 
-     class __lambda_25
+     class __lambda_25_14
      {
        public: inline /*constexpr */ void operator()(int x) const
        {
@@ -60,13 +60,13 @@ int main()
        
      };
      
-         __lambda_25 s = __lambda_25{};
+         __lambda_25_14 s = __lambda_25_14{};
 
     s.operator()(4);
 
 
 
-     class __lambda_36
+     class __lambda_36_14
      {
        public: inline void operator()() const
        {
@@ -80,12 +80,12 @@ int main()
        
      };
      
-         __lambda_36 f = __lambda_36{};
+         __lambda_36_14 f = __lambda_36_14{};
 
     f.operator()();
 
 
-     class __lambda_45
+     class __lambda_45_15
      {
        public: inline void operator()() const
        {
@@ -99,7 +99,7 @@ int main()
        
      };
      
-         __lambda_45 f2 = __lambda_45{};
+         __lambda_45_15 f2 = __lambda_45_15{};
 
     f2.operator()();
 }

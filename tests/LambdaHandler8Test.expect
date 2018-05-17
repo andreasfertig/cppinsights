@@ -7,7 +7,7 @@ int Test(T&& t)
 /* First instantiated from: LambdaHandler8Test.cpp:9 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int Test<__lambda_9>(__lambda_9 && t)
+int Test<__lambda_9_18>(__lambda_9_18 && t)
 {
   return t.operator()();
 }
@@ -17,7 +17,7 @@ int Test<__lambda_9>(__lambda_9 && t)
 int get(int& v){
 
 
-   class __lambda_9
+   class __lambda_9_18
    {
      public: inline /*constexpr */ int operator()() const
      {
@@ -27,13 +27,13 @@ int get(int& v){
      private:
      int & v;
      
-     public: __lambda_9(int & _v)
+     public: __lambda_9_18(int & _v)
      : v{_v}
      {}
      
    };
    
-     int x = Test( __lambda_9{v});
+     int x = Test( __lambda_9_18{v});
 
   return x;
 }

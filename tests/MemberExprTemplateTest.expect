@@ -8,7 +8,7 @@
 
   void test(X x) {
 
-     class __lambda_10
+     class __lambda_10_5
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -19,12 +19,12 @@
        private:
        X& x;
        
-       public: __lambda_10(X& _x)
+       public: __lambda_10_5(X& _x)
        : x{_x}
        {}
        
      };
      
-         __lambda_10{x}();
+         __lambda_10_5{x}();
 
 }

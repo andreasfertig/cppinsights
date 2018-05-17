@@ -40,7 +40,7 @@ inline void test(TB aa)
 /* First instantiated from: LambdaHandlerVLATest.cpp:36 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline void test<__lambda_36>(__lambda_36 aa)
+inline void test<__lambda_36_8>(__lambda_36_8 aa)
 {
 }
 #endif
@@ -52,7 +52,7 @@ inline SA<TA>::SA(const int & PA)
   float e[nt];
   
 
-   class __lambda_36
+   class __lambda_36_8
    {
      public: inline auto operator()(int i, int j) const
      {
@@ -62,13 +62,13 @@ inline SA<TA>::SA(const int & PA)
      private:
      float (&e)[this->nt];
      
-     public: __lambda_36(float (&_e)[this->nt])
+     public: __lambda_36_8(float (&_e)[this->nt])
      : e{_e}
      {}
      
    };
    
-     test(__lambda_36{e});
+     test(__lambda_36_8{e});
 }
 
 int main()

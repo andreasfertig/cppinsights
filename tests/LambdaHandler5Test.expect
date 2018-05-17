@@ -2,7 +2,7 @@ int main()
 {
   // empty lambda directly invoked with empty body
 
-     class __lambda_4
+     class __lambda_4_5
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -10,11 +10,11 @@ int main()
        
      };
      
-         __lambda_4{}();
+         __lambda_4_5{}();
 
 
 
-     class __lambda_7
+     class __lambda_7_5
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -23,14 +23,14 @@ int main()
        
      };
      
-         __lambda_7{}();
+         __lambda_7_5{}();
 
 
     int a;
     int b;
 
 
-     class __lambda_13
+     class __lambda_13_5
      {
        public: inline /*constexpr */ void operator()(int & x, int & y) const
        {
@@ -39,7 +39,7 @@ int main()
        
      };
      
-         __lambda_13{}(a, b);
+         __lambda_13_5{}(a, b);
     
 }
 

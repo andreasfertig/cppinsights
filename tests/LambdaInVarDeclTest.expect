@@ -4,7 +4,7 @@ int main()
 
     for(auto& c: buffer) {
 
-         class __lambda_6
+         class __lambda_6_17
          {
            public: inline /*constexpr */ char operator()() const
            {
@@ -14,13 +14,13 @@ int main()
            private:
            char & c;
            
-           public: __lambda_6(char & _c)
+           public: __lambda_6_17(char & _c)
            : c{_c}
            {}
            
          };
          
-                 int x = __lambda_6{c}();
+                 int x = __lambda_6_17{c}();
     }
 }
 

@@ -7,7 +7,7 @@ int main()
 {
   	static const char arr[] = { 1,2,3 };
 
-  class __lambda_9
+  class __lambda_9_11
   {
     public: inline /*constexpr */ void operator()() const
     {
@@ -17,11 +17,11 @@ int main()
     private:
     char uuu;
     
-    public: __lambda_9(char _uuu)
+    public: __lambda_9_11(char _uuu)
     : uuu{_uuu}
     {}
     
   };
   
-  	__lambda_9 && l=__lambda_9{arr[1]};
+  	__lambda_9_11 && l=__lambda_9_11{arr[1]};
 }

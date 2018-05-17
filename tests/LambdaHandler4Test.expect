@@ -4,7 +4,7 @@ class Foo
     :mX{0}
     {
 
-         class __lambda_6
+         class __lambda_6_18
          {
            public: inline /*constexpr */ void operator()() const
            {
@@ -14,16 +14,16 @@ class Foo
            private:
            Foo * __this;
            
-           public: __lambda_6(Foo * ___this)
+           public: __lambda_6_18(Foo * ___this)
            : __this{___this}
            {}
            
          };
          
-                 __lambda_6 f = __lambda_6{this};
+                 __lambda_6_18 f = __lambda_6_18{this};
 
 
-         class __lambda_10
+         class __lambda_10_18
          {
            public: inline /*constexpr */ void operator()() const
            {
@@ -33,16 +33,16 @@ class Foo
            private:
            Foo * __this;
            
-           public: __lambda_10(Foo * ___this)
+           public: __lambda_10_18(Foo * ___this)
            : __this{___this}
            {}
            
          };
          
-                 __lambda_10 g = __lambda_10{this};
+                 __lambda_10_18 g = __lambda_10_18{this};
 
 
-         class __lambda_14
+         class __lambda_14_18
          {
            public: inline /*constexpr */ void operator()() const
            {
@@ -52,13 +52,13 @@ class Foo
            private:
            Foo __this;
            
-           public: __lambda_14(Foo ___this)
+           public: __lambda_14_18(Foo ___this)
            : __this{___this}
            {}
            
          };
          
-                 __lambda_14 h = __lambda_14{*this};
+                 __lambda_14_18 h = __lambda_14_18{*this};
         
     }
 
@@ -81,7 +81,7 @@ struct X {
     {
         // the context of the following lambda is the member function X::f
 
-         class __lambda_35
+         class __lambda_35_9
          {
            public: inline /*constexpr */ int operator()() const
            {
@@ -91,11 +91,11 @@ struct X {
            private:
            X * __this;
            
-           public: __lambda_35(X * ___this)
+           public: __lambda_35_9(X * ___this)
            : __this{___this}
            {}
            
-         } __lambda_35{this};
+         } __lambda_35_9{this};
          
                  [=]()->int
         {

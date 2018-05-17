@@ -6,7 +6,7 @@ int main()
   std::vector<int> myVec{1,2,3,4,5};
 
 
-   class __lambda_8
+   class __lambda_8_57
    {
      public: inline /*constexpr */ int operator()(int fir, int sec) const
      {
@@ -15,5 +15,5 @@ int main()
      
    };
    
-     int fak= std::accumulate(myVec.begin(),myVec.end(),1,__lambda_8{});
+     int fak= std::accumulate(myVec.begin(),myVec.end(),1,__lambda_8_57{});
 }

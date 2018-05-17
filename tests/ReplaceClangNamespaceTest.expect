@@ -9,7 +9,7 @@ namespace mine {
 int main()
 {
 
-     class __lambda_11
+     class __lambda_11_5
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -18,5 +18,5 @@ int main()
        
      };
      
-         __lambda_11{}();
+         __lambda_11_5{}();
 }

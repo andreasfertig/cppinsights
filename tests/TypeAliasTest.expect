@@ -1,7 +1,7 @@
 int main()
 {
 
-    class __lambda_3
+    class __lambda_3_12
     {
       public: inline /*constexpr */ int operator()() const
       {
@@ -15,7 +15,7 @@ int main()
       
     };
     
-       int w = __lambda_3{}();
+       int w = __lambda_3_12{}();
 
 #if 0
    []() {

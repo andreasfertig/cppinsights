@@ -7,7 +7,7 @@ int Is(const T x)
 /* First instantiated from: LambdaHandler3Test.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int Is<__lambda_10>(const __lambda_10 x)
+int Is<__lambda_10_13>(const __lambda_10_13 x)
 {
   return x.operator()(22);
 }
@@ -18,7 +18,7 @@ int main()
 {
   int y = 3;
 
-          class __lambda_10
+          class __lambda_10_13
           {
             public: inline /*constexpr */ int operator()(int x) const
             {
@@ -28,12 +28,12 @@ int main()
             private:
             int& y;
             
-            public: __lambda_10(int& _y)
+            public: __lambda_10_13(int& _y)
             : y{_y}
             {}
             
           };
           
-            return Is(__lambda_10{y});
+            return Is(__lambda_10_13{y});
 }
 

@@ -2,7 +2,7 @@
 
 int main() {
 
-     class __lambda_4
+     class __lambda_4_28
      {
        public: using retType = int (*)(int, char);
        inline /*constexpr */ operator retType () const
@@ -20,7 +20,7 @@ int main() {
        
      };
      
-         int (*fp)(int, char) = __lambda_4{};
+         int (*fp)(int, char) = __lambda_4_28{};
 
 #if 0
 struct /* anonymous */

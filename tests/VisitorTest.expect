@@ -1,7 +1,7 @@
 template<class... Ts> struct visitor: Ts... { using Ts::operator()...; };
 /* First instantiated from: VisitorTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class visitor<__lambda_8, __lambda_9>
+class visitor<__lambda_8_7, __lambda_9_7>
 {
   
 };
@@ -14,7 +14,7 @@ template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
 int main()
 {
 
-     class __lambda_8
+     class __lambda_8_7
      {
        public: inline /*constexpr */ void operator()(int value) const
        {
@@ -23,7 +23,7 @@ int main()
      };
      
      
-     class __lambda_9
+     class __lambda_9_7
      {
        public: inline /*constexpr */ void operator()(const char * value) const
        {
@@ -31,12 +31,12 @@ int main()
        
      };
      
-         visitor<__lambda_8, __lambda_9> my_visitor = visitor{
-      __lambda_8{},
-      __lambda_9{},
+         visitor<__lambda_8_7, __lambda_9_7> my_visitor = visitor{
+      __lambda_8_7{},
+      __lambda_9_7{},
     };
 
 
-    static_cast<const __lambda_9&>(my_visitor).operator()("hello");
-    static_cast<const __lambda_8&>(my_visitor).operator()(2);
+    static_cast<const __lambda_9_7&>(my_visitor).operator()("hello");
+    static_cast<const __lambda_8_7&>(my_visitor).operator()(2);
 }

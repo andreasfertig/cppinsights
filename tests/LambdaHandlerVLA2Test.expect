@@ -4,7 +4,7 @@ void Test(int n)
 
 
 
-     class __lambda_6
+     class __lambda_6_5
      {
        public: inline /*constexpr */ bool operator()(int i, int x) const
        {
@@ -14,13 +14,13 @@ void Test(int n)
        private:
        char (&buffer)[n];
        
-       public: __lambda_6(char (&_buffer)[n])
+       public: __lambda_6_5(char (&_buffer)[n])
        : buffer{_buffer}
        {}
        
      };
      
-         __lambda_6{buffer}(1, 2);
+         __lambda_6_5{buffer}(1, 2);
 }
 
 int main()

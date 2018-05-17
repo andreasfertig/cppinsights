@@ -8,7 +8,7 @@ struct A
     {
         int i = 0;
 
-         class __lambda_10
+         class __lambda_10_38
          {
            public: inline /*constexpr */ int operator()() const
            {
@@ -18,13 +18,13 @@ struct A
            private:
            int& i;
            
-           public: __lambda_10(int& _i)
+           public: __lambda_10_38(int& _i)
            : i{_i}
            {}
            
          };
          
-                 std::generate(&v[0], &v[10], __lambda_10{i});
+                 std::generate(&v[0], &v[10], __lambda_10_38{i});
     }
 
     int v[10];
@@ -39,7 +39,7 @@ struct B
     {
         int i = 0;
 
-         class __lambda_22
+         class __lambda_22_38
          {
            public: inline /*constexpr */ int operator()() const
            {
@@ -49,13 +49,13 @@ struct B
            private:
            int& i;
            
-           public: __lambda_22(int& _i)
+           public: __lambda_22_38(int& _i)
            : i{_i}
            {}
            
          };
          
-                 std::generate(&v[0], &v[10], __lambda_22{i});
+                 std::generate(&v[0], &v[10], __lambda_22_38{i});
     }
 
     

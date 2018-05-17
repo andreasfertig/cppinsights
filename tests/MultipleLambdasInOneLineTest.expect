@@ -1,0 +1,26 @@
+#include <cstdio>
+
+int main()
+{
+
+   class __lambda_5_3
+   {
+     public: inline /*constexpr */ void operator()() const
+     {
+       printf("Hello ");
+     }
+     
+   };
+   
+   
+                                 class __lambda_5_33
+                                 {
+                                   public: inline /*constexpr */ void operator()() const
+                                   {
+                                     printf("world");
+                                   }
+                                   
+                                 };
+                                 
+                                   __lambda_5_3{}(), __lambda_5_33{}();
+}

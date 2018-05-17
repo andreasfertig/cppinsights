@@ -58,7 +58,7 @@ private:
 int main()
 {
 
-     class __lambda_60
+     class __lambda_60_5
      {
        public: inline void operator()() const
        {
@@ -88,7 +88,7 @@ int main()
        
      };
      
-         __lambda_60{}();
+         __lambda_60_5{}();
 
 
     int n = 10;

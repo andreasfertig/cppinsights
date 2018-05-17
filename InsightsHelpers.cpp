@@ -106,10 +106,11 @@ static void InsertAfter(std::string& source, const std::string& find, const std:
 std::string GetLambdaName(const CXXRecordDecl& lambda)
 {
     static const std::string lambdaPrefix{"__lambda_"};
-    const auto&              sm     = GetSM(lambda);
-    const auto               lineNo = sm.getSpellingLineNumber(lambda.getLocStart());
+    const auto&              sm       = GetSM(lambda);
+    const auto               lineNo   = sm.getSpellingLineNumber(lambda.getLocStart());
+    const auto               columnNo = sm.getSpellingColumnNumber(lambda.getLocStart());
 
-    return StrCat(lambdaPrefix, std::to_string(lineNo));
+    return StrCat(lambdaPrefix, std::to_string(lineNo), "_", std::to_string(columnNo));
 }
 //-----------------------------------------------------------------------------
 

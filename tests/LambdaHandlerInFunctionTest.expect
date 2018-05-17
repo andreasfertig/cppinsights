@@ -8,7 +8,7 @@ void Test(T&& t)
 /* First instantiated from: LambdaHandlerInFunctionTest.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void Test<__lambda_10>(__lambda_10 && t)
+void Test<__lambda_10_10>(__lambda_10_10 && t)
 {
 }
 #endif
@@ -26,7 +26,7 @@ void Test<int>(int && t)
 int main()
 {
 
-     class __lambda_10
+     class __lambda_10_10
      {
        public: inline /*constexpr */ void operator()() const
        {
@@ -35,10 +35,10 @@ int main()
        
      };
      
-         Test(__lambda_10{});
+         Test(__lambda_10_10{});
     
 
-          class __lambda_12
+          class __lambda_12_10
           {
             public: inline /*constexpr */ int operator()() const
             {
@@ -48,5 +48,5 @@ int main()
             
           };
           
-              Test(__lambda_12{}());
+              Test(__lambda_12_10{}());
 }
