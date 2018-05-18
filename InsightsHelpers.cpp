@@ -171,13 +171,10 @@ static std::string GetScope(const DeclContext* declCtx)
     if(!declCtx->isTranslationUnit() && !declCtx->isFunctionOrMethod()) {
 
         while(declCtx->isInlineNamespace()) {
-            DPrint("inline\n");
             declCtx = declCtx->getParent();
         }
 
         if(declCtx->isNamespace() || declCtx->getParent()->isTranslationUnit()) {
-
-            DPrint("namespace\n");
             if(const auto* namespaceDecl = dyn_cast_or_null<NamespaceDecl>(declCtx)) {
                 name = GetQualifiedName(*namespaceDecl);
                 name.append("::");
@@ -377,8 +374,6 @@ std::string GetName(const DeclRefExpr& declRefExpr)
 
         name.append(plainName);
     }
-
-    DPrint("name: %s\n", name);
 
     return name;
 }

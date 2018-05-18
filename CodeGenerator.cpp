@@ -282,15 +282,27 @@ static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
 
 void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 {
+    DPrint("EEEEEEEEEEEE\n");
+    decompositionDeclStmt->getInit()->dump();
+
     const auto* declName = FindDeclRef(decompositionDeclStmt->getInit());
     const auto  baseVarName{[&]() {
         if(declName) {
-            return GetPlainName(*declName);
+            std::string name = GetPlainName(*declName);
+
+            const std::string operatorName{"operator"};
+            if(name.find(operatorName) != std::string::npos) {
+                return operatorName;
+            }
+
+            return name;
         }
 
         Error(decompositionDeclStmt, "unknown decl\n");
         return std::string{""};
     }()};
+
+    DPrint("basename: %s\n", baseVarName);
 
     if(IsConst(*decompositionDeclStmt)) {
         mOutputFormatHelper.Append(kwConstSpace);
@@ -363,7 +375,9 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
 void CodeGenerator::InsertArg(const VarDecl* stmt)
 {
-    if(IsTrivialStaticClassVarDecl(*stmt)) {
+    if(const auto* decompDecl = dyn_cast_or_null<DecompositionDecl>(stmt)) {
+        InsertArg(decompDecl);
+    } else if(IsTrivialStaticClassVarDecl(*stmt)) {
         HandleLocalStaticNonTrivialClass(stmt);
 
     } else {
@@ -863,6 +877,7 @@ void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 void CodeGenerator::InsertArg(const DeclStmt* stmt)
 {
     for(const auto* decl : stmt->decls()) {
+        decl->dump();
         InsertArg(decl);
     }
 }
