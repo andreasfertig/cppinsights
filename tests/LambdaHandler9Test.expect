@@ -9,7 +9,7 @@ int main()
        {
          volatile char buffer[10];
          {
-           auto&& __range1 = buffer;
+           char volatile (&__range1)[10] = buffer;
            volatile char * __begin1 = __range1;
            volatile char * __end1 = __range1 + 10l;
            

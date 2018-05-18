@@ -22,7 +22,7 @@ class MyArrayWrapper<int>
 int main() {
     MyArrayWrapper<int> arr;
     {
-       auto&& __range1 = arr;
+       MyArrayWrapper<int> & __range1 = arr;
        int * __begin1 = __range1.begin();
        int * __end1 = __range1.end();
        

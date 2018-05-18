@@ -188,26 +188,8 @@ static std::string GetScope(const DeclContext* declCtx)
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetName(const QualType& t, const Unqualified unqualified = Unqualified::No)
+static std::string GetNameInternal(const QualType& t, const Unqualified unqualified)
 {
-    const auto  t2 = GetDesugarType(t);
-    const auto* at = t2->getContainedAutoType();
-
-    if(at && at->isSugared()) {
-
-        const auto* autoType = t->getContainedAutoType();
-        const auto  dt       = at->getDeducedType();
-
-        if(dt->isReferenceType() && t->isReferenceType() && !autoType->isDecltypeAuto()) {
-            /* rvalue ref for auto: auto&&
-             * we need to keep auto here due to we need auto&&. type&& is not a universal reference. See:
-             * https://books.google.de/books?id=ZDhIBQAAQBAJ&pg=PT255&lpg=PT255&dq=error:+rvalue+reference+to+type+%27vector%3C...%3E%27+cannot+bind+to+lvalue+of+type+%27vector%3C...%3E%27&source=bl&ots=6-WKbPZqSe&sig=49Zg9WGK59EhRoKy4azYub8H-wQ&hl=de&sa=X&ved=0ahUKEwjNpqqphozaAhUGzFMKHWQ7BI0Q6AEIIjAC#v=onepage&q&f=false
-             */
-            // return StrCat(std::string("auto&& /*"), t.getAsString(), std::string(" */"));
-            return std::string{"auto&&"};
-        }
-    }
-
     if(t.getTypePtrOrNull()) {
         const std::string cvqStr{t.getQualifiers().getAsString()};
         std::string       refOrPointer{};
@@ -278,6 +260,25 @@ static std::string GetName(const QualType& t, const Unqualified unqualified = Un
 
     return GetAsCPPStyleString(t);
 }
+//-----------------------------------------------------------------------------
+
+static std::string GetName(const QualType& t, const Unqualified unqualified = Unqualified::No)
+{
+    const auto  t2 = GetDesugarType(t);
+    const auto* at = t2->getContainedAutoType();
+
+    if(at && at->isSugared()) {
+        const auto dt = at->getDeducedType();
+
+        // treat LValueReference special at this point. This means we are coming from auto&& and it decayed to an
+        // l-value reference.
+        if(dt->isLValueReferenceType()) {
+            return GetNameInternal(dt, unqualified);
+        }
+    }
+
+    return GetNameInternal(t, unqualified);
+}
 }  // namespace details
 //-----------------------------------------------------------------------------
 
@@ -293,15 +294,16 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         if(const auto* lref = dyn_cast_or_null<LValueReferenceType>(t.getTypePtrOrNull())) {
             if(const auto* pt = dyn_cast_or_null<ParenType>(lref->getPointeeType().getTypePtrOrNull())) {
                 if(pt->getInnerType()->isArrayType()) {
-                    DPrint("is array\n");
                     return true;
                 }
+            } else if(isa<ConstantArrayType>(lref->getPointeeType().getTypePtrOrNull())) {
+                return true;
             }
         }
         return false;
     }();
 
-    std::string typeName = GetName(t, unqualified);
+    std::string typeName = details::GetName(t, unqualified);
 
     if(t->isArrayType() && t->isLValueReferenceType()) {
         InsertBefore(typeName, "[", StrCat("(&", varName, ")"));

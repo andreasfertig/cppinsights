@@ -15,7 +15,7 @@ public:
 int main() {
     MyArrayWrapper arr;
     {
-       auto&& __range1 = arr;
+       MyArrayWrapper & __range1 = arr;
        int * __begin1 = __range1.begin();
        int * __end1 = __range1.end();
        

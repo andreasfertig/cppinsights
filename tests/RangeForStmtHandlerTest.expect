@@ -95,7 +95,7 @@ int main()
     char arr[10]{2,4,6,8,10,12,14,16,18,20};
 
     {
-       auto&& __range1 = arr;
+       char (&__range1)[10] = arr;
        char * __begin1 = __range1;
        char * __end1 = __range1 + 10l;
        
@@ -111,7 +111,7 @@ int main()
     std::vector<int> v{1, 2, 3, 5};
 
     {
-       auto&& __range1 = v;
+       std::vector<int, std::allocator<int> > & __range1 = v;
        std::__wrap_iter<int *> __begin1 = __range1.begin();
        std::__wrap_iter<int *> __end1 = __range1.end();
        
@@ -123,7 +123,7 @@ int main()
      }
 
     {
-       auto&& __range1 = v;
+       std::vector<int, std::allocator<int> > & __range1 = v;
        std::__wrap_iter<int *> __begin1 = __range1.begin();
        std::__wrap_iter<int *> __end1 = __range1.end();
        
@@ -136,7 +136,7 @@ int main()
 
     A a;
     {
-       auto&& __range1 = a;
+       A & __range1 = a;
        int * __begin1 = begin(__range1);
        int * __end1 = end(__range1);
        
@@ -149,7 +149,7 @@ int main()
 
     B b;
     {
-       auto&& __range1 = b;
+       B & __range1 = b;
        int * __begin1 = __range1.begin();
        int * __end1 = __range1.end();
        
