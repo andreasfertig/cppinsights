@@ -25,7 +25,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         endif()
     endfunction(check_compiler)
 
-    check_compiler("GNU" 8.0)
+    check_compiler("GNU" 7.3)
     check_compiler("Clang" 6.0)
     check_compiler("AppleClang" 7.0)
 
