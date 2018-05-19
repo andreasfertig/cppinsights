@@ -45,3 +45,4 @@ before_script:
 
 script:
   - make -j 2
+  - ${TRAVIS_BUILD_DIR}/scripts/travis_tests.sh
