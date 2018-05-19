@@ -12,7 +12,7 @@
 ## What
 
 [C++ Insights](https://cppinsights.io) is a [clang](https://clang.llvm.org)-based tool which does a source to source 
-transformation. It's goal is it to make things visible which normally, and intentionally, happen behind the scenes. 
+transformation. Its goal is it to make things visible which normally, and intentionally, happen behind the scenes. 
 It's about the magic the compiler does for us to make things work.
 
 Take this piece of code for example:
