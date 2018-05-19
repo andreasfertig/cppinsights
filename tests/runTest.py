@@ -157,7 +157,19 @@ def main():
         fd, tmpFileName = tempfile.mkstemp('.cpp')
         try:
             with os.fdopen(fd, 'w') as tmp:
-                # do stuff with temp file
+                # stupid replacements for clang 6.0. With 7.0 they added a 1.
+                stdout = stdout.replace('__range ', '__range1')
+                stdout = stdout.replace('__range.', '__range1.')
+                stdout = stdout.replace('__range)', '__range1)')
+                stdout = stdout.replace('__begin ', '__begin1')
+                stdout = stdout.replace('__begin.', '__begin1.')
+                stdout = stdout.replace('__begin,', '__begin1,')
+                stdout = stdout.replace('__end ', '__end1')
+                stdout = stdout.replace('__end.', '__end1.')
+                stdout = stdout.replace('__end;', '__end1;')
+                stdout = stdout.replace('__end)', '__end1)')
+
+                # write the data to the temp file
                 tmp.write(stdout)
 
             equal = testCompare(tmpFileName, stdout, expectFile, f, args)
