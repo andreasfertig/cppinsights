@@ -71,6 +71,24 @@ def testCompile(tmpFileName, f, args, fileName):
     return False
 #------------------------------------------------------------------------------
 
+def getDefaultIncludeDirs(cxx):
+    cmd = [cxx, '-E', '-x', 'c++', '-v', '/dev/null']
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+
+    m = re.findall('\n (/.*)', stderr)
+
+    includes = []
+
+    for x in m:
+        if -1 != x.find('(framework directory)'):
+            continue
+
+        includes.append('-isystem%s' %(x))
+
+    return includes
+#------------------------------------------------------------------------------
+
 
 def main():
     parser = argparse.ArgumentParser(description='Description of your program')
@@ -95,6 +113,9 @@ def main():
     filesPassed     = 0
     missingExpected = 0
     ret             = 0
+
+    defaultIncludeDirs = getDefaultIncludeDirs(args['cxx'])
+
     for f in sorted(cppFiles):
         fileName   = os.path.splitext(f)[0]
         expectFile = os.path.join(mypath, fileName + '.expect')
@@ -110,7 +131,7 @@ def main():
                 p   = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate(input=data)
         else:
-                cmd = [insightsPath, f, '--', '-std=c++1z', '-isystem/usr/local/clang-current/include/c++/v1/', '-isystem/usr/local/clang-current/lib/clang/7.0.0/include']
+                cmd = [insightsPath, f, '--', '-std=c++1z'] + defaultIncludeDirs
                 p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
 
