@@ -9,7 +9,7 @@ matrix:
   include:
 
     # 1/ OSX Builds
-    - env: COMPILER='/Users/travis/build/andreasfertig/travistest/clang/current/bin/clang++' COMPILER_CC='/Users/travis/build/andreasfertig/travistest/clang/current/bin/clang' LLVM_CONFIG='/Users/travis/build/andreasfertig/travistest/clang/current/bin/llvm-config'
+    - env: COMPILER='/Users/travis/build/andreasfertig/cppinsights/clang/current/bin/clang++' COMPILER_CC='/Users/travis/build/andreasfertig/cppinsights/clang/current/bin/clang' LLVM_CONFIG='/Users/travis/build/andreasfertig/cppinsights/clang/current/bin/llvm-config'
       os: osx
       osx_image: xcode9.3
       compiler: clang
@@ -21,7 +21,7 @@ matrix:
           apt:
               sources: *all_sources
               packages: ['clang-7', 'libstdc++-6-dev', 'llvm-7-dev', 'libclang-7-dev', 'zlib1g-dev']
-      env: COMPILER='clang++-7' COMPILER_CC='clang-7'
+      env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG='/usr/bin/llvm-config-7'
 
     # 3/ Linux GCC Builds
     - os: linux
@@ -30,7 +30,7 @@ matrix:
         apt:
           sources: *all_sources
           packages: ['g++-8', 'clang-7', 'libstdc++-6-dev', 'llvm-7-dev', 'libclang-7-dev', 'zlib1g-dev']
-      env: COMPILER='g++-8' COMPILER_CC='gcc-8'
+      env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7'
 
 install:
   - ${TRAVIS_BUILD_DIR}/scripts/travis_install.sh
@@ -41,7 +41,7 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
   - mkdir build
   - cd build
-  - cmake -DINSIGHTS_LLVM_CONFIG=/usr/bin/llvm-config-7  ..
+  - cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG}  ..
 
 script:
   - make -j 2
