@@ -1,3 +1,3 @@
 # C++ Insights - scripts
 
-This folder mostly hosts script for Travis CI builds.
+This folder mostly hosts scripts for Travis CI builds.
