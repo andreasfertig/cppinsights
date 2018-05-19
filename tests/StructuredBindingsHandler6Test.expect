@@ -87,7 +87,7 @@ int main()
 {
 #if 1
     Point p     = Point{1, 2};
-    auto __p59 = Point(p);
+    Point __p59 = Point(p);
     std::tuple_element<0, Point>::type&& x = __p59.get<0>();
     std::tuple_element<1, Point>::type&& y = __p59.get<1>();
     
@@ -97,22 +97,22 @@ int main()
 #endif
 
     char ar[2];
-    auto __ar66 = ar;
+    char __ar66[2] = { ar[0], ar[1] };
     char a1 = __ar66[0];
     char a2 = __ar66[1];
     
-    auto __ar67 = ar;
+    char (&__ar67)[2] = ar;
     char& a4 = __ar67[0];
     char& a5 = __ar67[1];
     
 
-    auto __ar69 = ar;
+    char const (&__ar69)[2] = ar;
     const char& a8 = __ar69[0];
     const char& a9 = __ar69[1];
     
 
     const char aa[2]       = {1, 2};
-    auto __aa72 = aa;
+    char const (&__aa72)[2] = aa;
     const char& a18 = __aa72[0];
     const char& a19 = __aa72[1];
     
@@ -120,13 +120,13 @@ int main()
     std::tuple<int, char, double> muple = std::make_tuple(1, 'a', 2.3);
 
     // unpack the tuple into its individual components
-    auto __muple77 = muple;
+    std::tuple<int, char, double> & __muple77 = muple;
     std::tuple_element<0, std::tuple<int, char, double> >::type& i = get<0ul>(__muple77);
     std::tuple_element<1, std::tuple<int, char, double> >::type& c = get<1ul>(__muple77);
     std::tuple_element<2, std::tuple<int, char, double> >::type& d = get<2ul>(__muple77);
     
 
-    auto __muple79 = std::tuple<int, char, double>(muple);
+    std::tuple<int, char, double> __muple79 = std::tuple<int, char, double>(muple);
     std::tuple_element<0, std::tuple<int, char, double> >::type&& ii = get<0ul>(__muple79);
     std::tuple_element<1, std::tuple<int, char, double> >::type&& cc = get<1ul>(__muple79);
     std::tuple_element<2, std::tuple<int, char, double> >::type&& dd = get<2ul>(__muple79);

@@ -12,6 +12,22 @@
 
 namespace clang::insights {
 
+class ArrayInitCodeGenerator final : public CodeGenerator
+{
+    const uint64_t mIndex;
+
+public:
+    ArrayInitCodeGenerator(OutputFormatHelper& _outputFormatHelper, const uint64_t index)
+    : CodeGenerator{_outputFormatHelper}
+    , mIndex{index}
+    {
+    }
+
+    void InsertArg(const Stmt* stmt) override { CodeGenerator::InsertArg(stmt); }
+    void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(std::to_string(mIndex)); }
+};
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 {
     mOutputFormatHelper.OpenScope();
@@ -215,12 +231,6 @@ static bool IsReference(const QualType& type)
 }
 //-----------------------------------------------------------------------------
 
-static bool IsConst(const ValueDecl& valDecl)
-{
-    return valDecl.getType().isConstQualified();
-}
-//-----------------------------------------------------------------------------
-
 static bool IsRValueReference(const QualType& type)
 {
     return GetDesugarType(type)->isRValueReferenceType();
@@ -282,9 +292,6 @@ static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
 
 void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 {
-    DPrint("EEEEEEEEEEEE\n");
-    decompositionDeclStmt->getInit()->dump();
-
     const auto* declName = FindDeclRef(decompositionDeclStmt->getInit());
     const auto  baseVarName{[&]() {
         if(declName) {
@@ -302,15 +309,6 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
         return std::string{""};
     }()};
 
-    DPrint("basename: %s\n", baseVarName);
-
-    if(IsConst(*decompositionDeclStmt)) {
-        mOutputFormatHelper.Append(kwConstSpace);
-    }
-
-    // if we use GetNameWithoutClass a char arrays ends up like this char const [2] ...
-    mOutputFormatHelper.Append(kwAuto /*GetName(decompositionDeclStmt->getType())*/);
-
     const std::string tmpVarName = [&]() {
         if(declName && declName->getDecl()) {
             return BuildInternalVarName(baseVarName, decompositionDeclStmt->getLocStart(), GetSM(*declName->getDecl()));
@@ -319,7 +317,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
         return BuildInternalVarName(baseVarName);
     }();
 
-    mOutputFormatHelper.Append(" ", tmpVarName, " = ");
+    mOutputFormatHelper.Append(GetTypeNameAsParameter(decompositionDeclStmt->getType(), tmpVarName), " = ");
 
     InsertArg(decompositionDeclStmt->getInit());
 
@@ -470,6 +468,12 @@ void CodeGenerator::InsertArg(const StringLiteral* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const ArrayInitIndexExpr* stmt)
+{
+    Error(stmt, "ArrayInitIndexExpr should not be reached in CodeGenerator");
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const ArraySubscriptExpr* stmt)
 {
     InsertArg(stmt->getLHS());
@@ -482,8 +486,23 @@ void CodeGenerator::InsertArg(const ArraySubscriptExpr* stmt)
 
 void CodeGenerator::InsertArg(const ArrayInitLoopExpr* stmt)
 {
-    InsertArg(stmt->getCommonExpr());
-    //   	InsertArg(stmt->getSubExpr());
+    mOutputFormatHelper.Append("{ ");
+
+    const uint64_t size = stmt->getArraySize().getZExtValue();
+    bool           first{true};
+
+    for(uint64_t i = 0; i < size; ++i) {
+        if(!first) {
+            mOutputFormatHelper.Append(", ");
+        } else {
+            first = false;
+        }
+
+        ArrayInitCodeGenerator codeGenerator{mOutputFormatHelper, i};
+        codeGenerator.InsertArg(stmt->getSubExpr());
+    }
+
+    mOutputFormatHelper.Append(" }");
 }
 //-----------------------------------------------------------------------------
 
@@ -877,7 +896,6 @@ void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 void CodeGenerator::InsertArg(const DeclStmt* stmt)
 {
     for(const auto* decl : stmt->decls()) {
-        decl->dump();
         InsertArg(decl);
     }
 }

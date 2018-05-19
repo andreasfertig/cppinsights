@@ -120,7 +120,7 @@ private:
 int main()
 {
     Point p      = Point{1, 2};
-    auto __p64 = p;
+    Point & __p64 = p;
     std::tuple_element<0, Point>::type& x = __p64.get<0>();
     std::tuple_element<1, Point>::type&& y = __p64.get<1>();
     
@@ -131,7 +131,7 @@ int main()
     printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
 
     constexpr Point p2 = Point{3, 4};
-    auto __p272 = p2;
+    const Point & __p272 = p2;
     std::tuple_element<0, const Point>::type& x2 = __p272.get<0>();
     std::tuple_element<1, const Point>::type&& y2 = __p272.get<1>();
     

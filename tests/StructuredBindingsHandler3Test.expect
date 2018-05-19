@@ -74,14 +74,14 @@ template<int N> struct std::tuple_element<N, constant::Q> { typedef int type; };
 namespace constant {
   Q q;
   // This creates and lifetime-extends a temporary to hold the result of each get() call.
-  auto __q17 = constant::Q(constant::q);
+  constant::Q __q17 = constant::Q(constant::q);
   std::tuple_element<0, constant::Q>::type&& a = constant::get<0ul>(constant::__q17);
   std::tuple_element<1, constant::Q>::type&& b = constant::get<1ul>(constant::__q17);
   std::tuple_element<2, constant::Q>::type&& c = constant::get<2ul>(constant::__q17);
       // expected-note {{temporary}}
 
   constexpr bool f() {
-    auto __q20 = constant::Q(constant::q);
+    constant::Q __q20 = constant::Q(constant::q);
     std::tuple_element<0, constant::Q>::type&& a = constant::get<0ul>(__q20);
     std::tuple_element<1, constant::Q>::type&& b = constant::get<1ul>(__q20);
     std::tuple_element<2, constant::Q>::type&& c = constant::get<2ul>(__q20);
@@ -92,7 +92,7 @@ namespace constant {
   constexpr int g() {
     int *p = nullptr;
     {
-      auto __q27 = constant::Q(constant::q);
+      constant::Q __q27 = constant::Q(constant::q);
       std::tuple_element<0, constant::Q>::type&& a = constant::get<0ul>(__q27);
       std::tuple_element<1, constant::Q>::type&& b = constant::get<1ul>(__q27);
       std::tuple_element<2, constant::Q>::type&& c = constant::get<2ul>(__q27);
