@@ -26,7 +26,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     endfunction(check_compiler)
 
     check_compiler("GNU" 8.0)
-    check_compiler("Clang" 7.0)
+    check_compiler("Clang" 6.0)
     check_compiler("AppleClang" 7.0)
 
     if(NOT HAVE_COMPILER)
@@ -243,7 +243,7 @@ elseif(NOT DEFINED LLVM_PACKAGE_VERSION)
 
 endif()
 
-set(INSIGHTS_MIN_LLVM_VERSION 7.0)
+set(INSIGHTS_MIN_LLVM_VERSION 6.0)
 
 # minimum clang version
 if (${LLVM_PACKAGE_VERSION} VERSION_LESS ${INSIGHTS_MIN_LLVM_VERSION})

@@ -16,7 +16,21 @@ using namespace clang;
 using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
 
+#include "clang/Basic/Version.h"
+
 namespace clang::insights {
+
+#if CLANG_VERSION_MAJOR < 7
+AST_MATCHER(FunctionDecl, hasTrailingReturn)
+{
+    (void)Finder;
+    (void)Builder;
+
+    if(const auto* F = Node.getType()->getAs<FunctionProtoType>())
+        return F->hasTrailingReturn();
+    return false;
+}
+#endif
 
 AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)

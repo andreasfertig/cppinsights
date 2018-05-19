@@ -795,8 +795,9 @@ void CodeGenerator::InsertArg(const CXXBindTemporaryExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXFunctionalCastExpr* stmt)
 {
-    const bool isConstructor = isa<CXXConstructExpr>(stmt->getSubExpr());
-    const bool needsParens   = !isConstructor && !stmt->isListInitialization();
+    const bool isConstructor{isa<CXXConstructExpr>(stmt->getSubExpr())};
+    const bool isListInitialization{[&]() { return stmt->getLParenLoc().isInvalid(); }()};
+    const bool needsParens{!isConstructor && !isListInitialization};
 
     // If a constructor follows we do not need to insert the type name. This would insert it twice.
     if(!isConstructor) {

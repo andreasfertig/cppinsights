@@ -8,7 +8,13 @@ common_sources: &all_sources
 matrix:
   include:
 
-    # 1/ Linux Clang Builds
+    # 1/ OSX Builds
+    - env: COMPILER='/Users/travis/build/andreasfertig/travistest/clang/current/bin/clang++' COMPILER_CC='/Users/travis/build/andreasfertig/travistest/clang/current/bin/clang' LLVM_CONFIG='/Users/travis/build/andreasfertig/travistest/clang/current/bin/llvm-config'
+      os: osx
+      osx_image: xcode9.3
+      compiler: clang
+      
+    # 2/ Linux Clang Builds
     - os: linux
       compiler: clang
       addons:
@@ -17,7 +23,7 @@ matrix:
               packages: ['clang-7', 'libstdc++-6-dev', 'llvm-7-dev', 'libclang-7-dev', 'zlib1g-dev']
       env: COMPILER='clang++-7' COMPILER_CC='clang-7'
 
-    # 2/ Linux GCC Builds
+    # 3/ Linux GCC Builds
     - os: linux
       compiler: gcc
       addons: &gcc8
@@ -27,6 +33,7 @@ matrix:
       env: COMPILER='g++-8' COMPILER_CC='gcc-8'
 
 install:
+  - ${TRAVIS_BUILD_DIR}/scripts/travis_install.sh
     
 before_script:
   - export CXX=${COMPILER}
