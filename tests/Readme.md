@@ -5,7 +5,7 @@ target:
 
 ```
 cmake --build . --target tests
-``
+```
 
 the later one tries to setup all the stuff required (compiler, include paths, path to the insights executable...).
 
