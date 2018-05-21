@@ -13,7 +13,7 @@ static inline decltype(auto) Normalize(const T& arg)
 /* First instantiated from: TemplateArgumentsTest.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline static char const (&)[8] Normalize<char [8]>(char const &[8] arg)
+inline static char const (&)[8] Normalize<char [8]>(char const (&arg)[8])
 {
   if constexpr( std::is_same_v<char [8], std::basic_string<char>> ) ;
   else /* constexpr */ {
@@ -57,7 +57,7 @@ void Log(const char* fmt, const Ts&... ts)
 /* First instantiated from: TemplateArgumentsTest.cpp:23 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void Log<char [8]>(const char * fmt, char const &[8] ts)
+void Log<char [8]>(const char * fmt, char const (&ts)[8])
 {
   printf(fmt, Normalize(ts));
 }

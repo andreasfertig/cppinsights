@@ -171,13 +171,10 @@ static std::string GetScope(const DeclContext* declCtx)
     if(!declCtx->isTranslationUnit() && !declCtx->isFunctionOrMethod()) {
 
         while(declCtx->isInlineNamespace()) {
-            DPrint("inline\n");
             declCtx = declCtx->getParent();
         }
 
         if(declCtx->isNamespace() || declCtx->getParent()->isTranslationUnit()) {
-
-            DPrint("namespace\n");
             if(const auto* namespaceDecl = dyn_cast_or_null<NamespaceDecl>(declCtx)) {
                 name = GetQualifiedName(*namespaceDecl);
                 name.append("::");
@@ -293,11 +290,15 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
 {
     const bool isArrayRef = [&]() {
         if(const auto* lref = dyn_cast_or_null<LValueReferenceType>(t.getTypePtrOrNull())) {
-            if(const auto* pt = dyn_cast_or_null<ParenType>(lref->getPointeeType().getTypePtrOrNull())) {
+            const auto  subType      = GetDesugarType(lref->getPointeeType());
+            const auto& ct           = subType.getCanonicalType();
+            const auto* plainSubType = ct.getTypePtrOrNull();
+
+            if(const auto* pt = dyn_cast_or_null<ParenType>(plainSubType)) {
                 if(pt->getInnerType()->isArrayType()) {
                     return true;
                 }
-            } else if(isa<ConstantArrayType>(lref->getPointeeType().getTypePtrOrNull())) {
+            } else if(isa<ConstantArrayType>(plainSubType)) {
                 return true;
             }
         }
@@ -306,12 +307,32 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
 
     std::string typeName = details::GetName(t, unqualified);
 
+    // someties we get char const[2]. If we directly insert the typename we end up with char const__var[2] which is not
+    // a valid type name. Hence check for this condition and, if necessary, insert a space before __var.
+    auto getSpaceOrEmpty = [&](const std::string& needle) -> std::string {
+        if(std::string::npos == typeName.find(needle, 0)) {
+            return " ";
+        }
+
+        return "";
+    };
+
     if(t->isArrayType() && t->isLValueReferenceType()) {
-        InsertBefore(typeName, "[", StrCat("(&", varName, ")"));
+        std::string space = getSpaceOrEmpty(" [");
+        InsertBefore(typeName, "[", StrCat(space, "(&", varName, ")"));
+
     } else if(t->isArrayType() && !t->isLValueReferenceType()) {
-        InsertBefore(typeName, "[", varName);
+        std::string space = getSpaceOrEmpty(" [");
+        InsertBefore(typeName, "[", StrCat(space, varName));
+
     } else if(isArrayRef) {
-        InsertAfter(typeName, "(&", varName);
+        if(std::string::npos != typeName.find("(&", 0)) {
+            InsertAfter(typeName, "(&", varName);
+        } else {
+            InsertBefore(typeName, "&[", "(");
+            InsertAfter(typeName, "(&", StrCat(varName, ")"));
+        }
+
     } else if(!t->isArrayType() && !varName.empty()) {
         typeName += StrCat(" ", varName);
     }
@@ -377,8 +398,6 @@ std::string GetName(const DeclRefExpr& declRefExpr)
 
         name.append(plainName);
     }
-
-    DPrint("name: %s\n", name);
 
     return name;
 }

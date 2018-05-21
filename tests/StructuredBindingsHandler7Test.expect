@@ -6,7 +6,7 @@ int main() {
      {
        public: inline /*constexpr */ void operator()() const
        {
-         auto __buffer5 = buffer;
+         char (&__buffer5)[2] = buffer;
          char& a = __buffer5[0];
          char& b = __buffer5[1];
        }
