@@ -9,7 +9,7 @@ matrix:
   include:
 
     # 1/ OSX Builds
-    - env: COMPILER='/Users/travis/build/andreasfertig/cppinsights/clang/current/bin/clang++' COMPILER_CC='/Users/travis/build/andreasfertig/cppinsights/clang/current/bin/clang' LLVM_CONFIG='/Users/travis/build/andreasfertig/cppinsights/clang/current/bin/llvm-config'  COVERAGE='No'
+    - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config'  COVERAGE='No'
       os: osx
       osx_image: xcode9.3
       compiler: clang
@@ -45,6 +45,10 @@ install:
   - ${TRAVIS_BUILD_DIR}/scripts/travis_install.sh
     
 before_script:
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+        export PATH=${TRAVIS_BUILD_DIR}/clang/current/bin:$PATH
+    fi
   - export CXX=${COMPILER}
   - export CC=${COMPILER_CC}
   - cd "${TRAVIS_BUILD_DIR}"
