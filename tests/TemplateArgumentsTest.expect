@@ -39,7 +39,7 @@ inline static const int & Normalize<int>(const int & arg)
 /* First instantiated from: TemplateArgumentsTest.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline static const char * Normalize<std::basic_string<char> >(std::basic_string<char> & arg)
+inline static const char * Normalize<std::basic_string<char> >(const std::basic_string<char> & arg)
 {
   if constexpr( std::is_same_v<std::basic_string<char>, std::basic_string<char>> ) {
     return arg.c_str();
@@ -77,7 +77,7 @@ void Log<int>(const char * fmt, const int & ts)
 /* First instantiated from: TemplateArgumentsTest.cpp:28 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void Log<std::basic_string<char> >(const char * fmt, std::basic_string<char> & ts)
+void Log<std::basic_string<char> >(const char * fmt, const std::basic_string<char> & ts)
 {
   printf(fmt, Normalize(ts));
 }
