@@ -189,7 +189,6 @@ static std::string GetScope(const DeclContext* declCtx)
 static std::string GetNameInternal(const QualType& t, const Unqualified unqualified)
 {
     if(t.getTypePtrOrNull()) {
-        const std::string cvqStr{t.getQualifiers().getAsString()};
         std::string       refOrPointer{};
         const RecordType* recordType = [&]() -> const RecordType* {
             const auto& ct  = t.getCanonicalType();
@@ -213,6 +212,13 @@ static std::string GetNameInternal(const QualType& t, const Unqualified unqualif
 
         if(recordType) {
             if(const auto* decl = recordType->getDecl()) {
+                const std::string cvqStr{[&]() {
+                    if(const auto* refType = dyn_cast_or_null<ReferenceType>(t.getTypePtrOrNull())) {
+                        return refType->getPointeeTypeAsWritten().getLocalQualifiers().getAsString();
+                    }
+
+                    return t.getLocalQualifiers().getAsString();
+                }()};
 
                 if(const auto* tt = dyn_cast_or_null<ClassTemplateSpecializationDecl>(decl)) {
                     if(const auto* x = t.getBaseTypeIdentifier()) {

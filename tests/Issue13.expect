@@ -1,0 +1,18 @@
+#include <iostream>
+#include <memory>
+
+std::shared_ptr<int> create() {
+    return std::make_shared<int>(42);
+}
+
+int main()
+{
+  const std::shared_ptr<int> & car = create(); 
+  const std::shared_ptr<int> && cart = create();
+  std::shared_ptr<int> && carte = create();
+
+  const std::shared_ptr<int> & vcar = create(); 
+  const volatile std::shared_ptr<int> && cvcart = create();
+  volatile std::shared_ptr<int> && vcart = create();
+  volatile std::shared_ptr<int> && vcarte = create();
+}

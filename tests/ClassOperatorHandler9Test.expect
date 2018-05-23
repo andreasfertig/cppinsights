@@ -60,7 +60,7 @@ MyVector<T> operator*(const MyVector<T>& a, const MyVector<T>& b)
 /* First instantiated from: ClassOperatorHandler9Test.cpp:68 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-MyVector<int> operator*<int>(MyVector<int> & a, MyVector<int> & b)
+MyVector<int> operator*<int>(const MyVector<int> & a, const MyVector<int> & b)
 {
   MyVector<int> result = MyVector<int>(a.size()) /* NRVO variable */;
   for(std::size_t s = 0;
