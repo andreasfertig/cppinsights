@@ -52,6 +52,7 @@ ImplicitCastHandler::ImplicitCastHandler(Rewriter& rewrite, MatchFinder& matcher
         /* exclude if/switch init, that will be handeled by them */
         hasAncestor(ifStmt()),
         hasAncestor(switchStmt()),
+        hasAncestor(cxxConstructExpr(hasArgument(0, cxxStdInitializerListExpr()))),
         hasAncestor(cxxOperatorCallExpr()));
 
     matcher.addMatcher(

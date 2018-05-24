@@ -1,0 +1,16 @@
+#include <initializer_list>
+
+class Foo
+{
+public:
+    Foo(std::initializer_list<int> x, const bool b=false, const int z=2){}
+/* public: inline constexpr Foo(const Foo &); */
+/* public: inline constexpr Foo(Foo &&); */
+};
+
+int main()
+{
+  Foo f{ std::initializer_list<int>{ 1 } };
+  Foo f2{ std::initializer_list<int>{ 1, static_cast<const int>(true) } };
+  Foo f3{ std::initializer_list<int>{ 1, static_cast<const int>(true), 4 } };
+}
