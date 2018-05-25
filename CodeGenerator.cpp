@@ -525,10 +525,11 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
                     mOutputFormatHelper.Append('<');
 
                     const TemplateArgument& Pack = Args->get(0);
-                    for(const auto& P : Pack.pack_elements()) {
-                        char C{static_cast<char>(P.getAsIntegral().getZExtValue())};
-                        mOutputFormatHelper.Append(C);
-                    }
+
+                    ForEachArg(Pack.pack_elements(), [&](const auto& arg) {
+                        char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
+                        mOutputFormatHelper.Append("'", std::string{C}, "'");
+                    });
 
                     mOutputFormatHelper.Append('>');
                 }
