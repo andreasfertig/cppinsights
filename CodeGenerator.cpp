@@ -515,6 +515,27 @@ void CodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 void CodeGenerator::InsertArg(const CallExpr* stmt)
 {
     InsertArg(stmt->getCallee());
+
+    if(isa<UserDefinedLiteral>(stmt)) {
+        if(const auto* DRE = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
+            if(const TemplateArgumentList* Args = cast<FunctionDecl>(DRE->getDecl())->getTemplateSpecializationArgs()) {
+                if(1 != Args->size()) {
+                    InsertTemplateArgs(Args->asArray());
+                } else {
+                    mOutputFormatHelper.Append('<');
+
+                    const TemplateArgument& Pack = Args->get(0);
+                    for(const auto& P : Pack.pack_elements()) {
+                        char C{static_cast<char>(P.getAsIntegral().getZExtValue())};
+                        mOutputFormatHelper.Append(C);
+                    }
+
+                    mOutputFormatHelper.Append('>');
+                }
+            }
+        }
+    }
+
     mOutputFormatHelper.Append('(');
 
     ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
