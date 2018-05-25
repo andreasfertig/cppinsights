@@ -52,8 +52,28 @@ void StdInitializerListHandler::run(const MatchFinder::MatchResult& result)
         CodeGenerator      codeGenerator{outputFormatHelper};
 
         const auto* expr = result.Nodes.getNodeAs<CXXConstructExpr>("expr");
-        const bool isCtorInit{expr && (1 == expr->getNumArgs())};  // If an initializer list appears in a constructor as
-                                                                   // a single argument we need to add braces.
+
+        // If an initializer list appears in a constructor as a single argument we need to add braces.
+        const bool isCtorInit{[&]() {
+            if(!expr) {
+                return false;
+            }
+
+            // if the first argument is a std::initializer-list and the second is a default argument we need to add
+            // the braces.
+            if(1 < expr->getNumArgs()) {
+                // Skip the first argument: ++(expr->arg_begin())
+                for(const auto& arg : llvm::make_range(++(expr->arg_begin()), expr->arg_end())) {
+                    if(!arg->isDefaultArgument()) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return (1 == expr->getNumArgs());
+        }()};
 
         if(isCtorInit) {
             outputFormatHelper.Append("{ ");
