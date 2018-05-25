@@ -1,0 +1,38 @@
+#include <chrono>
+#include <string>
+
+std::chrono::seconds operator"" _s(unsigned long long s) {
+    return std::chrono::seconds(s);
+}
+
+std::string operator"" _str(const char *s, std::size_t len) {
+    return std::string(s, len);
+}
+
+
+template<typename T, T... C>
+constexpr int operator""_x()
+{
+  return 0;
+}
+
+/* First instantiated from: Issue15.cpp:24 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int operator""_x<char, 49, 50, 51, 52, 53>()
+{
+  return 0;
+}
+#endif
+
+
+int main()
+{
+    using namespace std::literals;
+    std::chrono::seconds t = std::operator""s(98291919ull);
+    
+    int t4 = operator""_x<char, 49, 50, 51, 52, 53>();
+
+    std::basic_string<char> str = operator""_str("abcd", 4ul);
+    std::chrono::duration<long long, std::ratio<1, 1> > sec = operator""_s(4ull);
+}
