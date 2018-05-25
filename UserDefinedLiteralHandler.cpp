@@ -29,6 +29,8 @@ UserDefinedLiteralHandler::UserDefinedLiteralHandler(Rewriter& rewrite, MatchFin
                                            descendants. So filter them here to avoid getting them multiple times */
                                         hasAncestor(cxxOperatorCallExpr()),
                                         hasLambdaAncestor,
+                                        hasAncestor(ifStmt()),
+                                        hasAncestor(switchStmt()),
                                         hasAncestor(implicitCastExpr(hasMatchingCast())),
 #ifdef MATCH_CXX_MEM_CEXPR
                                         hasAncestor(cxxMemberCallExpr()),
