@@ -1,6 +1,11 @@
 language: cpp
 sudo: false
 
+cache:
+  ccache: true
+  directories:
+    - $HOME/Library/Caches/Homebrew
+
 common_sources: &all_sources
 - ubuntu-toolchain-r-test
 - llvm-toolchain-trusty
