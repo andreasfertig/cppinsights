@@ -1,0 +1,7 @@
+.tmp.cpp:7:63: error: rvalue reference to type 'std::tuple_element<0, std::pair<const int, int> >::type' (aka 'const int') cannot bind to lvalue of type 'typename tuple_element<0UL, pair<const int, int> >::type' (aka 'const int')
+    std::tuple_element<0, std::pair<const int, int> >::type&& key = std::get<0ul>(__operator6);
+                                                              ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:8:63: error: rvalue reference to type 'std::tuple_element<1, std::pair<const int, int> >::type' (aka 'int') cannot bind to lvalue of type 'typename tuple_element<1UL, pair<const int, int> >::type' (aka 'int')
+    std::tuple_element<1, std::pair<const int, int> >::type&& value = std::get<1ul>(__operator6);
+                                                              ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors generated.

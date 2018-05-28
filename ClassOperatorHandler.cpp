@@ -45,6 +45,7 @@ ClassOperatorHandler::ClassOperatorHandler(Rewriter& rewrite, MatchFinder& match
                                        hasLambdaAncestor,
                                        hasAncestor(implicitCastExpr(hasMatchingCast())),
                                        hasAncestor(userDefinedLiteral()),
+                                       hasAncestor(decompositionDecl()),
                                        hasAncestor(cxxForRangeStmt())
 #ifdef MATCH_CXX_MEM_CEXPR
                                            ,
