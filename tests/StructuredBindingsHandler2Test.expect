@@ -1,0 +1,51 @@
+#include <cstdio>
+
+int main() {
+    struct SP
+    {
+        int x;
+        int y;
+    /* public: inline SP(); */
+    /* public: inline constexpr SP(const SP &) noexcept; */
+    /* public: inline constexpr SP(SP &&); */
+    };
+
+    SP sp{1, 2};
+
+    SP __sp12 = SP(sp);
+    int sx = __sp12.x;
+    int sy = __sp12.y;
+    
+
+    class CP
+    {
+    public:
+        int x;
+        int y;
+    /* public: inline CP(); */
+    /* public: inline constexpr CP(const CP &) noexcept; */
+    /* public: inline constexpr CP(CP &&); */
+    };
+
+    CP cp{1,2};
+
+    CP __cp23 = CP(cp);
+    int c1 = __cp23.x;
+    int c2 = __cp23.y;
+        
+
+    printf("c1: %d c2: %d\n", c1, c2);
+    ++c1;
+    ++c2;
+    printf("c1: %d c2: %d\n", c1, c2);
+
+    CP & __cp30 = cp;
+    int c3 = __cp30.x;
+    int c4 = __cp30.y;
+        
+    
+    printf("c3: %d c4: %d\n", c3, c4);
+    ++c3;
+    ++c4;
+    printf("c3: %d c4: %d\n", c3, c4);
+}
