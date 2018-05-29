@@ -227,21 +227,13 @@ void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 
 static bool IsReference(const QualType& type)
 {
-    return GetDesugarType(type)->isReferenceType();
-}
-//-----------------------------------------------------------------------------
-
-static bool IsRValueReference(const QualType& type)
-{
-    return GetDesugarType(type)->isRValueReferenceType();
+    return GetDesugarType(type)->isLValueReferenceType();
 }
 //-----------------------------------------------------------------------------
 
 static std::string GetReferenceOrRValueReferenceOrEmpty(const QualType& type)
 {
-    if(IsRValueReference(type)) {
-        return "&&";
-    } else if(IsReference(type)) {
+    if(IsReference(type)) {
         return "&";
     }
 
@@ -347,14 +339,21 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
         mOutputFormatHelper.Append(GetName(bindingDecl->getType()), refOrRefRef, " ", GetName(*bindingDecl), " = ");
 
+        const auto* holdingVarOrMemberExpr = [&]() -> const Expr* {
+            if(const auto* holdingVar = bindingDecl->getHoldingVar()) {
+                return holdingVar->getAnyInitializer();
+            }
+
+            return dyn_cast_or_null<MemberExpr>(binding);
+        }();
+
         // tuple decomposition
-        if(const auto* holdingVar = bindingDecl->getHoldingVar()) {
+        if(holdingVarOrMemberExpr) {
             DPrint("4444\n");
-            const auto* initializer = holdingVar->getAnyInitializer();
 
             StructuredBindingsCodeGenerator structuredBindingsCodeGenerator{mOutputFormatHelper, tmpVarName};
             CodeGenerator&                  codeGenerator = structuredBindingsCodeGenerator;
-            codeGenerator.InsertArg(initializer);
+            codeGenerator.InsertArg(holdingVarOrMemberExpr);
 
             // array decomposition
         } else if(const auto* arraySubscription = dyn_cast_or_null<ArraySubscriptExpr>(binding)) {

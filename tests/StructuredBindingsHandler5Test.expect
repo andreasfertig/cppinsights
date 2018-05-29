@@ -82,7 +82,7 @@ public:
         }
     }
     
-    /* First instantiated from: StructuredBindingsHandler5Test.cpp:72 */
+    /* First instantiated from: StructuredBindingsHandler5Test.cpp:73 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline constexpr const double & get<0>() noexcept
@@ -98,7 +98,7 @@ public:
     #endif
     
     
-    /* First instantiated from: StructuredBindingsHandler5Test.cpp:72 */
+    /* First instantiated from: StructuredBindingsHandler5Test.cpp:73 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline constexpr double get<1>() noexcept
@@ -122,18 +122,19 @@ int main()
     Point p      = Point{1, 2};
     Point & __p64 = p;
     std::tuple_element<0, Point>::type& x = __p64.get<0>();
-    std::tuple_element<1, Point>::type&& y = __p64.get<1>();
+    std::tuple_element<1, Point>::type y = __p64.get<1>();
     
 
     printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
-    x++;
+    ++x;
+    ++y;
     printf("x:%lf y:%lf\n", x, y);
     printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
 
     constexpr Point p2 = Point{3, 4};
-    const Point & __p272 = p2;
-    std::tuple_element<0, const Point>::type& x2 = __p272.get<0>();
-    std::tuple_element<1, const Point>::type&& y2 = __p272.get<1>();
+    const Point & __p273 = p2;
+    std::tuple_element<0, const Point>::type& x2 = __p273.get<0>();
+    std::tuple_element<1, const Point>::type y2 = __p273.get<1>();
     
 
     // error: decomposition declaration cannot be declared 'constexpr'

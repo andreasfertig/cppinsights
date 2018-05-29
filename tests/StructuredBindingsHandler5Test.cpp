@@ -64,7 +64,8 @@ int main()
     auto& [x, y] = p;
 
     printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
-    x++;
+    ++x;
+    ++y;
     printf("x:%lf y:%lf\n", x, y);
     printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
 
