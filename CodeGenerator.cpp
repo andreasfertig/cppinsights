@@ -227,21 +227,13 @@ void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 
 static bool IsReference(const QualType& type)
 {
-    return GetDesugarType(type)->isReferenceType();
-}
-//-----------------------------------------------------------------------------
-
-static bool IsRValueReference(const QualType& type)
-{
-    return GetDesugarType(type)->isRValueReferenceType();
+    return GetDesugarType(type)->isLValueReferenceType();
 }
 //-----------------------------------------------------------------------------
 
 static std::string GetReferenceOrRValueReferenceOrEmpty(const QualType& type)
 {
-    if(IsRValueReference(type)) {
-        return "&&";
-    } else if(IsReference(type)) {
+    if(IsReference(type)) {
         return "&";
     }
 

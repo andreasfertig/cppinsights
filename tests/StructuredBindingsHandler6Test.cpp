@@ -54,18 +54,21 @@ public:
 
 int main()
 {
-#if 1
     Point p     = Point{1, 2};
     auto [x, y] = p;
 
     printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
     printf("x:%lf y:%lf\n", x, y);
-#endif
 
-    char ar[2];
+    char ar[2]{7,8};
     auto [a1, a2]  = ar;
     auto& [a4, a5] = ar;
 
+    printf("%d %d\n", a4, a5);
+    ++a4;
+    --a5;
+    printf("%d %d\n", a4, a5);
+    
     const auto& [a8, a9] = ar;
 
     const char aa[2]       = {1, 2};
@@ -77,29 +80,4 @@ int main()
     auto& [i, c, d] = muple;
 
     auto [ii, cc, dd] = muple;
-
-#if 0
-    struct SP
-    {
-        int x;
-        int y;
-    };
-
-    SP sp{1, 2};
-
-    auto[sx, sy] = sp;
-#endif
-
-#if 0
-    class CP
-    {
-    public:
-        int x;
-        int y;
-    };
-
-    CP cp{1,2};
-
-    auto [ c1, c2 ] = cp;
-#endif
 }
