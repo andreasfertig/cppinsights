@@ -231,26 +231,6 @@ static bool IsReference(const QualType& type)
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetReferenceOrRValueReferenceOrEmpty(const QualType& type)
-{
-    if(IsReference(type)) {
-        return "&";
-    }
-
-    return "";
-}
-//-----------------------------------------------------------------------------
-
-static std::string GetReferenceOrRValueReferenceOrEmpty(const DeclRefExpr* declRefExpr)
-{
-    if(const auto* varDecl = GetVarDeclFromDeclRefExpr(declRefExpr)) {
-        return GetReferenceOrRValueReferenceOrEmpty(varDecl->getType());
-    }
-
-    return "";
-}
-//-----------------------------------------------------------------------------
-
 static bool IsReference(const ValueDecl& valDecl)
 {
     return IsReference(valDecl.getType());
@@ -318,54 +298,50 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
     const bool isRefToObject = IsReference(*decompositionDeclStmt);
 
     for(const auto* bindingDecl : decompositionDeclStmt->bindings()) {
-        const auto* binding = bindingDecl->getBinding();
+        if(const auto* binding = bindingDecl->getBinding()) {
 
-        if(!binding) {
-            Error(bindingDecl, "binding null\n");
-            return;
-        }
+            DPrint("sb name: %s\n", GetName(binding->getType()));
 
-        DPrint("sb name: %s\n", GetName(binding->getType()));
+            const auto* holdingVarOrMemberExpr = [&]() -> const Expr* {
+                if(const auto* holdingVar = bindingDecl->getHoldingVar()) {
+                    return holdingVar->getAnyInitializer();
+                }
 
-        const auto* bindingDeclRefExpr = dyn_cast_or_null<DeclRefExpr>(binding);
+                return dyn_cast_or_null<MemberExpr>(binding);
+            }();
 
-        const std::string refOrRefRef = [&]() {
-            if(isa<ArraySubscriptExpr>(binding) && isRefToObject) {
-                return std::string{"&"};
+            const std::string refOrRefRef = [&]() -> std::string {
+                const bool isArrayBinding{isa<ArraySubscriptExpr>(binding) && isRefToObject};
+                const bool isNotTemporary{holdingVarOrMemberExpr && !isa<ExprWithCleanups>(holdingVarOrMemberExpr)};
+                if(isArrayBinding || isNotTemporary) {
+                    return "&";
+                }
+
+                return "";
+            }();
+
+            mOutputFormatHelper.Append(GetName(bindingDecl->getType()), refOrRefRef, " ", GetName(*bindingDecl), " = ");
+
+            // tuple decomposition
+            if(holdingVarOrMemberExpr) {
+                DPrint("4444\n");
+
+                StructuredBindingsCodeGenerator structuredBindingsCodeGenerator{mOutputFormatHelper, tmpVarName};
+                CodeGenerator&                  codeGenerator = structuredBindingsCodeGenerator;
+                codeGenerator.InsertArg(holdingVarOrMemberExpr);
+
+                // array decomposition
+            } else if(const auto* arraySubscription = dyn_cast_or_null<ArraySubscriptExpr>(binding)) {
+                mOutputFormatHelper.Append(tmpVarName);
+
+                InsertArg(arraySubscription);
+
+            } else {
+                TODO(bindingDecl, mOutputFormatHelper);
             }
 
-            return GetReferenceOrRValueReferenceOrEmpty(bindingDeclRefExpr);
-        }();
-
-        mOutputFormatHelper.Append(GetName(bindingDecl->getType()), refOrRefRef, " ", GetName(*bindingDecl), " = ");
-
-        const auto* holdingVarOrMemberExpr = [&]() -> const Expr* {
-            if(const auto* holdingVar = bindingDecl->getHoldingVar()) {
-                return holdingVar->getAnyInitializer();
-            }
-
-            return dyn_cast_or_null<MemberExpr>(binding);
-        }();
-
-        // tuple decomposition
-        if(holdingVarOrMemberExpr) {
-            DPrint("4444\n");
-
-            StructuredBindingsCodeGenerator structuredBindingsCodeGenerator{mOutputFormatHelper, tmpVarName};
-            CodeGenerator&                  codeGenerator = structuredBindingsCodeGenerator;
-            codeGenerator.InsertArg(holdingVarOrMemberExpr);
-
-            // array decomposition
-        } else if(const auto* arraySubscription = dyn_cast_or_null<ArraySubscriptExpr>(binding)) {
-            mOutputFormatHelper.Append(tmpVarName);
-
-            InsertArg(arraySubscription);
-
-        } else {
-            TODO(bindingDecl, mOutputFormatHelper);
+            mOutputFormatHelper.AppendNewLine(";");
         }
-
-        mOutputFormatHelper.AppendNewLine(";");
     }
 }
 //-----------------------------------------------------------------------------

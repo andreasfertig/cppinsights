@@ -22,15 +22,15 @@ int main() {
 
     auto [ c1, c2 ] = cp;    
 
-    printf("c1: %d c2: %d\n", c1, c2);
+    printf("c1: %d c2: %d\n", cp.x, cp.y);
     ++c1;
     ++c2;
-    printf("c1: %d c2: %d\n", c1, c2);
+    printf("c1: %d c2: %d\n", cp.x, cp.y);
 
     auto& [ c3, c4 ] = cp;    
     
-    printf("c3: %d c4: %d\n", c3, c4);
+    printf("c3: %d c4: %d\n", cp.x, cp.y);
     ++c3;
     ++c4;
-    printf("c3: %d c4: %d\n", c3, c4);
+    printf("c3: %d c4: %d\n", cp.x, cp.y);
 }

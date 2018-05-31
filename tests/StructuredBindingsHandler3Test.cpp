@@ -10,7 +10,7 @@ namespace constant {
   template<int N> constexpr int get(Q &&) { return N * N; }
 }
 template<> struct std::tuple_size<constant::Q> { static const int value = 3; };
-template<int N> struct std::tuple_element<N, constant::Q> { typedef int type; };
+template<size_t N> struct std::tuple_element<N, constant::Q> { typedef int type; };
 namespace constant {
   Q q;
   // This creates and lifetime-extends a temporary to hold the result of each get() call.
