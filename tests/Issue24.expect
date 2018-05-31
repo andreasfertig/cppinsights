@@ -1,0 +1,6 @@
+class Simple 
+{
+    int p;
+  public:
+    double get() {return static_cast<double>(this->p);}
+};
