@@ -130,8 +130,8 @@ int main()
     
 
     std::tuple<int, char, double> __muple82 = std::tuple<int, char, double>(muple);
-    std::tuple_element<0, std::tuple<int, char, double> >::type ii = get<0ul>(__muple82);
-    std::tuple_element<1, std::tuple<int, char, double> >::type cc = get<1ul>(__muple82);
-    std::tuple_element<2, std::tuple<int, char, double> >::type dd = get<2ul>(__muple82);
+    std::tuple_element<0, std::tuple<int, char, double> >::type& ii = get<0ul>(__muple82);
+    std::tuple_element<1, std::tuple<int, char, double> >::type& cc = get<1ul>(__muple82);
+    std::tuple_element<2, std::tuple<int, char, double> >::type& dd = get<2ul>(__muple82);
     
 }
