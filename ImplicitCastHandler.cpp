@@ -84,11 +84,11 @@ void ImplicitCastHandler::run(const MatchFinder::MatchResult& result)
     if(!outputFormatHelper.GetString().empty()) {
         DPrint("repllacement: %s\n", outputFormatHelper.GetString());
 
-        const bool isMemberExpr = isa<MemberExpr>(implCastExpr->IgnoreImpCasts());
+        const bool isCastToBase{CastKind::CK_UncheckedDerivedToBase == implCastExpr->getCastKind()};
 
         /* Check if this is a CXXThisExpr which means a down-cast derived to base. If the called member/function is
          * private, the resulting code would not compile. Hence just add the code as comment here. */
-        if(!isMemberExpr && result.Nodes.getNodeAs<CXXThisExpr>("memberExpr")) {
+        if(isCastToBase && result.Nodes.getNodeAs<CXXThisExpr>("memberExpr")) {
             mRewrite.InsertText(implCastExpr->getLocStart(), outputFormatHelper.GetString());
         } else {
             mRewrite.ReplaceText(implCastExpr->getSourceRange(), outputFormatHelper.GetString());
