@@ -409,6 +409,18 @@ std::string GetName(const DeclRefExpr& declRefExpr)
 }
 //-----------------------------------------------------------------------------
 
+std::string GetNameAsFunctionPointer(const QualType& t)
+{
+    std::string typeName{GetName(t)};
+
+    if(!t->isFunctionPointerType()) {
+        InsertBefore(typeName, "(", "(*)");
+    }
+
+    return typeName;
+}
+//-----------------------------------------------------------------------------
+
 const char* GetNoExcept(const FunctionDecl& decl)
 {
     const auto* func = decl.getType()->castAs<FunctionProtoType>();

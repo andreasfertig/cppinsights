@@ -3,7 +3,7 @@ void Test(int n)
     char buffer[n];
 
 
-
+         
      class __lambda_6_5
      {
        public: inline /*constexpr */ bool operator()(int i, int x) const
@@ -18,9 +18,9 @@ void Test(int n)
        : buffer{_buffer}
        {}
        
-     };
+     } __lambda_6_5{buffer};
      
-         __lambda_6_5{buffer}(1, 2);
+     __lambda_6_5.operator()(1, 2);
 }
 
 int main()

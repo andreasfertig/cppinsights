@@ -14,11 +14,11 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 
-#include "DPrint.h"
 #include "InsightsHelpers.h"
 #include "InsightsStaticStrings.h"
 #include "InsightsStrongTypes.h"
 #include "OutputFormatHelper.h"
+#include "StackList.h"
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
@@ -32,9 +32,74 @@ class CodeGenerator
 protected:
     OutputFormatHelper& mOutputFormatHelper;
 
+    enum class LambdaCallerType
+    {
+        VarDecl,
+        CallExpr,
+        OperatorCallExpr,
+        MemberCallExpr,
+        LambdaExpr,
+        ReturnStmt,
+        BinaryOperator,
+    };
+
+    class LambdaHelper : public StackListEntry<LambdaHelper>
+    {
+    public:
+        LambdaHelper(const LambdaCallerType lambdaCallerType, OutputFormatHelper& outputFormatHelper)
+        : mLambdaCallerType{lambdaCallerType}
+        , mCurrentPos{outputFormatHelper.CurrentPos()}
+        , mOutputFormatHelper{outputFormatHelper}
+        , mLambdaOutputFormatHelper{}
+        , mInits{}
+        {
+            mLambdaOutputFormatHelper.SetIndent(mOutputFormatHelper);
+        }
+
+        void finish()
+        {
+            if(!mLambdaOutputFormatHelper.empty()) {
+                mOutputFormatHelper.InsertAt(mCurrentPos, mLambdaOutputFormatHelper.GetString());
+            }
+        }
+
+        OutputFormatHelper& buffer() { return mLambdaOutputFormatHelper; }
+
+        std::string& inits() { return mInits; }
+
+        void insertInits(OutputFormatHelper& outputFormatHelper)
+        {
+            if(!mInits.empty()) {
+                outputFormatHelper.Append(mInits);
+                mInits.clear();
+            }
+        }
+
+        LambdaCallerType callerType() const { return mLambdaCallerType; }
+
+    private:
+        const LambdaCallerType mLambdaCallerType;
+        const size_t           mCurrentPos;
+        OutputFormatHelper&    mOutputFormatHelper;
+        OutputFormatHelper     mLambdaOutputFormatHelper;
+        std::string            mInits;
+    };
+    //-----------------------------------------------------------------------------
+
+    using LambdaStackType = StackList<class LambdaHelper>;
+
 public:
     explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper)
     : mOutputFormatHelper{_outputFormatHelper}
+    , mLambdaStackThis{}
+    , mLambdaStack{mLambdaStackThis}
+    {
+    }
+
+    explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaStackType& lambdaStack)
+    : mOutputFormatHelper{_outputFormatHelper}
+    , mLambdaStackThis{}
+    , mLambdaStack{lambdaStack}
     {
     }
 
@@ -60,11 +125,22 @@ public:
         }
     }
 
+    STRONG_BOOL(SkipConstexpr);
+
+    static void InsertAccessModifierAndNameWithReturnType(OutputFormatHelper&  outputFormatHelper,
+                                                          const CXXMethodDecl& decl,
+                                                          SkipConstexpr        skipConstexpr = SkipConstexpr::No);
+
 protected:
     void HandleCharacterLiteral(const CharacterLiteral& stmt);
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
     void HandleCompoundStmt(const CompoundStmt* stmt);
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
+
+    void InsertMethod(const Decl*          d,
+                      OutputFormatHelper&  outputFormatHelper,
+                      const CXXMethodDecl& md,
+                      bool /*skipConstexpr*/);
 
     STRONG_BOOL(AsComment);
     void FormatCast(const std::string castName,
@@ -87,6 +163,27 @@ protected:
     static const char* GetKind(const UnaryExprOrTypeTraitExpr& uk);
     static const char* GetOpcodeName(const int kind);
     static const char* GetBuiltinTypeSuffix(const BuiltinType& type);
+
+    class LambdaScopeHandler
+    {
+    public:
+        LambdaScopeHandler(LambdaStackType&       stack,
+                           OutputFormatHelper&    outputFormatHelper,
+                           const LambdaCallerType lambdaCallerType);
+
+        ~LambdaScopeHandler();
+
+    private:
+        LambdaStackType& mStack;
+        LambdaHelper     mHelper;
+
+        OutputFormatHelper& GetBuffer(OutputFormatHelper& outputFormatHelper) const;
+    };
+
+    void HandleLambdaExpr(const LambdaExpr* stmt, LambdaHelper& lambdaHelper);
+
+    LambdaStackType  mLambdaStackThis;
+    LambdaStackType& mLambdaStack;
 };
 //-----------------------------------------------------------------------------
 

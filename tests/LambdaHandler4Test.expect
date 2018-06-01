@@ -3,7 +3,7 @@ class Foo
     Foo()
     :mX{0}
     {
-
+                 
          class __lambda_6_18
          {
            public: inline /*constexpr */ void operator()() const
@@ -20,9 +20,10 @@ class Foo
            
          };
          
-                 __lambda_6_18 f = __lambda_6_18{this};
+         __lambda_6_18 f = __lambda_6_18{this};
+         
 
-
+                 
          class __lambda_10_18
          {
            public: inline /*constexpr */ void operator()() const
@@ -39,9 +40,10 @@ class Foo
            
          };
          
-                 __lambda_10_18 g = __lambda_10_18{this};
+         __lambda_10_18 g = __lambda_10_18{this};
+         
 
-
+                 
          class __lambda_14_18
          {
            public: inline /*constexpr */ void operator()() const
@@ -58,7 +60,8 @@ class Foo
            
          };
          
-                 __lambda_14_18 h = __lambda_14_18{*this};
+         __lambda_14_18 h = __lambda_14_18{*this};
+         
         
     }
 
@@ -80,7 +83,7 @@ struct X {
     void f()
     {
         // the context of the following lambda is the member function X::f
-
+                 
          class __lambda_35_9
          {
            public: inline /*constexpr */ int operator()() const
@@ -97,10 +100,6 @@ struct X {
            
          } __lambda_35_9{this};
          
-                 [=]()->int
-        {
-            return operator()(this->x + y); // X::operator()(this->x + (*this).y)
-                                            // this has type X*
-        };
+         ;
     }
 };

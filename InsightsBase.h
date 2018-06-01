@@ -33,11 +33,7 @@ protected:
 
     STRONG_BOOL(SkipConstexpr);
 
-    static void        GenerateFunctionPrototype(OutputFormatHelper& outputFormatHelper, const FunctionDecl& FD);
-    static void        InsertAccessModifierAndNameWithReturnType(OutputFormatHelper&  outputFormatHelper,
-                                                                 const CXXMethodDecl& decl,
-                                                                 SkipConstexpr        skipConstexpr = SkipConstexpr::No);
-    static const char* AccessToString(const CXXMethodDecl& decl);
+    static void GenerateFunctionPrototype(OutputFormatHelper& outputFormatHelper, const FunctionDecl& FD);
 
     bool SkipIfAlreadySeen(const Stmt* stmt);
 

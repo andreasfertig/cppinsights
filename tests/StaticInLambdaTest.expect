@@ -61,7 +61,7 @@ private:
 
 int main()
 {
-
+         
      class __lambda_52_14
      {
        public: inline Bingleton operator()(bool c) const
@@ -82,10 +82,11 @@ int main()
        
      };
      
-         __lambda_52_14 x = __lambda_52_14{};
+     __lambda_52_14 x = __lambda_52_14{};
+     
 
 
-
+         
      class __lambda_62_14
      {
        public: inline Bingleton * operator()(bool c) const
@@ -106,6 +107,7 @@ int main()
        
      };
      
-         __lambda_62_14 y = __lambda_62_14{};
+     __lambda_62_14 y = __lambda_62_14{};
+     
 }
 

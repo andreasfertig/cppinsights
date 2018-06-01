@@ -7,7 +7,7 @@
 
 
   void test(X x) {
-
+         
      class __lambda_10_5
      {
        public: inline /*constexpr */ void operator()() const
@@ -23,8 +23,8 @@
        : x{_x}
        {}
        
-     };
+     } __lambda_10_5{x};
      
-         __lambda_10_5{x}();
+     __lambda_10_5.operator()();
 
 }

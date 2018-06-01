@@ -2,8 +2,15 @@ int main()
 {
     char buffer[4];
 
-    for(auto& c: buffer) {
-
+    {
+       char (&__range1)[4] = buffer;
+       char * __begin1 = __range1;
+       char * __end1 = __range1 + 4l;
+       
+       for( ; __begin1 != __end1; ++__begin1 )
+       {
+         char & c = *__begin1;
+                           
          class __lambda_6_17
          {
            public: inline /*constexpr */ char operator()() const
@@ -18,9 +25,10 @@ int main()
            : c{_c}
            {}
            
-         };
+         } __lambda_6_17{c};
          
-                 int x = __lambda_6_17{c}();
-    }
+         int x = static_cast<int>(__lambda_6_17.operator()());
+       }
+     }
 }
 

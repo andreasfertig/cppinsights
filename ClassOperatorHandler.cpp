@@ -37,6 +37,7 @@ ClassOperatorHandler::ClassOperatorHandler(Rewriter& rewrite, MatchFinder& match
     const auto operatorMatcher = anyOf(isExpansionInSystemHeader(),
                                        isMacroOrInvalidLocation(),
                                        isTemplate,
+                                       hasAncestor(binaryOperator(hasOperatorName(","))),
                                        hasAncestor(ifStmt()),
                                        hasAncestor(switchStmt()),
                                        /* if we match the top-most CXXOperatorCallExpr we will see all

@@ -7,6 +7,7 @@
 
 #include "ImplicitCastHandler.h"
 #include "CodeGenerator.h"
+#include "DPrint.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
 #include "InsightsStaticStrings.h"
@@ -26,6 +27,7 @@ ImplicitCastHandler::ImplicitCastHandler(Rewriter& rewrite, MatchFinder& matcher
         isExpansionInSystemHeader(),
         isMacroOrInvalidLocation(),
         isTemplate,
+        hasAncestor(binaryOperator(hasOperatorName(","))),
         /* Exclude code in range-based for compiler generated part */
         hasAncestor(cxxForRangeStmt()),
         hasAncestor(userDefinedLiteral()),

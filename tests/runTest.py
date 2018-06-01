@@ -99,6 +99,11 @@ def main():
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = vars(parser.parse_args())
 
+    bFailureIsOk = False
+
+    if os.environ.has_key('FAILURE_IS_OK'):
+        bFailureIsOk = (os.environ['FAILURE_IS_OK'] == 1)
+
     insightsPath  = args['insights']
     remainingArgs = args['args']
 
@@ -139,6 +144,10 @@ def main():
             compileErrorFile = os.path.join(mypath, fileName + '.cerr')
             if os.path.isfile(compileErrorFile):
                 ce = open(compileErrorFile, 'r').read()
+
+                # Linker errors name the tmp file and not the .tmp.cpp, replace the name here to be able to suppress
+                # these errors.
+                ce = re.sub('(.*).cpp:', '.tmp:', ce)
 
                 if ce == stderr:
                     print '[PASSED] Compile: %s' %(f)
@@ -188,8 +197,10 @@ def main():
     print '-----------------------------------------------------------------'
     print 'Tests passed: %d/%d' %(filesPassed, expectedToPass)
 
-#    return expectedToPass != filesPassed # note bash expects 0 for ok
-    return 0
+    if bFailureIsOk:
+        return 0
+
+    return expectedToPass != filesPassed # note bash expects 0 for ok
 #------------------------------------------------------------------------------
 
 

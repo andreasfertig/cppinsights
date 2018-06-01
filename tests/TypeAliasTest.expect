@@ -1,6 +1,6 @@
 int main()
 {
-
+           
     class __lambda_3_12
     {
       public: inline /*constexpr */ int operator()() const
@@ -13,9 +13,10 @@ int main()
         return x + y;
       }
       
-    };
+    } __lambda_3_12{};
     
-       int w = __lambda_3_12{}();
+    int w = __lambda_3_12.operator()();
+    
 
 #if 0
    []() {

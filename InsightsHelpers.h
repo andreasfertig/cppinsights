@@ -133,6 +133,9 @@ static inline std::string GetName(const NamedDecl& ND)
 std::string GetName(const NamedDecl& namedDecl);
 //-----------------------------------------------------------------------------
 
+std::string GetNameAsFunctionPointer(const QualType& t);
+//-----------------------------------------------------------------------------
+
 std::string GetLambdaName(const CXXRecordDecl& lambda);
 
 static inline std::string GetLambdaName(const LambdaExpr& lambda)

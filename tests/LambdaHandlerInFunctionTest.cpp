@@ -9,5 +9,5 @@ int main()
 {
     Test([]{printf("Hello");});
     
-    Test([]{printf("Hello"); return 1;}());
+    Test([]{printf("Bello"); return 1;}());
 }

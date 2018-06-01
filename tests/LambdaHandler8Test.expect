@@ -16,7 +16,7 @@ int Test<__lambda_9_18>(__lambda_9_18 && t)
 
 int get(int& v){
 
-
+        
    class __lambda_9_18
    {
      public: inline /*constexpr */ int operator()() const
@@ -33,7 +33,8 @@ int get(int& v){
      
    };
    
-     int x = Test( __lambda_9_18{v});
+   int x = Test(__lambda_9_18{v});
+   
 
   return x;
 }

@@ -27,38 +27,6 @@ static auto __invoke(A a, B b) { // N3386 Return Type Deduction return a + b;
 } } L;
 
 int (*fp)(int, char) = L;
-
-
-
-
-int main() {
-    class __lambda_4
-    {
-    public:
-    using x = int ;
-   using ptr_t = int (*)(int,char);    
-    typedef int (*ptr_t)(int,char);
-//    public: inline constexpr  operator x(*)(int, char)() const
-    public: inline constexpr  operator ptr_t () const
-    {
-      return __invoke;
-    }
-    
-    public: inline constexpr int operator()(int, char) const
-    {
-      return a + b;
-    }
-    
-    private: inline static int __invoke(int, char)
-    {
-      return a + b;
-    }
-    
-    };
-    
-    int (*fp)(int, char) = __lambda_4{};
-
-}
 #endif
 }
 
