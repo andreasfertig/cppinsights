@@ -107,7 +107,7 @@ deploy:
   skip_cleanup: true
   script: scp $TRAVIS_BUILD_DIR/build/insights ${SCP_CRED} && scp $TRAVIS_BUILD_DIR/build/include*.tar.bz2 ${SCP_CRED}
   on:
-    branch: trustyClang6
+    branch: master
     condition: $DEPLOY = Yes
 env:
   global:
