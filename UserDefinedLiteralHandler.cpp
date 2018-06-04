@@ -23,12 +23,12 @@ UserDefinedLiteralHandler::UserDefinedLiteralHandler(Rewriter& rewrite, MatchFin
     matcher.addMatcher(
         userDefinedLiteral(unless(anyOf(isExpansionInSystemHeader(),
                                         isMacroOrInvalidLocation(),
-                                        hasAncestor(cxxOperatorCallExpr()),
                                         hasAncestor(userDefinedLiteral()),
                                         isTemplate,
                                         /* if we match the top-most CXXOperatorCallExpr we will see all
                                            descendants. So filter them here to avoid getting them multiple times */
                                         hasAncestor(cxxOperatorCallExpr()),
+                                        hasAncestor(cxxStdInitializerListExpr()),
                                         hasLambdaAncestor,
                                         hasAncestor(ifStmt()),
                                         hasAncestor(switchStmt()),
