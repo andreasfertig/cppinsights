@@ -40,7 +40,7 @@ matrix:
         - libclang-7-dev
         - zlib1g-dev
       ssh_known_hosts: cppinsights.io
-    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7' COVERAGE='No' DEPLOY='Yes' STATIC='No'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7' COVERAGE='No' DEPLOY='No' STATIC='No'
 
     # 3/ Linux Clang Coverage Builds
   - os: linux
@@ -57,6 +57,23 @@ matrix:
         - zlib1g-dev
         - lcov
     env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG='/usr/bin/llvm-config-7' STATIC='No' COVERAGE='Yes'
+
+    # Clang 6.0 deployment
+  - os: linux
+    compiler: clang
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-trusty-6.0
+        packages:
+        - clang-6.0
+        - llvm-6.0-dev
+        - libclang-6.0-dev
+        - zlib1g-dev
+      ssh_known_hosts: cppinsights.io
+    env: COMPILER='clang++-6.0' COMPILER_CC='clang-6.0' LLVM_CONFIG='/usr/bin/llvm-config-6.0' COVERAGE='No' DEPLOY='Yes' STATIC='Yes'
+
 install:
   - ${TRAVIS_BUILD_DIR}/scripts/travis_install.sh
     
