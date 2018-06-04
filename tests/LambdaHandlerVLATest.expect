@@ -51,7 +51,7 @@ inline SA<TA>::SA(const int & PA)
 {
   float e[nt];
   
-
+     
    class __lambda_36_8
    {
      public: inline auto operator()(int i, int j) const
@@ -68,7 +68,7 @@ inline SA<TA>::SA(const int & PA)
      
    };
    
-     test(__lambda_36_8{e});
+   test(__lambda_36_8{e});
 }
 
 int main()

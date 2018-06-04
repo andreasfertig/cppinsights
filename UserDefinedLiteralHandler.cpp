@@ -7,6 +7,7 @@
 
 #include "UserDefinedLiteralHandler.h"
 #include "CodeGenerator.h"
+#include "DPrint.h"
 #include "InsightsMatchers.h"
 //-----------------------------------------------------------------------------
 

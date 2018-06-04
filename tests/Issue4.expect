@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
   	static const char arr[] = { 1,2,3 };
-
+	  
   class __lambda_9_11
   {
     public: inline /*constexpr */ void operator()() const
@@ -23,5 +23,6 @@ int main()
     
   };
   
-  	__lambda_9_11 && l=__lambda_9_11{arr[1]};
+  __lambda_9_11 && l = __lambda_9_11{arr[1]};
+  
 }

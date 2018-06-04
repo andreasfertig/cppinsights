@@ -2,7 +2,7 @@ int main() {
     int l1;
     int l2;
 
-
+         
      class __lambda_5_5
      {
        public: inline /*constexpr */ void operator()() const
@@ -19,7 +19,7 @@ int main() {
 , l2{_l2}
        {}
        
-     };
+     } __lambda_5_5{l1, l2};
      
-         __lambda_5_5{l1, l2}();
+     __lambda_5_5.operator()();
 }

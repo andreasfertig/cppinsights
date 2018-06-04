@@ -57,7 +57,7 @@ private:
 
 int main()
 {
-
+         
      class __lambda_60_5
      {
        public: inline void operator()() const
@@ -86,9 +86,9 @@ int main()
          printf("%d\n", f.Get());
        }
        
-     };
+     } __lambda_60_5{};
      
-         __lambda_60_5{}();
+     __lambda_60_5.operator()();
 
 
     int n = 10;

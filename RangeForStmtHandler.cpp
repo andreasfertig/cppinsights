@@ -21,11 +21,13 @@ namespace clang::insights {
 RangeForStmtHandler::RangeForStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    matcher.addMatcher(
-        cxxForRangeStmt(
-            unless(anyOf(isExpansionInSystemHeader(), isTemplate, isMacroOrInvalidLocation(), hasLambdaAncestor)))
-            .bind("forRange"),
-        this);
+    matcher.addMatcher(cxxForRangeStmt(unless(anyOf(isExpansionInSystemHeader(),
+                                                    isTemplate,
+                                                    isMacroOrInvalidLocation(),
+                                                    hasAncestor(lambdaExpr()),
+                                                    hasAncestor(compoundStmt(hasParent(lambdaExpr()))))))
+                           .bind("forRange"),
+                       this);
 }
 //-----------------------------------------------------------------------------
 

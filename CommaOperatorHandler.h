@@ -5,9 +5,8 @@
  *
  ****************************************************************************/
 
-#ifndef INSIGHTS_LAMBDA_HANDLER_H
-#define INSIGHTS_LAMBDA_HANDLER_H
-//-----------------------------------------------------------------------------
+#ifndef INSIGHTS_COMMA_OPERATOR_HANDLER_H
+#define INSIGHTS_COMMA_OPERATOR_HANDLER_H
 
 #include "clang/AST/AST.h"
 #include "clang/AST/ASTContext.h"
@@ -20,19 +19,20 @@
 
 namespace clang::insights {
 
-/// \brief Show the transformation of a lambda to a class.
+/// \brief Transform statements which are separated by the comma operator.
 ///
-/// Transforms a lambda to the internal class representation with its members, mostly as described here:
-/// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3559.pdf
-class LambdaHandler final : public ast_matchers::MatchFinder::MatchCallback, public InsightsBase
+/// For example:
+/// \code
+/// [&]() {}(), []() {} ();
+/// \endcode
+class CommaOperatorHandler final : public ast_matchers::MatchFinder::MatchCallback, public InsightsBase
 {
 public:
-    LambdaHandler(Rewriter& rewrite, ast_matchers::MatchFinder& matcher);
-
+    CommaOperatorHandler(Rewriter& rewrite, ast_matchers::MatchFinder& matcher);
     void run(const ast_matchers::MatchFinder::MatchResult& result) override;
 };
 //-----------------------------------------------------------------------------
 
 }  // namespace clang::insights
 
-#endif /* INSIGHTS_LAMBDA_HANDLER_H */
+#endif /* INSIGHTS_COMMA_OPERATOR_HANDLER_H */

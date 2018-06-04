@@ -6,7 +6,7 @@
  ****************************************************************************/
 
 #include "CompilerGeneratedHandler.h"
-#include "DPrint.h"
+#include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
 #include "InsightsStaticStrings.h"
@@ -39,7 +39,7 @@ void CompilerGeneratedHandler::run(const MatchFinder::MatchResult& result)
         OutputFormatHelper outputFormatHelper{};
         outputFormatHelper.Append("/* ");
 
-        InsertAccessModifierAndNameWithReturnType(outputFormatHelper, *methodDecl);
+        CodeGenerator::InsertAccessModifierAndNameWithReturnType(outputFormatHelper, *methodDecl);
 
         outputFormatHelper.AppendNewLine("; */");
 

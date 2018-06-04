@@ -1,20 +1,12 @@
 int main() 
 {
     char buffer;
-
+         
      class __lambda_4_5
      {
        public: inline /*constexpr */ void operator()() const
        {
-         __lambda_6_9.operator()();
-       }
-       
-       private:
-       char& buffer;
-       
-       public: __lambda_4_5(char& _buffer)
-       : buffer{_buffer}
-  
+                  
          class __lambda_6_9
          {
            public: inline /*constexpr */ void operator()() const
@@ -29,9 +21,20 @@ int main()
            : buffer{_buffer}
            {}
            
-         };
+         } __lambda_6_9{buffer};
          
-              {}
-__lambda_6_9{buffer}_5{buffer}();
+         __lambda_6_9.operator()();
+       }
+       
+       private:
+       char& buffer;
+       
+       public: __lambda_4_5(char& _buffer)
+       : buffer{_buffer}
+       {}
+       
+     } __lambda_4_5{buffer};
+     
+     __lambda_4_5.operator()();
 
 }

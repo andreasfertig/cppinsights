@@ -1,19 +1,19 @@
 int main()
 {
   // empty lambda directly invoked with empty body
-
+         
      class __lambda_4_5
      {
        public: inline /*constexpr */ void operator()() const
        {
        }
        
-     };
+     } __lambda_4_5{};
      
-         __lambda_4_5{}();
+     __lambda_4_5.operator()();
 
 
-
+         
      class __lambda_7_5
      {
        public: inline /*constexpr */ void operator()() const
@@ -21,15 +21,15 @@ int main()
          1 * 2;
        }
        
-     };
+     } __lambda_7_5{};
      
-         __lambda_7_5{}();
+     __lambda_7_5.operator()();
 
 
     int a;
     int b;
 
-
+         
      class __lambda_13_5
      {
        public: inline /*constexpr */ void operator()(int & x, int & y) const
@@ -37,9 +37,9 @@ int main()
          x = x + y;
        }
        
-     };
+     } __lambda_13_5{};
      
-         __lambda_13_5{}(a, b);
+     __lambda_13_5.operator()(a, b);
     
 }
 

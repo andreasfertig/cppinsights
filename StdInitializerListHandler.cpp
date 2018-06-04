@@ -7,6 +7,7 @@
 
 #include "StdInitializerListHandler.h"
 #include "CodeGenerator.h"
+#include "DPrint.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
 #include "InsightsStaticStrings.h"

@@ -268,6 +268,7 @@ add_clang_executable(insights
     AutoStmtHandler.cpp
     ClassOperatorHandler.cpp
     CodeGenerator.cpp
+    CommaOperatorHandler.cpp
     CompilerGeneratedHandler.cpp
     DPrint.cpp
     IfStmtHandler.cpp

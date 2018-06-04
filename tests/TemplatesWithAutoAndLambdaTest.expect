@@ -1,0 +1,47 @@
+#include <iostream>
+
+// Example taken from Nicolai Josuttis slides
+template<auto sep = ' ',
+         typename T1, typename... Types>
+void print(const T1& arg1, const Types&... args)
+{
+    std::cout << arg1;
+    auto coutSpaceAndArg = [](const auto& arg) {
+      std::cout << sep << arg;
+      };
+
+   // we end up here with multiple parameters named 'args'. Other than that it would compile    
+   (..., coutSpaceAndArg(args));     
+}
+
+/* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:20 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3], const double & args, const std::basic_string<char> & args)
+{
+  std::operator<<(std::cout, arg1);
+    
+  class __lambda_9_28
+  {
+    public: inline /*constexpr */ void operator()(const double & arg) const
+    {
+      std::operator<<(std::cout, ' ') << arg;
+    }
+    public: inline /*constexpr */ void operator()(const std::basic_string<char> & arg) const
+    {
+      std::operator<<(std::cout, ' ') << arg;
+    }
+    
+  };
+  
+  __lambda_9_28 coutSpaceAndArg = __lambda_9_28{};
+  coutSpaceAndArg.operator()(args) , coutSpaceAndArg.operator()(args);
+}
+#endif
+
+
+int main()
+{
+  std::string str = "world";
+  print( "hi", 7.5, str);
+}

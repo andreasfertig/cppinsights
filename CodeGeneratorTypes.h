@@ -76,6 +76,7 @@ SUPPORTED_STMT(DefaultStmt)
 SUPPORTED_STMT(CXXForRangeStmt)
 SUPPORTED_STMT(DoStmt)
 SUPPORTED_STMT(ArrayInitIndexExpr)
+SUPPORTED_STMT(UnresolvedLookupExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

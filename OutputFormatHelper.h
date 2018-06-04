@@ -36,6 +36,26 @@ public:
     {
     }
 
+    /// \brief Returns the current position in the output buffer.
+    size_t CurrentPos() const { return mOutput.length(); }
+
+    /// \brief Insert a string before the position \c atPos
+    void InsertAt(const size_t atPos, const std::string& data) { mOutput.insert(atPos, data); }
+
+    /// \brief Set the indent level of this class to that of \c rhs.
+    void SetIndent(const OutputFormatHelper& rhs)
+    {
+        if(&rhs != this) {
+            mDefaultIndent = rhs.mDefaultIndent;
+            Indent(mDefaultIndent);
+        }
+    }
+
+    /// \brief Check whether the buffer is empty.
+    ///
+    /// This also treats a string of just whitespaces as empty.
+    bool empty() const { return mOutput.empty() || (std::string::npos == mOutput.find_first_not_of(' ', 0)); }
+
     /// \brief Returns a reference to the underlying string buffer.
     std::string& GetString() { return mOutput; }
 

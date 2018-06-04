@@ -6,8 +6,14 @@
  ****************************************************************************/
 
 #include "CodeGenerator.h"
+#include "DPrint.h"
 #include "InsightsMatchers.h"
 #include "InsightsStrCat.h"
+//-----------------------------------------------------------------------------
+
+/// \brief Convenience macro to create a \ref LambdaScopeHandler on the stack.
+#define LAMBDA_SCOPE_HELPER(type)                                                                                      \
+    LambdaScopeHandler lambdaScopeHandler{mLambdaStack, mOutputFormatHelper, LambdaCallerType::type};
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
@@ -26,6 +32,58 @@ public:
     void InsertArg(const Stmt* stmt) override { CodeGenerator::InsertArg(stmt); }
     void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(std::to_string(mIndex)); }
 };
+//-----------------------------------------------------------------------------
+
+CodeGenerator::LambdaScopeHandler::LambdaScopeHandler(LambdaStackType&       stack,
+                                                      OutputFormatHelper&    outputFormatHelper,
+                                                      const LambdaCallerType lambdaCallerType)
+: mStack{stack}
+, mHelper{lambdaCallerType, GetBuffer(outputFormatHelper)}
+{
+    DPrint("xx: %d\n", static_cast<int>(lambdaCallerType));
+    mStack.push(mHelper);
+}
+//-----------------------------------------------------------------------------
+
+CodeGenerator::LambdaScopeHandler::~LambdaScopeHandler()
+{
+    DPrint("ddddd\n");
+    if(!mStack.empty()) {
+        mStack.pop()->finish();
+    }
+}
+//-----------------------------------------------------------------------------
+
+OutputFormatHelper& CodeGenerator::LambdaScopeHandler::GetBuffer(OutputFormatHelper& outputFormatHelper) const
+{
+    DPrint("kkk  - ");
+    // Find the most outer element to place the lambda class definition. For example, if we have this:
+    // Test( [&]() {} );
+    // The lambda's class definition needs to be placed _before_ the CallExpr to Test.
+    auto* element = [&]() -> LambdaHelper* {
+        for(auto& l : mStack) {
+            DPrint(" x: %d  ", static_cast<int>(l.callerType()));
+
+            switch(l.callerType()) {
+                case LambdaCallerType::CallExpr:
+                case LambdaCallerType::VarDecl:
+                case LambdaCallerType::ReturnStmt:
+                case LambdaCallerType::OperatorCallExpr:
+                case LambdaCallerType::MemberCallExpr:
+                case LambdaCallerType::BinaryOperator: return &l;
+                default: break;
+            }
+        }
+
+        return nullptr;
+    }();
+
+    if(element) {
+        return element->buffer();
+    }
+
+    return outputFormatHelper;
+}
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
@@ -72,6 +130,12 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 
     // close outer range-for scope
     mOutputFormatHelper.CloseScope();
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const UnresolvedLookupExpr* stmt)
+{
+    mOutputFormatHelper.Append(stmt->getName().getAsString());
 }
 //-----------------------------------------------------------------------------
 
@@ -169,12 +233,28 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
     InsertArg(stmt->getBase());
 
     const std::string op{stmt->isArrow() ? "->" : "."};
-    mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getName().getAsString());
+    const auto*       meDecl = stmt->getMemberDecl();
+    bool              skipTemplateArgs{false};
+    const auto        name = [&]() -> std::string {
+        // Handle a special case where we have a lambda static invoke operator. In that case use the appropriate using
+        // retType as return type
+        if(const auto* m = dyn_cast_or_null<CXXMethodDecl>(meDecl)) {
+            if(const auto* rd = m->getParent(); rd && rd->isLambda()) {
+                skipTemplateArgs = true;
 
-    const auto* meDecl = stmt->getMemberDecl();
+                return StrCat("operator ", GetLambdaName(*rd), "::retType");
+            }
+        }
 
-    if(const auto cxxMethod = dyn_cast_or_null<CXXMethodDecl>(meDecl)) {
-        InsertTemplateArgs(*cxxMethod->getAsFunction());
+        return stmt->getMemberNameInfo().getName().getAsString();
+    }();
+
+    mOutputFormatHelper.Append(op, name);
+
+    if(!skipTemplateArgs) {
+        if(const auto cxxMethod = dyn_cast_or_null<CXXMethodDecl>(meDecl)) {
+            InsertTemplateArgs(*cxxMethod->getAsFunction());
+        }
     }
 }
 //-----------------------------------------------------------------------------
@@ -219,6 +299,8 @@ void CodeGenerator::InsertArg(const CXXTypeidExpr* stmt)
 
 void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 {
+    LAMBDA_SCOPE_HELPER(BinaryOperator);
+
     InsertArg(stmt->getLHS());
     mOutputFormatHelper.Append(" ", stmt->getOpcodeStr(), " ");
     InsertArg(stmt->getRHS());
@@ -348,13 +430,23 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
 void CodeGenerator::InsertArg(const VarDecl* stmt)
 {
+    LAMBDA_SCOPE_HELPER(VarDecl);
+
     if(const auto* decompDecl = dyn_cast_or_null<DecompositionDecl>(stmt)) {
         InsertArg(decompDecl);
     } else if(IsTrivialStaticClassVarDecl(*stmt)) {
         HandleLocalStaticNonTrivialClass(stmt);
 
     } else {
-        mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
+        if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
+            const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
+            const std::string funcPtrName{StrCat("FuncPtr_", std::to_string(lineNo), " ")};
+
+            mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
+            mOutputFormatHelper.Append((stmt->isConstexpr() ? kwConstExprSpace : ""), funcPtrName, GetName(*stmt));
+        } else {
+            mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
+        }
 
         if(stmt->hasInit()) {
             mOutputFormatHelper.Append(" = ");
@@ -397,6 +489,8 @@ void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 {
+    LAMBDA_SCOPE_HELPER(MemberCallExpr);
+
     InsertArg(stmt->getCallee());
     mOutputFormatHelper.Append('(');
 
@@ -489,6 +583,8 @@ void CodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 
 void CodeGenerator::InsertArg(const CallExpr* stmt)
 {
+    LAMBDA_SCOPE_HELPER(CallExpr);
+
     InsertArg(stmt->getCallee());
 
     if(isa<UserDefinedLiteral>(stmt)) {
@@ -719,6 +815,8 @@ void CodeGenerator::InsertArg(const MaterializeTemporaryExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 {
+    LAMBDA_SCOPE_HELPER(OperatorCallExpr);
+
     DPrint("args: %d\n", stmt->getNumArgs());
 
     Dump(stmt);
@@ -805,7 +903,17 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 
 void CodeGenerator::InsertArg(const LambdaExpr* stmt)
 {
-    mOutputFormatHelper.Append(GetLambdaName(*stmt));
+    if(!mLambdaStack.empty()) {
+        HandleLambdaExpr(stmt, mLambdaStack.back());
+        mOutputFormatHelper.Append(GetLambdaName(*stmt));
+    } else {
+        LAMBDA_SCOPE_HELPER(LambdaExpr);
+        HandleLambdaExpr(stmt, mLambdaStack.back());
+    }
+
+    if(!mLambdaStack.empty()) {
+        mLambdaStack.back().insertInits(mOutputFormatHelper);
+    }
 }
 //-----------------------------------------------------------------------------
 
@@ -906,13 +1014,15 @@ void CodeGenerator::InsertArg(const SubstNonTypeTemplateParmExpr* stmt)
 
 void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 {
+    LAMBDA_SCOPE_HELPER(ReturnStmt);
+
     mOutputFormatHelper.Append("return");
 
     if(const auto* retVal = stmt->getRetValue()) {
         mOutputFormatHelper.Append(' ');
         InsertArg(retVal);
     }
-}
+}  // namespace clang::insights
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
@@ -1132,7 +1242,9 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
 {
     switch(arg.getKind()) {
         case TemplateArgument::Type: mOutputFormatHelper.Append(GetName(arg.getAsType())); break;
-        case TemplateArgument::Declaration: InsertArg(arg.getAsDecl()); break;
+        case TemplateArgument::Declaration:
+            mOutputFormatHelper.Append(GetNameAsFunctionPointer(arg.getAsDecl()->getType()));
+            break;
         case TemplateArgument::NullPtr: mOutputFormatHelper.Append(GetName(arg.getNullPtrType())); break;
         case TemplateArgument::Integral: mOutputFormatHelper.Append(arg.getAsIntegral()); break;
         case TemplateArgument::Expression: InsertArg(arg.getAsExpr()); break;
@@ -1234,6 +1346,321 @@ const char* CodeGenerator::GetBuiltinTypeSuffix(const BuiltinType& type)
         default: return "";
     }
 #undef BTCASE
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertMethod(const Decl*          d,
+                                 OutputFormatHelper&  outputFormatHelper,
+                                 const CXXMethodDecl& md,
+                                 bool /*skipConstexpr*/)
+{
+    if(const auto* m = dyn_cast_or_null<CXXMethodDecl>(d)) {
+        InsertAccessModifierAndNameWithReturnType(outputFormatHelper, *m, SkipConstexpr::Yes);
+        outputFormatHelper.AppendNewLine();
+
+        LambdaCodeGenerator lambdaCodeGenerator{outputFormatHelper, mLambdaStack};
+        CodeGenerator&      codeGenerator{lambdaCodeGenerator};
+        codeGenerator.InsertArg(md.getBody());
+        outputFormatHelper.AppendNewLine();
+    }
+}
+//-----------------------------------------------------------------------------
+
+/// \brief Get a correct type for an array.
+///
+/// This is a special case for lambdas. The QualType of the VarDecl we are looking at could be a plain type. But if we
+/// capture via reference, obviously we need to a a reference. This is why the more general version does not work here.
+/// Probably needs improvement.
+static std::string GetCaptureTypeNameAsParameter(const QualType& t, const std::string& varName)
+{
+    std::string typeName = GetName(t);
+
+    if(t->isArrayType()) {
+        InsertBefore(typeName, "[", StrCat("(&", varName, ")"));
+    }
+
+    return typeName;
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lambdaHelper)
+{
+    const LambdaCallerType lambdaCallerType   = lambdaHelper.callerType();
+    OutputFormatHelper&    outputFormatHelper = lambdaHelper.buffer();
+
+    outputFormatHelper.AppendNewLine();
+
+    const std::string lambdaTypeName{GetLambdaName(*lambda->getLambdaClass())};
+    outputFormatHelper.AppendNewLine(kwClassSpace, lambdaTypeName);
+    outputFormatHelper.OpenScope();
+
+    const auto& callOp      = *lambda->getCallOperator();
+    const auto& lambdaClass = *lambda->getLambdaClass();
+
+    if(lambda->isGenericLambda()) {
+        bool       haveConversionOperator{false};
+        const auto conversions = llvm::make_range(lambdaClass.conversion_begin(), lambdaClass.conversion_end());
+        for(auto&& conversion : conversions) {
+            for(const auto* s : conversion->getAsFunction()->getDescribedFunctionTemplate()->specializations()) {
+                if(const auto* cxxmd = dyn_cast_or_null<CXXMethodDecl>(s)) {
+                    haveConversionOperator = true;
+                    InsertMethod(s, outputFormatHelper, *cxxmd, false);
+                }
+            }
+
+            DPrint("-----\n");
+        }
+
+        for(const auto* o : lambdaClass.getLambdaCallOperator()->getDescribedFunctionTemplate()->specializations()) {
+            InsertMethod(o, outputFormatHelper, *lambdaClass.getLambdaCallOperator(), false);
+        }
+
+        if(haveConversionOperator && lambdaClass.getLambdaStaticInvoker()) {
+            for(const auto* iv :
+                lambdaClass.getLambdaStaticInvoker()->getDescribedFunctionTemplate()->specializations()) {
+                DPrint("invoker:\n");
+
+                InsertMethod(iv, outputFormatHelper, *lambdaClass.getLambdaCallOperator(), false);
+            }
+        }
+
+    } else {
+        bool       haveConversionOperator{false};
+        const auto conversions = llvm::make_range(lambdaClass.conversion_begin(), lambdaClass.conversion_end());
+        for(auto&& conversion : conversions) {
+            const auto* func = conversion->getAsFunction();
+
+            if(const auto* cxxmd = dyn_cast_or_null<CXXMethodDecl>(func)) {
+                /* looks like a conversion operator is (often) there but sometimes undeduced. e.g. still has return
+                 * type auto and no body. We do not want these functions. */
+                if(cxxmd->hasBody()) {
+                    haveConversionOperator = true;
+                    InsertMethod(func, outputFormatHelper, *cxxmd, false);
+                }
+            }
+
+            DPrint("-----\n");
+        }
+
+        InsertMethod(&callOp, outputFormatHelper, callOp, false);
+
+        if(haveConversionOperator && lambdaClass.getLambdaStaticInvoker()) {
+            InsertMethod(
+                lambdaClass.getLambdaStaticInvoker(), outputFormatHelper, *lambdaClass.getLambdaCallOperator(), false);
+        }
+    }
+
+    /*
+     *   class xx
+     *   {
+     *      x _var1{var1}
+     *      ...
+     *
+     *      RET operator()() MUTABLE
+     *      {
+     *        BODY
+     *      }
+     *
+     *   };
+     *
+     */
+
+    std::string ctor{StrCat("public: ", lambdaTypeName, "(")};
+    std::string ctorInits{": "};
+    std::string inits("{");
+
+    if(0 != lambda->capture_size()) {
+        outputFormatHelper.AppendNewLine();
+        outputFormatHelper.Append("private:");
+    }
+
+    DPrint("captures\n");
+    bool        first{true};
+    bool        ctorRequired{false};
+    const auto* captureInits = lambda->capture_init_begin();
+    for(const auto& c : lambda->captures()) {
+        const auto* captureInit = *captureInits;
+        ++captureInits;
+        ctorRequired = true;
+
+        if(!c.capturesVariable() && !c.capturesThis()) {
+            // This also catches VLA captures
+            if(!c.capturesVLAType()) {
+                Error(captureInit, "no capture var\n");
+            }
+            continue;
+        }
+
+        if(first) {
+            first = false;
+            outputFormatHelper.AppendNewLine();
+        } else {
+            ctor.append(", ");
+            inits.append(", ");
+            ctorInits.append("\n, ");
+        }
+
+        const auto* capturedVar = c.getCapturedVar();
+        const auto& varType     = [&]() {
+            if(c.capturesThis()) {
+                return captureInit->getType();
+            }
+
+            return capturedVar->getType();
+        }();
+
+        const std::string varNamePlain = [&]() {
+            if(c.capturesThis()) {
+                return std::string{"this"};
+            }
+
+            return GetName(*capturedVar);
+        }();
+
+        DPrint("plain name: %s\n", varNamePlain);
+
+        const std::string varName = [&]() {
+            if(c.capturesThis()) {
+                return StrCat("__", varNamePlain);
+            }
+
+            return varNamePlain;
+        }();
+
+        const std::string varTypeName     = GetCaptureTypeNameAsParameter(varType, varNamePlain);
+        const std::string ctorVarTypeName = GetCaptureTypeNameAsParameter(varType, StrCat("_", varNamePlain));
+
+        DPrint("%s\n", varTypeName);
+
+        ctor.append(ctorVarTypeName);
+
+        outputFormatHelper.Append(varTypeName);
+
+        const auto captureKind = c.getCaptureKind();
+        switch(captureKind) {
+            case LCK_This: break;
+            case LCK_StarThis: break;
+            case LCK_ByCopy: break;
+            case LCK_VLAType: break;  //  unreachable
+            case LCK_ByRef:
+                /* varTypeName already carries the & in case we capture a reference by reference, we need to skip it in
+                 * case of an array */
+                if(!varType->isReferenceType() && !varType->isArrayType()) {
+                    ctor.append("&");
+                    outputFormatHelper.Append("&");
+                }
+                break;
+        }
+
+        // If we initialize by copy we can assign a variable: [a=b[1]], get this assigned variable (b[1]) and not a in
+        // this case.
+        if(!c.capturesThis() && capturedVar->hasInit() && (captureKind == LCK_ByCopy)) {
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm, mLambdaStack};
+            codeGenerator.InsertArg(captureInit);
+            inits.append(ofm.GetString());
+        } else {
+            inits.append(StrCat(((c.getCaptureKind() == LCK_StarThis) ? "*" : ""), varNamePlain));
+        }
+
+        if(!varType->isArrayType()) {
+            ctor.append(StrCat(" _", varName));
+            outputFormatHelper.AppendNewLine(" ", varName, ";");
+        } else {
+            outputFormatHelper.AppendNewLine(";");
+        }
+
+        ctorInits.append(StrCat(varName, "{_", varName, "}"));
+    }
+
+    ctor.append(")");
+    inits.append("}");
+
+    if(ctorRequired) {
+        outputFormatHelper.AppendNewLine("");
+        outputFormatHelper.AppendNewLine(ctor);
+        outputFormatHelper.AppendNewLine(ctorInits);
+        outputFormatHelper.AppendNewLine("{}");
+    }
+
+    // close the class scope
+    outputFormatHelper.CloseScope();
+
+    if((LambdaCallerType::VarDecl != lambdaCallerType) && (LambdaCallerType::CallExpr != lambdaCallerType)) {
+        outputFormatHelper.Append(" ", GetLambdaName(*lambda), inits);
+    } else {
+        mLambdaStack.back().inits().append(inits);
+    }
+
+    outputFormatHelper.AppendNewLine(";");
+    outputFormatHelper.AppendNewLine();
+}
+//-----------------------------------------------------------------------------
+
+static const char* AccessToString(const CXXMethodDecl& decl)
+{
+    switch(decl.getAccess()) {
+        case AS_public: return "public";
+        case AS_protected: return "protected";
+        case AS_private: return "private";
+        default: return "";
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertAccessModifierAndNameWithReturnType(OutputFormatHelper&  outputFormatHelper,
+                                                              const CXXMethodDecl& decl,
+                                                              SkipConstexpr        skipConstexpr)
+{
+    outputFormatHelper.Append(AccessToString(decl), ": ");
+
+    // types of conversion decls can be invalid to type at this place. So introduce a using
+    if(isa<CXXConversionDecl>(decl)) {
+        outputFormatHelper.AppendNewLine("using retType = ", GetName(GetDesugarReturnType(decl)), ";");
+    }
+
+    if(decl.isInlined()) {
+        outputFormatHelper.Append(kwInlineSpace);
+    }
+
+    if(decl.isStatic()) {
+        outputFormatHelper.Append(kwStaticSpace);
+    }
+
+    if(decl.isVirtual()) {
+        outputFormatHelper.Append(kwVirtualSpace);
+    }
+
+    if(decl.isVolatile()) {
+        outputFormatHelper.Append(kwVolatileSpace);
+    }
+
+    if(decl.isConstexpr()) {
+        if(SkipConstexpr::Yes == skipConstexpr) {
+            outputFormatHelper.Append("/*");
+        }
+
+        outputFormatHelper.Append(kwConstExprSpace);
+
+        if(SkipConstexpr::Yes == skipConstexpr) {
+            outputFormatHelper.Append("*/ ");
+        }
+    }
+
+    if(!isa<CXXConstructorDecl>(decl) && !isa<CXXDestructorDecl>(decl)) {
+        if(isa<CXXConversionDecl>(decl)) {
+            outputFormatHelper.Append("operator retType (");
+        } else {
+            outputFormatHelper.Append(GetName(GetDesugarReturnType(decl)), " ");
+        }
+    }
+
+    if(!isa<CXXConversionDecl>(decl)) {
+        outputFormatHelper.Append(GetName(decl), "(");
+    }
+
+    outputFormatHelper.AppendParameterList(decl.parameters(), OutputFormatHelper::WithParameterName::Yes);
+    outputFormatHelper.Append(")", GetConst(decl), GetNoExcept(decl));
 }
 //-----------------------------------------------------------------------------
 

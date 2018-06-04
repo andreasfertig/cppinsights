@@ -1,6 +1,6 @@
 int main()
 {
-
+         
      class __lambda_3_5
      {
        public: inline /*constexpr */ void operator()() const
@@ -11,7 +11,7 @@ int main()
          } while( true );
        }
        
-     };
+     } __lambda_3_5{};
      
-         __lambda_3_5{}();
+     __lambda_3_5.operator()();
 }

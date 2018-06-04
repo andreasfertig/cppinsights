@@ -34,6 +34,7 @@
 
 #include "AutoStmtHandler.h"
 #include "ClassOperatorHandler.h"
+#include "CommaOperatorHandler.h"
 #include "CompilerGeneratedHandler.h"
 #include "IfStmtHandler.h"
 #include "ImplicitCastHandler.h"
@@ -88,6 +89,7 @@ public:
     , mNrvoHandler{rewriter, mMatcher}
     , mUserDefinedLiteralHandler{rewriter, mMatcher}
     , mStdInitializerListHandler{rewriter, mMatcher}
+    , mCommaOperatorHandler{rewriter, mMatcher}
     {
     }
 
@@ -109,6 +111,7 @@ private:
     NRVOHandler               mNrvoHandler;
     UserDefinedLiteralHandler mUserDefinedLiteralHandler;
     StdInitializerListHandler mStdInitializerListHandler;
+    CommaOperatorHandler      mCommaOperatorHandler;
 };
 //-----------------------------------------------------------------------------
 
