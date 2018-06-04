@@ -100,14 +100,14 @@ before_deploy:
 - chmod 600 /tmp/deploy_rsa
 - ssh-add /tmp/deploy_rsa
 - tar -cjf $TRAVIS_BUILD_DIR/build/include.tar.bz2 /usr/include
-- tar -cjf $TRAVIS_BUILD_DIR/build/include-clang.tar.bz2 /usr/lib/llvm-7/lib/clang/7.0.0/include
+- tar -cjf $TRAVIS_BUILD_DIR/build/include-clang.tar.bz2 /usr/lib/llvm-6.0/lib/clang/6.0.1/include
   
 deploy:
   provider: script
   skip_cleanup: true
   script: scp $TRAVIS_BUILD_DIR/build/insights ${SCP_CRED} && scp $TRAVIS_BUILD_DIR/build/include*.tar.bz2 ${SCP_CRED}
   on:
-    branch: master
+    branch: trustyClang6
     condition: $DEPLOY = Yes
 env:
   global:
