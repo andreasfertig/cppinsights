@@ -1,0 +1,99 @@
+template<typename T, bool array>
+class Alloc
+{
+    T* data;
+    
+public:
+    Alloc() {
+        if( array ) {
+            data = new T[10];
+            data = new T[10]{1,2,3};
+        } else {
+            data = new T;
+            data = new T(2);
+            data = new T{2};
+        }
+    }
+
+    ~Alloc() {
+        if( array ) {
+            delete[] data;
+        } else {
+            delete data;
+        }
+    }
+};
+/* First instantiated from: CXXDestructorTest.cpp:29 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Alloc<int, 0>
+{
+  int * data;
+  
+  public: 
+  inline Alloc()
+  {
+    if(false) {
+      this->data = new int[10];
+      this->data = new int[10]{1, 2, 3};
+    } else {
+      this->data = new int;
+      this->data = new int{2};
+      this->data = new int{2};
+    }
+  }
+  
+  inline ~Alloc() noexcept
+  {
+    if(false) {
+      delete[] this->data;
+    } else {
+      delete this->data;
+    }
+  }
+  
+  inline constexpr Alloc(const Alloc<int, 0> &) = default;
+  
+};
+
+#endif
+
+/* First instantiated from: CXXDestructorTest.cpp:30 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Alloc<char, 1>
+{
+  char * data;
+  
+  public: 
+  inline Alloc()
+  {
+    if(true) {
+      this->data = new char[10];
+      this->data = new char[10]{1, 2, 3};
+    } else {
+      this->data = new char;
+      this->data = new char{2};
+      this->data = new char{2};
+    }
+  }
+  
+  inline ~Alloc() noexcept
+  {
+    if(true) {
+      delete[] this->data;
+    } else {
+      delete this->data;
+    }
+  }
+  
+  inline constexpr Alloc(const Alloc<char, 1> &) = default;
+  
+};
+
+#endif
+
+
+int main()
+{
+    Alloc<int, false> a;
+    Alloc<char, true> b;
+}

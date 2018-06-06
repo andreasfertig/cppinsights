@@ -24,8 +24,34 @@ struct SA
 };
 /* First instantiated from: LambdaHandlerVLATest.cpp:42 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class SA<2>
+struct SA<2>
 {
+  inline SA(const int & PA)
+  {
+    float e[this->nt];
+        
+    class __lambda_36_8
+    {
+      public: inline /*constexpr */ bool operator()(int i, int j) const
+      {
+        return e[i] < e[j];
+      }
+      
+      private:
+      float (&e)[this->nt];
+      
+      public: __lambda_36_8(float (&_e)[this->nt])
+      : e{_e}
+      {}
+      
+    };
+    
+    test(__lambda_36_8{e});
+  }
+  
+  int nt;
+  inline constexpr SA(const SA<2> &) = default;
+  inline constexpr SA(SA<2> &&) = default;
   
 };
 

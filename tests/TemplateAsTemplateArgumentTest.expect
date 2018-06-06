@@ -3,6 +3,10 @@ template<typename T> class my_array {};
 #ifdef INSIGHTS_USE_TEMPLATE
 class my_array<int>
 {
+  inline constexpr my_array() noexcept = default;
+  inline ~my_array() = default;
+  inline constexpr my_array(const my_array<int> &) = default;
+  inline constexpr my_array(my_array<int> &&) = default;
   
 };
 
@@ -20,6 +24,11 @@ class Map
 #ifdef INSIGHTS_USE_TEMPLATE
 class Map<int, int, my_array>
 {
+  my_array<int> key;
+  my_array<int> value;
+  inline constexpr Map() noexcept = default;
+  inline constexpr Map(const Map<int, int, my_array> &) = default;
+  inline constexpr Map(Map<int, int, my_array> &&) = default;
   
 };
 

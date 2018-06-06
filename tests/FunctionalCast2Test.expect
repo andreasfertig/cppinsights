@@ -31,7 +31,7 @@ constexpr bool Compare(const T (&ar)[N], const TTo& to)
 template<>
 inline constexpr bool Compare<unsigned char, 6, int>(const unsigned char (&ar)[6], const int & to)
 {
-  return details::array_single_compare::Compare(ar, to, std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>{  });
+  return details::array_single_compare::Compare(ar, to, std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>{});
 }
 #endif
 
@@ -65,7 +65,7 @@ constexpr bool Compare(const T (&ar)[N], const T (&to)[N])
 template<>
 inline constexpr bool Compare<unsigned char, 6>(const unsigned char (&ar)[6], const unsigned char (&to)[6])
 {
-  return details::array_compare::Compare(ar, to, std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>{  });
+  return details::array_compare::Compare(ar, to, std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>{});
 }
 #endif
 

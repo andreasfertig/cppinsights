@@ -44,6 +44,10 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         InsertInstantiatedTemplate(*functionDecl, result);
 
     } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("class")) {
+        // skip classes/struct's without a definition
+        if(!clsTmplSpecDecl->hasDefinition()) {
+            return;
+        }
 
         OutputFormatHelper outputFormatHelper{};
         outputFormatHelper.AppendNewLine();
@@ -53,19 +57,9 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
 
-        outputFormatHelper.Append(kwClassSpace, GetName(*clsTmplSpecDecl));
-
         CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertTemplateArgs(*clsTmplSpecDecl);
+        codeGenerator.InsertArg(clsTmplSpecDecl);
 
-        outputFormatHelper.AppendNewLine();
-
-        outputFormatHelper.OpenScope();
-
-        outputFormatHelper.CloseScopeWithSemi();
-        outputFormatHelper.AppendNewLine();
-
-        outputFormatHelper.AppendNewLine();
         outputFormatHelper.AppendNewLine("#endif");
 
         const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");

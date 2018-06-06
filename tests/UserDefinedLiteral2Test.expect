@@ -9,7 +9,7 @@ constexpr seconds_t operator ""_s(unsigned long long s)
 
 int main()
 {
-    if( true ) {
+    if(true) {
        std::chrono::duration<long long, std::ratio<1, 1> > s = operator""_s(1ull);
      }
      

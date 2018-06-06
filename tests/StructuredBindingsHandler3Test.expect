@@ -5,8 +5,9 @@ namespace std { template<typename T> struct tuple_size; }
 namespace std { template<size_t, typename> struct tuple_element;
 /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class tuple_element<0, constant::Q>
+struct tuple_element<0, constant::Q>
 {
+  using type = int;
   
 };
 
@@ -14,8 +15,9 @@ class tuple_element<0, constant::Q>
 
 /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class tuple_element<1, constant::Q>
+struct tuple_element<1, constant::Q>
 {
+  using type = int;
   
 };
 
@@ -23,8 +25,9 @@ class tuple_element<1, constant::Q>
 
 /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class tuple_element<2, constant::Q>
+struct tuple_element<2, constant::Q>
 {
+  using type = int;
   
 };
 

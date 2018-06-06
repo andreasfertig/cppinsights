@@ -57,29 +57,29 @@ void something<float>(std::initializer_list<float>)
 
 
 void foo() {
-    X{ std::initializer_list<int>{ 1, 2, 3 } };
+    X{ std::initializer_list<int>{1, 2, 3} };
     X{nullptr, 0};
 
-    X x{ std::initializer_list<int>{ 3, 4, 5 } };
-    X b{ std::initializer_list<int>{ 1 } };
+    X x{ std::initializer_list<int>{3, 4, 5} };
+    X b{ std::initializer_list<int>{1} };
 
-    X{1, std::initializer_list<int>{ 2, 3 }};
-    X c{1, std::initializer_list<int>{ 2, 3 }};
+    X{1, std::initializer_list<int>{2, 3}};
+    X c{1, std::initializer_list<int>{2, 3}};
 
-    X{std::initializer_list<int>{ 1, 2 }, 3};
-    X d{std::initializer_list<int>{ 1, 2 }, 3};
+    X{std::initializer_list<int>{1, 2}, 3};
+    X d{std::initializer_list<int>{1, 2}, 3};
     
-    b.operator+=(std::initializer_list<int>{ 2, 4 });
+    b.operator+=(std::initializer_list<int>{2, 4});
 
     takes_y({1, 2});
 
-    bar( std::initializer_list<int>{ 1, 2 } );
+    bar( std::initializer_list<int>{1, 2} );
 
-    something( std::initializer_list<int>{ 1, 2 } );
+    something( std::initializer_list<int>{1, 2} );
 
-    something( std::initializer_list<float>{ 1.0f, 2.0f } );
+    something( std::initializer_list<float>{1.0f, 2.0f} );
 
-    V v{ std::initializer_list<int>{ 1 } };
-    V vv{ std::initializer_list<int>{ 1, 2 } };
+    V v{ std::initializer_list<int>{1} };
+    V vv{ std::initializer_list<int>{1, 2} };
 }
 

@@ -1,0 +1,64 @@
+template<typename T, bool array>
+class Alloc
+{
+    const int z;
+    T* data{nullptr};    
+    const bool x{false};
+    
+public:
+    Alloc() : z{2}
+    {
+    }
+};
+/* First instantiated from: CXXDefaultInitExprTest.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Alloc<int, 0>
+{
+  const int z;
+  int * data;
+  const bool x;
+  
+  public: 
+  inline Alloc()
+  : z{2}
+  , data{nullptr}
+  , x{false}
+  {
+  }
+  
+  inline constexpr Alloc(const Alloc<int, 0> &) = default;
+  inline constexpr Alloc(Alloc<int, 0> &&) = default;
+  
+};
+
+#endif
+
+/* First instantiated from: CXXDefaultInitExprTest.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Alloc<char, 1>
+{
+  const int z;
+  char * data;
+  const bool x;
+  
+  public: 
+  inline Alloc()
+  : z{2}
+  , data{nullptr}
+  , x{false}
+  {
+  }
+  
+  inline constexpr Alloc(const Alloc<char, 1> &) = default;
+  inline constexpr Alloc(Alloc<char, 1> &&) = default;
+  
+};
+
+#endif
+
+
+int main()
+{
+    Alloc<int, false> a;
+    Alloc<char, true> b;
+}

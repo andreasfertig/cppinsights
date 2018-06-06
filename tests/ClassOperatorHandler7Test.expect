@@ -8,8 +8,13 @@ struct A
 };
 /* First instantiated from: ClassOperatorHandler7Test.cpp:20 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class A<int>
+struct A<int>
 {
+  void foo(int);
+  
+  inline constexpr A() noexcept = default;
+  inline constexpr A(const A<int> &) = default;
+  inline constexpr A(A<int> &&) = default;
   
 };
 
@@ -17,8 +22,23 @@ class A<int>
 
 /* First instantiated from: ClassOperatorHandler7Test.cpp:20 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class A<int *>
+struct A<int *>
 {
+  struct B
+  {
+    void operator()(int);
+    
+    inline constexpr B() noexcept = default;
+    inline ~B() = default;
+    inline constexpr B(const A<int *>::B &) = default;
+    inline constexpr B(A<int *>::B &&) = default;
+    
+  };
+  
+  A<int *>::B foo;
+  inline constexpr A() noexcept = default;
+  inline constexpr A(const A<int *> &) = default;
+  inline constexpr A(A<int *> &&) = default;
   
 };
 

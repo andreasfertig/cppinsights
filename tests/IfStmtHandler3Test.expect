@@ -3,7 +3,7 @@ int Test()
     int ret;
     char buffer[2];
 
-    if( static_cast<int>(buffer[0]) == static_cast<int>('0') ) ret = 1;
+    if(static_cast<int>(buffer[0]) == static_cast<int>('0')) ret = 1;
      else ret = 2
      ;
     

@@ -7,7 +7,7 @@ int main(){
   
   {
      std::shared_ptr<int> sharedPtr1 = weakPtr.lock();
-     if( static_cast<bool>(sharedPtr1.operator bool()) ) {
+     if(static_cast<bool>(sharedPtr1.operator bool())) {
        std::operator<<(std::cout, "*sharedPtr: ").operator<<(sharedPtr.operator*()).operator<<(std::endl);
      } else {
      }

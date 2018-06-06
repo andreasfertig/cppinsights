@@ -74,7 +74,7 @@ int main()
            new (&__bb) Bingleton;
            __bbB = true;
          }
-         if( c ) {
+         if(c) {
            return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
          }
          return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
@@ -99,7 +99,7 @@ int main()
            new (&__bb) Bingleton;
            __bbB = true;
          }
-         if( c ) {
+         if(c) {
            return &*reinterpret_cast<Bingleton*>(__bb);
          }
          return &*reinterpret_cast<Bingleton*>(__bb);

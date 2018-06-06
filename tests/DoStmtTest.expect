@@ -8,7 +8,7 @@ int main()
          int x = 1;
          do {
            ++x;
-         } while( true );
+         } while(true) ;
        }
        
      } __lambda_3_5{};

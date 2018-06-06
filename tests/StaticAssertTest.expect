@@ -2,7 +2,8 @@ struct S {
   int x;
 };
 
-/* PASSED: static_assert(sizeof(S) == sizeof(int))*/;
+/* PASSED: static_assert(sizeof(S) == sizeof(int)); */
+
 
 //static_assert(sizeof(S) != sizeof(int));
 

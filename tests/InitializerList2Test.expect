@@ -10,7 +10,7 @@ public:
 
 int main()
 {
-  Foo f{ std::initializer_list<int>{ 1 } };
-  Foo f2{ std::initializer_list<int>{ 1, static_cast<const int>(true) } };
-  Foo f3{ std::initializer_list<int>{ 1, static_cast<const int>(true), 4 } };
+  Foo f{ std::initializer_list<int>{1} };
+  Foo f2{ std::initializer_list<int>{1, static_cast<const int>(true)} };
+  Foo f3{ std::initializer_list<int>{1, static_cast<const int>(true), 4} };
 }

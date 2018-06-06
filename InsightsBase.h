@@ -33,8 +33,10 @@ protected:
 
     STRONG_BOOL(SkipConstexpr);
 
+public:
     static void GenerateFunctionPrototype(OutputFormatHelper& outputFormatHelper, const FunctionDecl& FD);
 
+protected:
     bool SkipIfAlreadySeen(const Stmt* stmt);
 
 private:

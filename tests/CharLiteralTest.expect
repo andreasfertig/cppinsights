@@ -21,8 +21,25 @@ struct Foo
 };
 /* First instantiated from: CharLiteralTest.cpp:61 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class Foo<int>
+struct Foo<int>
 {
+  int raw;
+  inline Foo() noexcept = default;
+  inline constexpr Foo(const Foo<int> & v) noexcept = default;
+  inline constexpr Foo(int v);
+  
+  using retType = int;
+  inline constexpr operator retType () const
+  {
+    return this->raw;
+  }
+  
+  inline constexpr Foo<int> & operator=(const Foo<int> & rhs) = default;
+  inline Foo<int> & operator=(int v);
+  
+  inline volatile void operator=(int v);
+  
+  inline ~Foo() noexcept = default;
   
 };
 
@@ -30,8 +47,26 @@ class Foo<int>
 
 /* First instantiated from: CharLiteralTest.cpp:60 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class Foo<char>
+struct Foo<char>
 {
+  char raw;
+  inline Foo() noexcept = default;
+  inline constexpr Foo(const Foo<char> & v) = default;
+  inline constexpr Foo(char v);
+  
+  using retType = char;
+  inline constexpr operator retType () const;
+  
+  inline constexpr Foo<char> & operator=(const Foo<char> & rhs) = default;
+  inline Foo<char> & operator=(char v)
+  {
+    this->raw = v;
+    return *this;
+  }
+  
+  inline volatile void operator=(char v);
+  
+  inline ~Foo() = default;
   
 };
 

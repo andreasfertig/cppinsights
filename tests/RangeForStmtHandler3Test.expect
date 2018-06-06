@@ -34,7 +34,7 @@
       template<>
       inline bool operator!=<const char *, 0>(const char *const & ptr, null_sentinal_t)
       {
-        return !(operator==(ptr, null_sentinal_t{  }));
+        return !(operator==(ptr, null_sentinal_t{}));
       }
       #endif
       
@@ -70,8 +70,20 @@ struct str_view {
 };
 /* First instantiated from: RangeForStmtHandler3Test.cpp:49 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class str_view<char>
+struct str_view<char>
 {
+  const char * ptr;
+  inline const char * begin() const
+  {
+    return this->ptr;
+  }
+  
+  inline null_sentinal_t end() const
+  {
+    return {};
+  }
+  
+  inline ~str_view() noexcept = default;
   
 };
 
@@ -80,7 +92,7 @@ class str_view<char>
 int main() {
     
     {
-       str_view<char> && __range1 = str_view<char>{ "hello world\n" };
+       str_view<char> && __range1 = str_view<char>{"hello world\n"};
        const char * __begin1 = __range1.begin();
        null_sentinal_t __end1 = __range1.end();
        

@@ -7,12 +7,12 @@ int Foo()
 {
     {
        int ret = Open();
-       if( 1 != ret ) {
+       if(1 != ret) {
          return ret;
        } else {
          {
            int ret = Write();
-           if( 1 != ret ) {
+           if(1 != ret) {
              return ret;
            }
            

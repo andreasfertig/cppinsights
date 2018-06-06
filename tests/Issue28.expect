@@ -5,5 +5,5 @@ int main()
 {
   using namespace std::string_literals;
  
-  std::vector<std::string> foo{ std::initializer_list<std::basic_string<char> >{ std::operator""s("foo", 3ul), std::operator""s("bar", 3ul) } };
+  std::vector<std::string> foo{ std::initializer_list<std::basic_string<char> >{std::operator""s("foo", 3ul), std::operator""s("bar", 3ul)} };
 }
