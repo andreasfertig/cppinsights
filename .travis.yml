@@ -115,6 +115,10 @@ after_success:
       bash upload.sh ${GZ_FILE_NAME}
   fi
 
+branches:
+  except:
+  - /^(?i:continuous)$/
+
 before_deploy:
 - openssl aes-256-cbc -K $encrypted_71e42633e801_key -iv $encrypted_71e42633e801_iv -in $TRAVIS_BUILD_DIR/scripts/deploy_rsa.enc -out /tmp/deploy_rsa -d
 - eval "$(ssh-agent -s)"
