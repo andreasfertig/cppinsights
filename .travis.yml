@@ -9,7 +9,7 @@ matrix:
   include:
 
     # 1/ OSX Builds
-  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' COVERAGE='No' STATIC='No'
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' COVERAGE='No' STATIC='No' UPLOAD='Yes'
     os: osx
     osx_image: xcode9.3
     compiler: clang
@@ -72,7 +72,7 @@ matrix:
         - libclang-6.0-dev
         - zlib1g-dev
       ssh_known_hosts: cppinsights.io
-    env: COMPILER='clang++-6.0' COMPILER_CC='clang-6.0' LLVM_CONFIG='/usr/bin/llvm-config-6.0' COVERAGE='No' DEPLOY='Yes' STATIC='Yes'
+    env: COMPILER='clang++-6.0' COMPILER_CC='clang-6.0' LLVM_CONFIG='/usr/bin/llvm-config-6.0' COVERAGE='No' DEPLOY='Yes' STATIC='Yes' UPLOAD='Yes'
 
 install:
   - ${TRAVIS_BUILD_DIR}/scripts/travis_install.sh
@@ -89,11 +89,27 @@ before_script:
   - cd build
   - cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC}  ..
 script:
-  - make -j 2
-  - ${TRAVIS_BUILD_DIR}/scripts/travis_tests.sh
-
+- make -j 2
+- "${TRAVIS_BUILD_DIR}/scripts/travis_tests.sh"
+- |
+  if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
+      export GZ_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-macos.tar.gz
+  fi
+- |
+  if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
+      export GZ_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-ubuntu-14.04.tar.gz
+  fi
+  
 after_success:
-  - ${TRAVIS_BUILD_DIR}/scripts/travis_coverage.sh
+- "${TRAVIS_BUILD_DIR}/scripts/travis_coverage.sh"
+- |
+  if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${UPLOAD}" = "Yes" ]]; then
+      cd ${TRAVIS_BUILD_DIR}/build/
+      wget -c https://raw.githubusercontent.com/probonopd/uploadtool/27acba5793df031bd0884b2e0a31b4692332b7ba/upload.sh
+      tar -czf ${GZ_FILE_NAME} -C ${TRAVIS_BUILD_DIR}/build insights
+      bash upload.sh ${GZ_FILE_NAME}
+  fi
+
 before_deploy:
 - openssl aes-256-cbc -K $encrypted_71e42633e801_key -iv $encrypted_71e42633e801_iv -in $TRAVIS_BUILD_DIR/scripts/deploy_rsa.enc -out /tmp/deploy_rsa -d
 - eval "$(ssh-agent -s)"
@@ -112,4 +128,5 @@ deploy:
 env:
   global:
     secure: MI6S+9up0JKkDxrW7b248Ro7auyyVogdwSj/UsTLNTKMBwNOaK4HccDNif6K2qAJmTlGt1xFHh0cHXvTkACcUc8hvZghJVGUOOCaWK9YvwR8wwQgoFi034BjG/Tg7Uj6WX6G65mv0UVv/2dxZRghDTujCnFiZOoSpApBvqFjQ/gamP7P+vjJiWQVJWJTOhYHz/oK6jQHMMlNeRJbzZhp/kgo7LPtdGZVT95+S6Xn3rHIuj5pJdgwYf/NFckWI9rkkkqn47XqYozGf5HHnBlcZEDCdGEQzI8HDngRC5mjejEMCKd2mBJP319xO8UDesplpabzZhAqucskKynVK9lqFlHtdYn7dvSLXHUF9oPAWoMckxDmNIBqarEy5kYZG+ccRm4xmP2V7JAfGpW7HAtLycXEHs5Fxf839IfyTHMIp6fF+a/t2M6SE/m4rZ3Ser7Y09EAeGqUKgvc/YQwkSSdrRxE1bMIfHES6/IRdSMGkAOa1U74ulqN3FzdfKX2Ng93EZ15zXiHqipljmlPDiC8BFXG3VEbFMubKBuvB8c5KjlpwuU5Udk9cehGWDLDcKi0K7PZpZ1p2l1aU17y8QxFEcOUw6Q/nYbZ9gEf7eF5DrpycSyv6xpGyYq59LrL5m5/XUAQ9ZLN+92rQlMXZqRncMll2ZJX5Tzb+PeO8P1y7mA=
+    secure: CFbIrswqs8U7pCMnF57QrC/KgNlybr5SNFlKE9BHA9I9WXcjLBGm3tv9JM7TvzwD5ivhe9P/MVcc1ROaTSPVRSdOI9aQuNBauDYoab1OrlO0SFnHjr6tKzvw9P+wnfuyawhH8vm6m/cdyyIKagFUKtFSKUnpLeakTEUUG6O9IBLHzBa0BTqlmviV9OjDUjD61adUSWVWe96T6A/tlGyFAWAYuAU1jvGN9HSE06mFlGC0NmbT25kq/8SGv9+9KoGgXNFB6lsQ6C5C3cWIlsaO0EtTnLGa2IfSZk4lg4CzZ97CGcraH5avrG5guSDWUGZEe8a+rxA42SvrhKVRDhu3qz0agH1BlXi+0q7k8oS7wAaRG63sjyD0DtFlA783bQmdLXh/BY5rz1FsqV9rr8qVdfo+5cVfW6sOZLrNeyF8OcxWAln5SNiuLpAb2cYTGNJ15J0KLynYBL/6e3Qe6gsUS4BIHFORr9dHMXA3TBnqEIo4hzJwnGNDixs7rLXCmdX3uxsAHUJEtSxm63AiCNvZhWq6Lm+Lf1CKQ9mNRzUT3IQGwuhCmv6XFR/ZTCFCiXwwC6lTy1ItC6c/90quMZpdxTcUVts6JmMI6i86bJgKrx4dzHpZmYkQ4D+r9LpqAOm1IgDlACZnCIjgHbTh6VOjNpU3jonzN1mHNxDP8Ezgjss=
 
