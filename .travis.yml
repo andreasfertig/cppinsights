@@ -14,12 +14,12 @@ matrix:
   include:
 
     # 1/ OSX Builds
-  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' COVERAGE='No' STATIC='No' UPLOAD='Yes'
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes'
     os: osx
     osx_image: xcode9.3
     compiler: clang
       
-    # 2/ Linux Clang Builds
+    # Linux Clang Build
   - os: linux
     compiler: clang
     addons:
@@ -31,7 +31,9 @@ matrix:
         - llvm-7-dev
         - libclang-7-dev
         - zlib1g-dev
-    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG='/usr/bin/llvm-config-7'  COVERAGE='No' STATIC='No'
+    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG='/usr/bin/llvm-config-7'  COVERAGE='No' STATIC='No' DEBUG='No'
+
+  # Linux g++ Build
   - os: linux
     compiler: gcc
     addons:
@@ -44,10 +46,24 @@ matrix:
         - llvm-7-dev
         - libclang-7-dev
         - zlib1g-dev
-      ssh_known_hosts: cppinsights.io
-    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7' COVERAGE='No' DEPLOY='No' STATIC='No'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7' COVERAGE='No' STATIC='No' DEBUG='No'
 
-    # 3/ Linux Clang Coverage Builds
+  # Debug build
+  - os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources: *all_sources
+        packages:
+        - g++-8
+        - clang-7
+        - libc++-dev
+        - llvm-7-dev
+        - libclang-7-dev
+        - zlib1g-dev
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7' COVERAGE='No' STATIC='No' DEBUG='Yes'
+
+    # Linux Clang Coverage Build
   - os: linux
     compiler: gcc
     addons:
@@ -61,7 +77,7 @@ matrix:
         - libclang-7-dev
         - zlib1g-dev
         - lcov
-    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG='/usr/bin/llvm-config-7' STATIC='No' COVERAGE='Yes'
+    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG='/usr/bin/llvm-config-7' STATIC='No' COVERAGE='Yes' DEBUG='No'
 
     # Clang 6.0 deployment
   - os: linux
@@ -77,7 +93,7 @@ matrix:
         - libclang-6.0-dev
         - zlib1g-dev
       ssh_known_hosts: cppinsights.io
-    env: COMPILER='clang++-6.0' COMPILER_CC='clang-6.0' LLVM_CONFIG='/usr/bin/llvm-config-6.0' COVERAGE='No' DEPLOY='Yes' STATIC='Yes' UPLOAD='Yes'
+    env: COMPILER='clang++-6.0' COMPILER_CC='clang-6.0' LLVM_CONFIG='/usr/bin/llvm-config-6.0' COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes'
 
 install:
   - ${TRAVIS_BUILD_DIR}/scripts/travis_install.sh
@@ -92,7 +108,7 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
   - mkdir build
   - cd build
-  - cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC}  ..
+  - cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG}  ..
 script:
 - make -j 2
 - "${TRAVIS_BUILD_DIR}/scripts/travis_tests.sh"
