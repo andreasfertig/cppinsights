@@ -263,6 +263,18 @@ else()
   set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" )
 endif()
 
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+    message(STATUS "Found ccache: ${CCACHE_FOUND}")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        add_definitions(-Qunused-arguments)        
+    endif()
+endif(CCACHE_FOUND)
+
+
 # name the executable and all source files
 add_clang_executable(insights
     AutoStmtHandler.cpp
