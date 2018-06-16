@@ -137,12 +137,12 @@ int main()
 
     t1.operator+=(t2);
 
-    if( t1.operator>(t2) ) {
+    if(t1.operator>(t2)) {
        return 1;
      }
      
 
-    if( t1.operator>=(t2) ) {
+    if(t1.operator>=(t2)) {
        return 3;
      }
      
@@ -163,7 +163,7 @@ int main()
     Fest f1{2};
     Fest f2{3};
 
-    if( operator<(f1, f2) ) {
+    if(operator<(f1, f2)) {
        return 22;
      }
      
@@ -171,7 +171,7 @@ int main()
     Hello::Bello::Fest f3{3};
     Hello::Bello::Fest f4{3};
 
-    if( Hello::Bello::operator<(f3, f4) ) {
+    if(Hello::Bello::operator<(f3, f4)) {
        return 44;
      }
      

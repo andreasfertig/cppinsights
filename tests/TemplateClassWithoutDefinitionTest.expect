@@ -1,0 +1,24 @@
+template <typename T>
+class Foo{};
+/* First instantiated from: TemplateClassWithoutDefinitionTest.cpp:11 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Foo<double>
+{
+  inline constexpr Foo() noexcept = default;
+  inline constexpr Foo(const Foo<double> &) = default;
+  inline constexpr Foo(Foo<double> &&) = default;
+  
+};
+
+#endif
+
+
+typedef Foo<int> IntFoo; // this type is never instantiated which results in a 
+                         // CXXRecordDecl without a definition
+typedef Foo<double> DoubleFoo;
+
+
+int main()
+{
+  DoubleFoo df;
+}

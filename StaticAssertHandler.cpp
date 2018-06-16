@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "StaticAssertHandler.h"
+#include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
 #include "InsightsStaticStrings.h"
@@ -30,17 +31,15 @@ StaticAssertHandler::StaticAssertHandler(Rewriter& rewrite, MatchFinder& matcher
 
 void StaticAssertHandler::run(const MatchFinder::MatchResult& result)
 {
-    const auto*       matchedDecl = result.Nodes.getNodeAs<StaticAssertDecl>("static_assert");
-    const std::string passFailed  = [&]() {
-        if(!matchedDecl->isFailed()) {
-            return "/* PASSED: ";
-        }
+    if(const auto* matchedDecl = result.Nodes.getNodeAs<StaticAssertDecl>("static_assert")) {
+        OutputFormatHelper outputFormatHelper{};
+        CodeGenerator      codeGenerator{outputFormatHelper};
+        codeGenerator.InsertArg(matchedDecl);
 
-        return "/* FAILED: ";
-    }();
+        const auto sr = GetSourceRangeAfterToken(matchedDecl->getSourceRange(), tok::semi, result);
 
-    mRewrite.InsertText(matchedDecl->getLocStart(), passFailed);
-    mRewrite.InsertTextAfterToken(matchedDecl->getLocEnd(), "*/");
+        mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
+    }
 }
 //-----------------------------------------------------------------------------
 

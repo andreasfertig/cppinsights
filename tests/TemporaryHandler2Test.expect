@@ -43,7 +43,7 @@ void f7(X& x)
 
 X f8(bool x, int y)
 {
-    if( x || y == 2 ) {
+    if(x || y == 2) {
        return X(y);
      }
      

@@ -2,29 +2,29 @@
 
 int main()
 {
-    if constexpr( false ) {
+    if constexpr(false) {
        printf("False\n");
      } else /* constexpr */ {
-       if( true ) {
+       if(true) {
          printf("true");
        }
        
      }
      
 
-    if constexpr( false ) {
+    if constexpr(false) {
        printf("False\n");
      } else /* constexpr */ {
-       if constexpr( true ) {
+       if constexpr(true) {
          printf("true");
        }
        
      }
          
 
-    if constexpr( false ) printf("False\n");
+    if constexpr(false) printf("False\n");
      else /* constexpr */ {
-       if( true ) printf("true");
+       if(true) printf("true");
        
        
      }
@@ -32,14 +32,14 @@ int main()
 
 
     int x = 1;
-    if( 1 == x ) printf("a");
+    if(1 == x) printf("a");
      else {
-       if( 2 == x ) {
+       if(2 == x) {
          printf("b");
-         if( x == 5 ) printf("5");
+         if(x == 5) printf("5");
          
        } else {
-         if( x == 3 ) printf("r");
+         if(x == 3) printf("r");
          
        }
        

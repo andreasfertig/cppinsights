@@ -2,7 +2,7 @@ int main()
 {
     {
        char * ptr = nullptr;
-       if( ptr ) {
+       if(ptr) {
        } else {
          *ptr = 2;
        }
@@ -11,7 +11,7 @@ int main()
      
 
     const char* ptr2;
-    if( ptr2 ) {
+    if(ptr2) {
      }
      
 }

@@ -84,7 +84,7 @@ Bingleton* B(bool c)
     }
     ;
 
-    if( c ) {
+    if(c) {
        return nullptr;
      }
      
@@ -105,7 +105,7 @@ Bingleton& BB(bool c)
     }
     ;
 
-    if( c ) {
+    if(c) {
        return *reinterpret_cast<Bingleton*>(__bb);
      }
      

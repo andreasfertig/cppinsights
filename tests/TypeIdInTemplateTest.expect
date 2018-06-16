@@ -1,0 +1,41 @@
+#include <string>
+
+template <typename T>
+class Foo{
+public:    
+    std::string Get() {
+        std::string typeId{typeid(T).name()};
+        return typeId;
+    }
+
+};
+/* First instantiated from: TypeIdInTemplateTest.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+class Foo<int>
+{
+  
+  public: 
+  inline std::basic_string<char> Get()
+  {
+    std::basic_string<char> typeId = std::basic_string<char>{typeid(const std::type_info).name()} /* NRVO variable */;
+    return std::basic_string<char>(typeId);
+  }
+  
+  inline constexpr Foo() noexcept = default;
+  inline constexpr Foo(const Foo<int> &) = default;
+  inline constexpr Foo(Foo<int> &&) = default;
+  
+};
+
+#endif
+
+
+
+
+int main()
+{
+  Foo<int> i;
+
+  i.Get();
+}
+

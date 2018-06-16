@@ -65,7 +65,7 @@ int main()
          int n = 10;
          f(n);
          f(42);
-         f(int{  });
+         f(int{});
          Foo f = Foo(1);
          f.operator++();
          f.operator++(0);

@@ -8,8 +8,8 @@ int Foo()
     // normal if but with an DeclStmt. No rewrite expected
     {
        int ret = Open();
-       if( static_cast<bool>(ret) ) {
-         if( 1 != ret ) {
+       if(static_cast<bool>(ret)) {
+         if(1 != ret) {
            return ret;
          }
        }

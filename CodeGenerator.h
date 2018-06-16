@@ -105,6 +105,8 @@ public:
 
     virtual ~CodeGenerator() = default;
 
+#define IGNORED_DECL(type)                                                                                             \
+    virtual void InsertArg(const type*) {}
 #define IGNORED_STMT(type)                                                                                             \
     virtual void InsertArg(const type*) {}
 #define SUPPORTED_DECL(type) virtual void InsertArg(const type* stmt);
@@ -126,10 +128,12 @@ public:
     }
 
     STRONG_BOOL(SkipConstexpr);
+    STRONG_BOOL(SkipAccess);
 
     static void InsertAccessModifierAndNameWithReturnType(OutputFormatHelper&  outputFormatHelper,
                                                           const CXXMethodDecl& decl,
-                                                          SkipConstexpr        skipConstexpr = SkipConstexpr::No);
+                                                          const SkipConstexpr  skipConstexpr = SkipConstexpr::No,
+                                                          const SkipAccess     skipAccess    = SkipAccess::No);
 
 protected:
     void HandleCharacterLiteral(const CharacterLiteral& stmt);
@@ -159,6 +163,22 @@ protected:
     void InsertSuffix(const QualType& type);
     void InsertTemplateArgs(const ArrayRef<TemplateArgument>& array);
     void InsertTemplateArg(const TemplateArgument& arg);
+
+    /// \brief Check whether or not this statement will add curlys or parentheses and add them only if required.
+    void InsertCurlysIfRequired(const Stmt* stmt);
+
+    STRONG_BOOL(AddSpaceAtTheEnd);
+
+    enum class BraceKind
+    {
+        Parens,
+        Curlys
+    };
+
+    template<typename T>
+    void WrapInParensOrCurlys(const BraceKind        curlys,
+                              T&&                    lambda,
+                              const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
     static const char* GetKind(const UnaryExprOrTypeTraitExpr& uk);
     static const char* GetOpcodeName(const int kind);

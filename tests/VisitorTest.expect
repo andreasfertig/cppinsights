@@ -1,8 +1,12 @@
 template<class... Ts> struct visitor: Ts... { using Ts::operator()...; };
 /* First instantiated from: VisitorTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE
-class visitor<__lambda_8_7, __lambda_9_7>
+struct visitor<__lambda_8_7, __lambda_9_7> : public __lambda_8_7, public __lambda_9_7
 {
+  using visitor<__lambda_8_7, __lambda_9_7>::operator();
+  using visitor<__lambda_8_7, __lambda_9_7>::operator();
+  inline constexpr visitor<__lambda_8_7, __lambda_9_7> & operator=(visitor<__lambda_8_7, __lambda_9_7> &&) = default;
+  inline ~visitor() noexcept = default;
   
 };
 
@@ -31,7 +35,7 @@ int main()
        
      };
      
-     visitor<__lambda_8_7, __lambda_9_7> my_visitor = visitor{ __lambda_8_7(__lambda_8_7{}), __lambda_9_7(__lambda_9_7{}) };
+     visitor<__lambda_8_7, __lambda_9_7> my_visitor = visitor{__lambda_8_7(__lambda_8_7{}), __lambda_9_7(__lambda_9_7{})};
      
 
 

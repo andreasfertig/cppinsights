@@ -11,7 +11,7 @@ bool Is(const T& x)
 template<>
 bool Is<int>(const int & x)
 {
-  int b = { x };
+  int b = {x};
   return b == x;
 }
 #endif

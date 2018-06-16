@@ -24,7 +24,7 @@ int main()
 
     const bool b = operator==(f1, f2);
 
-    if( b ) {
+    if(b) {
        return 0;
      } else {
        return 1;

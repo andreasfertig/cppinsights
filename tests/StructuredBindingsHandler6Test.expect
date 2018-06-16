@@ -56,9 +56,9 @@ public:
     template<>
     inline constexpr double get<0>() noexcept
     {
-      if constexpr( 0ul == 1 ) ;
+      if constexpr(0ul == 1) ;
       else /* constexpr */ {
-        if constexpr( 0ul == 0 ) {
+        if constexpr(0ul == 0) {
           return this->mY;
         }
         
@@ -72,7 +72,7 @@ public:
     template<>
     inline constexpr double get<1>() noexcept
     {
-      if constexpr( 1ul == 1 ) {
+      if constexpr(1ul == 1) {
         return this->GetX();
       }
     }
@@ -95,7 +95,7 @@ int main()
     printf("x:%lf y:%lf\n", x, y);
 
     char ar[2]{7,8};
-    char __ar64[2] = { ar[0], ar[1] };
+    char __ar64[2] = {ar[0], ar[1]};
     char a1 = __ar64[0];
     char a2 = __ar64[1];
     

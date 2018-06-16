@@ -2,7 +2,7 @@
 
 std::string trim(const std::string& input)
 {
-    if( input.length() == 0 ) {
+    if(input.length() == 0) {
        return std::basic_string<char>("");
      }
      
@@ -14,12 +14,12 @@ std::string trim(const std::string& input)
         i++;
     }
 
-    if( i >= reinterpret_cast<int>(static_cast<int>(input.length())) ) {
+    if(i >= reinterpret_cast<int>(static_cast<int>(input.length()))) {
        return std::basic_string<char>("");
      }
      
 
-    if( i > 0 ) {
+    if(i > 0) {
        final.operator=(input.substr(static_cast<unsigned long>(i), input.length() - static_cast<unsigned long>(i)));
      }
      

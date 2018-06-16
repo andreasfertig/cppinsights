@@ -49,9 +49,9 @@ public:
     template<>
     inline constexpr double & get<0>() noexcept
     {
-      if constexpr( 0ul == 1 ) ;
+      if constexpr(0ul == 1) ;
       else /* constexpr */ {
-        if constexpr( 0ul == 0 ) {
+        if constexpr(0ul == 0) {
           return (this->mY);
         }
         
@@ -65,7 +65,7 @@ public:
     template<>
     inline constexpr double get<1>() noexcept
     {
-      if constexpr( 1ul == 1 ) {
+      if constexpr(1ul == 1) {
         return this->GetX();
       }
     }
@@ -87,9 +87,9 @@ public:
     template<>
     inline constexpr const double & get<0>() noexcept
     {
-      if constexpr( 0ul == 1 ) ;
+      if constexpr(0ul == 1) ;
       else /* constexpr */ {
-        if constexpr( 0ul == 0 ) {
+        if constexpr(0ul == 0) {
           return (this->mY);
         }
         
@@ -103,7 +103,7 @@ public:
     template<>
     inline constexpr double get<1>() noexcept
     {
-      if constexpr( 1ul == 1 ) {
+      if constexpr(1ul == 1) {
         return this->GetX();
       }
     }

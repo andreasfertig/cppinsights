@@ -15,6 +15,9 @@ class B {
 #ifdef INSIGHTS_USE_TEMPLATE
 class B<A, void (A::*)()>
 {
+  inline constexpr B() noexcept = default;
+  inline constexpr B(const B<A, void (A::*)()> &) = default;
+  inline constexpr B(B<A, void (A::*)()> &&) = default;
   
 };
 

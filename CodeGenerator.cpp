@@ -7,8 +7,10 @@
 
 #include "CodeGenerator.h"
 #include "DPrint.h"
+#include "InsightsBase.h"
 #include "InsightsMatchers.h"
 #include "InsightsStrCat.h"
+#include "NumberIterator.h"
 //-----------------------------------------------------------------------------
 
 /// \brief Convenience macro to create a \ref LambdaScopeHandler on the stack.
@@ -17,6 +19,29 @@
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
+
+static const char* AccessToString(const AccessSpecifier& access)
+{
+    switch(access) {
+        case AS_public: return "public";
+        case AS_protected: return "protected";
+        case AS_private: return "private";
+        default: return "";
+    }
+}
+//-----------------------------------------------------------------------------
+
+static std::string AccessToStringWithColon(const AccessSpecifier& access)
+{
+    return StrCat(AccessToString(access), ": ");
+}
+//-----------------------------------------------------------------------------
+
+static std::string AccessToStringWithColon(const CXXMethodDecl& decl)
+{
+    return AccessToStringWithColon(decl.getAccess());
+}
+//-----------------------------------------------------------------------------
 
 class ArrayInitCodeGenerator final : public CodeGenerator
 {
@@ -122,7 +147,7 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
     }
 
     if(!isBodyBraced && !isa<NullStmt>(body)) {
-        mOutputFormatHelper.AppendNewLine(";");
+        mOutputFormatHelper.AppendNewLine(';');
     }
 
     // close range-for scope in for
@@ -156,12 +181,11 @@ void CodeGenerator::InsertArg(const DoStmt* stmt)
     InsertArg(body);
 
     if(isa<CompoundStmt>(body)) {
-        mOutputFormatHelper.Append(" ");
+        mOutputFormatHelper.Append(' ');
     }
 
-    mOutputFormatHelper.Append("while( ");
-    InsertArg(stmt->getCond());
-    mOutputFormatHelper.Append(" )");
+    mOutputFormatHelper.Append("while");
+    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 }
 //-----------------------------------------------------------------------------
 
@@ -204,11 +228,9 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
         }
     }
 
-    mOutputFormatHelper.Append("switch(");
+    mOutputFormatHelper.Append("switch");
 
-    InsertArg(stmt->getCond());
-
-    mOutputFormatHelper.Append(") ");
+    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     InsertArg(stmt->getBody());
 
@@ -220,9 +242,8 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 
 void CodeGenerator::InsertArg(const WhileStmt* stmt)
 {
-    mOutputFormatHelper.Append("while(");
-    InsertArg(stmt->getCond());
-    mOutputFormatHelper.Append(") ");
+    mOutputFormatHelper.Append("while");
+    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     InsertArg(stmt->getBody());
 }
@@ -291,9 +312,14 @@ void CodeGenerator::InsertArg(const FloatingLiteral* stmt)
 
 void CodeGenerator::InsertArg(const CXXTypeidExpr* stmt)
 {
-    mOutputFormatHelper.Append("typeid(");
-    InsertArg(stmt->getExprOperand());
-    mOutputFormatHelper.Append(")");
+    mOutputFormatHelper.Append("typeid");
+    WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+        if(stmt->isTypeOperand()) {
+            mOutputFormatHelper.Append(GetName(stmt->getType()));
+        } else {
+            InsertArg(stmt->getExprOperand());
+        }
+    });
 }
 //-----------------------------------------------------------------------------
 
@@ -375,7 +401,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
     InsertArg(decompositionDeclStmt->getInit());
 
-    mOutputFormatHelper.AppendNewLine(";");
+    mOutputFormatHelper.AppendNewLine(';');
 
     const bool isRefToObject = IsReference(*decompositionDeclStmt);
 
@@ -422,9 +448,33 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
                 TODO(bindingDecl, mOutputFormatHelper);
             }
 
-            mOutputFormatHelper.AppendNewLine(";");
+            mOutputFormatHelper.AppendNewLine(';');
         }
     }
+}
+//-----------------------------------------------------------------------------
+
+static std::string GetQualifiers(const VarDecl& vd)
+{
+    std::string qualifiers{};
+
+    if(vd.isInline()) {
+        qualifiers += "inline ";
+    }
+
+    if(SC_Extern == vd.getStorageClass()) {
+        qualifiers += "extern ";
+    }
+
+    if(SC_Static == vd.getStorageClass()) {
+        qualifiers += "static ";
+    }
+
+    if(vd.isConstexpr()) {
+        qualifiers += "constexpr ";
+    }
+
+    return qualifiers;
 }
 //-----------------------------------------------------------------------------
 
@@ -438,12 +488,14 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         HandleLocalStaticNonTrivialClass(stmt);
 
     } else {
+        mOutputFormatHelper.Append(GetQualifiers(*stmt));
+
         if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
             const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
             const std::string funcPtrName{StrCat("FuncPtr_", std::to_string(lineNo), " ")};
 
             mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
-            mOutputFormatHelper.Append((stmt->isConstexpr() ? kwConstExprSpace : ""), funcPtrName, GetName(*stmt));
+            mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
         } else {
             mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
         }
@@ -465,25 +517,52 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
-    mOutputFormatHelper.Append("{ ");
-    mOutputFormatHelper.IncreaseIndent();
+    WrapInParensOrCurlys(BraceKind::Curlys, [&]() {
+        mOutputFormatHelper.IncreaseIndent();
 
-    ForEachArg(stmt->inits(), [&](const auto& init) { InsertArg(init); });
+        ForEachArg(stmt->inits(), [&](const auto& init) { InsertArg(init); });
+    });
 
-    mOutputFormatHelper.Append(" }");
     mOutputFormatHelper.DecreaseIndent();
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CXXDefaultInitExpr* stmt)
+{
+    InsertArg(stmt->getExpr());
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CXXDeleteExpr* stmt)
+{
+    mOutputFormatHelper.Append("delete");
+
+    if(stmt->isArrayForm()) {
+        mOutputFormatHelper.Append("[]");
+    }
+
+    mOutputFormatHelper.Append(' ');
+
+    InsertArg(stmt->getArgument());
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
 {
-    mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes), "(");
+    mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
 
-    if(stmt->getNumArgs()) {
-        ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
-    }
+    const BraceKind braceKind = [&]() {
+        if(stmt->isListInitialization()) {
+            return BraceKind::Curlys;
+        }
+        return BraceKind::Parens;
+    }();
 
-    mOutputFormatHelper.Append(')');
+    WrapInParensOrCurlys(braceKind, [&]() {
+        if(stmt->getNumArgs()) {
+            ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
+        }
+    });
 }
 //-----------------------------------------------------------------------------
 
@@ -492,21 +571,15 @@ void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
     LAMBDA_SCOPE_HELPER(MemberCallExpr);
 
     InsertArg(stmt->getCallee());
-    mOutputFormatHelper.Append('(');
 
-    ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
-
-    mOutputFormatHelper.Append(')');
+    WrapInParensOrCurlys(BraceKind::Parens,
+                         [&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const ParenExpr* stmt)
 {
-    mOutputFormatHelper.Append('(');
-
-    InsertArg(stmt->getSubExpr());
-
-    mOutputFormatHelper.Append(')');
+    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getSubExpr()); });
 }
 //-----------------------------------------------------------------------------
 
@@ -547,31 +620,22 @@ void CodeGenerator::InsertArg(const ArraySubscriptExpr* stmt)
 {
     InsertArg(stmt->getLHS());
 
-    mOutputFormatHelper.Append("[");
+    mOutputFormatHelper.Append('[');
     InsertArg(stmt->getRHS());
-    mOutputFormatHelper.Append("]");
+    mOutputFormatHelper.Append(']');
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const ArrayInitLoopExpr* stmt)
 {
-    mOutputFormatHelper.Append("{ ");
+    WrapInParensOrCurlys(BraceKind::Curlys, [&]() {
+        const uint64_t size = stmt->getArraySize().getZExtValue();
 
-    const uint64_t size = stmt->getArraySize().getZExtValue();
-    bool           first{true};
-
-    for(uint64_t i = 0; i < size; ++i) {
-        if(!first) {
-            mOutputFormatHelper.Append(", ");
-        } else {
-            first = false;
-        }
-
-        ArrayInitCodeGenerator codeGenerator{mOutputFormatHelper, i};
-        codeGenerator.InsertArg(stmt->getSubExpr());
-    }
-
-    mOutputFormatHelper.Append(" }");
+        ForEachArg(NumberIterator(size), [&](const auto& i) {
+            ArrayInitCodeGenerator codeGenerator{mOutputFormatHelper, i};
+            codeGenerator.InsertArg(stmt->getSubExpr());
+        });
+    });
 }
 //-----------------------------------------------------------------------------
 
@@ -608,11 +672,8 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
         }
     }
 
-    mOutputFormatHelper.Append('(');
-
-    ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
-
-    mOutputFormatHelper.Append(')');
+    WrapInParensOrCurlys(BraceKind::Parens,
+                         [&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
 }
 //-----------------------------------------------------------------------------
 
@@ -672,7 +733,7 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
         InsertArg(item);
 
         if(!isa<IfStmt>(item) && !isa<ForStmt>(item) && !isa<DeclStmt>(item)) {
-            mOutputFormatHelper.AppendNewLine(";");
+            mOutputFormatHelper.AppendNewLine(';');
         }
     }
 }
@@ -695,11 +756,9 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
         }
     }
 
-    mOutputFormatHelper.Append("if", cexpr, "( ");
+    mOutputFormatHelper.Append("if", cexpr);
 
-    InsertArg(stmt->getCond());
-
-    mOutputFormatHelper.Append(" ) ");
+    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     const auto* body = stmt->getThen();
 
@@ -744,21 +803,25 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
 void CodeGenerator::InsertArg(const ForStmt* stmt)
 {
-    mOutputFormatHelper.Append("for(");
+    mOutputFormatHelper.Append("for");
 
-    if(const auto* init = stmt->getInit()) {
-        // the init-stmt carries a ; at the end
-        InsertArg(init);
-    } else {
-        mOutputFormatHelper.Append("; ");
-    }
+    WrapInParensOrCurlys(BraceKind::Parens,
+                         [&]() {
+                             if(const auto* init = stmt->getInit()) {
+                                 // the init-stmt carries a ; at the end
+                                 InsertArg(init);
+                             } else {
+                                 mOutputFormatHelper.Append("; ");
+                             }
 
-    InsertArg(stmt->getCond());
-    mOutputFormatHelper.Append("; ");
+                             InsertArg(stmt->getCond());
+                             mOutputFormatHelper.Append("; ");
 
-    InsertArg(stmt->getInc());
+                             InsertArg(stmt->getInc());
+                         },
+                         AddSpaceAtTheEnd::Yes);
 
-    mOutputFormatHelper.AppendNewLine(')');
+    mOutputFormatHelper.AppendNewLine();
 
     InsertArg(stmt->getBody());
     mOutputFormatHelper.AppendNewLine();
@@ -781,11 +844,9 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
     if(stmt->getNumPlacementArgs()) {
         /* we have a placement new */
 
-        mOutputFormatHelper.Append('(');
-
-        ForEachArg(stmt->placement_arguments(), [&](const auto& placementArg) { InsertArg(placementArg); });
-
-        mOutputFormatHelper.Append(')');
+        WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+            ForEachArg(stmt->placement_arguments(), [&](const auto& placementArg) { InsertArg(placementArg); });
+        });
     }
 
     Dump(stmt);
@@ -794,14 +855,17 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
     if(const auto* ctorExpr = stmt->getConstructExpr()) {
         InsertArg(ctorExpr);
 
-    } else if(stmt->isArray()) {
-        mOutputFormatHelper.Append(GetName(stmt->getAllocatedType()), "[");
+    } else {
+        mOutputFormatHelper.Append(GetName(stmt->getAllocatedType()));
 
-        InsertArg(stmt->getArraySize());
-        mOutputFormatHelper.Append(']');
+        if(stmt->isArray()) {
+            mOutputFormatHelper.Append('[');
+            InsertArg(stmt->getArraySize());
+            mOutputFormatHelper.Append(']');
+        }
 
         if(stmt->hasInitializer()) {
-            InsertArg(stmt->getInitializer());
+            InsertCurlysIfRequired(stmt->getInitializer());
         }
     }
 }
@@ -998,6 +1062,201 @@ void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
+{
+    InsertAccessModifierAndNameWithReturnType(mOutputFormatHelper, *stmt, SkipConstexpr::No, SkipAccess::Yes);
+
+    if(stmt->isDefaulted()) {
+        mOutputFormatHelper.AppendNewLine(" = default;");
+    } else if(stmt->isDeleted()) {
+        mOutputFormatHelper.AppendNewLine(" = delete;");
+    }
+
+    if(!stmt->isUserProvided()) {
+        return;
+    }
+
+    if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
+        bool first = true;
+
+        for(const auto* init : ctor->inits()) {
+            mOutputFormatHelper.AppendNewLine();
+            if(first) {
+                first = false;
+                mOutputFormatHelper.Append(": ");
+            } else {
+                mOutputFormatHelper.Append(", ");
+            }
+
+            // in case of delegating or base initializer there is no member.
+            if(const auto* member = init->getMember()) {
+                mOutputFormatHelper.Append(member->getNameAsString());
+                InsertCurlysIfRequired(init->getInit());
+            } else {
+                InsertArg(init->getInit());
+            }
+        }
+    }
+
+    if(stmt->hasBody()) {
+        mOutputFormatHelper.AppendNewLine();
+        InsertArg(stmt->getBody());
+        mOutputFormatHelper.AppendNewLine();
+    } else {
+        mOutputFormatHelper.AppendNewLine(';');
+    }
+
+    mOutputFormatHelper.AppendNewLine();
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const FieldDecl* stmt)
+{
+    mOutputFormatHelper.AppendNewLine(GetName(stmt->getType()), " ", GetName(*stmt), ";");
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const AccessSpecDecl* stmt)
+{
+    mOutputFormatHelper.AppendNewLine();
+    mOutputFormatHelper.AppendNewLine(AccessToStringWithColon(stmt->getAccess()));
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const StaticAssertDecl* stmt)
+{
+    if(!stmt->isFailed()) {
+        mOutputFormatHelper.Append("/* PASSED: ");
+    } else {
+        mOutputFormatHelper.Append("/* FAILED: ");
+    }
+
+    mOutputFormatHelper.Append("static_assert(");
+
+    InsertArg(stmt->getAssertExpr());
+
+    if(stmt->getMessage()) {
+        mOutputFormatHelper.Append(", ");
+        InsertArg(stmt->getMessage());
+    }
+
+    mOutputFormatHelper.AppendNewLine("); */");
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const UsingDecl* stmt)
+{
+    mOutputFormatHelper.Append("using ");
+
+    if(const DeclContext* Ctx = stmt->getDeclContext()) {
+        bool isFunctionOrMethod{false};
+
+        if(!Ctx->isFunctionOrMethod()) {
+
+            using ContextsTy = SmallVector<const DeclContext*, 8>;
+            ContextsTy Contexts;
+
+            while(Ctx) {
+                if(isa<NamedDecl>(Ctx)) {
+                    Contexts.push_back(Ctx);
+                }
+                Ctx = Ctx->getParent();
+            }
+
+            for(const auto* DC : llvm::reverse(Contexts)) {
+                if(const auto* Spec = dyn_cast<ClassTemplateSpecializationDecl>(DC)) {
+                    mOutputFormatHelper.Append(Spec->getName());
+                    InsertTemplateArgs(*Spec);
+
+                } else if(const auto* ND = dyn_cast<NamespaceDecl>(DC)) {
+                    if(ND->isAnonymousNamespace() || ND->isInline()) {
+                        continue;
+                    }
+
+                    mOutputFormatHelper.Append(ND->getNameAsString());
+
+                } else if(const auto* RD = dyn_cast<RecordDecl>(DC)) {
+                    if(RD->getIdentifier()) {
+                        mOutputFormatHelper.Append(RD->getNameAsString());
+                    }
+
+                } else if(const auto* FD = dyn_cast<FunctionDecl>(DC)) {
+                    InsightsBase::GenerateFunctionPrototype(mOutputFormatHelper, *FD);
+
+                } else if(const auto* ED = dyn_cast<EnumDecl>(DC)) {
+                    if(!ED->isScoped()) {
+                        continue;
+                    }
+
+                    mOutputFormatHelper.Append(ED->getNameAsString());
+
+                } else {
+                    mOutputFormatHelper.Append(cast<NamedDecl>(DC)->getNameAsString());
+                }
+
+                mOutputFormatHelper.Append("::");
+            }
+        } else {
+            isFunctionOrMethod = true;
+        }
+
+        if(isFunctionOrMethod || stmt->getDeclName() || isa<DecompositionDecl>(stmt)) {
+            mOutputFormatHelper.Append(stmt->getNameAsString());
+        }
+    }
+
+    mOutputFormatHelper.AppendNewLine(';');
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
+{
+    // skip classes/struct's without a definition
+    if(!stmt->hasDefinition()) {
+        return;
+    }
+
+    if(stmt->isClass()) {
+        mOutputFormatHelper.Append(kwClassSpace);
+
+    } else {
+        mOutputFormatHelper.Append("struct ");
+    }
+
+    mOutputFormatHelper.Append(GetName(*stmt));
+
+    if(const auto* clsTmpl = dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {
+        InsertTemplateArgs(*clsTmpl);
+    }
+
+    if(stmt->getNumBases()) {
+        mOutputFormatHelper.Append(" : ");
+
+        ForEachArg(stmt->bases(), [&](const auto& base) {
+            mOutputFormatHelper.Append(AccessToString(base.getAccessSpecifier()), " ", GetName(base.getType()));
+        });
+    }
+
+    mOutputFormatHelper.AppendNewLine();
+
+    mOutputFormatHelper.OpenScope();
+
+    bool firstRecordDecl{true};
+    for(const auto* d : stmt->decls()) {
+        if(isa<CXXRecordDecl>(d) && firstRecordDecl) {
+            firstRecordDecl = false;
+            continue;
+        }
+
+        InsertArg(d);
+    }
+
+    mOutputFormatHelper.CloseScopeWithSemi();
+    mOutputFormatHelper.AppendNewLine();
+    mOutputFormatHelper.AppendNewLine();
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const DeclStmt* stmt)
 {
     for(const auto* decl : stmt->decls()) {
@@ -1022,7 +1281,7 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
         mOutputFormatHelper.Append(' ');
         InsertArg(retVal);
     }
-}  // namespace clang::insights
+}
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
@@ -1066,6 +1325,8 @@ void CodeGenerator::InsertArg(const Decl* stmt)
         return;                                                                                                        \
     }
 
+#define IGNORED_DECL SUPPORTED_DECL
+
 #include "CodeGeneratorTypes.h"
 
     TODO(stmt, mOutputFormatHelper);
@@ -1085,9 +1346,9 @@ void CodeGenerator::InsertArg(const Stmt* stmt)
         return;                                                                                                        \
     }
 
-#include "CodeGeneratorTypes.h"
+#define IGNORED_STMT SUPPORTED_STMT
 
-    // PackExpansionExpr
+#include "CodeGeneratorTypes.h"
 
     TODO(stmt, mOutputFormatHelper);
 }
@@ -1567,7 +1828,7 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
             ctor.append(StrCat(" _", varName));
             outputFormatHelper.AppendNewLine(" ", varName, ";");
         } else {
-            outputFormatHelper.AppendNewLine(";");
+            outputFormatHelper.AppendNewLine(';');
         }
 
         ctorInits.append(StrCat(varName, "{_", varName, "}"));
@@ -1592,27 +1853,19 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
         mLambdaStack.back().inits().append(inits);
     }
 
-    outputFormatHelper.AppendNewLine(";");
+    outputFormatHelper.AppendNewLine(';');
     outputFormatHelper.AppendNewLine();
-}
-//-----------------------------------------------------------------------------
-
-static const char* AccessToString(const CXXMethodDecl& decl)
-{
-    switch(decl.getAccess()) {
-        case AS_public: return "public";
-        case AS_protected: return "protected";
-        case AS_private: return "private";
-        default: return "";
-    }
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertAccessModifierAndNameWithReturnType(OutputFormatHelper&  outputFormatHelper,
                                                               const CXXMethodDecl& decl,
-                                                              SkipConstexpr        skipConstexpr)
+                                                              const SkipConstexpr  skipConstexpr,
+                                                              const SkipAccess     skipAccess)
 {
-    outputFormatHelper.Append(AccessToString(decl), ": ");
+    if(SkipAccess::No == skipAccess) {
+        outputFormatHelper.Append(AccessToStringWithColon(decl));
+    }
 
     // types of conversion decls can be invalid to type at this place. So introduce a using
     if(isa<CXXConversionDecl>(decl)) {
@@ -1661,6 +1914,45 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(OutputFormatHelper
 
     outputFormatHelper.AppendParameterList(decl.parameters(), OutputFormatHelper::WithParameterName::Yes);
     outputFormatHelper.Append(")", GetConst(decl), GetNoExcept(decl));
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertCurlysIfRequired(const Stmt* stmt)
+{
+    const bool requiresCurlys{!isa<InitListExpr>(stmt) && !isa<ParenExpr>(stmt) && !isa<CXXDefaultInitExpr>(stmt)};
+
+    if(requiresCurlys) {
+        mOutputFormatHelper.Append('{');
+    }
+
+    InsertArg(stmt);
+
+    if(requiresCurlys) {
+        mOutputFormatHelper.Append('}');
+    }
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInParensOrCurlys(const BraceKind braceKind, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    if(BraceKind::Curlys == braceKind) {
+        mOutputFormatHelper.Append('{');
+    } else {
+        mOutputFormatHelper.Append('(');
+    }
+
+    lambda();
+
+    if(BraceKind::Curlys == braceKind) {
+        mOutputFormatHelper.Append('}');
+    } else {
+        mOutputFormatHelper.Append(')');
+    }
+
+    if(AddSpaceAtTheEnd::Yes == addSpaceAtTheEnd) {
+        mOutputFormatHelper.Append(' ');
+    }
 }
 //-----------------------------------------------------------------------------
 

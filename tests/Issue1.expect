@@ -16,7 +16,7 @@ template<typename T> T fooGood() {return T{42}; }
 template<>
 int fooGood<int>()
 {
-  return int{ 42 };
+  return int{42};
 }
 #endif
  

@@ -17,13 +17,22 @@
 IGNORED_STMT(OMPOrderedDirective)
 IGNORED_STMT(OMPParallelForDirective)
 
-IGNORED_DECL(StaticAssertDecl)
+IGNORED_DECL(UsingShadowDecl)
+IGNORED_DECL(UsingPackDecl)
 
 SUPPORTED_DECL(DecompositionDecl)
 SUPPORTED_DECL(VarDecl)
 SUPPORTED_DECL(TypeAliasDecl)
 SUPPORTED_DECL(TypedefDecl)
+SUPPORTED_DECL(StaticAssertDecl)
+SUPPORTED_DECL(FieldDecl)
+SUPPORTED_DECL(AccessSpecDecl)
+SUPPORTED_DECL(CXXMethodDecl)
+SUPPORTED_DECL(UsingDecl)
+SUPPORTED_DECL(CXXRecordDecl)
 
+SUPPORTED_STMT(CXXDeleteExpr)
+SUPPORTED_STMT(CXXDefaultInitExpr)
 SUPPORTED_STMT(MemberExpr)
 SUPPORTED_STMT(IntegerLiteral)
 SUPPORTED_STMT(StringLiteral)

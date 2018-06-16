@@ -2,6 +2,7 @@
 
 if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
    export HOMEBREW_NO_AUTO_UPDATE=1
+   brew update > /dev/null
    brew install cmake || brew upgrade cmake
    brew install xz || brew upgrade xz
 
