@@ -8,6 +8,7 @@
 - [What](#what)
 - [Why](#why)
 - [Building](#building)
+- [Usage](#usage)
 
 
 ## What
@@ -141,3 +142,34 @@ cmake -G"Eclipse CDT4 - Unix Makefiles" ../cppinsights/
 
 Then in [Cevelop](https://www.cevelop.com) Import -> General -> Existing Project into Workspace. Select `build_eclipse`. Enjoy editing with
 [Cevelop](https://www.cevelop.com).
+
+## Usage
+
+Using C++ Insights is fairly simple: 
+
+```
+insights <YOUR_CPP_FILE> -- -std=c++17
+```
+
+Things get complicate with when it comes to the system include paths. There are path hard-coded in the binary which seem
+to come from the compiler C++ Insights was build with. To help with that check out `scripts/getinclude.py`. It tries to
+collect the system include paths from the compiler. Without an option it uses `g++`, you can also pass another compiler
+as a first argument.
+
+Here is an example:
+
+```
+./scripts/getinclude.py 
+-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1 -isystem/usr/local/include -isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include -isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -isystem/usr/include 
+```
+
+The script can be used together with C++ Insights:
+
+```
+insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
+```
+
+
+There is also another github project which sets up a docker container with the latest C++ Insights version in it: [C++
+Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
+
