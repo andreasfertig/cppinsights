@@ -515,6 +515,25 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const FunctionDecl* stmt)
+{
+    //    LAMBDA_SCOPE_HELPER(VarDecl);
+
+    InsightsBase::GenerateFunctionPrototype(mOutputFormatHelper, *stmt);
+
+    // defaulted
+    // isConstexpr
+    // isExternC
+    // isNoReturn
+
+    if(stmt->doesThisDeclarationHaveABody()) {
+        InsertArg(stmt->getBody());
+    } else {
+        mOutputFormatHelper.AppendNewLine(';');
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
     WrapInParensOrCurlys(BraceKind::Curlys, [&]() {

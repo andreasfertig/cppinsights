@@ -1,0 +1,19 @@
+int main()
+{
+    if(true) {
+       extern void Func(int x);
+       extern int Foo(double);
+       float Bar(int x, float y);
+     }
+     
+}
+
+extern int Foo(double d)
+{
+    return static_cast<int>(2 * d);
+}
+
+float Bar(int x, float y)
+{
+    return static_cast<float>(x) + y;
+}
