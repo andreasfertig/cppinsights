@@ -12,6 +12,7 @@
 - [Why](#why)
 - [Building](#building)
 - [Usage](#usage)
+- [Get Involved](#getinvolved)
 - [Support](#support)
 
 
@@ -177,7 +178,11 @@ insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
 There is also another github project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
+## Get Involved
++ Report bugs/issues by submitting a [Github issue](https://github.com/andreasfertig/cppinsights/issues).
++ Submit contributions using [pull requests](https://github.com/andreasfertig/cppinsights/pulls). See [Contributing](CONTRIBUTING.md)
 
 ## Support
 
-If you like to support the project consider submitting a patch. Another alternative is to become a [Patreon](https://www.patreon.com/cppinsights) supporter.
+If you like to support the project consider [submitting](CONTRIBUTING.md) a patch. Another alternative is to become a [Patreon](https://www.patreon.com/cppinsights) supporter.
+
