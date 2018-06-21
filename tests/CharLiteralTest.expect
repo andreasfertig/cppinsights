@@ -79,35 +79,36 @@ using Char = Foo<char>;
 class Test
 {
 public:
-    void Apply()
+    inline void Apply()
     {
-        Char* data            = mData;
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\0');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\n');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\\');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\'');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\a');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\b');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\f');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\r');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\t');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\v');
-
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(L'\n'));
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(u8'\n');
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(u'\n'));
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(U'\n'));
-
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3u);
-
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ul);
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ull);
-
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ll);
-        data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3l);
+      Foo<char> * data = this->mData;
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\0');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\n');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\\');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\'');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\a');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\b');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\f');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\r');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\t');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\v');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(L'\n'));
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(u8'\n');
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(u'\n'));
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(U'\n'));
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3u);
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ul);
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ull);
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ll);
+      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3l);
     }
+    
 
-    Int GetLength() const { return mLength; }
+    inline Foo<int> GetLength() const
+    {
+      return Foo<int>(this->mLength);
+    }
+    
 
 private:
     Char mData[1024];
@@ -120,7 +121,7 @@ private:
 
 int main()
 {
-    Test t;
-
-    t.Apply();
+  Test t = Test();
+  t.Apply();
 }
+

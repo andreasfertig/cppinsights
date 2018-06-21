@@ -12,7 +12,12 @@ class A
 class B
     {
     public:
-        operator A() const { return A(); }
+        using retType = A;
+        inline operator retType () const
+        {
+          return A();
+        }
+        
     /* public: inline constexpr B() noexcept; */
     /* public: inline ~B() noexcept; */
     /* public: inline constexpr B(const B &); */
@@ -28,18 +33,21 @@ class C
     /* public: inline ~C() noexcept; */
     };
 
-void foo( const A& )
-    {
-    std::operator<<(std::cout, "A").operator<<(std::endl);
-    }
+void foo(const A &)
+{
+  std::operator<<(std::cout, "A").operator<<(std::endl);
+}
 
-void foo( B& )
-    {
-    std::operator<<(std::cout, "B").operator<<(std::endl);
-    }
+
+void foo(B &)
+{
+  std::operator<<(std::cout, "B").operator<<(std::endl);
+}
+
 
 int main()
-    {
-    foo( static_cast<A>(static_cast<const B&>(C()).operator A()));
-    } 
+{
+  foo(static_cast<A>(static_cast<const B&>(C()).operator A()));
+}
+ 
 

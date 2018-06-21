@@ -1,0 +1,118 @@
+#include <string>
+#include <iostream>
+
+struct B {
+    inline virtual void f(int)
+    {
+      std::operator<<(std::cout, "B::f\n");
+    }
+    
+    inline void g(char)
+    {
+      std::operator<<(std::cout, "B::g\n");
+    }
+    
+    inline void h(int)
+    {
+      std::operator<<(std::cout, "B::h\n");
+    }
+    
+
+ protected:
+    int m; // B::m is protected
+    typedef int value_type;
+/* public: inline B & operator=(const B &); */
+/* public: inline B & operator=(B &&); */
+/* public: inline ~B(); */
+/* public: inline B() noexcept; */
+/* public: inline constexpr B(const B &); */
+/* public: inline constexpr B(B &&); */
+};
+ 
+template<typename T>
+struct D : B {
+    using B::m; // D::m is public
+    using B::value_type; // D::value_type is public
+ 
+    using B::f;
+    void f(int) { std::cout << "D::f\n"; } // D::f(int) overrides B::f(int)
+    using B::g;
+    void g(int) { std::cout << "D::g\n"; } // both g(int) and g(char) are visible
+                                           // as members of D
+    using B::h;
+    void h(int) { std::cout << "D::h\n"; } // D::h(int) hides B::h(int)
+};
+/* First instantiated from: UsingDeclTest.cpp:56 */
+#ifdef INSIGHTS_USE_TEMPLATE
+struct D<int> : public B
+{
+  using D<int>::m;
+  using D<int>::value_type;
+  using D<int>::f;
+  inline virtual void f(int)
+  {
+    std::operator<<(std::cout, "D::f\n");
+  }
+  
+  using D<int>::g;
+  inline void g(int);
+  
+  using D<int>::h;
+  inline void h(int);
+  
+  inline D<int> & operator=(const D<int> &) = default;
+  inline D<int> & operator=(D<int> &&) = default;
+  inline ~D() = default;
+  inline D() noexcept = default;
+  inline constexpr D(const D<int> &) = default;
+  inline constexpr D(D<int> &&) = default;
+  
+};
+
+#endif
+
+
+
+
+namespace Test
+{
+    struct Alloc { /* public: inline constexpr Alloc() noexcept; */
+    /* public: inline constexpr Alloc(const Test::Alloc &); */
+    /* public: inline constexpr Alloc(Test::Alloc &&); */
+    };
+
+    enum class West { north };
+    enum struct Best { north };
+    enum  Fest { cheer };
+
+    namespace Inner
+    {
+        inline namespace v1 /*inline namespace*/ {
+            static const int zz=0;
+            using type = int;
+
+            namespace /*anonymous namespace*/ {
+                class Void{};
+            }
+        }
+    }
+}
+
+int main()
+{
+  using std::string;
+  std::string str = std::basic_string<char>("Example");
+  D<int> d = D<int>();
+  using namespace std::string_literals;
+  std::basic_string<char> str2 = std::operator""s("abc", 3ul);
+  using Vec = Test::Alloc;
+  Vec v = Vec();
+  using W = Test::West;
+  using B = Test::Best;
+  using F = Test::Fest;
+  namespace myStd = std;
+  namespace myInner = Test::Inner;
+  using vzz = Test::Inner::type;
+  using Test::Inner::Void;
+}
+

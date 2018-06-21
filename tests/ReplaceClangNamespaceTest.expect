@@ -8,15 +8,16 @@ namespace mine {
 
 int main()
 {
-         
-     class __lambda_11_5
-     {
-       public: inline /*constexpr */ void operator()() const
-       {
-         int x = mine::x;
-       }
-       
-     } __lambda_11_5{};
-     
-     __lambda_11_5.operator()();
+    
+  class __lambda_11_5
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      int x = mine::x;
+    }
+    
+  } __lambda_11_5{};
+  
+  __lambda_11_5.operator()();
 }
+

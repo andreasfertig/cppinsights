@@ -17,9 +17,8 @@ class Derived : public Base
 
 int main()
 {
-    Derived* d{new Derived};
-
-    Base* b = static_cast<Base *>(d);
-
-    Base* bb{static_cast<Base *>(new Derived())};
+  Derived * d = {new Derived()};
+  Base * b = static_cast<Base *>(d);
+  Base * bb = {static_cast<Base *>(new Derived())};
 }
+

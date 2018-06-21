@@ -27,10 +27,11 @@ void foo<std::set<int, std::less<int>, std::allocator<int> > >(std::set<int, std
 
 
 
-int main() {
-std::map<int, int> m;
-std::set<int> s;
-
-foo(m);
-foo(s);
+int main()
+{
+  std::map<int, int> m = std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > >();
+  std::set<int> s = std::set<int, std::less<int>, std::allocator<int> >();
+  foo(m);
+  foo(s);
 }
+

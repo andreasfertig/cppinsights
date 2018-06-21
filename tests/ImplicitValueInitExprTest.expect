@@ -1,0 +1,48 @@
+#include <array>
+
+struct Point
+{
+    double x;
+    double y;
+};
+
+struct Float
+{
+    float f;
+};
+
+struct Char
+{
+    char c;
+    wchar_t w;
+    char16_t c16;
+    char32_t c32;
+};
+
+struct Bool
+{
+    bool b;
+};
+
+struct Pointer
+{
+    char* p;
+};
+
+
+struct Ints
+{
+    int i;
+    unsigned int ui;
+};
+
+int main()
+{
+  Point array[10] = {{1.0, 0.0}, {0.0, 0.0}, {2.0, 1.0}};
+  Float ff = {0.0f};
+  Char c = {'\0', L'\0', u'\0', U'\0'};
+  Bool b = {false};
+  Pointer p = {nullptr};
+  Ints i = {0, 0};
+}
+

@@ -1,0 +1,99 @@
+#include <cstdio>
+
+class Foo
+{
+public:
+    Foo() = default;
+
+    template<typename T>
+    void Do(T&& t)
+    {
+        t();
+    }
+    
+    /* First instantiated from: TemplateMemberFunctionTest.cpp:33 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline void Do<__lambda_33_10>(__lambda_33_10 && t)
+    {
+      t.operator()();
+    }
+    #endif
+    
+
+
+    template<int X, typename T>
+    void DoOther(T&& t)
+    {
+        t();        
+    }
+    
+    /* First instantiated from: TemplateMemberFunctionTest.cpp:35 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline void DoOther<1, __lambda_35_18>(__lambda_35_18 && t)
+    {
+      t.operator()();
+    }
+    #endif
+    
+
+    template<int X, char c, typename T>
+    void DoBar(T&& t)
+    {
+        t();        
+    }
+    
+    /* First instantiated from: TemplateMemberFunctionTest.cpp:37 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline void DoBar<1, 116, __lambda_37_21>(__lambda_37_21 && t)
+    {
+      t.operator()();
+    }
+    #endif
+    
+    
+/* public: inline constexpr Foo() noexcept; */
+/* public: inline constexpr Foo(const Foo &); */
+/* public: inline constexpr Foo(Foo &&); */
+};
+
+int main()
+{
+  Foo f = Foo();
+    
+  class __lambda_33_10
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("hello\n");
+    }
+    
+  } __lambda_33_10{};
+  
+  f.Do(__lambda_33_10);
+    
+  class __lambda_35_18
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("hello\n");
+    }
+    
+  } __lambda_35_18{};
+  
+  f.DoOther<1>(__lambda_35_18);
+    
+  class __lambda_37_21
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("hello\n");
+    }
+    
+  } __lambda_37_21{};
+  
+  f.DoBar<1, 116>(__lambda_37_21);
+}
+

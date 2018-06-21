@@ -25,28 +25,28 @@ void Test<int>(int && t)
 
 int main()
 {
-         
-     class __lambda_10_10
-     {
-       public: inline /*constexpr */ void operator()() const
-       {
-         printf("Hello");
-       }
-       
-     };
-     
-     Test(__lambda_10_10{});
     
-              
-     class __lambda_12_10
-     {
-       public: inline /*constexpr */ int operator()() const
-       {
-         printf("Bello");
-         return 1;
-       }
-       
-     } __lambda_12_10{};
-     
-     Test(__lambda_12_10.operator()());
+  class __lambda_10_10
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("Hello");
+    }
+    
+  };
+  
+  Test(__lambda_10_10{});
+      
+  class __lambda_12_10
+  {
+    public: inline /*constexpr */ int operator()() const
+    {
+      printf("Bello");
+      return 1;
+    }
+    
+  } __lambda_12_10{};
+  
+  Test(__lambda_12_10.operator()());
 }
+

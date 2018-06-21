@@ -2,109 +2,95 @@
 
 int main()
 {
-         
-     class __lambda_5_14
-     {
-       public: inline void operator()() const
-       {
-         volatile char buffer[10];
-         {
-           char volatile (&__range1)[10] = buffer;
-           volatile char * __begin1 = __range1;
-           volatile char * __end1 = __range1 + 10l;
-           
-           for( ; __begin1 != __end1; ++__begin1 )
-           {
-             volatile char & c = *__begin1;
-             c = 1;
-           }
-         };
-       }
-       
-     };
-     
-     __lambda_5_14 l = __lambda_5_14{};
-     
-
-    l.operator()();
-
-         
-     class __lambda_14_14
-     {
-       public: inline void operator()() const
-       {
-         volatile char buffer[10];
-         int i = 0;
-         while(static_cast<unsigned long>(i) < sizeof(buffer)) {
-           buffer[i++] = 1;
-         };
-       }
-       
-     };
-     
-     __lambda_14_14 w = __lambda_14_14{};
-     
-
-    w.operator()();
-
-
-         
-     class __lambda_25_14
-     {
-       public: inline /*constexpr */ void operator()(int x) const
-       {
-         switch(x) {
-           case 2: printf("is 2\n");
-           break;
-           default: return;
-         };
-       }
-       
-     };
-     
-     __lambda_25_14 s = __lambda_25_14{};
-     
-
-    s.operator()(4);
-
-
-         
-     class __lambda_36_14
-     {
-       public: inline void operator()() const
-       {
-         volatile char buffer[10];
-         for(int i = 0;
-         static_cast<unsigned long>(i) < sizeof(buffer); ++i) 
-         {
-           buffer[i] = 1;
-         }
-       }
-       
-     };
-     
-     __lambda_36_14 f = __lambda_36_14{};
-     
-
-    f.operator()();
-
-         
-     class __lambda_45_15
-     {
-       public: inline void operator()() const
-       {
-         volatile char buffer[10];
-         int i = 0;
-         for(; static_cast<unsigned long>(i) < sizeof(buffer); ++i) 
-         {
-           buffer[i] = 1;
-         }
-       }
-       
-     };
-     
-     __lambda_45_15 f2 = __lambda_45_15{};
-     
-
-    f2.operator()();
+    
+  class __lambda_5_14
+  {
+    public: inline void operator()() const
+    {
+      volatile char buffer[10];
+      {
+        char volatile (&__range1)[10] = buffer;
+        volatile char * __begin1 = __range1;
+        volatile char * __end1 = __range1 + 10l;
+        
+        for( ; __begin1 != __end1; ++__begin1 )
+        {
+          volatile char & c = *__begin1;
+          c = 1;
+        }
+      }
+    }
+    
+  };
+  
+  __lambda_5_14 l = __lambda_5_14{};
+  l.operator()();
+    
+  class __lambda_14_14
+  {
+    public: inline void operator()() const
+    {
+      volatile char buffer[10];
+      int i = 0;
+      while(static_cast<unsigned long>(i) < sizeof(buffer)) {
+        buffer[i++] = 1;
+      }
+    }
+    
+  };
+  
+  __lambda_14_14 w = __lambda_14_14{};
+  w.operator()();
+    
+  class __lambda_25_14
+  {
+    public: inline /*constexpr */ void operator()(int x) const
+    {
+      switch(x) {
+        case 2: printf("is 2\n");
+        break;
+        default: return;
+      }
+    }
+    
+  };
+  
+  __lambda_25_14 s = __lambda_25_14{};
+  s.operator()(4);
+    
+  class __lambda_36_14
+  {
+    public: inline void operator()() const
+    {
+      volatile char buffer[10];
+      for(int i = 0; static_cast<unsigned long>(i) < sizeof(buffer); ++i) 
+      {
+        buffer[i] = 1;
+      }
+      
+    }
+    
+  };
+  
+  __lambda_36_14 f = __lambda_36_14{};
+  f.operator()();
+    
+  class __lambda_45_15
+  {
+    public: inline void operator()() const
+    {
+      volatile char buffer[10];
+      int i = 0;
+      for(; static_cast<unsigned long>(i) < sizeof(buffer); ++i) 
+      {
+        buffer[i] = 1;
+      }
+      
+    }
+    
+  };
+  
+  __lambda_45_15 f2 = __lambda_45_15{};
+  f2.operator()();
 }
+

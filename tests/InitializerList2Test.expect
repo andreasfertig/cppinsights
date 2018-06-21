@@ -3,14 +3,19 @@
 class Foo
 {
 public:
-    Foo(std::initializer_list<int> x, const bool b=false, const int z=2){}
+    inline Foo(std::initializer_list<int> x, const bool b, const int z)
+    {
+    }
+    
+    
 /* public: inline constexpr Foo(const Foo &); */
 /* public: inline constexpr Foo(Foo &&); */
 };
 
 int main()
 {
-  Foo f{ std::initializer_list<int>{1} };
-  Foo f2{ std::initializer_list<int>{1, static_cast<const int>(true)} };
-  Foo f3{ std::initializer_list<int>{1, static_cast<const int>(true), 4} };
+  Foo f = Foo{std::initializer_list<int>{1}, false, 2};
+  Foo f2 = Foo{std::initializer_list<int>{1, static_cast<const int>(true)}, false, 2};
+  Foo f3 = Foo{std::initializer_list<int>{1, static_cast<const int>(true), 4}, false, 2};
 }
+

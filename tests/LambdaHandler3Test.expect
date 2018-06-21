@@ -17,23 +17,24 @@ int Is<__lambda_10_13>(const __lambda_10_13 x)
 int main()
 {
   int y = 3;
-        
-   class __lambda_10_13
-   {
-     public: inline /*constexpr */ int operator()(int x) const
-     {
-       return x + y;
-     }
-     
-     private:
-     int& y;
-     
-     public: __lambda_10_13(int& _y)
-     : y{_y}
-     {}
-     
-   };
-   
-   return Is(__lambda_10_13{y});
+      
+  class __lambda_10_13
+  {
+    public: inline /*constexpr */ int operator()(int x) const
+    {
+      return x + y;
+    }
+    
+    private:
+    int& y;
+    
+    public: __lambda_10_13(int& _y)
+    : y{_y}
+    {}
+    
+  };
+  
+  return Is(__lambda_10_13{y});
 }
+
 

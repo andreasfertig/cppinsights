@@ -22,17 +22,35 @@ struct std::tuple_element<1, Point>
 class Point
 {
 public:
-    constexpr Point(double x, double y) noexcept
-    : mX(x)
-    , mY(y)
+    inline constexpr Point(double x, double y) noexcept
+    : mX{x}
+    , mY{y}
     {
     }
+    
+    
 
-    constexpr double GetX() const noexcept { return mX; }
-    constexpr double GetY() const noexcept { return mY; }
+    inline constexpr double GetX() const noexcept
+    {
+      return this->mX;
+    }
+    
+    inline constexpr double GetY() const noexcept
+    {
+      return this->mY;
+    }
+    
 
-    constexpr void SetX(double x) noexcept { mX = x; }
-    constexpr void SetY(double y) noexcept { mY = y; }
+    inline constexpr void SetX(double x) noexcept
+    {
+      this->mX = x;
+    }
+    
+    inline constexpr void SetY(double y) noexcept
+    {
+      this->mY = y;
+    }
+    
 
     template<size_t N>
     constexpr decltype(auto) get() noexcept
@@ -55,7 +73,9 @@ public:
           return (this->mY);
         }
         
+        
       }
+      
     }
     #endif
     
@@ -68,6 +88,7 @@ public:
       if constexpr(1ul == 1) {
         return this->GetX();
       }
+      
     }
     #endif
     
@@ -85,7 +106,7 @@ public:
     /* First instantiated from: StructuredBindingsHandler5Test.cpp:73 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline constexpr const double & get<0>() noexcept
+    inline constexpr const double & get<0>() const noexcept
     {
       if constexpr(0ul == 1) ;
       else /* constexpr */ {
@@ -93,7 +114,9 @@ public:
           return (this->mY);
         }
         
+        
       }
+      
     }
     #endif
     
@@ -101,11 +124,12 @@ public:
     /* First instantiated from: StructuredBindingsHandler5Test.cpp:73 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline constexpr double get<1>() noexcept
+    inline constexpr double get<1>() const noexcept
     {
       if constexpr(1ul == 1) {
         return this->GetX();
       }
+      
     }
     #endif
     
@@ -119,24 +143,18 @@ private:
 
 int main()
 {
-    Point p      = Point{1, 2};
-    Point & __p64 = p;
-    std::tuple_element<0, Point>::type& x = __p64.get<0>();
-    std::tuple_element<1, Point>::type y = __p64.get<1>();
-    
-
-    printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
-    ++x;
-    ++y;
-    printf("x:%lf y:%lf\n", x, y);
-    printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
-
-    constexpr Point p2 = Point{3, 4};
-    const Point & __p273 = p2;
-    std::tuple_element<0, const Point>::type& x2 = __p273.get<0>();
-    std::tuple_element<1, const Point>::type y2 = __p273.get<1>();
-    
-
-    // error: decomposition declaration cannot be declared 'constexpr'
-    // constexpr auto [x3, y3] = p2;
+  Point p = Point{1, 2};
+  Point & __p64 = p;
+  std::tuple_element<0, Point>::type& x = __p64.get<0>();
+  std::tuple_element<1, Point>::type y = __p64.get<1>();
+  printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
+  ++x;
+  ++y;
+  printf("x:%lf y:%lf\n", x, y);
+  printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
+  constexpr const Point p2 = Point{3, 4};
+  const Point & __p273 = p2;
+  std::tuple_element<0, const Point>::type& x2 = __p273.get<0>();
+  std::tuple_element<1, const Point>::type y2 = __p273.get<1>();
 }
+

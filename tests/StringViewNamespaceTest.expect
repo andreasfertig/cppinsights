@@ -2,11 +2,11 @@
 #include <string>
 #include <string_view>
 
-int main(){
-    
-  std::string str = "Some string";
+int main()
+{
+  std::string str = std::basic_string<char>("Some string");
   std::string_view strView = static_cast<std::basic_string_view<char, std::char_traits<char> >>(str.operator basic_string_view());
-                 
   std::operator<<(std::operator<<(std::cout, "strView  : "), std::basic_string_view<char, std::char_traits<char> >(strView)).operator<<(std::endl);
 }
+
 

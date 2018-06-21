@@ -1,7 +1,7 @@
-.tmp.cpp:33:37: error: use of undeclared identifier 'get'
-       std::basic_string<char>& s = get<0ul>(__operator15);
-                                    ^
-.tmp.cpp:34:84: error: use of undeclared identifier 'get'
-       std::tuple_element<1, std::tuple<std::basic_string<char>, int> >::type& n = get<1ul>(__operator15);
-                                                                                   ^
+.tmp.cpp:33:36: error: use of undeclared identifier 'get'
+      std::basic_string<char>& s = get<0ul>(__operator15);
+                                   ^
+.tmp.cpp:34:83: error: use of undeclared identifier 'get'
+      std::tuple_element<1, std::tuple<std::basic_string<char>, int> >::type& n = get<1ul>(__operator15);
+                                                                                  ^
 2 errors generated.

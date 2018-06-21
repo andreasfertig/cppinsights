@@ -6,25 +6,26 @@
   };
 
 
-  void test(X x) {
-         
-     class __lambda_10_5
-     {
-       public: inline /*constexpr */ void operator()() const
-       {
-         x.f<int>(17);
-         x.ff<int, int, double>(17, 2, 55.5);
-       }
-       
-       private:
-       X& x;
-       
-       public: __lambda_10_5(X& _x)
-       : x{_x}
-       {}
-       
-     } __lambda_10_5{x};
-     
-     __lambda_10_5.operator()();
-
-}
+  void test(X x)
+  {
+        
+    class __lambda_10_5
+    {
+      public: inline /*constexpr */ void operator()() const
+      {
+        x.f(17);
+        x.ff(17, 2, 55.5);
+      }
+      
+      private:
+      X& x;
+      
+      public: __lambda_10_5(X& _x)
+      : x{_x}
+      {}
+      
+    } __lambda_10_5{x};
+    
+    __lambda_10_5.operator()();
+  }
+  

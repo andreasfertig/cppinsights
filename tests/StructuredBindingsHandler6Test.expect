@@ -25,17 +25,35 @@ struct std::tuple_element<1, Point>
 class Point
 {
 public:
-    constexpr Point(double x, double y) noexcept
-    : mX(x)
-    , mY(y)
+    inline constexpr Point(double x, double y) noexcept
+    : mX{x}
+    , mY{y}
     {
     }
+    
+    
 
-    constexpr double GetX() const noexcept { return mX; }
-    constexpr double GetY() const noexcept { return mY; }
+    inline constexpr double GetX() const noexcept
+    {
+      return this->mX;
+    }
+    
+    inline constexpr double GetY() const noexcept
+    {
+      return this->mY;
+    }
+    
 
-    constexpr void SetX(double x) noexcept { mX = x; }
-    constexpr void SetY(double y) noexcept { mY = y; }
+    inline constexpr void SetX(double x) noexcept
+    {
+      this->mX = x;
+    }
+    
+    inline constexpr void SetY(double y) noexcept
+    {
+      this->mY = y;
+    }
+    
 
 private:
     double mX, mY;
@@ -54,7 +72,7 @@ public:
     /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline constexpr double get<0>() noexcept
+    inline constexpr double get<0>() const noexcept
     {
       if constexpr(0ul == 1) ;
       else /* constexpr */ {
@@ -62,7 +80,9 @@ public:
           return this->mY;
         }
         
+        
       }
+      
     }
     #endif
     
@@ -70,11 +90,12 @@ public:
     /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline constexpr double get<1>() noexcept
+    inline constexpr double get<1>() const noexcept
     {
       if constexpr(1ul == 1) {
         return this->GetX();
       }
+      
     }
     #endif
     
@@ -85,53 +106,38 @@ public:
 
 int main()
 {
-    Point p     = Point{1, 2};
-    Point __p58 = Point(p);
-    std::tuple_element<0, Point>::type x = __p58.get<0>();
-    std::tuple_element<1, Point>::type y = __p58.get<1>();
-    
-
-    printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
-    printf("x:%lf y:%lf\n", x, y);
-
-    char ar[2]{7,8};
-    char __ar64[2] = {ar[0], ar[1]};
-    char a1 = __ar64[0];
-    char a2 = __ar64[1];
-    
-    char (&__ar65)[2] = ar;
-    char& a4 = __ar65[0];
-    char& a5 = __ar65[1];
-    
-
-    printf("%d %d\n", static_cast<int>(a4), static_cast<int>(a5));
-    ++a4;
-    --a5;
-    printf("%d %d\n", static_cast<int>(a4), static_cast<int>(a5));
-    
-    char const (&__ar72)[2] = ar;
-    const char& a8 = __ar72[0];
-    const char& a9 = __ar72[1];
-    
-
-    const char aa[2]       = {1, 2};
-    char const (&__aa75)[2] = aa;
-    const char& a18 = __aa75[0];
-    const char& a19 = __aa75[1];
-    
-
-    std::tuple<int, char, double> muple = std::make_tuple(1, 'a', 2.3);
-
-    // unpack the tuple into its individual components
-    std::tuple<int, char, double> & __muple80 = muple;
-    std::tuple_element<0, std::tuple<int, char, double> >::type& i = get<0ul>(__muple80);
-    std::tuple_element<1, std::tuple<int, char, double> >::type& c = get<1ul>(__muple80);
-    std::tuple_element<2, std::tuple<int, char, double> >::type& d = get<2ul>(__muple80);
-    
-
-    std::tuple<int, char, double> __muple82 = std::tuple<int, char, double>(muple);
-    std::tuple_element<0, std::tuple<int, char, double> >::type& ii = get<0ul>(__muple82);
-    std::tuple_element<1, std::tuple<int, char, double> >::type& cc = get<1ul>(__muple82);
-    std::tuple_element<2, std::tuple<int, char, double> >::type& dd = get<2ul>(__muple82);
-    
+  Point p = Point{1, 2};
+  Point __p58 = Point(p);
+  std::tuple_element<0, Point>::type x = __p58.get<0>();
+  std::tuple_element<1, Point>::type y = __p58.get<1>();
+  printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
+  printf("x:%lf y:%lf\n", x, y);
+  char ar[2] = {7, 8};
+  char __ar64[2] = {ar[0], ar[1]};
+  char a1 = __ar64[0];
+  char a2 = __ar64[1];
+  char (&__ar65)[2] = ar;
+  char& a4 = __ar65[0];
+  char& a5 = __ar65[1];
+  printf("%d %d\n", static_cast<int>(a4), static_cast<int>(a5));
+  ++a4;
+  --a5;
+  printf("%d %d\n", static_cast<int>(a4), static_cast<int>(a5));
+  char const (&__ar72)[2] = ar;
+  const char& a8 = __ar72[0];
+  const char& a9 = __ar72[1];
+  const char aa[2] = {1, 2};
+  char const (&__aa75)[2] = aa;
+  const char& a18 = __aa75[0];
+  const char& a19 = __aa75[1];
+  std::tuple<int, char, double> muple = std::make_tuple(1, 'a', 2.2999999999999998);
+  std::tuple<int, char, double> & __muple80 = muple;
+  std::tuple_element<0, std::tuple<int, char, double> >::type& i = get<0ul>(__muple80);
+  std::tuple_element<1, std::tuple<int, char, double> >::type& c = get<1ul>(__muple80);
+  std::tuple_element<2, std::tuple<int, char, double> >::type& d = get<2ul>(__muple80);
+  std::tuple<int, char, double> __muple82 = std::tuple<int, char, double>(muple);
+  std::tuple_element<0, std::tuple<int, char, double> >::type& ii = get<0ul>(__muple82);
+  std::tuple_element<1, std::tuple<int, char, double> >::type& cc = get<1ul>(__muple82);
+  std::tuple_element<2, std::tuple<int, char, double> >::type& dd = get<2ul>(__muple82);
 }
+

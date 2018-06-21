@@ -20,17 +20,16 @@ public:
 
 int main()
 {
-    Test t;
-
-         
-     class __lambda_13_12
-     {
-       public: inline /*constexpr */ void operator()() const
-       {
-       }
-       
-     } __lambda_13_12{};
-     
-     t.foo<__lambda_13_12>(__lambda_13_12);
-
+  Test t = Test();
+    
+  class __lambda_13_12
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+    }
+    
+  } __lambda_13_12{};
+  
+  t.foo(__lambda_13_12);
 }
+

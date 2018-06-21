@@ -1,6 +1,6 @@
 template <typename T>
 class Foo{};
-/* First instantiated from: TemplateClassWithoutDefinitionTest.cpp:11 */
+/* First instantiated from: ClassTemplateWithoutDefinitionTest.cpp:11 */
 #ifdef INSIGHTS_USE_TEMPLATE
 class Foo<double>
 {
@@ -20,5 +20,6 @@ typedef Foo<double> DoubleFoo;
 
 int main()
 {
-  DoubleFoo df;
+  DoubleFoo df = Foo<double>();
 }
+

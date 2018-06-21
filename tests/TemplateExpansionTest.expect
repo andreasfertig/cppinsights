@@ -24,9 +24,11 @@ template_tuple<identity> f7<identity>()
 #endif
 
 
-void foo2() {
+void foo2()
+{
   f7<identity>();
 }
+
 
 
   template<typename> class A { };
@@ -45,6 +47,7 @@ void foo2() {
   #endif
   
   int foo();
+  ;
 
   template<typename> class testType { };
   /* First instantiated from: TemplateExpansionTest.cpp:43 */
@@ -146,20 +149,15 @@ void foo2() {
 template<typename T>
 struct Test {};
 
-int main() {
-
-
-    C<Test, Test> te;
-
-    testType<int> type;
-    
-    testDecl<foo> a{};
-    testDecl<nullptr> b{};
-
-    testIntegral<2> integral;
-
-    testExpr<2*2, 1> expr;
-
-    testPack<0, 1, 2, 4> pack;
+int main()
+{
+  C<Test, Test> te = C<Test, Test>();
+  testType<int> type = testType<int>();
+  testDecl<foo> a = {};
+  testDecl<nullptr> b = {};
+  testIntegral<2> integral = testIntegral<2>();
+  testExpr<2 * 2, 1> expr = testExpr<4, 1>();
+  testPack<0, 1, 2, 4> pack = testPack<0, 1, 2, 4>();
 }
+
 

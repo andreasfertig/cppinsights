@@ -1,31 +1,31 @@
-.tmp.cpp:15:23: error: reference to local variable 'n' declared in enclosing function 'Test'
-       char (&buffer)[n];
-                      ^
+.tmp.cpp:13:20: error: reference to local variable 'n' declared in enclosing function 'Test'
+    char (&buffer)[n];
+                   ^
 .tmp.cpp:1:15: note: 'n' declared here
-void Test(int n) 
+void Test(int n)
               ^
-.tmp.cpp:15:15: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
-       char (&buffer)[n];
-              ^
-.tmp.cpp:17:45: error: reference to local variable 'n' declared in enclosing function 'Test'
-       public: __lambda_6_5(char (&_buffer)[n])
-                                            ^
+.tmp.cpp:13:12: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
+    char (&buffer)[n];
+           ^
+.tmp.cpp:15:42: error: reference to local variable 'n' declared in enclosing function 'Test'
+    public: __lambda_6_5(char (&_buffer)[n])
+                                         ^
 .tmp.cpp:1:15: note: 'n' declared here
-void Test(int n) 
+void Test(int n)
               ^
-.tmp.cpp:21:8: error: no matching constructor for initialization of 'class __lambda_6_5'
-     } __lambda_6_5{buffer};
-       ^           ~~~~~~~~
-.tmp.cpp:7:12: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'char [n]' to 'const __lambda_6_5' for 1st argument
-     class __lambda_6_5
-           ^
-.tmp.cpp:7:12: note: candidate constructor (the implicit move constructor) not viable: no known conversion from 'char [n]' to '__lambda_6_5' for 1st argument
-     class __lambda_6_5
-           ^
-.tmp.cpp:17:16: note: candidate constructor not viable: no known conversion from 'char [n]' to 'char (&)[n]' for 1st argument
-       public: __lambda_6_5(char (&_buffer)[n])
-               ^
-.tmp.cpp:23:18: error: cannot use dot operator on a type
-     __lambda_6_5.operator()(1, 2);
-                 ^
+.tmp.cpp:19:5: error: no matching constructor for initialization of 'class __lambda_6_5'
+  } __lambda_6_5{buffer};
+    ^           ~~~~~~~~
+.tmp.cpp:5:9: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'char [n]' to 'const __lambda_6_5' for 1st argument
+  class __lambda_6_5
+        ^
+.tmp.cpp:5:9: note: candidate constructor (the implicit move constructor) not viable: no known conversion from 'char [n]' to '__lambda_6_5' for 1st argument
+  class __lambda_6_5
+        ^
+.tmp.cpp:15:13: note: candidate constructor not viable: no known conversion from 'char [n]' to 'char (&)[n]' for 1st argument
+    public: __lambda_6_5(char (&_buffer)[n])
+            ^
+.tmp.cpp:21:15: error: cannot use dot operator on a type
+  __lambda_6_5.operator()(1, 2);
+              ^
 5 errors generated.

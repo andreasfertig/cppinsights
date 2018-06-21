@@ -1,9 +1,10 @@
 int main()
 {
-    float a = static_cast<float>(2.0);
-    double dl = static_cast<double>(a);
-    float fl = static_cast<float>(dl);
-    int i = static_cast<int>(fl);
-    fl = static_cast<float>(i);
+  float a = static_cast<float>(2.0);
+  double dl = static_cast<double>(a);
+  float fl = static_cast<float>(dl);
+  int i = static_cast<int>(fl);
+  fl = static_cast<float>(i);
 }
+
 

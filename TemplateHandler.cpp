@@ -7,10 +7,8 @@
 
 #include "TemplateHandler.h"
 #include "CodeGenerator.h"
-#include "DPrint.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
-#include "InsightsStaticStrings.h"
 #include "OutputFormatHelper.h"
 
 #include "llvm/Support/Path.h"
@@ -81,7 +79,8 @@ void TemplateHandler::InsertInstantiatedTemplate(const FunctionDecl& funcDecl, c
         InsertInstantiationPoint(outputFormatHelper, sm, funcDecl.getPointOfInstantiation());
         outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
 
-        GenerateFunctionPrototype(outputFormatHelper, funcDecl);
+        CodeGenerator::InsertAccessModifierAndNameWithReturnType(
+            outputFormatHelper, funcDecl, CodeGenerator::SkipConstexpr::No, CodeGenerator::SkipAccess::Yes);
 
         outputFormatHelper.AppendNewLine();
 

@@ -1,20 +1,27 @@
 class Test
 {
 public:
-    Test(int v)
+    inline Test(int v)
     : mV{v}
-    {}
+    {
+    }
+    
+    
 
-    Test(Test& v)
+    inline Test(Test & v)
     : mV{v.mV}
-    {}
+    {
+    }
+    
+    
 
   
-    Test& operator=(const Test& other)
+    inline Test & operator=(const Test & other)
     {
-        mV = other.mV;
-        return *this;
+      this->mV = other.mV;
+      return *this;
     }
+    
 
 #if 0  
     Test& operator=( Test&& other)
@@ -32,26 +39,34 @@ public:
     }
   #endif
 
-    Test& operator++()
+    inline Test & operator++()
     {
-        mV++;
-        return *this;
+      this->mV++;
+      return *this;
     }
+    
 
-    Test operator++(int)
+    inline Test operator++(int)
     {
-        Test tmp(*this) /* NRVO variable */; // copy
-        operator++(); // pre-increment
-        return tmp;   // return old value
-    }    
+      Test tmp = Test(*this) /* NRVO variable */;
+      this->operator++();
+      return Test(tmp);
+    }
+        
 
-    Test& operator+=(const Test& rhs) // compound assignment (does not need to be a member,
-  {                           // but often is, to modify the private members)
-    mV += rhs.mV;
-    return *this; // return the result by reference
-  }
+    inline Test & operator+=(const Test & rhs)
+    {
+      this->mV += rhs.mV;
+      return *this;
+    }
+    
  
-  operator int() { return mV; }
+  using retType = int;
+  inline operator retType ()
+  {
+    return this->mV;
+  }
+  
 
 private:
     int mV;
@@ -60,14 +75,10 @@ private:
 
 int main()
 {
-    Test t(2);
-    
-
-    t.operator=(Test(3 * 2));
-
-	Test tt(4);
-
-  	t.operator+=(Test(static_cast<int>(tt.operator int()) * 2));
-  
+  Test t = Test(2);
+  t.operator=(Test(3 * 2));
+  Test tt = Test(4);
+  t.operator+=(Test(static_cast<int>(tt.operator int()) * 2));
 }
+
 

@@ -1,21 +1,32 @@
 class Foo
 {
 public:
-    Foo(int x) : mX{x} {    }
+    inline Foo(int x)
+    : mX{x}
+    {
+    }
+    
+    
 
-     Foo(const char c) : mX{0} {
-        (*this).operator=(Foo(c));
+     inline Foo(const char c)
+     : mX{0}
+     {
+       (*this).operator=(Foo(c));
      }
+     
+     
 
-    bool operator==(const int& right) 
+    inline bool operator==(const int & right)
     {
-        return false;
+      return false;
     }
+    
 
-    bool operator==(const long& right) 
+    inline bool operator==(const long & right)
     {
-        return false;
+      return false;
     }
+    
 
 
    template<int N>
@@ -27,11 +38,12 @@ public:
    /* First instantiated from: ClassOpInTemplateFunctionTest.cpp:37 */
    #ifdef INSIGHTS_USE_TEMPLATE
    template<>
-   inline constexpr int get<1>() noexcept
+   inline constexpr int get<1>() const noexcept
    {
      if constexpr(1 == 1) {
        return this->mX;
      }
+     
    }
    #endif
    
@@ -48,8 +60,8 @@ public:
 
 int main()
 {
-    Foo f1{1};
-    Foo f2{2};
-
-    const bool b2 = f1.operator==(f2.get<1>());
+  Foo f1 = Foo{1};
+  Foo f2 = Foo{2};
+  const bool b2 = f1.operator==(f2.get<1>());
 }
+

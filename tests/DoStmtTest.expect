@@ -1,17 +1,14 @@
 int main()
 {
-         
-     class __lambda_3_5
-     {
-       public: inline /*constexpr */ void operator()() const
-       {
-         int x = 1;
-         do {
-           ++x;
-         } while(true) ;
-       }
-       
-     } __lambda_3_5{};
-     
-     __lambda_3_5.operator()();
+  int x = 1;
+  do {
+    ++x;
+  } while(true);
+  
+  do x++; while(true);
+  
+  do ;
+  while(false);
+  
 }
+

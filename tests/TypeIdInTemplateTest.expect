@@ -17,7 +17,7 @@ class Foo<int>
   public: 
   inline std::basic_string<char> Get()
   {
-    std::basic_string<char> typeId = std::basic_string<char>{typeid(const std::type_info).name()} /* NRVO variable */;
+    std::string typeId = std::basic_string<char>{typeid(const std::type_info).name()} /* NRVO variable */;
     return std::basic_string<char>(typeId);
   }
   
@@ -34,8 +34,8 @@ class Foo<int>
 
 int main()
 {
-  Foo<int> i;
-
+  Foo<int> i = Foo<int>();
   i.Get();
 }
+
 

@@ -1,7 +1,0 @@
-.tmp.cpp:34:8: error: no matching member function for call to 'foo'
-     t.foo<__lambda_13_12>(__lambda_13_12);
-     ~~^~~~~~~~~~~~~~~~~~~
-.tmp.cpp:6:10: note: candidate template ignored: invalid explicitly-specified argument for template parameter 'T'
-    void foo(T&&){}
-         ^
-1 error generated.

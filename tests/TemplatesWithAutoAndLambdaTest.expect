@@ -42,6 +42,7 @@ void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3]
 
 int main()
 {
-  std::string str = "world";
-  print( "hi", 7.5, str);
+  std::string str = std::basic_string<char>("world");
+  print("hi", 7.5, str);
 }
+

@@ -1,8 +1,9 @@
 class A {
 public:
-void SomeMethod()
+inline void SomeMethod()
 {
 }
+
 };
 
 

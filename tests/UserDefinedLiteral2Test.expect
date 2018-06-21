@@ -2,15 +2,14 @@
 
 using seconds_t      = std::chrono::seconds;
 
-constexpr seconds_t operator ""_s(unsigned long long s)
+inline constexpr std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long long s)
 {
-    return seconds_t(s);
+  return std::chrono::duration<long long, std::ratio<1, 1> >(s, 0);
 }
+
 
 int main()
 {
-    if(true) {
-       std::chrono::duration<long long, std::ratio<1, 1> > s = operator""_s(1ull);
-     }
-     
+  std::chrono::duration<long long, std::ratio<1, 1> > s = operator""_s(1ull);
 }
+

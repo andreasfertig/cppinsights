@@ -1,0 +1,48 @@
+#include <stdio.h>
+
+class Foo
+{
+public:
+    inline Foo()
+    : mI{0}
+    {
+    }
+    
+    
+
+    inline void Print()
+    {
+      printf("%d\n", this->mI);
+    }
+    
+
+private:
+    class Secrect {};
+    friend class DearFriend;
+
+    int mI;
+
+    friend void ChangePrivate(Foo &);
+    ;
+/* public: inline constexpr Foo(const Foo &); */
+/* public: inline constexpr Foo(Foo &&); */
+};
+
+void ChangePrivate(Foo & i)
+{
+  ++i.mI;
+}
+
+
+class DearFriend : public Foo::Secrect
+{};
+
+
+int main()
+{
+  Foo sPoint = Foo();
+  sPoint.Print();
+  ChangePrivate(sPoint);
+  sPoint.Print();
+}
+

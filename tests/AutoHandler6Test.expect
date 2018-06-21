@@ -1,0 +1,9 @@
+int main()
+{
+  char buffer[20];
+  char (&x)[20] = buffer;
+  char (&z)[20] = buffer;
+  char (&h)[20] = buffer;
+  char (&k)[20] = buffer;
+}
+

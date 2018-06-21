@@ -1,0 +1,14 @@
+int main()
+{
+  char c0 = 'A';
+  char c1 = u8'A';
+  wchar_t c2 = L'A';
+  char16_t c3 = u'A';
+  char32_t c4 = U'A';
+  const char * s0 = "hello";
+  const char * s1 = u8"hello";
+  const wchar_t * s2 = L"hello";
+  const char16_t * s3 = u"hello";
+  const char32_t * s4 = U"hello";
+}
+  

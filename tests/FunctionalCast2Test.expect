@@ -78,16 +78,14 @@ struct MACAddress
 
 void Main()
 {
-  const MACAddress macA{1, 1, 1, 1, 1, 1};
-  const MACAddress macB{1, 1, 1, 1, 1, 2};
-  const MACAddress macC{1, 1, 1, 1, 1, 1};
-
+  const MACAddress macA = {{1, 1, 1, 1, 1, 1}};
+  const MACAddress macB = {{1, 1, 1, 1, 1, 2}};
+  const MACAddress macC = {{1, 1, 1, 1, 1, 1}};
   printf("Equal: %d\n", static_cast<int>(Compare(macA.value, 1)));
   printf("Not equal: %d\n", static_cast<int>(!Compare(macB.value, 1)));
   printf("---------------\n");
-  printf("Not equal: %d\n",
-         static_cast<int>(!Compare(macA.value, macB.value)));
-  printf("Equal: %d\n",
-         static_cast<int>(Compare(macA.value, macC.value)));
+  printf("Not equal: %d\n", static_cast<int>(!Compare(macA.value, macB.value)));
+  printf("Equal: %d\n", static_cast<int>(Compare(macA.value, macC.value)));
 }
+
 

@@ -1,14 +1,16 @@
-void foo() {
- 
- class __lambda_2_1
- {
-   public: inline /*constexpr */ void operator()() const
-   {
-   }
-   
- } __lambda_2_1{};
- 
- __lambda_2_1.operator()();
+void foo()
+{
+    
+  class __lambda_2_1
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+    }
+    
+  } __lambda_2_1{};
+  
+  __lambda_2_1.operator()();
 }
+
 
 

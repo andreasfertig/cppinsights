@@ -1,21 +1,16 @@
 int main()
 {
-    char p[2];
-    char const __p4[2] = {p[0], p[1]};
-    const char x = __p4[0];
-    const char y = __p4[1];
-    
-
-
-    volatile char p2[2];
-    volatile char const __p28[2] = {p2[0], p2[1]};
-    const volatile char x2 = __p28[0];
-    const volatile char y2 = __p28[1];
-    
-
-    char p3[2];
-    char (&__p311)[2] = p3;
-    char& x3 = __p311[0];
-    char& y3 = __p311[1];
-    
+  char p[2];
+  char const __p4[2] = {p[0], p[1]};
+  const char x = __p4[0];
+  const char y = __p4[1];
+  volatile char p2[2];
+  volatile char const __p28[2] = {p2[0], p2[1]};
+  const volatile char x2 = __p28[0];
+  const volatile char y2 = __p28[1];
+  char p3[2];
+  char (&__p311)[2] = p3;
+  char& x3 = __p311[0];
+  char& y3 = __p311[1];
 }
+

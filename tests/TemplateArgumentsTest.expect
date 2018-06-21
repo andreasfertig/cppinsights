@@ -13,12 +13,13 @@ static inline decltype(auto) Normalize(const T& arg)
 /* First instantiated from: TemplateArgumentsTest.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline static char const (&)[8] Normalize<char [8]>(char const (&arg)[8])
+static inline char const (&)[8] Normalize<char [8]>(char const (&arg)[8])
 {
   if constexpr(std::is_same_v<char [8], std::basic_string<char>>) ;
   else /* constexpr */ {
     return arg;
   }
+  
 }
 #endif
 
@@ -26,12 +27,13 @@ inline static char const (&)[8] Normalize<char [8]>(char const (&arg)[8])
 /* First instantiated from: TemplateArgumentsTest.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline static const int & Normalize<int>(const int & arg)
+static inline const int & Normalize<int>(const int & arg)
 {
   if constexpr(std::is_same_v<int, std::basic_string<char>>) ;
   else /* constexpr */ {
     return arg;
   }
+  
 }
 #endif
 
@@ -39,11 +41,12 @@ inline static const int & Normalize<int>(const int & arg)
 /* First instantiated from: TemplateArgumentsTest.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline static const char * Normalize<std::basic_string<char> >(const std::basic_string<char> & arg)
+static inline const char * Normalize<std::basic_string<char> >(const std::basic_string<char> & arg)
 {
   if constexpr(std::is_same_v<std::basic_string<char>, std::basic_string<char>>) {
     return arg.c_str();
   }
+  
 }
 #endif
 
@@ -86,12 +89,10 @@ void Log<std::basic_string<char> >(const char * fmt, const std::basic_string<cha
 
 int main()
 {
-  int result = 0x22;
-
+  int result = 34;
   Log("Hello World %s\n", "nothing");
-
   Log("And the number is %d\n", result);
-
-  std::string test{"Hello"};
+  std::string test = std::basic_string<char>{"Hello"};
   Log("%s\n", test);
 }
+

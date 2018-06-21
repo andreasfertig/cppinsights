@@ -11,8 +11,9 @@ class Derived : public Base {
 /* public: inline constexpr Derived(Derived &&); */
 };
 
-int main(){
-  Derived d;
-  // static_cast<Base&>(d)
-  Base& b = static_cast<Base&>(d);
+int main()
+{
+  Derived d = Derived();
+  Base & b = static_cast<Base&>(d);
 }
+

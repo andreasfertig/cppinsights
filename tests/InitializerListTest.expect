@@ -2,26 +2,54 @@
 
 class X {
 public:
-  ~X() {}
-  
-  X(std::initializer_list<int> x) {}
-
-  X(int z, std::initializer_list<int> x) {}
-
-  X(std::initializer_list<int> x, int z) {}
-  
-  X(void *x, int y) {}
-
-  X& operator+=(const std::initializer_list<int>& x)
+  inline ~X() noexcept
   {
-     return *this;
   }
+  
+  
+  inline X(std::initializer_list<int> x)
+  {
+  }
+  
+  
+
+  inline X(int z, std::initializer_list<int> x)
+  {
+  }
+  
+  
+
+  inline X(std::initializer_list<int> x, int z)
+  {
+  }
+  
+  
+  
+  inline X(void * x, int y)
+  {
+  }
+  
+  
+
+  inline X & operator+=(const std::initializer_list<int> & x)
+  {
+    return *this;
+  }
+  
 /* public: inline constexpr X(const X &); */
 };
 
 struct V {
-  V(int x) {}
-  V(std::initializer_list<int> x) {}
+  inline V(int x)
+  {
+  }
+  
+  
+  inline V(std::initializer_list<int> x)
+  {
+  }
+  
+  
 
 /* public: inline constexpr V(const V &); */
 /* public: inline constexpr V(V &&); */
@@ -31,8 +59,12 @@ struct Y { int x, y; /* public: inline ~Y() noexcept; */
 };
 
 void takes_y(Y y);
+;
 
-void bar(std::initializer_list<int> x) {}
+void bar(std::initializer_list<int> x)
+{
+}
+
 
 
 template<typename T>
@@ -56,30 +88,23 @@ void something<float>(std::initializer_list<float>)
 #endif
 
 
-void foo() {
-    X{ std::initializer_list<int>{1, 2, 3} };
-    X{nullptr, 0};
-
-    X x{ std::initializer_list<int>{3, 4, 5} };
-    X b{ std::initializer_list<int>{1} };
-
-    X{1, std::initializer_list<int>{2, 3}};
-    X c{1, std::initializer_list<int>{2, 3}};
-
-    X{std::initializer_list<int>{1, 2}, 3};
-    X d{std::initializer_list<int>{1, 2}, 3};
-    
-    b.operator+=(std::initializer_list<int>{2, 4});
-
-    takes_y({1, 2});
-
-    bar( std::initializer_list<int>{1, 2} );
-
-    something( std::initializer_list<int>{1, 2} );
-
-    something( std::initializer_list<float>{1.0f, 2.0f} );
-
-    V v{ std::initializer_list<int>{1} };
-    V vv{ std::initializer_list<int>{1, 2} };
+void foo()
+{
+  X{std::initializer_list<int>{1, 2, 3}};
+  X{nullptr, 0};
+  X x = X{std::initializer_list<int>{3, 4, 5}};
+  X b = X{std::initializer_list<int>{1}};
+  X{1, std::initializer_list<int>{2, 3}};
+  X c = X{1, std::initializer_list<int>{2, 3}};
+  X{std::initializer_list<int>{1, 2}, 3};
+  X d = X{std::initializer_list<int>{1, 2}, 3};
+  b.operator+=(std::initializer_list<int>{2, 4});
+  takes_y({1, 2});
+  bar(std::initializer_list<int>{1, 2});
+  something(std::initializer_list<int>{1, 2});
+  something(std::initializer_list<float>{1.0f, 2.0f});
+  V v = V{std::initializer_list<int>{1}};
+  V vv = V{std::initializer_list<int>{1, 2}};
 }
+
 

@@ -1,7 +1,10 @@
 #include <functional>
 #include <cstdio>
 
-void Func() {}
+void Func()
+{
+}
+
 
 template<typename T>
 void Test(T& t) 
@@ -19,7 +22,7 @@ void Test<std::function<void ()> >(std::function<void ()> & t)
 
 int main()
 {
-    std::function<void()> x = Func;
-
+  std::function<void ()> x = std::function<void ()>(Func);
   Test(x);
 }
+

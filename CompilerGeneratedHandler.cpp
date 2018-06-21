@@ -9,7 +9,6 @@
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
-#include "InsightsStaticStrings.h"
 #include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
 
@@ -22,11 +21,12 @@ namespace clang::insights {
 CompilerGeneratedHandler::CompilerGeneratedHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    static const auto compilerProvided = allOf(unless(isUserProvided()),
-                                               unless(isDeleted()),
-                                               unless(isExpansionInSystemHeader()),
-                                               unless(isTemplate),
-                                               unless(isMacroOrInvalidLocation()),
+    static const auto compilerProvided = allOf(unless(anyOf(isUserProvided(),
+                                                            isDeleted(),
+                                                            isExpansionInSystemHeader(),
+                                                            isTemplate,
+                                                            hasAncestor(functionDecl()),
+                                                            isMacroOrInvalidLocation())),
                                                hasParent(cxxRecordDecl().bind("record")));
 
     matcher.addMatcher(cxxMethodDecl(compilerProvided).bind("method"), this);

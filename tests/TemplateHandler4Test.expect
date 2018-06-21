@@ -19,5 +19,6 @@ bool Is<int>(const int & x)
 
 int main()
 {
-    return static_cast<int>(Is(22));
+  return static_cast<int>(Is(22));
 }
+

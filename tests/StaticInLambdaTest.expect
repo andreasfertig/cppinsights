@@ -5,14 +5,26 @@
 class Singleton
 {
 public:
-    static Singleton& Instance();
+    static Singleton & Instance();
+    ;
 
-    int Get() const { return mX;}
-    void Set(int x) { mX = x;}
+    inline int Get() const
+    {
+      return this->mX;
+    }
+    
+    inline void Set(int x)
+    {
+      this->mX = x;
+    }
+    
 
 private:
     Singleton() = default;
-    ~Singleton(){}
+    inline ~Singleton() noexcept
+    {
+    }
+    
 
     int mX;
 
@@ -23,7 +35,7 @@ private:
 
 static size_t counter = 0;
 
-Singleton& Singleton::Instance()
+Singleton & Singleton::Instance()
 {
   static bool __singletonB;
   static char __singleton[sizeof(Singleton)];
@@ -33,23 +45,32 @@ Singleton& Singleton::Instance()
     new (&__singleton) Singleton;
     __singletonB = true;
   }
-  ;
-
   static bool passed = true;
-
   return *reinterpret_cast<Singleton*>(__singleton);
 }
+
 
 
 class Bingleton
 {
 public:
 
-    int Get() const { return mX;}
-    void Set(int x) { mX = x;}
+    inline int Get() const
+    {
+      return this->mX;
+    }
+    
+    inline void Set(int x)
+    {
+      this->mX = x;
+    }
+    
 
     Bingleton() = default;
-    ~Bingleton(){}
+    inline ~Bingleton() noexcept
+    {
+    }
+    
 
 private:
     int mX;
@@ -61,53 +82,52 @@ private:
 
 int main()
 {
-         
-     class __lambda_52_14
-     {
-       public: inline Bingleton operator()(bool c) const
-       {
-         static bool __bbB;
-         static char __bb[sizeof(Bingleton)];
-         
-         if( ! __bbB )
-         {
-           new (&__bb) Bingleton;
-           __bbB = true;
-         }
-         if(c) {
-           return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
-         }
-         return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
-       }
-       
-     };
-     
-     __lambda_52_14 x = __lambda_52_14{};
-     
-
-
-         
-     class __lambda_62_14
-     {
-       public: inline Bingleton * operator()(bool c) const
-       {
-         static bool __bbB;
-         static char __bb[sizeof(Bingleton)];
-         
-         if( ! __bbB )
-         {
-           new (&__bb) Bingleton;
-           __bbB = true;
-         }
-         if(c) {
-           return &*reinterpret_cast<Bingleton*>(__bb);
-         }
-         return &*reinterpret_cast<Bingleton*>(__bb);
-       }
-       
-     };
-     
-     __lambda_62_14 y = __lambda_62_14{};
-     
+    
+  class __lambda_52_14
+  {
+    public: inline Bingleton operator()(bool c) const
+    {
+      static bool __bbB;
+      static char __bb[sizeof(Bingleton)];
+      
+      if( ! __bbB )
+      {
+        new (&__bb) Bingleton;
+        __bbB = true;
+      }
+      if(c) {
+        return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
+      }
+      
+      return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
+    }
+    
+  };
+  
+  __lambda_52_14 x = __lambda_52_14{};
+    
+  class __lambda_62_14
+  {
+    public: inline Bingleton * operator()(bool c) const
+    {
+      static bool __bbB;
+      static char __bb[sizeof(Bingleton)];
+      
+      if( ! __bbB )
+      {
+        new (&__bb) Bingleton;
+        __bbB = true;
+      }
+      if(c) {
+        return &*reinterpret_cast<Bingleton*>(__bb);
+      }
+      
+      return &*reinterpret_cast<Bingleton*>(__bb);
+    }
+    
+  };
+  
+  __lambda_62_14 y = __lambda_62_14{};
 }
+
 

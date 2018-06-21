@@ -2,12 +2,25 @@
 
 class Foo {
 public:
-  Foo(int foo) : mFoo(foo) {}
+  inline Foo(int foo)
+  : mFoo{foo}
+  {
+  }
+  
+  
 
-  int Mul(int f) { return f * GetFoo(); }
+  inline int Mul(int f)
+  {
+    return f * this->GetFoo();
+  }
+  
 
 protected:
-  int GetFoo() const { return mFoo; }
+  inline int GetFoo() const
+  {
+    return this->mFoo;
+  }
+  
 
 private:
   int mFoo;
@@ -18,10 +31,19 @@ private:
 
 class Bar : public Foo {
 public:
-  Bar(int foo, int bar) 
-  : Foo(foo), mBar(bar) {}
+  inline Bar(int foo, int bar)
+  : Foo(foo)
+  , mBar{bar}
+  {
+  }
+  
+  
 
-  int Sum() { return mBar + /*static_cast<const Foo *>(this)*/GetFoo(); }
+  inline int Sum()
+  {
+    return this->mBar + /* static_cast<const Foo *>(this)-> */ GetFoo();
+  }
+  
 
 private:
   int mBar;
@@ -29,11 +51,11 @@ private:
 /* public: inline constexpr Bar(Bar &&); */
 };
 
-int main() {
-  Foo foo(10);
-  Bar bar(10, 5);
-
-  printf( "%d %d %d\n", foo.Mul(2), 
-          bar.Sum(), static_cast<Foo&>(bar).Mul(3) );
+int main()
+{
+  Foo foo = Foo(10);
+  Bar bar = Bar(10, 5);
+  printf("%d %d %d\n", foo.Mul(2), bar.Sum(), static_cast<Foo&>(bar).Mul(3));
 }
+
 

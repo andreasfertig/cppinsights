@@ -7,7 +7,6 @@
 
 #include "StructuredBindingsHandler.h"
 #include "CodeGenerator.h"
-#include "DPrint.h"
 #include "InsightsMatchers.h"
 #include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
@@ -21,22 +20,15 @@ namespace clang::insights {
 StructuredBindingsHandler::StructuredBindingsHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    matcher.addMatcher(decompositionDecl(unless(anyOf(isExpansionInSystemHeader(),
-                                                      isTemplate,
-                                                      isMacroOrInvalidLocation(),
-                                                      hasAncestor(lambdaExpr()),
-                                                      hasAncestor(cxxForRangeStmt()))),
-                                         has(expr(hasDescendant(declRefExpr().bind("dref"))).bind("arinit")))
-                           .bind("decl"),
-                       this);
+    const auto decompMatcher =
+        anyOf(isExpansionInSystemHeader(), isTemplate, isMacroOrInvalidLocation(), hasAncestor(functionDecl()));
 
     matcher.addMatcher(
-        decompositionDecl(
-            unless(anyOf(
-                isExpansionInSystemHeader(), isTemplate, hasAncestor(lambdaExpr()), hasAncestor(cxxForRangeStmt()))),
-            has(declRefExpr().bind("dref")))
+        decompositionDecl(unless(decompMatcher), has(expr(hasDescendant(declRefExpr().bind("dref"))).bind("arinit")))
             .bind("decl"),
         this);
+
+    matcher.addMatcher(decompositionDecl(unless(decompMatcher), has(declRefExpr().bind("dref"))).bind("decl"), this);
 }
 //-----------------------------------------------------------------------------
 
