@@ -96,16 +96,13 @@ def main():
     parser.add_argument('--cxx',            help='C++ compiler to used', default='/usr/local/clang-current/bin/clang++')
     parser.add_argument('--docker',         help='Run tests in docker container', action='store_true')
     parser.add_argument('--docker-image',   help='Docker image name', default='cppinsights-runtime')
+    parser.add_argument('--failure-is-ok',  help='Failing tests are ok', default=False, action='store_true')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = vars(parser.parse_args())
 
-    bFailureIsOk = False
-
-    if os.environ.has_key('FAILURE_IS_OK'):
-        bFailureIsOk = (os.environ['FAILURE_IS_OK'] == 1)
-
     insightsPath  = args['insights']
     remainingArgs = args['args']
+    bFailureIsOk  = args['failure_is_ok']
 
     if 0 == len(remainingArgs):
         cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp'))]

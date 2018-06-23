@@ -96,7 +96,25 @@ matrix:
     env: COMPILER='clang++-6.0' COMPILER_CC='clang-6.0' LLVM_CONFIG='/usr/bin/llvm-config-6.0' COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes'
 
 install:
-  - ${TRAVIS_BUILD_DIR}/scripts/travis_install.sh
+- |   
+  if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+    export HOMEBREW_NO_AUTO_UPDATE=1
+    brew update > /dev/null
+    brew install cmake || brew upgrade cmake
+    brew install xz || brew upgrade xz
+
+    brew install ccache
+    export PATH="/usr/local/opt/ccache/libexec:$PATH"
+
+    mkdir ${TRAVIS_BUILD_DIR}/clang
+    cd ${TRAVIS_BUILD_DIR}/clang
+    wget -q --continue --directory-prefix=$HOME/Library/Caches/Homebrew https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz
+    cp $HOME/Library/Caches/Homebrew/clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz
+
+    xz -d clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz
+    tar -xf clang+llvm-6.0.0-x86_64-apple-darwin.tar
+    mv clang+llvm-6.0.0-x86_64-apple-darwin current
+  fi
     
 before_script:
   - |
@@ -111,7 +129,10 @@ before_script:
   - cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG}  ..
 script:
 - make -j 2
-- "${TRAVIS_BUILD_DIR}/scripts/travis_tests.sh"
+- |
+  if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+    make tests
+  fi  
 - |
   if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
       export GZ_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-macos.tar.gz
@@ -122,7 +143,16 @@ script:
   fi
   
 after_success:
-- "${TRAVIS_BUILD_DIR}/scripts/travis_coverage.sh"
+- |
+  if [[ "${COVERAGE}" == "Yes" ]]; then
+    # Creating report
+    cd ${TRAVIS_BUILD_DIR}/build
+
+    make coverage -j 2
+
+    # Uploading report to CodeCov
+    bash <(curl -s https://codecov.io/bash) -f ${TRAVIS_BUILD_DIR}/build/filtered.info || echo "Codecov did not collect coverage reports"
+  fi
 - |
   if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${UPLOAD}" = "Yes" ]]; then
       cd ${TRAVIS_BUILD_DIR}/build/
