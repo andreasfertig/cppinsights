@@ -1,51 +1,47 @@
 #include <cstdio>
 
-int main() {
-    struct SP
-    {
-        int x;
-        int y;
-    /* public: inline SP(); */
-    /* public: inline constexpr SP(const SP &) noexcept; */
-    /* public: inline constexpr SP(SP &&); */
-    };
-
-    SP sp{1, 2};
-
-    SP __sp12 = SP(sp);
-    int& sx = __sp12.x;
-    int& sy = __sp12.y;
+int main()
+{
+  struct SP
+  {
+    int x;
+    int y;
+    inline SP() = default;
+    inline constexpr SP(const SP &) noexcept = default;
+    inline constexpr SP(SP &&) = default;
     
-
-    class CP
-    {
-    public:
-        int x;
-        int y;
-    /* public: inline CP(); */
-    /* public: inline constexpr CP(const CP &) noexcept; */
-    /* public: inline constexpr CP(CP &&); */
-    };
-
-    CP cp{1,2};
-
-    CP __cp23 = CP(cp);
-    int& c1 = __cp23.x;
-    int& c2 = __cp23.y;
-        
-
-    printf("c1: %d c2: %d\n", cp.x, cp.y);
-    ++c1;
-    ++c2;
-    printf("c1: %d c2: %d\n", cp.x, cp.y);
-
-    CP & __cp30 = cp;
-    int& c3 = __cp30.x;
-    int& c4 = __cp30.y;
-        
+  };
+  
+  SP sp = {1, 2};
+  SP __sp12 = SP(sp);
+  int& sx = __sp12.x;
+  int& sy = __sp12.y;
+  class CP
+  {
     
-    printf("c3: %d c4: %d\n", cp.x, cp.y);
-    ++c3;
-    ++c4;
-    printf("c3: %d c4: %d\n", cp.x, cp.y);
+    public: 
+    int x;
+    int y;
+    inline CP() = default;
+    inline constexpr CP(const CP &) noexcept = default;
+    inline constexpr CP(CP &&) = default;
+    
+  };
+  
+  CP cp = {1, 2};
+  CP __cp23 = CP(cp);
+  int& c1 = __cp23.x;
+  int& c2 = __cp23.y;
+  printf("c1: %d c2: %d\n", cp.x, cp.y);
+  ++c1;
+  ++c2;
+  printf("c1: %d c2: %d\n", cp.x, cp.y);
+  CP & __cp30 = cp;
+  int& c3 = __cp30.x;
+  int& c4 = __cp30.y;
+  printf("c3: %d c4: %d\n", cp.x, cp.y);
+  ++c3;
+  ++c4;
+  printf("c3: %d c4: %d\n", cp.x, cp.y);
 }
+

@@ -1,36 +1,26 @@
 int main()
 {
-#if 0
-  [](){}();
-
-  [](){ return 1;}();
-#endif
-        
-   class __lambda_8_26
-   {
-     public: using retType = int (*)(int, char);
-     inline /*constexpr */ operator retType () const
-     {
-       return __invoke;
-     }
-     public: inline /*constexpr */ int operator()(int a, char b) const
-     {
-       return a + static_cast<int>(b);
-     }
-     private: inline static int __invoke(int a, char b)
-     {
-       return a + static_cast<int>(b);
-     }
-     
-   } __lambda_8_26{};
-   
-   using FuncPtr_8 = int (*)(int, char);
-   FuncPtr_8 fp = static_cast<int (*)(int, char)>(__lambda_8_26.operator __lambda_8_26::retType());
-   
-
-//   int (*fp)(int, char) = static_cast<int (*)(int, char)>(__lambda_8_26{}.operator __lambda_8_26::retType());
-
-//  int (*fd)(int) = [](auto a){ return a;};
-
+      
+  class __lambda_8_26
+  {
+    public: using retType = int (*)(int, char);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    }
+    public: inline /*constexpr */ int operator()(int a, char b) const
+    {
+      return a + static_cast<int>(b);
+    }
+    private: static inline int __invoke(int a, char b)
+    {
+      return a + static_cast<int>(b);
+    }
+    
+  } __lambda_8_26{};
+  
+  using FuncPtr_8 = int (*)(int, char);
+  FuncPtr_8 fp = static_cast<int (*)(int, char)>(__lambda_8_26.operator __lambda_8_26::retType());
 }
+
 

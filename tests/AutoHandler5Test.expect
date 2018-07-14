@@ -1,12 +1,18 @@
-int foo(int a,int b){ return a+b; }
-
-int main(){
-  if(true) {
-     using FuncPtr_5 = int (*)(int, int);
-     FuncPtr_5 add = foo;
-     using FuncPtr_7 = int (*)(int, int);
-     FuncPtr_7 add1 = foo;
-   }
-   
+int foo(int a, int b)
+{
+  return a + b;
 }
+
+
+int main()
+{
+  if(true) {
+    using FuncPtr_5 = int (*)(int, int);
+    FuncPtr_5 add = foo;
+    using FuncPtr_7 = int (*)(int, int);
+    FuncPtr_7 add1 = foo;
+  }
+  
+}
+
 

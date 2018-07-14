@@ -140,15 +140,19 @@ const std::string EvaluateAsFloat(const FloatingLiteral& expr)
 }
 //-----------------------------------------------------------------------------
 
-const VarDecl* GetVarDeclFromDeclRefExpr(const DeclRefExpr* declRefExpr)
+static const VarDecl* GetVarDeclFromDeclRefExpr(const DeclRefExpr& declRefExpr)
 {
-    if(nullptr != declRefExpr) {
-        const auto* valueDecl = declRefExpr->getDecl();
+    const auto* valueDecl = declRefExpr.getDecl();
 
-        return dyn_cast_or_null<VarDecl>(valueDecl);
-    }
+    return dyn_cast_or_null<VarDecl>(valueDecl);
+}
+//-----------------------------------------------------------------------------
 
-    return nullptr;
+std::string GetNameAsWritten(const QualType& t)
+{
+    SplitQualType T_split = t.split();
+
+    return QualType::getAsString(T_split, InsightsPrintingPolicy);
 }
 //-----------------------------------------------------------------------------
 
@@ -349,7 +353,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
 
 static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 {
-    if(const VarDecl* VD = GetVarDeclFromDeclRefExpr(&declRefExpr)) {
+    if(const VarDecl* VD = GetVarDeclFromDeclRefExpr(declRefExpr)) {
         return IsTrivialStaticClassVarDecl(*VD);
     }
 
@@ -394,7 +398,7 @@ std::string GetName(const DeclRefExpr& declRefExpr)
         // this case, as we teared that variable apart, we need to adjust the variable named and add a reinterpret
         // cast
         if(IsTrivialStaticClassVarDecl(declRefExpr)) {
-            if(const VarDecl* VD = GetVarDeclFromDeclRefExpr(&declRefExpr)) {
+            if(const VarDecl* VD = GetVarDeclFromDeclRefExpr(declRefExpr)) {
                 if(const auto* cxxRecordDecl = VD->getType()->getAsCXXRecordDecl()) {
                     plainName = StrCat(
                         "*reinterpret_cast<", GetName(*cxxRecordDecl), "*>(", BuildInternalVarName(plainName), ")");
@@ -433,10 +437,12 @@ const char* GetNoExcept(const FunctionDecl& decl)
 }
 //-----------------------------------------------------------------------------
 
-const char* GetConst(const CXXMethodDecl& decl)
+const char* GetConst(const FunctionDecl& decl)
 {
-    if(decl.isConst()) {
-        return kwSpaceConst;
+    if(const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl)) {
+        if(methodDecl->isConst()) {
+            return kwSpaceConst;
+        }
     }
 
     return "";

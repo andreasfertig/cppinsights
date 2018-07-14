@@ -70,14 +70,17 @@ class MyVector<int>
 
 using vec_t = MyVector<int>;
 
-vec_t operator+(const vec_t& a, const vec_t& b)
+MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
 {
-    vec_t result(a.size()) /* NRVO variable */;
-    for(std::size_t s = 0; s <= a.size(); ++s) {
-        result.operator[](s) = a.operator[](s) + b.operator[](s);
-    }
-    return result;
+  vec_t result = MyVector<int>(a.size()) /* NRVO variable */;
+  for(std::size_t s = 0; s <= a.size(); ++s) 
+  {
+    result.operator[](s) = a.operator[](s) + b.operator[](s);
+  }
+  
+  return MyVector<int>(result);
 }
+
 
 template<typename T>
 MyVector<T> operator*(const MyVector<T>& a, const MyVector<T>& b)
@@ -95,32 +98,34 @@ template<>
 MyVector<int> operator*<int>(const MyVector<int> & a, const MyVector<int> & b)
 {
   MyVector<int> result = MyVector<int>(a.size()) /* NRVO variable */;
-  for(std::size_t s = 0;
-  s <= a.size(); ++s) 
+  for(std::size_t s = 0; s <= a.size(); ++s) 
   {
     result.operator[](s) = a.operator[](s) + b.operator[](s);
   }
+  
   return MyVector<int>(result);
 }
 #endif
 
 
-vec_t Foo(const vec_t& a, const vec_t& b)
+MyVector<int> Foo(const MyVector<int> & a, const MyVector<int> & b)
 {
-    vec_t result{a.size()} /* NRVO variable */;
-    for(std::size_t s = 0; s <= a.size(); ++s) {
-        result.operator[](s) = a.operator[](s) + b.operator[](s);
-    }
-    return result;
+  vec_t result = MyVector<int>{a.size()} /* NRVO variable */;
+  for(std::size_t s = 0; s <= a.size(); ++s) 
+  {
+    result.operator[](s) = a.operator[](s) + b.operator[](s);
+  }
+  
+  return MyVector<int>(result);
 }
+
 
 int main()
 {
-    vec_t vecA(4, 2);
-    vec_t vecB(6, 7);
-
-    vec_t res = Foo(vecA, vecB);
-
-    operator+(vecA, vecB);
-    operator*(vecA, vecB);
+  vec_t vecA = MyVector<int>(4, 2);
+  vec_t vecB = MyVector<int>(6, 7);
+  vec_t res = Foo(vecA, vecB);
+  operator+(vecA, vecB);
+  operator*(vecA, vecB);
 }
+

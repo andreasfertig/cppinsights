@@ -1,0 +1,8 @@
+int main()
+{
+  int x;
+  char z;
+  unsigned int sx = static_cast<unsigned int>(sizeof(x));
+  unsigned int sz = static_cast<unsigned int>(sizeof(z));
+}
+

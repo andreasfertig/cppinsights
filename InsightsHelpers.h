@@ -103,8 +103,9 @@ static inline const SourceManager& GetSM(const Decl& decl)
 }
 //-----------------------------------------------------------------------------
 
-const VarDecl* GetVarDeclFromDeclRefExpr(const DeclRefExpr* declRefExpr);
-bool           IsTrivialStaticClassVarDecl(const VarDecl& varDecl);
+std::string GetNameAsWritten(const QualType& t);
+
+bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl);
 //-----------------------------------------------------------------------------
 
 /*
@@ -165,7 +166,7 @@ GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqu
 
 const std::string EvaluateAsFloat(const FloatingLiteral& expr);
 const char*       GetNoExcept(const FunctionDecl& decl);
-const char*       GetConst(const CXXMethodDecl& decl);
+const char*       GetConst(const FunctionDecl& decl);
 
 }  // namespace clang::insights
 

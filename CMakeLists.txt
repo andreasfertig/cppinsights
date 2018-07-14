@@ -278,23 +278,16 @@ endif(CCACHE_FOUND)
 # name the executable and all source files
 add_clang_executable(insights
     AutoStmtHandler.cpp
-    ClassOperatorHandler.cpp
     CodeGenerator.cpp
-    CommaOperatorHandler.cpp
     CompilerGeneratedHandler.cpp
     DPrint.cpp
-    IfStmtHandler.cpp
+    FunctionDeclHandler.cpp
     ImplicitCastHandler.cpp
     Insights.cpp
     InsightsBase.cpp
     InsightsHelpers.cpp
-    LambdaHandler.cpp
-    NRVOHandler.cpp
     OutputFormatHelper.cpp
-    RangeForStmtHandler.cpp
     StaticAssertHandler.cpp
-    StaticHandler.cpp
-    StdInitializerListHandler.cpp
     StructuredBindingsHandler.cpp
     TemplateHandler.cpp
     UserDefinedLiteralHandler.cpp

@@ -1,12 +1,10 @@
 int main()
 {
-    if(true) {
-        extern void Func(int x);
+    extern void Func(int x);
 
-        extern int Foo(double);
+    extern int Foo(double);
 
-        float Bar(int x, float y);
-    }
+    float Bar(int x, float y);
 }
 
 extern int Foo(double d)
@@ -17,4 +15,8 @@ extern int Foo(double d)
 float Bar(int x, float y)
 {
     return x + y;
+}
+
+static void Char() 
+{
 }

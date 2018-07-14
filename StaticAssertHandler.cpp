@@ -9,7 +9,6 @@
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
-#include "InsightsStaticStrings.h"
 #include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
 
@@ -23,7 +22,9 @@ StaticAssertHandler::StaticAssertHandler(Rewriter& rewrite, MatchFinder& matcher
 : InsightsBase(rewrite)
 {
     matcher.addMatcher(
-        staticAssertDecl(unless(anyOf(isExpansionInSystemHeader(), isMacroOrInvalidLocation(), isTemplate)))
+        staticAssertDecl(
+            unless(anyOf(
+                isExpansionInSystemHeader(), isMacroOrInvalidLocation(), isTemplate, hasAncestor(functionDecl()))))
             .bind("static_assert"),
         this);
 }

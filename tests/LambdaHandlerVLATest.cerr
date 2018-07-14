@@ -1,7 +1,7 @@
-.tmp.cpp:89:17: error: invalid use of 'this' outside of a non-static member function
-     float (&e)[this->nt];
-                ^
-.tmp.cpp:91:40: error: invalid use of 'this' outside of a non-static member function
-     public: __lambda_36_8(float (&_e)[this->nt])
-                                       ^
+.tmp.cpp:97:16: error: invalid use of 'this' outside of a non-static member function
+    float (&e)[this->nt];
+               ^
+.tmp.cpp:99:39: error: invalid use of 'this' outside of a non-static member function
+    public: __lambda_40_8(float (&_e)[this->nt])
+                                      ^
 2 errors generated.

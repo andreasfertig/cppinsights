@@ -1,46 +1,57 @@
 class CTest
 {
-    inline int Test() { return 22; }
+    inline int Test()
+    {
+      return 22;
+    }
+    
 };
 
 int Test();
+;
 
 // http://clang.llvm.org/extra/doxygen/TrailingReturnCheck_8cpp_source.html
 int Test()
 {
-    return 1;
+  return 1;
 }
+
 
 int Best()
 {
-    return 1;
+  return 1;
 }
+
 
 inline constexpr int CEBest()
 {
-    return 1;
+  return 1;
 }
+
 
 char West()
 {
-    return 'c';
+  return 'c';
 }
 
-constexpr inline char CEWest()
+
+inline constexpr char CEWest()
 {
-    return 'c';
+  return 'c';
 }
 
-[[maybe_unused]] constexpr inline char MUCEWest()
-{
-    return 'c';
-}
+
+[[maybe_unused]] inline constexpr char MUCEWest()
+                 {
+                   return 'c';
+                 }
+                 
 
 
 int main()
 {
   int x = 2;
-  const char* p;
+  const char * p;
   constexpr const int cei = 0;
   constexpr const int cei2 = 0;
   int i = 0;
@@ -55,9 +66,9 @@ int main()
   float f = 1.0f;
   char c = 'c';
   unsigned int u = 0u;
-  unsigned int uu = u;
-
-  [[maybe_unused]] unsigned int mu = 0u;
-  [[maybe_unused]] unsigned int muu = u;
+  decltype(u) uu = u;
+  unsigned int mu = 0u;
+  decltype(u) muu = u;
 }
+
 

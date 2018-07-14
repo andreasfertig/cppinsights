@@ -1,43 +1,63 @@
 class Test
 {
 public:
-    Test(): mV{} {}
+    inline Test()
+    : mV{}
+    {
+    }
+    
+    
 
-    Test(int v)
+    inline Test(int v)
     : mV{v}
-    {}
+    {
+    }
+    
+    
 
-    Test(Test& v)
+    inline Test(Test & v)
     : mV{v.mV}
-    {}
+    {
+    }
+    
+    
 
   
-    Test& operator=(const Test& other)
+    inline Test & operator=(const Test & other)
     {
-        mV = other.mV;
-        return *this;
+      this->mV = other.mV;
+      return *this;
     }
+    
 
-    Test& operator++()
+    inline Test & operator++()
     {
-        mV++;
-        return *this;
+      this->mV++;
+      return *this;
     }
+    
 
-    Test operator++(int)
+    inline Test operator++(int)
     {
-        Test tmp(*this) /* NRVO variable */;
-        operator++();
-        return tmp;  
-    }    
+      Test tmp = Test(*this) /* NRVO variable */;
+      this->operator++();
+      return Test(tmp);
+    }
+        
 
-    Test& operator+=(const Test& rhs) 
-  {              
-    mV += rhs.mV;
-    return *this; 
-  }
+    inline Test & operator+=(const Test & rhs)
+    {
+      this->mV += rhs.mV;
+      return *this;
+    }
+    
  
-  operator int() { return mV; }
+  using retType = int;
+  inline operator retType ()
+  {
+    return this->mV;
+  }
+  
 
 private:
     int mV;
@@ -56,19 +76,16 @@ struct S
 
 int main()
 {
-    S s;
-	S s2;
-  
-    s.count.operator++(0);
-
-    Test t;
-  
-	char * raw = reinterpret_cast<char*>(&s+1);
-	Test * p =  reinterpret_cast<Test*>(&raw[static_cast<long>(static_cast<int>(s.count.operator int()))]); // missing the user-defined converion op here for s.count to int
-    (*p).operator=((t));
-    (*p).operator=(s2.count);
-  
-    s.count.operator+=(Test(static_cast<int>(sizeof(p))));
-    s.count.operator+=(Test(static_cast<int>(alignof(p))));
-    s.count.operator+=(Test(p ? 1 : 2));    
+  S s = S();
+  S s2 = S();
+  s.count.operator++(0);
+  Test t = Test();
+  char * raw = reinterpret_cast<char *>(&s + 1);
+  Test * p = reinterpret_cast<Test *>(&raw[static_cast<long>(static_cast<int>(s.count.operator int()))]);
+  (*p).operator=((t));
+  (*p).operator=(s2.count);
+  s.count.operator+=(Test(static_cast<int>(sizeof(p))));
+  s.count.operator+=(Test(static_cast<int>(alignof(p))));
+  s.count.operator+=(Test(p ? 1 : 2));
 }
+

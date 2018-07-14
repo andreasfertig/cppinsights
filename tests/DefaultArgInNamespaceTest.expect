@@ -10,9 +10,17 @@ inline constexpr Order OrderA = Order::A;
 
 class West
 {
-    public: West() {}
+    public: inline West()
+            {
+            }
+            
+            
 
-    int load(const Order order = OrderA) { return 2; }
+    inline int load(const Test::Order order)
+    {
+      return 2;
+    }
+    
 /* public: inline constexpr West(const Test::West &); */
 /* public: inline constexpr West(Test::West &&); */
 };
@@ -20,7 +28,7 @@ class West
 
 int main()
 {
-    Test::West w;
-
-    std::operator<<(std::operator<<(std::cout, "test: ").operator<<(w.load(Test::OrderA)), "\n");
+  Test::West w = Test::West();
+  std::operator<<(std::operator<<(std::cout, "test: ").operator<<(w.load(Test::OrderA)), "\n");
 }
+

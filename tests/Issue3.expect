@@ -1,24 +1,24 @@
 void x()
 {
-     
-   class __lambda_3_12
-   {
-     public: inline /*constexpr */ void operator()() const
-     {
-       
-       class __lambda_4_5
-       {
-         public: inline /*constexpr */ void operator()() const
-         {
-         }
-         
-       };
-       
-       __lambda_4_5{};
-     }
-     
-   };
-   
-   __lambda_3_12 a = __lambda_3_12{};
-   
+    
+  class __lambda_3_12
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      
+      class __lambda_4_5
+      {
+        public: inline /*constexpr */ void operator()() const
+        {
+        }
+        
+      };
+      
+      __lambda_4_5{};
+    }
+    
+  };
+  
+  __lambda_3_12 a = __lambda_3_12{};
 }
+

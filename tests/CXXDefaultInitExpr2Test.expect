@@ -1,0 +1,24 @@
+struct Foo
+{
+    int mem= 0;
+    int x{2};
+    char c[2]{1, 2};
+
+ public:
+    inline Foo()
+    : mem{0}
+    , x{2}
+    , c{1, 2}
+    {
+    }
+    
+    
+/* public: inline constexpr Foo(const Foo &); */
+/* public: inline constexpr Foo(Foo &&); */
+};
+ 
+int main()
+{
+  Foo f = Foo();
+}
+

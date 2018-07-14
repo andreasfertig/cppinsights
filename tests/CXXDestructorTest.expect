@@ -40,6 +40,7 @@ class Alloc<int, 0>
       this->data = new int{2};
       this->data = new int{2};
     }
+    
   }
   
   inline ~Alloc() noexcept
@@ -49,6 +50,7 @@ class Alloc<int, 0>
     } else {
       delete this->data;
     }
+    
   }
   
   inline constexpr Alloc(const Alloc<int, 0> &) = default;
@@ -74,6 +76,7 @@ class Alloc<char, 1>
       this->data = new char{2};
       this->data = new char{2};
     }
+    
   }
   
   inline ~Alloc() noexcept
@@ -83,6 +86,7 @@ class Alloc<char, 1>
     } else {
       delete this->data;
     }
+    
   }
   
   inline constexpr Alloc(const Alloc<char, 1> &) = default;
@@ -94,6 +98,7 @@ class Alloc<char, 1>
 
 int main()
 {
-    Alloc<int, false> a;
-    Alloc<char, true> b;
+  Alloc<int, false> a = Alloc<int, 0>();
+  Alloc<char, true> b = Alloc<char, 1>();
 }
+

@@ -2,7 +2,12 @@
 class Foo
 {
 public:
-    Foo(int x) : mX{x} {}
+    inline Foo(int x)
+    : mX{x}
+    {
+    }
+    
+    
 
     int mX;
 /* public: inline constexpr Foo(const Foo &); */
@@ -10,24 +15,24 @@ public:
 };
 
 
-bool operator==(const Foo& left, const Foo& right) 
+bool operator==(const Foo & left, const Foo & right)
 {
-    return left.mX == right.mX;
-};
+  return left.mX == right.mX;
+}
+;
 
 
 
 int main()
 {
-    Foo f1{1};
-    Foo f2{2};
-
-    const bool b = operator==(f1, f2);
-
-    if(b) {
-       return 0;
-     } else {
-       return 1;
-     }
-     
+  Foo f1 = Foo{1};
+  Foo f2 = Foo{2};
+  const bool b = operator==(f1, f2);
+  if(b) {
+    return 0;
+  } else {
+    return 1;
+  }
+  
 }
+

@@ -4,10 +4,19 @@
 class Singleton
 {
 public:
-    static Singleton& Instance();
+    static Singleton & Instance();
+    ;
 
-    int Get() const { return mX;}
-    void Set(int x) { mX = x;}
+    inline int Get() const
+    {
+      return this->mX;
+    }
+    
+    inline void Set(int x)
+    {
+      this->mX = x;
+    }
+    
 
 private:
     Singleton() = default;
@@ -22,21 +31,19 @@ private:
 
 static size_t counter = 0;
 
-Singleton& Singleton::Instance()
+Singleton & Singleton::Instance()
 {
-  static Singleton singleton;
-
+  static Singleton singleton = Singleton();
   static bool passed = true;
-
   return singleton;
 }
 
 
+
 int main()
 {
-    Singleton& s = Singleton::Instance();
-
-    s.Set(22);
-
-    return s.Get();
+  Singleton & s = Singleton::Instance();
+  s.Set(22);
+  return s.Get();
 }
+

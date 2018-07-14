@@ -51,6 +51,8 @@ public:
         }
     }
 
+    void RemoveIndentIncludingLastNewLine();
+
     /// \brief Check whether the buffer is empty.
     ///
     /// This also treats a string of just whitespaces as empty.
@@ -160,9 +162,11 @@ private:
     void Indent(unsigned count);
     void NewLine()
     {
-        mOutput += "\n";
+        mOutput += '\n';
         Indent(mDefaultIndent);
     }
+
+    void RemoveIndent();
 
     template<typename T, typename Lambda>
     inline void ForEachArg(const T& arguments, Lambda&& lambda)

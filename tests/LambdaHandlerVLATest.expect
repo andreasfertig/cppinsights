@@ -20,9 +20,13 @@ template<unsigned int TA>
 struct SA
 {
   SA (const int & PA);
+
+ ~SA();
+
+  bool Test();
   int nt;
 };
-/* First instantiated from: LambdaHandlerVLATest.cpp:42 */
+/* First instantiated from: LambdaHandlerVLATest.cpp:59 */
 #ifdef INSIGHTS_USE_TEMPLATE
 struct SA<2>
 {
@@ -30,7 +34,7 @@ struct SA<2>
   {
     float e[this->nt];
         
-    class __lambda_36_8
+    class __lambda_40_8
     {
       public: inline /*constexpr */ bool operator()(int i, int j) const
       {
@@ -40,18 +44,23 @@ struct SA<2>
       private:
       float (&e)[this->nt];
       
-      public: __lambda_36_8(float (&_e)[this->nt])
+      public: __lambda_40_8(float (&_e)[this->nt])
       : e{_e}
       {}
       
     };
     
-    test(__lambda_36_8{e});
+    test(__lambda_40_8{e});
   }
+  
+  ~SA() noexcept
+  {
+  }
+  
+  bool Test();
   
   int nt;
   inline constexpr SA(const SA<2> &) = default;
-  inline constexpr SA(SA<2> &&) = default;
   
 };
 
@@ -63,10 +72,10 @@ inline void test(TB aa)
 {
 }
 
-/* First instantiated from: LambdaHandlerVLATest.cpp:36 */
+/* First instantiated from: LambdaHandlerVLATest.cpp:40 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline void test<__lambda_36_8>(__lambda_36_8 aa)
+inline void test<__lambda_40_8>(__lambda_40_8 aa)
 {
 }
 #endif
@@ -75,30 +84,47 @@ inline void test<__lambda_36_8>(__lambda_36_8 aa)
 template<unsigned int TA>
 inline SA<TA>::SA(const int & PA)
 {
-  float e[nt];
+  float e[this->nt];
+    
+  class __lambda_40_8
+  {
+    public: inline auto operator()(int i, int j) const
+    {
+      return e[i] < e[j];
+    }
+    
+    private:
+    float (&e)[this->nt];
+    
+    public: __lambda_40_8(float (&_e)[this->nt])
+    : e{_e}
+    {}
+    
+  };
   
-     
-   class __lambda_36_8
-   {
-     public: inline auto operator()(int i, int j) const
-     {
-       return e[i] < e[j];
-     }
-     
-     private:
-     float (&e)[this->nt];
-     
-     public: __lambda_36_8(float (&_e)[this->nt])
-     : e{_e}
-     {}
-     
-   };
-   
-   test(__lambda_36_8{e});
+  test(__lambda_40_8{e});
 }
+
+
+
+template<unsigned int TA>
+SA<TA>::~SA()
+{
+}
+
+
+
+template<unsigned int TA>
+inline bool SA<TA>::Test()
+{
+  return false;
+}
+
+
 
 int main()
 {
-    int d;
-    SA<2> iso(d);
+  int d;
+  SA<2> iso = SA<2>(d);
 }
+

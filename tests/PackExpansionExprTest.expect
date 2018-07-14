@@ -1,5 +1,7 @@
-void f(int,int,int) {
+void f(int, int, int)
+{
 }
+
 
 template<typename F, typename ...Types>
 void forward(F f, Types &&...args) {
@@ -11,7 +13,7 @@ void forward(F f, Types &&...args) {
 template<>
 void forward<void (*)(int, int, int), int, int, int>(void (*)(int, int, int) f, int && args, int && args, int && args)
 {
-  f(static_cast<int>(args), static_cast<int>(args), static_cast<int>(args));
+  f(static_cast<int &&>(args), static_cast<int &&>(args), static_cast<int &&>(args));
 }
 #endif
 
@@ -19,6 +21,7 @@ void forward<void (*)(int, int, int), int, int, int>(void (*)(int, int, int) f, 
 
 int main()
 {
-    forward(f,1, 2,3);    
+  forward(f, 1, 2, 3);
 }
+
 

@@ -37,10 +37,8 @@ class D : public C
 
 int main()
 {
-    C c{};
-
-    C c2 = c;
-    C c3 = std::move(c);
-
-
+  C c = C{};
+  C c2 = C(c);
+  C c3 = C(std::move(c));
 }
+

@@ -99,24 +99,24 @@ bool foo2() {
 template<>
 bool foo2<int>()
 {
-  std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >();
+  std::vector<int> vec = std::vector<int, std::allocator<int> >();
   return vec.empty();
 }
 #endif
 
 
-bool bar() {
-    std::vector<int> vec;
-//    vec._M_impl; // both 'vec' & access to member field '_M_impl' are identified as expected
-    return vec.empty(); // both 'vec' & 'empty' are identified as expected
+bool bar()
+{
+  std::vector<int> vec = std::vector<int, std::allocator<int> >();
+  return vec.empty();
 }
+
 
 
 int main()
 {
-    
-    foo<int>();
-    foo<int*>();
-
-    foo2<int>();
+  foo<int>();
+  foo<int *>();
+  foo2<int>();
 }
+

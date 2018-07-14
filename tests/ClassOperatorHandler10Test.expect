@@ -11,11 +11,10 @@ enum struct State: char {
   off,
 };
 
-int main(){
-
-  // UnaryExprOrTypeTraitExpr with Type
-  std::cout.operator<<(sizeof(Color)).operator<<(std::endl);  
+int main()
+{
+  std::cout.operator<<(sizeof(Color)).operator<<(std::endl);
   std::cout.operator<<(sizeof(State)).operator<<(std::endl);
-
 }
+
 

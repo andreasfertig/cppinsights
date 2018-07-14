@@ -15,7 +15,6 @@
 
 #include <unordered_map>
 
-#include "InsightsStrongTypes.h"
 #include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
 
@@ -30,11 +29,6 @@ protected:
     , mMap{}
     {
     }
-
-    STRONG_BOOL(SkipConstexpr);
-
-public:
-    static void GenerateFunctionPrototype(OutputFormatHelper& outputFormatHelper, const FunctionDecl& FD);
 
 protected:
     bool SkipIfAlreadySeen(const Stmt* stmt);

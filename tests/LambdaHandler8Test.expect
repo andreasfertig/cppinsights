@@ -14,33 +14,34 @@ int Test<__lambda_9_18>(__lambda_9_18 && t)
 #endif
 
 
-int get(int& v){
-
-        
-   class __lambda_9_18
-   {
-     public: inline /*constexpr */ int operator()() const
-     {
-       return v;
-     }
-     
-     private:
-     int & v;
-     
-     public: __lambda_9_18(int & _v)
-     : v{_v}
-     {}
-     
-   };
-   
-   int x = Test(__lambda_9_18{v});
-   
-
+int get(int & v)
+{
+      
+  class __lambda_9_18
+  {
+    public: inline /*constexpr */ int operator()() const
+    {
+      return v;
+    }
+    
+    private:
+    int & v;
+    
+    public: __lambda_9_18(int & _v)
+    : v{_v}
+    {}
+    
+  };
+  
+  int x = Test(__lambda_9_18{v});
   return x;
 }
 
 
-int main(){
-    int x = 2;
-    return get(x);
+
+int main()
+{
+  int x = 2;
+  return get(x);
 }
+

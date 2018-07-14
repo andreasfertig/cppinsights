@@ -44,7 +44,12 @@ class E
 {
 public:
     
-    E(int x): i{x} {}
+    inline E(int x)
+    : i{x}
+    {
+    }
+    
+    
 private:
     int i;
 /* public: inline constexpr E(const E &); */
@@ -53,35 +58,24 @@ private:
 
 int main()
 {
-    S s{1};
-
-    S s2 = s;
-    S s3 = std::move(s);
-
-    C c{2};
-
-    C c2 = c;
-    C c3 = std::move(c);
-
-
-    D d{2};
-
-    D d2 = d;
-    D d3 = std::move(d);
-    D d4;
-    d4.operator=(d2);
-
-    SS ss{2};
-
-    SS ss2 = ss;
-    SS ss3 = std::move(ss);
-    SS ss4;
-    ss4.operator=(ss2);
-
-    D* dd = new D{3};
-
-    delete dd;
-
-    E e{6};
-
+  S s = {1};
+  S s2 = S(s);
+  S s3 = S(std::move(s));
+  C c = {2};
+  C c2 = C(c);
+  C c3 = C(std::move(c));
+  D d = {2};
+  D d2 = D(d);
+  D d3 = D(std::move(d));
+  D d4 = D();
+  d4.operator=(d2);
+  SS ss = {2};
+  SS ss2 = SS(ss);
+  SS ss3 = SS(std::move(ss));
+  SS ss4 = SS();
+  ss4.operator=(ss2);
+  D * dd = new D{3};
+  delete dd;
+  E e = E{6};
 }
+

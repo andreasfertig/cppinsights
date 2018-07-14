@@ -116,10 +116,11 @@ class Template<double>
 
 
  
-void tprintf(const char* format) // base function
+void tprintf(const char * format)
 {
-    std::operator<<(std::cout, format);
+  std::operator<<(std::cout, format);
 }
+
  
 template<typename T, typename... Targs>
 void tprintf(const char* format, T value, Targs... Fargs) // recursive variadic function
@@ -146,8 +147,10 @@ void tprintf<const char *, char, int>(const char * format, const char * value, c
       tprintf(format + 1, Fargs, Fargs);
       return;
     }
+    
     std::operator<<(std::cout, *format);
   }
+  
 }
 #endif
 
@@ -164,8 +167,10 @@ void tprintf<char, int>(const char * format, char value, int Fargs)
       tprintf(format + 1, Fargs);
       return;
     }
+    
     std::operator<<(std::cout, *format);
   }
+  
 }
 #endif
 
@@ -182,28 +187,26 @@ void tprintf<int, >(const char * format, int value)
       tprintf(format + 1);
       return;
     }
+    
     std::operator<<(std::cout, *format);
   }
+  
 }
 #endif
 
 
 int main()
 {
-    int a=1, b=2;
-
-    int mi = min(a, b);
-
-    double ad=2.4, bd=3.4;
-
-    double md = min( ad, bd);
-
-    Template<int> w{2};
-
-    Template<double> ww{3.0};
-
-    tprintf("% world% %\n","Hello",'!',123);
-
-    int ma1 = max(1, 2);
-    double ma2 = max(2.0, 4.0);
+  int a = 1;
+  int b = 2;
+  int mi = min(a, b);
+  double ad = 2.3999999999999999;
+  double bd = 3.3999999999999999;
+  double md = min(ad, bd);
+  Template<int> w = Template<int>{2};
+  Template<double> ww = Template<double>{3.0};
+  tprintf("% world% %\n", "Hello", '!', 123);
+  int ma1 = max(1, 2);
+  double ma2 = max(2.0, 4.0);
 }
+

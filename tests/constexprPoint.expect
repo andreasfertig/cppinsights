@@ -1,12 +1,34 @@
  class Point {
  public:
-   constexpr Point(double x, double y) noexcept : mX(x), mY(y) {}
+   inline constexpr Point(double x, double y) noexcept
+   : mX{x}
+   , mY{y}
+   {
+   }
+   
+   
 
-   constexpr double GetX() const noexcept { return mX; } 
-   constexpr double GetY() const noexcept { return mY; }
+   inline constexpr double GetX() const noexcept
+   {
+     return this->mX;
+   }
+    
+   inline constexpr double GetY() const noexcept
+   {
+     return this->mY;
+   }
+   
 
-   constexpr void SetX(double x) noexcept { mX = x; }
-   constexpr void SetY(double y) noexcept { mY = y; }
+   inline constexpr void SetX(double x) noexcept
+   {
+     this->mX = x;
+   }
+   
+   inline constexpr void SetY(double y) noexcept
+   {
+     this->mY = y;
+   }
+   
  private:
    double mX, mY;
  /* public: inline constexpr Point(const Point &); */
@@ -17,10 +39,9 @@
 
 int main()
 {
-    constexpr Point p{2.0, 3.0};
-
-    constexpr double x = /*p.GetX()*/ static_cast<const double>(2.0f);
-  
-    return static_cast<int>(p.GetX());
+  constexpr const Point p = Point{2.0, 3.0};
+  constexpr const double x = static_cast<const double>(2.0f);
+  return static_cast<int>(p.GetX());
 }
+
 

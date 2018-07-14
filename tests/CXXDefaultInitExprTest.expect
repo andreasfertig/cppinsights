@@ -59,6 +59,7 @@ class Alloc<char, 1>
 
 int main()
 {
-    Alloc<int, false> a;
-    Alloc<char, true> b;
+  Alloc<int, false> a = Alloc<int, 0>();
+  Alloc<char, true> b = Alloc<char, 1>();
 }
+

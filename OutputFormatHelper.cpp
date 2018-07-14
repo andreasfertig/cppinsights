@@ -51,6 +51,16 @@ void OutputFormatHelper::CloseScope(const NoNewLineBefore newLineBefore)
         NewLine();
     }
 
+    RemoveIndent();
+
+    Append('}');
+
+    DecreaseIndent();
+}
+//-----------------------------------------------------------------------------
+
+void OutputFormatHelper::RemoveIndent()
+{
     /* After a newline we are already indented by one level to much. Try to decrease it. */
     if(0 != mDefaultIndent) {
         for(unsigned i = 0; i < SCOPE_INDENT; ++i) {
@@ -61,10 +71,18 @@ void OutputFormatHelper::CloseScope(const NoNewLineBefore newLineBefore)
             mOutput.pop_back();
         }
     }
+}
+//-----------------------------------------------------------------------------
 
-    Append('}');
+void OutputFormatHelper::RemoveIndentIncludingLastNewLine()
+{
 
-    DecreaseIndent();
+    while('\n' != mOutput.back()) {
+        RemoveIndent();
+    }
+
+    mOutput.pop_back();
+    mOutput += ' ';
 }
 //-----------------------------------------------------------------------------
 

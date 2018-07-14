@@ -114,15 +114,16 @@ class Y<double> : public S<double>, public E
 
 void test()
 {
-  int buffer[16]{};
-
-  const unsigned long & xx = ARRAY_SIZE(buffer);
-
-  S<int> s; 
-
-  Y<double> y;
+  int buffer[16] = {};
+  const unsigned long & xx = details::extent<int [16], 0>::value;
+  S<int> s = S<int>();
+  Y<double> y = Y<double>();
 }
 
 
-int main(){}
+
+int main()
+{
+}
+
 

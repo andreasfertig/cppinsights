@@ -1,0 +1,30 @@
+void FloatingCast(double d)
+{
+}
+
+void IntegralToBoolean(bool b)
+{
+}
+
+
+// CK_UserDefinedConversion
+struct A { using retType = int;
+           inline operator retType ()
+           {
+             return 2;
+           }
+            /* public: inline constexpr A() noexcept; */
+/* public: inline constexpr A(const A &); */
+/* public: inline constexpr A(A &&); */
+/* public: inline ~A() noexcept; */
+}; 
+
+int main()
+{
+  float f = 1.0f;
+  FloatingCast(static_cast<double>(f));
+  int i = 1;
+  IntegralToBoolean(static_cast<bool>(i));
+  int ii = int(static_cast<int>(A().operator int()));
+}
+

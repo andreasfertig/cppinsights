@@ -20,6 +20,10 @@ template<unsigned int TA>
 struct SA
 {
   SA (const int & PA);
+
+ ~SA();
+
+  bool Test();
   int nt;
 };
 
@@ -35,6 +39,19 @@ inline SA<TA>::SA(const int & PA)
   
   test([&e](int i, int j){ return e[i] < e[j]; });
 }
+
+template<unsigned int TA>
+SA<TA>::~SA()
+{
+}
+
+
+template<unsigned int TA>
+inline bool SA<TA>::Test()
+{
+    return false;
+}
+
 
 int main()
 {

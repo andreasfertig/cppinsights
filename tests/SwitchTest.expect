@@ -3,23 +3,21 @@ const unsigned short FOO = static_cast<const unsigned short>(static_cast<int>(FO
 
 int main()
 {
-    int x;
-
-    switch(x) {
-       case static_cast<int>(FOO): return 1;
-     }
-
-    {
-       int y = 1;
-       switch(y) {
-         case static_cast<int>(FOO): return 1;
-       }
-     }   
-
-    {
-       int y = 1;
-       switch(y++) {
-         case static_cast<int>(FOO): return 1;
-       }
-     }   
+  int x;
+  switch(x) {
+    case static_cast<int>(FOO): return 1;
+  }
+  {
+    int y = 1;
+    switch(y) {
+      case static_cast<int>(FOO): return 1;
+    }
+  }
+  {
+    int y = 1;
+    switch(y++) {
+      case static_cast<int>(FOO): return 1;
+    }
+  }
 }
+

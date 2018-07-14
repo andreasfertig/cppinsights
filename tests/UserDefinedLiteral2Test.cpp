@@ -9,7 +9,5 @@ constexpr seconds_t operator ""_s(unsigned long long s)
 
 int main()
 {
-    if(true) {
-        auto s = 1_s;
-    }
+    auto s = 1_s;
 }

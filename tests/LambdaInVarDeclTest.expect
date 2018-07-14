@@ -1,34 +1,34 @@
 int main()
 {
-    char buffer[4];
-
+  char buffer[4];
+  {
+    char (&__range1)[4] = buffer;
+    char * __begin1 = __range1;
+    char * __end1 = __range1 + 4l;
+    
+    for( ; __begin1 != __end1; ++__begin1 )
     {
-       char (&__range1)[4] = buffer;
-       char * __begin1 = __range1;
-       char * __end1 = __range1 + 4l;
-       
-       for( ; __begin1 != __end1; ++__begin1 )
-       {
-         char & c = *__begin1;
-                           
-         class __lambda_6_17
-         {
-           public: inline /*constexpr */ char operator()() const
-           {
-             return c;
-           }
-           
-           private:
-           char & c;
-           
-           public: __lambda_6_17(char & _c)
-           : c{_c}
-           {}
-           
-         } __lambda_6_17{c};
-         
-         int x = static_cast<int>(__lambda_6_17.operator()());
-       }
-     }
+      char & c = *__begin1;
+                  
+      class __lambda_6_17
+      {
+        public: inline /*constexpr */ char operator()() const
+        {
+          return c;
+        }
+        
+        private:
+        char & c;
+        
+        public: __lambda_6_17(char & _c)
+        : c{_c}
+        {}
+        
+      } __lambda_6_17{c};
+      
+      int x = static_cast<int>(__lambda_6_17.operator()());
+    }
+  }
 }
+
 

@@ -1,0 +1,16 @@
+
+const char * Foo()
+{
+  return "a";
+}
+
+
+int x = 22;
+
+const char * c = Foo();
+
+
+int main()
+{
+}
+

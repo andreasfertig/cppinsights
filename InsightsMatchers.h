@@ -26,45 +26,10 @@ static const auto isTemplate = anyOf(hasAncestor(classTemplateDecl()),
                                      hasAncestor(classTemplateSpecializationDecl()));
 //-----------------------------------------------------------------------------
 
-/* A lambdaExpr has it's body in the call operator as well as directly below the lambdaExpr itself. The
- * compoundStmt-part ensures that only the operator part is matched */
-static const auto hasLambdaAncestor =
-    anyOf(hasDescendant(lambdaExpr()), hasAncestor(lambdaExpr()), hasAncestor(compoundStmt(hasParent(lambdaExpr()))));
-//-----------------------------------------------------------------------------
-
 /// \brief Shut up a unused variable warnings
 #define SILENCE                                                                                                        \
     (void)Finder;                                                                                                      \
     (void)Builder
-
-/// \brief Matches AST nodes of type \c VarDecl which a static local.
-///
-/// \code
-/// void func() {
-///   static Foo f;
-/// }
-/// \endcode
-AST_MATCHER(VarDecl, isStaticLocal)
-{
-    SILENCE;
-    return Node.isStaticLocal();
-}
-
-/// \brief Matches AST nodes of type \c VarDecl which represent a NRVO variable.
-///
-/// NRVO (Named Return Value Optimization) are constructions which are done in-place.
-AST_MATCHER(VarDecl, isNRVOVariable)
-{
-    SILENCE;
-    return Node.isNRVOVariable();
-}
-
-/// \brief Matches AST nodes of type \c CXXRecordDecl which have a trivial destructor.
-AST_MATCHER(CXXRecordDecl, hasTrivialDestructor)
-{
-    SILENCE;
-    return Node.hasTrivialDestructor();
-}
 
 // \brief Matches AST nodes of type \c FunctionDecl which is a template instantiation.
 AST_MATCHER(FunctionDecl, isTemplateInstantiationPlain)

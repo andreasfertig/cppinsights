@@ -21,29 +21,13 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include <string>
-#include <unordered_map>
-
-#include "CodeGenerator.h"
 #include "DPrint.h"
-#include "InsightsBase.h"
-#include "InsightsHelpers.h"
-#include "InsightsMatchers.h"
-#include "InsightsStrCat.h"
-#include "OutputFormatHelper.h"
 
 #include "AutoStmtHandler.h"
-#include "ClassOperatorHandler.h"
-#include "CommaOperatorHandler.h"
 #include "CompilerGeneratedHandler.h"
-#include "IfStmtHandler.h"
+#include "FunctionDeclHandler.h"
 #include "ImplicitCastHandler.h"
-#include "LambdaHandler.h"
-#include "NRVOHandler.h"
-#include "RangeForStmtHandler.h"
 #include "StaticAssertHandler.h"
-#include "StaticHandler.h"
-#include "StdInitializerListHandler.h"
 #include "StructuredBindingsHandler.h"
 #include "TemplateHandler.h"
 #include "UserDefinedLiteralHandler.h"
@@ -75,21 +59,14 @@ class CppInsightASTConsumer final : public ASTConsumer
 public:
     explicit CppInsightASTConsumer(Rewriter& rewriter)
     : mMatcher{}
-    , mRangeForStmtHandler{rewriter, mMatcher}
     , mStructuredBindingsHandler{rewriter, mMatcher}
-    , mClassOperatorHandler{rewriter, mMatcher}
-    , mLambdaHandler{rewriter, mMatcher}
     , mCompilerGeneratedHandler{rewriter, mMatcher}
-    , mStaticHandler{rewriter, mMatcher}
     , mStaticAssertHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
     , mImplicitCastHandler{rewriter, mMatcher}
-    , mIfStmtHandler{rewriter, mMatcher}
     , mAutoStmtHandler{rewriter, mMatcher}
-    , mNrvoHandler{rewriter, mMatcher}
     , mUserDefinedLiteralHandler{rewriter, mMatcher}
-    , mStdInitializerListHandler{rewriter, mMatcher}
-    , mCommaOperatorHandler{rewriter, mMatcher}
+    , mFunctionDeclHandler{rewriter, mMatcher}
     {
     }
 
@@ -97,21 +74,14 @@ public:
 
 private:
     MatchFinder               mMatcher;
-    RangeForStmtHandler       mRangeForStmtHandler;
     StructuredBindingsHandler mStructuredBindingsHandler;
-    ClassOperatorHandler      mClassOperatorHandler;
-    LambdaHandler             mLambdaHandler;
     CompilerGeneratedHandler  mCompilerGeneratedHandler;
-    StaticHandler             mStaticHandler;
     StaticAssertHandler       mStaticAssertHandler;
     TemplateHandler           mTemplateHandler;
     ImplicitCastHandler       mImplicitCastHandler;
-    IfStmtHandler             mIfStmtHandler;
     AutoStmtHandler           mAutoStmtHandler;
-    NRVOHandler               mNrvoHandler;
     UserDefinedLiteralHandler mUserDefinedLiteralHandler;
-    StdInitializerListHandler mStdInitializerListHandler;
-    CommaOperatorHandler      mCommaOperatorHandler;
+    FunctionDeclHandler       mFunctionDeclHandler;
 };
 //-----------------------------------------------------------------------------
 

@@ -1,9 +1,15 @@
-int foo(int a,int b){ return a+b; }
-
-int main(){
-  int (*add)(int,int)= foo;
-  // auto within a function pointer
-  using FuncPtr_6 = int (*)(int, int);
- FuncPtr_6 add1= foo;         
+int foo(int a, int b)
+{
+  return a + b;
 }
+
+
+int main()
+{
+  using FuncPtr_4 = int (*)(int, int);
+  FuncPtr_4 add = foo;
+  using FuncPtr_6 = int (*)(int, int);
+  FuncPtr_6 add1 = foo;
+}
+
 

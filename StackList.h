@@ -46,9 +46,10 @@ public:
 
     T* pop() noexcept
     {
+        TStackListEntry* last = mLast;
+
         if(mLast) {
-            TStackListEntry* last = mLast;
-            mLast                 = mLast->prev;
+            mLast = mLast->prev;
 
             if(mLast) {
                 mLast->next = nullptr;
@@ -58,11 +59,9 @@ public:
             } else {
                 mFirst = nullptr;
             }
-
-            return static_cast<T*>(last);
         }
 
-        return nullptr;
+        return static_cast<T*>(last);
     }
 
     T& back() noexcept { return *static_cast<T*>(mLast); }

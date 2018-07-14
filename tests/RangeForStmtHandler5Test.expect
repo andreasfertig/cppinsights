@@ -4,25 +4,34 @@ class MyArrayWrapper {
    int size;
 
 public:
-   int* begin() { return size>0 ? &data[0] : nullptr; }
-   int* end()   { return size>0 ? &data[size-1] : nullptr; }
+   inline int * begin()
+   {
+     return this->size > 0 ? &this->data[0] : nullptr;
+   }
+   
+   inline int * end()
+   {
+     return this->size > 0 ? &this->data[this->size - 1] : nullptr;
+   }
+   
 /* public: inline MyArrayWrapper() noexcept; */
 /* public: inline constexpr MyArrayWrapper(const MyArrayWrapper &); */
 /* public: inline constexpr MyArrayWrapper(MyArrayWrapper &&); */
 };
 
 
-int main() {
-    MyArrayWrapper arr;
+int main()
+{
+  MyArrayWrapper arr = MyArrayWrapper();
+  {
+    MyArrayWrapper & __range1 = arr;
+    int * __begin1 = __range1.begin();
+    int * __end1 = __range1.end();
+    
+    for( ; __begin1 != __end1; ++__begin1 )
     {
-       MyArrayWrapper & __range1 = arr;
-       int * __begin1 = __range1.begin();
-       int * __end1 = __range1.end();
-       
-       for( ; __begin1 != __end1; ++__begin1 )
-       {
-         int i = *__begin1;
-       }
-     }
-
+      int i = *__begin1;
+    }
+  }
 }
+

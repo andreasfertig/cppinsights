@@ -1,5 +1,5 @@
-.tmp.cpp:51:20: error: member reference type 'const Foo' is not a pointer; did you mean to use '.'?
-             __this->Get();
-             ~~~~~~^~
-                   .
+.tmp.cpp:47:17: error: member reference type 'const Foo' is not a pointer; did you mean to use '.'?
+          __this->Get();
+          ~~~~~~^~
+                .
 1 error generated.

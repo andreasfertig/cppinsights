@@ -27,17 +27,8 @@ UserDefinedLiteralHandler::UserDefinedLiteralHandler(Rewriter& rewrite, MatchFin
                                         isTemplate,
                                         /* if we match the top-most CXXOperatorCallExpr we will see all
                                            descendants. So filter them here to avoid getting them multiple times */
-                                        hasAncestor(cxxOperatorCallExpr()),
-                                        hasAncestor(cxxStdInitializerListExpr()),
-                                        hasLambdaAncestor,
-                                        hasAncestor(ifStmt()),
-                                        hasAncestor(switchStmt()),
-                                        hasAncestor(implicitCastExpr(hasMatchingCast())),
-#ifdef MATCH_CXX_MEM_CEXPR
-                                        hasAncestor(cxxMemberCallExpr()),
-#endif
-                                        hasAncestor(unaryOperator(anyOf(hasOperatorName("++"), hasOperatorName("--")))),
-                                        hasAncestor(cxxForRangeStmt()))))
+                                        hasAncestor(functionDecl()),
+                                        hasAncestor(implicitCastExpr(hasMatchingCast())))))
             .bind("udl"),
         this);
 }

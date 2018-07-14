@@ -1,32 +1,40 @@
-int Open() { return 0; }
-int Write() { return 0; }
+int Open()
+{
+  return 0;
+}
+
+int Write()
+{
+  return 0;
+}
+
 #define SUCCESS 1
 
 
 int Foo()
 {
-    // normal if but with an DeclStmt. No rewrite expected
-    {
-       int ret = Open();
-       if(static_cast<bool>(ret)) {
-         if(1 != ret) {
-           return ret;
-         }
-       }
-       
-     }
-     
-    // ...
+  {
+    int ret = Open();
+    if(static_cast<bool>(ret)) {
+      if(1 != ret) {
+        return ret;
+      }
+      
+    }
     
-    return SUCCESS;
+  }
+  
+  return 1;
 }
+
 
 
 
 
 int main()
 {
-    Foo();
+  Foo();
 }
+
 
 

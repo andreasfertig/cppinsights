@@ -17,28 +17,26 @@ template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
 
 int main()
 {
-         
-     class __lambda_8_7
-     {
-       public: inline /*constexpr */ void operator()(int value) const
-       {
-       }
-       
-     };
-     
-     
-     class __lambda_9_7
-     {
-       public: inline /*constexpr */ void operator()(const char * value) const
-       {
-       }
-       
-     };
-     
-     visitor<__lambda_8_7, __lambda_9_7> my_visitor = visitor{__lambda_8_7(__lambda_8_7{}), __lambda_9_7(__lambda_9_7{})};
-     
-
-
-    static_cast<const __lambda_9_7&>(my_visitor).operator()("hello");
-    static_cast<const __lambda_8_7&>(my_visitor).operator()(2);
+    
+  class __lambda_8_7
+  {
+    public: inline /*constexpr */ void operator()(int value) const
+    {
+    }
+    
+  };
+  
+  
+  class __lambda_9_7
+  {
+    public: inline /*constexpr */ void operator()(const char * value) const
+    {
+    }
+    
+  };
+  
+  visitor<__lambda_8_7, __lambda_9_7> my_visitor = visitor{__lambda_8_7(__lambda_8_7{}), __lambda_9_7(__lambda_9_7{})};
+  static_cast<const __lambda_9_7&>(my_visitor).operator()("hello");
+  static_cast<const __lambda_8_7&>(my_visitor).operator()(2);
 }
+
