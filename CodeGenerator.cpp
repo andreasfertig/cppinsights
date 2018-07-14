@@ -121,6 +121,15 @@ OutputFormatHelper& CodeGenerator::LambdaScopeHandler::GetBuffer(OutputFormatHel
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
+{
+    InsertArg(stmt->getBase());
+    const std::string op{stmt->isArrow() ? "->" : "."};
+
+    mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getAsString());
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 {
     mOutputFormatHelper.OpenScope();
@@ -1070,7 +1079,12 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 
     // operators in a namespace but outside a class so operator goes first
     if(!isCXXMethod) {
-        mOutputFormatHelper.Append(GetName(*callee), "(");
+        if(callee) {
+            mOutputFormatHelper.Append(GetName(*callee), "(");
+        } else {
+            InsertArg(stmt->getCallee()->IgnoreImpCasts());
+            mOutputFormatHelper.Append("(");
+        }
     }
 
     // insert the arguments
