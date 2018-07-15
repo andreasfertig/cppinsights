@@ -11,6 +11,7 @@ std::basic_string<char> trim(const std::basic_string<char> & input)
   while(i < static_cast<int>(static_cast<int>(input.length())) && static_cast<int>(input.operator[](i)) <= static_cast<int>(' ')) {
     i++;
   }
+  
   if(i >= static_cast<int>(static_cast<int>(input.length()))) {
     return std::basic_string<char>("");
   }
@@ -23,6 +24,7 @@ std::basic_string<char> trim(const std::basic_string<char> & input)
   while(i >= 0 && static_cast<int>(final.operator[](i)) <= static_cast<int>(' ')) {
     i--;
   }
+  
   return final.substr(0, static_cast<unsigned long>(i + 1));
 }
 

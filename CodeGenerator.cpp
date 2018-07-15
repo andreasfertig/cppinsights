@@ -272,7 +272,20 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
     mOutputFormatHelper.Append("while");
     WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
-    InsertArg(stmt->getBody());
+    const auto* body = stmt->getBody();
+    const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
+
+    InsertArg(body);
+
+    if(hasCompoundStmt) {
+        mOutputFormatHelper.AppendNewLine();
+    } else {
+        const bool isBodyBraced = isa<CompoundStmt>(body);
+        if(!isBodyBraced) {
+            mOutputFormatHelper.AppendNewLine(';');
+        }
+    }
+
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -970,17 +983,23 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
                          },
                          AddSpaceAtTheEnd::Yes);
 
-    const bool hasCompoundStmt{isa<CompoundStmt>(stmt->getBody())};
+    const auto* body = stmt->getBody();
+    const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
 
     if(hasCompoundStmt) {
         mOutputFormatHelper.AppendNewLine();
     }
 
-    InsertArg(stmt->getBody());
+    InsertArg(body);
 
     // Note: an empty for-loop carries a simi-colon at the end
     if(hasCompoundStmt) {
         mOutputFormatHelper.AppendNewLine();
+    } else {
+        const bool isBodyBraced = isa<CompoundStmt>(body);
+        if(!isBodyBraced) {
+            mOutputFormatHelper.AppendNewLine(';');
+        }
     }
 
     mOutputFormatHelper.AppendNewLine();
