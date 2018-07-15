@@ -27,7 +27,7 @@ CompilerGeneratedHandler::CompilerGeneratedHandler(Rewriter& rewrite, MatchFinde
                                                             isTemplate,
                                                             hasAncestor(functionDecl()),
                                                             isMacroOrInvalidLocation())),
-                                               hasParent(cxxRecordDecl().bind("record")));
+                                               hasParent(cxxRecordDecl(unless(isLambda())).bind("record")));
 
     matcher.addMatcher(cxxMethodDecl(compilerProvided).bind("method"), this);
 }

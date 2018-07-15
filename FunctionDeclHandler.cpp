@@ -23,6 +23,7 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
 : InsightsBase(rewrite)
 {
     matcher.addMatcher(functionDecl(unless(anyOf(cxxMethodDecl(unless(isUserProvided())),
+                                                 cxxMethodDecl(hasParent(cxxRecordDecl(isLambda()))),
                                                  isExpansionInSystemHeader(),
                                                  isTemplate,
                                                  hasAncestor(friendDecl()),    // friendDecl has functionDecl as child
@@ -36,6 +37,7 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
                                                     hasDescendant(classTemplateSpecializationDecl()));
 
     matcher.addMatcher(friendDecl(unless(anyOf(cxxMethodDecl(unless(isUserProvided())),
+                                               cxxMethodDecl(hasParent(cxxRecordDecl(isLambda()))),
                                                isExpansionInSystemHeader(),
                                                isTemplate,
                                                hasTemplateDescendant,
