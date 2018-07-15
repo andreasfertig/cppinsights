@@ -5,9 +5,11 @@ const char * Foo()
 }
 
 
-int x = 22;
+static int x = 22;
 
-const char * c = Foo();
+
+static const char * c = Foo();
+
 
 
 int main()
