@@ -32,7 +32,6 @@ AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
 
     matcher.addMatcher(varDecl(unless(anyOf(isExpansionInSystemHeader(),
                                             isMacroOrInvalidLocation(),
-                                            decompositionDecl(),
                                             isAutoAncestor,
                                             /* don't replace auto in templates */
                                             isTemplate,
@@ -51,7 +50,9 @@ AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
 void AutoStmtHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* autoDecl = result.Nodes.getNodeAs<VarDecl>("autoDecl")) {
-        OutputFormatHelper outputFormatHelper{};
+        const auto&        sm       = GetSM(result);
+        const auto         columnNr = sm.getSpellingColumnNumber(autoDecl->getLocStart()) - 1;
+        OutputFormatHelper outputFormatHelper{columnNr};
         CodeGenerator      codeGenerator{outputFormatHelper};
         codeGenerator.InsertArg(autoDecl);
 

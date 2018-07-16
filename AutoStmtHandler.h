@@ -21,11 +21,17 @@ namespace clang::insights {
 
 /// \brief Show the types behind \c auto
 ///
-/// For example:
+/// The AutoStmtHandler matches all \c auto statements in global space. That means:
+///
 /// \code
 /// auto i = 0;
+/// auto [x,y] = Point{1,2};
+/// auto lambda = [&]() { return errno; };
 /// \endcode
 ///
+/// The transformation itself shows the fully expanded type behind \c auto and a possible associated statmente like
+/// lambda or structured binding.
+/// For example: \code auto i = 0; \endcode
 /// will give you
 /// \code
 /// int i = 0;
