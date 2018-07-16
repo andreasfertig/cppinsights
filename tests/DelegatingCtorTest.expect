@@ -1,0 +1,86 @@
+template<typename T>
+struct Foo {
+  Foo(char x, int y) : _x{x}, _y(y) {}
+  Foo(int y) : Foo('a', y) {}
+
+  char _x;
+  int _y;
+};
+/* First instantiated from: DelegatingCtorTest.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+struct Foo<int>
+{
+  inline Foo(char x, int y)
+  : _x{x}
+  , _y{y}
+  {
+  }
+  
+  inline Foo(int y)
+  : Foo<int>('a', y)
+  {
+  }
+  
+  char _x;
+  int _y;
+  inline constexpr Foo(const Foo<int> &) = default;
+  inline constexpr Foo(Foo<int> &&) = default;
+  inline ~Foo() noexcept = default;
+  
+};
+
+#endif
+
+/* First instantiated from: DelegatingCtorTest.cpp:12 */
+#ifdef INSIGHTS_USE_TEMPLATE
+struct Foo<char>
+{
+  inline Foo(char x, int y)
+  : _x{x}
+  , _y{y}
+  {
+  }
+  
+  inline Foo(int y);
+  
+  char _x;
+  int _y;
+  inline constexpr Foo(const Foo<char> &) = default;
+  inline constexpr Foo(Foo<char> &&) = default;
+  inline ~Foo() = default;
+  
+};
+
+#endif
+
+
+
+template<typename T>
+struct Bar : Foo<T>
+{
+    Bar(int x) : Foo<T>(x, 2) {}
+};
+/* First instantiated from: DelegatingCtorTest.cpp:22 */
+#ifdef INSIGHTS_USE_TEMPLATE
+struct Bar<char> : public Foo<char>
+{
+  inline Bar(int x)
+  : Foo<char>(static_cast<char>(x), 2)
+  {
+  }
+  
+  inline constexpr Bar(const Bar<char> &) = default;
+  inline constexpr Bar(Bar<char> &&) = default;
+  
+};
+
+#endif
+
+
+int main()
+{
+  Foo<int> f = Foo<int>{1, 2};
+  Foo<int> f2 = Foo<int>{1};
+  Bar<char> b = Bar<char>{1};
+}
+

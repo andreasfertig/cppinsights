@@ -28,7 +28,6 @@
 #include "FunctionDeclHandler.h"
 #include "ImplicitCastHandler.h"
 #include "StaticAssertHandler.h"
-#include "StructuredBindingsHandler.h"
 #include "TemplateHandler.h"
 #include "UserDefinedLiteralHandler.h"
 #include "version.h"
@@ -59,7 +58,6 @@ class CppInsightASTConsumer final : public ASTConsumer
 public:
     explicit CppInsightASTConsumer(Rewriter& rewriter)
     : mMatcher{}
-    , mStructuredBindingsHandler{rewriter, mMatcher}
     , mCompilerGeneratedHandler{rewriter, mMatcher}
     , mStaticAssertHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
@@ -74,7 +72,6 @@ public:
 
 private:
     MatchFinder               mMatcher;
-    StructuredBindingsHandler mStructuredBindingsHandler;
     CompilerGeneratedHandler  mCompilerGeneratedHandler;
     StaticAssertHandler       mStaticAssertHandler;
     TemplateHandler           mTemplateHandler;

@@ -1,0 +1,106 @@
+template<class... Args>
+int g(Args ...)
+{
+    return 1;
+}
+
+/* First instantiated from: LambdaPackExpansionTest.cpp:9 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int g<int, int, int, int, int>(int, int, int, int, int)
+{
+  return 1;
+}
+#endif
+
+
+template<class... Args>
+void f(Args... args) {
+    auto lm = [&] { return g(args...); };
+    lm();
+}
+
+/* First instantiated from: LambdaPackExpansionTest.cpp:21 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void f<int, int, int, int, int>(int args, int args, int args, int args, int args)
+{
+    
+  class __lambda_9_15
+  {
+    public: inline /*constexpr */ int operator()() const
+    {
+      return g(args, args, args, args, args);
+    }
+    
+    private:
+    int& args;
+    int& args;
+    int& args;
+    int& args;
+    int& args;
+    
+    public: __lambda_9_15(int& _args, int& _args, int& _args, int& _args, int& _args)
+    : args{_args}
+, args{_args}
+, args{_args}
+, args{_args}
+, args{_args}
+    {}
+    
+  };
+  
+  __lambda_9_15 lm = __lambda_9_15{args, args, args, args, args};
+  lm.operator()();
+}
+#endif
+
+
+template<class... Args>
+void f2(Args... args) {
+    auto lm = [&, args...] { return g(args...); };
+    lm();
+}
+
+/* First instantiated from: LambdaPackExpansionTest.cpp:22 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void f2<int, int, int, int, int>(int args, int args, int args, int args, int args)
+{
+    
+  class __lambda_15_15
+  {
+    public: inline /*constexpr */ int operator()() const
+    {
+      return g(args, args, args, args, args);
+    }
+    
+    private:
+    int args;
+    int args;
+    int args;
+    int args;
+    int args;
+    
+    public: __lambda_15_15(int _args, int _args, int _args, int _args, int _args)
+    : args{_args}
+, args{_args}
+, args{_args}
+, args{_args}
+, args{_args}
+    {}
+    
+  };
+  
+  __lambda_15_15 lm = __lambda_15_15{args, args, args, args, args};
+  lm.operator()();
+}
+#endif
+
+
+int main()
+{
+  f(1, 2, 3, 4, 5);
+  f2(1, 2, 3, 4, 5);
+}
+

@@ -996,8 +996,7 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
     if(hasCompoundStmt) {
         mOutputFormatHelper.AppendNewLine();
     } else {
-        const bool isBodyBraced = isa<CompoundStmt>(body);
-        if(!isBodyBraced) {
+        if(!isa<CompoundStmt>(body) && !isa<NullStmt>(body)) {
             mOutputFormatHelper.AppendNewLine(';');
         }
     }

@@ -288,7 +288,6 @@ add_clang_executable(insights
     InsightsHelpers.cpp
     OutputFormatHelper.cpp
     StaticAssertHandler.cpp
-    StructuredBindingsHandler.cpp
     TemplateHandler.cpp
     UserDefinedLiteralHandler.cpp
 )
