@@ -462,9 +462,11 @@ static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
         }
     }
 
-    for(const auto* child : stmt->children()) {
-        if(const auto* childRef = FindDeclRef(child)) {
-            return childRef;
+    if(stmt) {
+        for(const auto* child : stmt->children()) {
+            if(const auto* childRef = FindDeclRef(child)) {
+                return childRef;
+            }
         }
     }
 
