@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 template<typename T>
 struct Foo {
   Foo(char x, int y) : _x{x}, _y(y) {}
@@ -6,8 +8,9 @@ struct Foo {
   char _x;
   int _y;
 };
-/* First instantiated from: DelegatingCtorTest.cpp:19 */
+/* First instantiated from: DelegatingCtorTest.cpp:21 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct Foo<int>
 {
   inline Foo(char x, int y)
@@ -31,8 +34,9 @@ struct Foo<int>
 
 #endif
 
-/* First instantiated from: DelegatingCtorTest.cpp:12 */
+/* First instantiated from: DelegatingCtorTest.cpp:14 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct Foo<char>
 {
   inline Foo(char x, int y)
@@ -60,8 +64,9 @@ struct Bar : Foo<T>
 {
     Bar(int x) : Foo<T>(x, 2) {}
 };
-/* First instantiated from: DelegatingCtorTest.cpp:22 */
+/* First instantiated from: DelegatingCtorTest.cpp:24 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct Bar<char> : public Foo<char>
 {
   inline Bar(int x)

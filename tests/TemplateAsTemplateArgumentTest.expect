@@ -1,6 +1,7 @@
 template<typename T> class my_array {};
 /* First instantiated from: TemplateAsTemplateArgumentTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class my_array<int>
 {
   inline constexpr my_array() noexcept = default;
@@ -22,6 +23,7 @@ class Map
 };
 /* First instantiated from: TemplateAsTemplateArgumentTest.cpp:13 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Map<int, int, my_array>
 {
   my_array<int> key;

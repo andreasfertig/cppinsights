@@ -14,6 +14,7 @@ class B {
 };
 /* First instantiated from: TemplateWithNullptrTest.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class B<A, void (A::*)()>
 {
   inline constexpr B() noexcept = default;

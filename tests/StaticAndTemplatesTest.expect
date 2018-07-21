@@ -1,0 +1,67 @@
+#define INSIGHTS_USE_TEMPLATE
+
+template<typename T>
+constexpr T min(const T& a, const T& b)
+{
+    return (a < b) ? a : b;
+}
+
+/* First instantiated from: StaticAndTemplatesTest.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int min<int>(const int & a, const int & b)
+{
+  return (a < b) ? a : b;
+}
+#endif
+
+
+/* First instantiated from: StaticAndTemplatesTest.cpp:23 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr double min<double>(const double & a, const double & b)
+{
+  return (a < b) ? a : b;
+}
+#endif
+ 
+
+template<typename T>
+static T max(const T& a, const T& b)
+{
+    return (a > b) ? a : b;
+}
+
+/* First instantiated from: StaticAndTemplatesTest.cpp:25 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int max<int>(const int & a, const int & b)
+{
+  return (a > b) ? a : b;
+}
+#endif
+
+
+/* First instantiated from: StaticAndTemplatesTest.cpp:26 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+double max<double>(const double & a, const double & b)
+{
+  return (a > b) ? a : b;
+}
+#endif
+ 
+
+int main()
+{
+  int a = 1;
+  int b = 2;
+  int mi = min(a, b);
+  double ad = 2.3999999999999999;
+  double bd = 3.3999999999999999;
+  double md = min(ad, bd);
+  int ma1 = max(1, 2);
+  double ma2 = max(2.0, 4.0);
+}
+
+

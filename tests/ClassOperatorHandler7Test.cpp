@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 //CXXDependentScopeMemberExpr
 // http://lists.llvm.org/pipermail/cfe-dev/2017-January/052433.html
 

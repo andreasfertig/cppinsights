@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 //CXXDependentScopeMemberExpr
 // http://lists.llvm.org/pipermail/cfe-dev/2017-January/052433.html
 
@@ -6,8 +8,9 @@ struct A
 {
    void foo(int);
 };
-/* First instantiated from: ClassOperatorHandler7Test.cpp:20 */
+/* First instantiated from: ClassOperatorHandler7Test.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct A<int>
 {
   void foo(int);
@@ -20,8 +23,9 @@ struct A<int>
 
 #endif
 
-/* First instantiated from: ClassOperatorHandler7Test.cpp:20 */
+/* First instantiated from: ClassOperatorHandler7Test.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct A<int *>
 {
   struct B
@@ -59,7 +63,7 @@ void foo()
   a.foo(3);
 }
 
-/* First instantiated from: ClassOperatorHandler7Test.cpp:24 */
+/* First instantiated from: ClassOperatorHandler7Test.cpp:26 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 void foo<int>()
@@ -70,7 +74,7 @@ void foo<int>()
 #endif
 
 
-/* First instantiated from: ClassOperatorHandler7Test.cpp:25 */
+/* First instantiated from: ClassOperatorHandler7Test.cpp:27 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 void foo<int *>()
@@ -94,7 +98,7 @@ bool foo2() {
     return vec.empty(); // 'vec' is identified as part of 'CXXDependentScopeMemberExpr' but call expression 'empty' is not and it's completely missing from the AST
 }
 
-/* First instantiated from: ClassOperatorHandler7Test.cpp:50 */
+/* First instantiated from: ClassOperatorHandler7Test.cpp:52 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 bool foo2<int>()

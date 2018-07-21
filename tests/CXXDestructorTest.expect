@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 template<typename T, bool array>
 class Alloc
 {
@@ -23,8 +25,9 @@ public:
         }
     }
 };
-/* First instantiated from: CXXDestructorTest.cpp:29 */
+/* First instantiated from: CXXDestructorTest.cpp:31 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Alloc<int, 0>
 {
   int * data;
@@ -59,8 +62,9 @@ class Alloc<int, 0>
 
 #endif
 
-/* First instantiated from: CXXDestructorTest.cpp:30 */
+/* First instantiated from: CXXDestructorTest.cpp:32 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Alloc<char, 1>
 {
   char * data;

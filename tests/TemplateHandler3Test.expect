@@ -1,10 +1,12 @@
+#define INSIGHTS_USE_TEMPLATE
+    
 template<int N, typename T>
 constexpr T min(const T& b)
 {
     return N < b;
 }
 
-/* First instantiated from: TemplateHandler3Test.cpp:9 */
+/* First instantiated from: TemplateHandler3Test.cpp:11 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr int min<2, int>(const int & b)

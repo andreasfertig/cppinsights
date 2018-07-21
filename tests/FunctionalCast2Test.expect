@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 #include <cstdio>
 #include <type_traits>
 #include <utility>
@@ -9,7 +11,7 @@ namespace details::array_single_compare {
     return ((to == ar[I]) && ...);
   }
   
-  /* First instantiated from: FunctionalCast2Test.cpp:16 */
+  /* First instantiated from: FunctionalCast2Test.cpp:18 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline constexpr bool Compare<unsigned char, 6, int, 0, 1, 2, 3, 4, 5>(const unsigned char (&ar)[6], const int & to, std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>)
@@ -26,7 +28,7 @@ constexpr bool Compare(const T (&ar)[N], const TTo& to)
   return details::array_single_compare::Compare(ar, to, std::make_index_sequence<N>{});
 }
 
-/* First instantiated from: FunctionalCast2Test.cpp:45 */
+/* First instantiated from: FunctionalCast2Test.cpp:47 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr bool Compare<unsigned char, 6, int>(const unsigned char (&ar)[6], const int & to)
@@ -43,7 +45,7 @@ namespace details::array_compare {
     return ((to[I] == ar[I]) && ...);
   }
   
-  /* First instantiated from: FunctionalCast2Test.cpp:30 */
+  /* First instantiated from: FunctionalCast2Test.cpp:32 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline constexpr bool Compare<unsigned char, 6, 0, 1, 2, 3, 4, 5>(const unsigned char (&ar)[6], const unsigned char (&to)[6], std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>)
@@ -60,7 +62,7 @@ constexpr bool Compare(const T (&ar)[N], const T (&to)[N])
   return details::array_compare::Compare(ar, to, std::make_index_sequence<N>{});
 }
 
-/* First instantiated from: FunctionalCast2Test.cpp:49 */
+/* First instantiated from: FunctionalCast2Test.cpp:51 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr bool Compare<unsigned char, 6>(const unsigned char (&ar)[6], const unsigned char (&to)[6])

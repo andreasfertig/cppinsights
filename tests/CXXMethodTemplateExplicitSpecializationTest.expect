@@ -6,6 +6,7 @@ public:
 };
 /* First instantiated from: CXXMethodTemplateExplicitSpecializationTest.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Foo<int>
 {
   
@@ -22,6 +23,7 @@ class Foo<int>
 
 /* First instantiated from: CXXMethodTemplateExplicitSpecializationTest.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Foo<char>
 {
   

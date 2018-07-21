@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 #include <vector>
 
 template<typename T>
@@ -26,8 +28,9 @@ public:
 
     T& operator[](const std::size_t i) { return v[i]; }
 };
-/* First instantiated from: ClassOperatorHandler9Test.cpp:32 */
+/* First instantiated from: ClassOperatorHandler9Test.cpp:34 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class MyVector<int>
 {
   std::vector<int, std::allocator<int> > v;
@@ -92,7 +95,7 @@ MyVector<T> operator*(const MyVector<T>& a, const MyVector<T>& b)
     return result;
 }
 
-/* First instantiated from: ClassOperatorHandler9Test.cpp:68 */
+/* First instantiated from: ClassOperatorHandler9Test.cpp:70 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 MyVector<int> operator*<int>(const MyVector<int> & a, const MyVector<int> & b)

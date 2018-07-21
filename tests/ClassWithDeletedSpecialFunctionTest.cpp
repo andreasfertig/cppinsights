@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 template<typename T>
 class Foo {
 public:

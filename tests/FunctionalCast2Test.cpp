@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 #include <cstdio>
 #include <type_traits>
 #include <utility>

@@ -74,6 +74,7 @@ struct str_view {
 };
 /* First instantiated from: RangeForStmtHandler3Test.cpp:49 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct str_view<char>
 {
   const char * ptr;

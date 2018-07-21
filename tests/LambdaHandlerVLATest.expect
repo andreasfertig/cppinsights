@@ -28,6 +28,7 @@ struct SA
 };
 /* First instantiated from: LambdaHandlerVLATest.cpp:59 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct SA<2>
 {
   inline SA(const int & PA)

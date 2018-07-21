@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 // https://mbevin.wordpress.com/2012/11/14/range-based-for/
 template<class T>
 class MyArrayWrapper {

@@ -5,6 +5,7 @@ namespace details {
   template<class T>
   struct remove_reference      { typedef T type; };
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   struct remove_reference<int [16]>
   {
     using type = int [16];
@@ -26,6 +27,7 @@ namespace details {
     static_assert(N != 0, "Arrays only");
   };
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   struct extent<int [16], 0>
   {
     inline static constexpr const size_t value = 16ul;
@@ -70,6 +72,7 @@ class S : public B
 };
 /* First instantiated from: TemplateExpansion2Test.cpp:57 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class S<int> : public B
 {
   inline constexpr S() noexcept = default;
@@ -82,6 +85,7 @@ class S<int> : public B
 
 /* First instantiated from: TemplateExpansion2Test.cpp:46 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class S<double> : public B
 {
   inline constexpr S() noexcept = default;
@@ -100,6 +104,7 @@ class Y : public S<T>, public E
 };
 /* First instantiated from: TemplateExpansion2Test.cpp:59 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Y<double> : public S<double>, public E
 {
   inline constexpr Y() noexcept = default;

@@ -36,7 +36,7 @@ static T max(const T& a, const T& b)
 /* First instantiated from: TemplateHandlerTest.cpp:67 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-static int max<int>(const int & a, const int & b)
+int max<int>(const int & a, const int & b)
 {
   return (a > b) ? a : b;
 }
@@ -46,7 +46,7 @@ static int max<int>(const int & a, const int & b)
 /* First instantiated from: TemplateHandlerTest.cpp:68 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-static double max<double>(const double & a, const double & b)
+double max<double>(const double & a, const double & b)
 {
   return (a > b) ? a : b;
 }
@@ -69,6 +69,7 @@ private:
 };
 /* First instantiated from: TemplateHandlerTest.cpp:61 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Template<int>
 {
   
@@ -92,6 +93,7 @@ class Template<int>
 
 /* First instantiated from: TemplateHandlerTest.cpp:63 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Template<double>
 {
   

@@ -1657,6 +1657,10 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
 
 void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
+    if(dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {
+        mOutputFormatHelper.AppendNewLine("template<>");
+    }
+
     if(stmt->isClass()) {
         mOutputFormatHelper.Append(kwClassSpace);
 
@@ -2251,10 +2255,13 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
                                                               const SkipConstexpr skipConstexpr,
                                                               const SkipAccess    skipAccess)
 {
-    bool isLambda{false};
-    bool isFirstCxxMethodDecl{true};
+    bool        isLambda{false};
+    bool        isFirstCxxMethodDecl{true};
+    bool        isCXXMethodDecl{isa<CXXMethodDecl>(&decl)};
+    const auto* methodDecl{dyn_cast_or_null<CXXMethodDecl>(&decl)};
+    const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
 
-    if(const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl)) {
+    if(methodDecl) {
         isLambda             = methodDecl->getParent()->isLambda();
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
     }
@@ -2262,10 +2269,6 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     if(isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) {
         mOutputFormatHelper.Append(AccessToStringWithColon(decl));
     }
-
-    const bool  isCXXMethodDecl{isa<CXXMethodDecl>(&decl)};
-    const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl);
-    const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
 
     if(!isLambda && ((isFirstCxxMethodDecl && decl.isFunctionTemplateSpecialization()) ||
                      (!isFirstCxxMethodDecl && isClassTemplateSpec))) {
@@ -2277,9 +2280,11 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         mOutputFormatHelper.AppendNewLine("using retType = ", GetName(GetDesugarReturnType(decl)), ";");
     }
 
-    mOutputFormatHelper.Append(GetStorageClassAsStringWithSpace(decl.getStorageClass()));
+    if(!decl.isFunctionTemplateSpecialization() || (isCXXMethodDecl && isFirstCxxMethodDecl)) {
+        mOutputFormatHelper.Append(GetStorageClassAsStringWithSpace(decl.getStorageClass()));
+    }
 
-    if(const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl)) {
+    if(methodDecl) {
         if(methodDecl->getPreviousDecl()) {
             if(const auto* ct = methodDecl->getParent()->getDescribedClassTemplate()) {
                 mOutputFormatHelper.Append("template<");
@@ -2302,7 +2307,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         mOutputFormatHelper.Append(kwInlineSpace);
     }
 
-    if(const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl)) {
+    if(methodDecl) {
         if(methodDecl->isVirtual()) {
             mOutputFormatHelper.Append(kwVirtualSpace);
         }
@@ -2332,7 +2337,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         }
     }
 
-    if(const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl)) {
+    if(methodDecl) {
         if(!isFirstCxxMethodDecl) {
             const auto* parent = methodDecl->getParent();
             mOutputFormatHelper.Append(parent->getNameAsString());
@@ -2358,7 +2363,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
     if(!isa<CXXConversionDecl>(decl)) {
         if(isa<CXXConstructorDecl>(decl) || isa<CXXDestructorDecl>(decl)) {
-            if(const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl)) {
+            if(methodDecl) {
                 if(isa<CXXDestructorDecl>(decl)) {
                     mOutputFormatHelper.Append('~');
                 }

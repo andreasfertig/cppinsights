@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 #include <functional>
 #include <cstdio>
 
@@ -11,7 +13,7 @@ void Test(T& t)
 {
 }
 
-/* First instantiated from: StdFunctionTest.cpp:15 */
+/* First instantiated from: StdFunctionTest.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 void Test<std::function<void ()> >(std::function<void ()> & t)
