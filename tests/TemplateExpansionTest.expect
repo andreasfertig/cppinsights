@@ -47,7 +47,7 @@ void foo2()
   #endif
   
   int foo();
-  ;
+  
 
   template<typename> class testType { };
   /* First instantiated from: TemplateExpansionTest.cpp:43 */

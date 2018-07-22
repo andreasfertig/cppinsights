@@ -59,7 +59,7 @@ struct Y { int x, y; /* public: inline ~Y() noexcept; */
 };
 
 void takes_y(Y y);
-;
+
 
 void bar(std::initializer_list<int> x)
 {

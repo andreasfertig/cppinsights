@@ -5,7 +5,7 @@ class Singleton
 {
 public:
     static Singleton & Instance();
-    ;
+    
 
     inline int Get() const
     {
