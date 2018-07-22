@@ -8,7 +8,7 @@ class CTest
 };
 
 int Test();
-;
+
 
 // http://clang.llvm.org/extra/doxygen/TrailingReturnCheck_8cpp_source.html
 int Test()

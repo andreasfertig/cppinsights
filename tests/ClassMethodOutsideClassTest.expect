@@ -5,9 +5,9 @@ class X
 public:
     X(int ii);
     
-     ;
+    
     void modify();
-    ;
+    
 /* public: inline constexpr X(const X &); */
 /* public: inline constexpr X(X &&); */
 };

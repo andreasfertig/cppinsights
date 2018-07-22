@@ -2,12 +2,12 @@ struct Base
 {
     Base();
     
-    ;
+    
     Base(const Base &);
     
-    ;
+    
     ~Base() noexcept;
-    ;
+    
 };
 
 Base::Base() = default;

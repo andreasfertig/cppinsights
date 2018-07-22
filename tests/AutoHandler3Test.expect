@@ -1,5 +1,5 @@
 struct S { void f();
-           ; /* public: inline ~S() noexcept; */
+            /* public: inline ~S() noexcept; */
 };
 struct T {/* public: inline ~T() noexcept; */
 };

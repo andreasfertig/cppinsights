@@ -59,8 +59,18 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 
         codeGenerator.InsertArg(funcDecl);
 
+        // Find the correct ending of the source range. In case of a declaration we need to find the ending semi,
+        // otherwise the provided source range is correct.
+        const auto sr = [&]() {
+            if(!funcDecl->doesThisDeclarationHaveABody()) {
+                return GetSourceRangeAfterToken(funcDecl->getSourceRange(), tok::semi, result);
+            }
+
+            return funcDecl->getSourceRange();
+        }();
+
         // DPrint("fd rw: %s\n", outputFormatHelper.GetString());
-        mRewrite.ReplaceText(funcDecl->getSourceRange(), outputFormatHelper.GetString());
+        mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
 
     } else if(const auto* friendDecl = result.Nodes.getNodeAs<FriendDecl>("friendDecl")) {
         if(const auto* fd = friendDecl->getFriendDecl()) {

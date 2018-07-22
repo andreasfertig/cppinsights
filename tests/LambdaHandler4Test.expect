@@ -80,7 +80,7 @@ class Foo
 struct X {
     int x, y;
     int operator()(int);
-    ;
+    
     inline void f()
     {
             
