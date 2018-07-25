@@ -39,7 +39,8 @@ void CompilerGeneratedHandler::run(const MatchFinder::MatchResult& result)
         OutputFormatHelper outputFormatHelper{};
         outputFormatHelper.Append("/* ");
 
-        CodeGenerator::InsertAccessModifierAndNameWithReturnType(outputFormatHelper, *methodDecl);
+        CodeGenerator codeGenerator{outputFormatHelper};
+        codeGenerator.InsertAccessModifierAndNameWithReturnType(*methodDecl);
 
         outputFormatHelper.AppendNewLine("; */");
 

@@ -130,10 +130,9 @@ public:
     STRONG_BOOL(SkipConstexpr);
     STRONG_BOOL(SkipAccess);
 
-    static void InsertAccessModifierAndNameWithReturnType(OutputFormatHelper& outputFormatHelper,
-                                                          const FunctionDecl& decl,
-                                                          const SkipConstexpr skipConstexpr = SkipConstexpr::No,
-                                                          const SkipAccess    skipAccess    = SkipAccess::No);
+    void InsertAccessModifierAndNameWithReturnType(const FunctionDecl& decl,
+                                                   const SkipConstexpr skipConstexpr = SkipConstexpr::No,
+                                                   const SkipAccess    skipAccess    = SkipAccess::No);
 
     static const char* GetStorageClassAsString(const StorageClass& sc);
     static std::string GetStorageClassAsStringWithSpace(const StorageClass& sc);
