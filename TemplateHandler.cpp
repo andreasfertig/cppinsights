@@ -78,13 +78,13 @@ void TemplateHandler::InsertInstantiatedTemplate(const FunctionDecl& funcDecl, c
         const auto& sm = GetSM(result);
         InsertInstantiationPoint(outputFormatHelper, sm, funcDecl.getPointOfInstantiation());
         outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
+        CodeGenerator codeGenerator{outputFormatHelper};
 
-        CodeGenerator::InsertAccessModifierAndNameWithReturnType(
-            outputFormatHelper, funcDecl, CodeGenerator::SkipConstexpr::No, CodeGenerator::SkipAccess::Yes);
+        codeGenerator.InsertAccessModifierAndNameWithReturnType(
+            funcDecl, CodeGenerator::SkipConstexpr::No, CodeGenerator::SkipAccess::Yes);
 
         outputFormatHelper.AppendNewLine();
 
-        CodeGenerator codeGenerator{outputFormatHelper};
         codeGenerator.InsertArg(body);
 
         outputFormatHelper.AppendNewLine();
