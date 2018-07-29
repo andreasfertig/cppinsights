@@ -16,9 +16,6 @@
 
 namespace clang {
 namespace ast_matchers {
-const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType>      decltypeType;
-const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl> decompositionDecl;  // DecompositionDecl
-//-----------------------------------------------------------------------------
 
 /* don't replace stuff in template definitions */
 static const auto isTemplate = anyOf(hasAncestor(classTemplateDecl()),
