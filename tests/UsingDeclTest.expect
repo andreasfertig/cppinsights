@@ -44,6 +44,7 @@ struct D : B {
 };
 /* First instantiated from: UsingDeclTest.cpp:56 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct D<int> : public B
 {
   using D<int>::m;

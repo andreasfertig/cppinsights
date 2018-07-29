@@ -21,6 +21,7 @@ struct Foo
 };
 /* First instantiated from: CharLiteralTest.cpp:61 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct Foo<int>
 {
   int raw;
@@ -47,6 +48,7 @@ struct Foo<int>
 
 /* First instantiated from: CharLiteralTest.cpp:60 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct Foo<char>
 {
   char raw;

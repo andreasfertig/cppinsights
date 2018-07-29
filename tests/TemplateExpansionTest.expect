@@ -2,6 +2,7 @@ template <template <typename> class... Templates>
 struct template_tuple {};
 /* First instantiated from: TemplateExpansionTest.cpp:9 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct template_tuple<identity>
 {
   inline ~template_tuple() noexcept = default;
@@ -35,6 +36,7 @@ void foo2()
   template<template<typename> class ...> class B { };
   /* First instantiated from: TemplateExpansionTest.cpp:27 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class B<Test, Test>
   {
     inline constexpr B() noexcept = default;
@@ -52,6 +54,7 @@ void foo2()
   template<typename> class testType { };
   /* First instantiated from: TemplateExpansionTest.cpp:43 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class testType<int>
   {
     inline constexpr testType() noexcept = default;
@@ -66,6 +69,7 @@ void foo2()
   template<int fp(void)> class testDecl { };
   /* First instantiated from: TemplateExpansionTest.cpp:45 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class testDecl<int (*)()>
   {
     
@@ -75,6 +79,7 @@ void foo2()
   
   /* First instantiated from: TemplateExpansionTest.cpp:46 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class testDecl<int (*)()>
   {
     
@@ -86,6 +91,7 @@ void foo2()
   template<int> class testIntegral { };
   /* First instantiated from: TemplateExpansionTest.cpp:48 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class testIntegral<2>
   {
     inline constexpr testIntegral() noexcept = default;
@@ -105,6 +111,7 @@ void foo2()
   };
   /* First instantiated from: TemplateExpansionTest.cpp:41 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class C<Test, Test>
   {
     B<Test, Test> testTemplateExpansion;
@@ -120,6 +127,7 @@ void foo2()
   template<int, int = 0> class testExpr{};
   /* First instantiated from: TemplateExpansionTest.cpp:50 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class testExpr<4, 1>
   {
     inline constexpr testExpr() noexcept = default;
@@ -134,6 +142,7 @@ void foo2()
   template<int, int ...> class testPack { };
   /* First instantiated from: TemplateExpansionTest.cpp:52 */
   #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
   class testPack<0, 1, 2, 4>
   {
     inline constexpr testPack() noexcept = default;

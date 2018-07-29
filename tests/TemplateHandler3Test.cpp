@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+    
 template<int N, typename T>
 constexpr T min(const T& b)
 {

@@ -1,3 +1,4 @@
+#define INSIGHTS_USE_TEMPLATE
 #include <map>
 #include <set>
 

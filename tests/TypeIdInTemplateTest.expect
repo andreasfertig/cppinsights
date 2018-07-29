@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 #include <string>
 
 template <typename T>
@@ -9,8 +11,9 @@ public:
     }
 
 };
-/* First instantiated from: TypeIdInTemplateTest.cpp:17 */
+/* First instantiated from: TypeIdInTemplateTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Foo<int>
 {
   

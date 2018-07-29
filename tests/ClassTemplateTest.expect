@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 template <typename T>
 class Foo{
 public:
@@ -6,8 +8,9 @@ public:
 protected:
     bool Mo() { return false; }
 };
-/* First instantiated from: ClassTemplateTest.cpp:10 */
+/* First instantiated from: ClassTemplateTest.cpp:12 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Foo<int>
 {
   

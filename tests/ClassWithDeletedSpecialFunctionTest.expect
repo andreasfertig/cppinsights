@@ -1,11 +1,14 @@
+#define INSIGHTS_USE_TEMPLATE
+
 template<typename T>
 class Foo {
 public:
     Foo() = delete;
     Foo(int){}
 };
-/* First instantiated from: ClassWithDeletedSpecialFunctionTest.cpp:10 */
+/* First instantiated from: ClassWithDeletedSpecialFunctionTest.cpp:12 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Foo<int>
 {
   

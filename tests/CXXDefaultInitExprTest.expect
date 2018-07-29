@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 template<typename T, bool array>
 class Alloc
 {
@@ -10,8 +12,9 @@ public:
     {
     }
 };
-/* First instantiated from: CXXDefaultInitExprTest.cpp:16 */
+/* First instantiated from: CXXDefaultInitExprTest.cpp:18 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Alloc<int, 0>
 {
   const int z;
@@ -33,8 +36,9 @@ class Alloc<int, 0>
 
 #endif
 
-/* First instantiated from: CXXDefaultInitExprTest.cpp:17 */
+/* First instantiated from: CXXDefaultInitExprTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 class Alloc<char, 1>
 {
   const int z;

@@ -1,3 +1,4 @@
+#define INSIGHTS_USE_TEMPLATE
 #include <map>
 #include <set>
 
@@ -6,7 +7,7 @@ template <typename T> void foo(T & t)
     auto it = t.find(42);
 }
 
-/* First instantiated from: AutoHandler2Test.cpp:14 */
+/* First instantiated from: AutoHandler2Test.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 void foo<std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > >(std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > & t)
@@ -16,7 +17,7 @@ void foo<std::map<int, int, std::less<int>, std::allocator<std::pair<const int, 
 #endif
 
 
-/* First instantiated from: AutoHandler2Test.cpp:15 */
+/* First instantiated from: AutoHandler2Test.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 void foo<std::set<int, std::less<int>, std::allocator<int> > >(std::set<int, std::less<int>, std::allocator<int> > & t)

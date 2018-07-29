@@ -1,6 +1,7 @@
 template<class... Ts> struct visitor: Ts... { using Ts::operator()...; };
 /* First instantiated from: VisitorTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE
+template<>
 struct visitor<__lambda_8_7, __lambda_9_7> : public __lambda_8_7, public __lambda_9_7
 {
   using visitor<__lambda_8_7, __lambda_9_7>::operator();
