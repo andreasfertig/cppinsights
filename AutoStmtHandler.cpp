@@ -17,6 +17,10 @@ using namespace clang;
 using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
 
+// XXX: recent clang source has a declType matcher. Try to figure out a migration path.
+const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType> myDecltypeType;
+//-----------------------------------------------------------------------------
+
 namespace clang::insights {
 
 AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
@@ -27,8 +31,8 @@ AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
         hasAncestor(varDecl(anyOf(hasType(autoType().bind("autoType")),
                                   hasType(qualType(hasDescendant(autoType().bind("autoType")))),
                                   /* decltype and decltype(auto) */
-                                  hasType(decltypeType().bind("dt")),
-                                  hasType(qualType(hasDescendant(decltypeType().bind("dt")))))));
+                                  hasType(myDecltypeType().bind("dt")),
+                                  hasType(qualType(hasDescendant(myDecltypeType().bind("dt")))))));
 
     matcher.addMatcher(varDecl(unless(anyOf(isExpansionInSystemHeader(),
                                             isMacroOrInvalidLocation(),
@@ -40,8 +44,8 @@ AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
                                      hasType(autoType().bind("autoType")),
                                      hasType(qualType(hasDescendant(autoType().bind("autoType")))),
                                      /* decltype and decltype(auto) */
-                                     hasType(decltypeType().bind("dt")),
-                                     hasType(qualType(hasDescendant(decltypeType().bind("dt"))))))
+                                     hasType(myDecltypeType().bind("dt")),
+                                     hasType(qualType(hasDescendant(myDecltypeType().bind("dt"))))))
                            .bind("autoDecl"),
                        this);
 }

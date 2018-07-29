@@ -20,18 +20,18 @@ matrix:
     compiler: clang
       
     # Linux Clang Build
-#  - os: linux
-#    compiler: clang
-#    addons:
-#      apt:
-#        sources: *all_sources
-#        packages:
-#        - clang-7
-#        - libstdc++-6-dev
-#        - llvm-7-dev
-#        - libclang-7-dev
-#        - zlib1g-dev
-#    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG='/usr/bin/llvm-config-7'  COVERAGE='No' STATIC='No' DEBUG='No'
+  - os: linux
+    compiler: clang
+    addons:
+      apt:
+        sources: *all_sources
+        packages:
+        - clang-7
+        - libstdc++-7-dev
+        - llvm-7-dev
+        - libclang-7-dev
+        - zlib1g-dev
+    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG='/usr/bin/llvm-config-7'  COVERAGE='No' STATIC='No' DEBUG='No'
 
   # Linux g++ Build
   - os: linux
