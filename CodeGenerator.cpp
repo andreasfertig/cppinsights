@@ -1906,7 +1906,8 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
     switch(arg.getKind()) {
         case TemplateArgument::Type: mOutputFormatHelper.Append(GetName(arg.getAsType())); break;
         case TemplateArgument::Declaration:
-            mOutputFormatHelper.Append(GetNameAsFunctionPointer(arg.getAsDecl()->getType()));
+            // TODO: handle pointers
+            mOutputFormatHelper.Append("&", arg.getAsDecl()->getQualifiedNameAsString());
             break;
         case TemplateArgument::NullPtr: mOutputFormatHelper.Append(GetName(arg.getNullPtrType())); break;
         case TemplateArgument::Integral: mOutputFormatHelper.Append(arg.getAsIntegral()); break;

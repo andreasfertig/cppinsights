@@ -1,0 +1,56 @@
+#define INSIGHTS_USE_TEMPLATE
+
+#include <map>
+
+struct Person {
+    int age;
+    inline int yob() const
+    {
+      return 2018 - this->age;
+    }
+    
+};
+
+template<typename Key, typename POD>
+Key extractKey(Key POD::* pMember);
+template<typename Key, typename POD>
+POD extractPOD(Key POD::* pMember);
+
+template<auto pMember>
+using Key_t = decltype(extractKey(pMember));
+
+template<auto pMember>
+using POD_t = decltype(extractPOD(pMember));
+
+template<auto pmember>
+struct Index {
+  using Key = Key_t<pmember>;
+  using POD = POD_t<pmember>;  
+
+  std::map<Key, int> data;
+  static Key extractKey(POD const& pod) {
+    return pod.*pmember;
+  }
+};
+/* First instantiated from: Issue60.cpp:34 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Index<&Person::age>
+{
+  using Key = Key_t<&Person::age>;
+  using POD = POD_t<&Person::age>;
+  std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > data;
+  static inline Index<&Person::age>::Key extractKey(const Index<&Person::age>::POD & pod);
+  
+  inline Index(const Index<&Person::age> &) = default;
+  inline Index(Index<&Person::age> &&) = default;
+  inline Index<&Person::age> & operator=(Index<&Person::age> &&) = default;
+  inline Index() noexcept = default;
+  inline ~Index() noexcept = default;
+  
+};
+
+#endif
+
+
+Index<&Person::age> myAgeIndex;
