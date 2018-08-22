@@ -70,7 +70,7 @@ void foo2()
   /* First instantiated from: TemplateExpansionTest.cpp:45 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  class testDecl<int (*)()>
+  class testDecl<&foo>
   {
     
   };
