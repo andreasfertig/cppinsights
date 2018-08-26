@@ -1,7 +1,10 @@
+![cpp insights logo](artwork/logo_cppinsights.png)
 # C++ Insights - See your source code with the eyes of a compiler.
+
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://github.com/andreasfertig/cppinsights/releases) [![Build Status](https://api.travis-ci.org/andreasfertig/cppinsights.svg?branch=master)](https://travis-ci.org/andreasfertig/cppinsights) 
 [![codecov](https://codecov.io/gh/andreasfertig/cppinsights/branch/master/graph/badge.svg)](https://codecov.io/gh/andreasfertig/cppinsights)
 [![Try online](https://img.shields.io/badge/try-online-blue.svg)](https://cppinsights.io)
+[![patreon](https://img.shields.io/badge/patreon-support-orange.svg)](https://www.patreon.com/cppinsights)
 
 ## Contents
 
@@ -9,6 +12,7 @@
 - [Why](#why)
 - [Building](#building)
 - [Usage](#usage)
+- [Support](#support)
 
 
 ## What
@@ -77,7 +81,7 @@ quite satisfying for me.
 
 I started to write a clang-based tool able to transform a range-based for-loop into the compiler-internal version. Then, I did the same 
 for structured bindings and lambdas. In the end, I ended up with doing a lot more as initially planned. It shows where operators are 
-invoked, places in which the compiler does some casting. C++ Insights is able to deduce the type behind auto or decltype. The goal 
+invoked, places in which the compiler does some casting. C++ Insights is able to deduce the type behind `auto` or `decltype`. The goal 
 is to produce compilable code. However, this is not possible in all places.
 
 Still, there is work to do.
@@ -121,7 +125,7 @@ Then build clang as you normally do.
 
 ### cmake options
 
-There are a couple of options which can be enable with cmake:
+There are a couple of options which can be enable with [!cmake](https://cmake.org):
 
 | Option            | Description                | Default |
 |-------------------|:---------------------------| --------|
@@ -152,7 +156,7 @@ insights <YOUR_CPP_FILE> -- -std=c++17
 ```
 
 Things get complicate with when it comes to the system include paths. There are path hard-coded in the binary which seem
-to come from the compiler C++ Insights was build with. To help with that check out `scripts/getinclude.py`. It tries to
+to come from the compiler C++ Insights was build with. To help with that check out [scripts/getinclude.py](scripts/getinclude.py). It tries to
 collect the system include paths from the compiler. Without an option it uses `g++`, you can also pass another compiler
 as a first argument.
 
@@ -173,3 +177,7 @@ insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
 There is also another github project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
+
+## Support
+
+If you like to support the project consider submitting a patch. Another alternative is to become a [Patreon](https://www.patreon.com/cppinsights) supporter.
