@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "AutoStmtHandler.h"
+#include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
@@ -55,7 +56,7 @@ void AutoStmtHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* autoDecl = result.Nodes.getNodeAs<VarDecl>("autoDecl")) {
         const auto&        sm       = GetSM(result);
-        const auto         columnNr = sm.getSpellingColumnNumber(autoDecl->getLocStart()) - 1;
+        const auto         columnNr = sm.getSpellingColumnNumber(GetBeginLoc(autoDecl)) - 1;
         OutputFormatHelper outputFormatHelper{columnNr};
         CodeGenerator      codeGenerator{outputFormatHelper};
         codeGenerator.InsertArg(autoDecl);

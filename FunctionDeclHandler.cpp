@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "FunctionDeclHandler.h"
+#include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "DPrint.h"
 #include "InsightsHelpers.h"
@@ -53,7 +54,7 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
 void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* funcDecl = result.Nodes.getNodeAs<FunctionDecl>("funcDecl")) {
-        const auto         columnNr = GetSM(result).getSpellingColumnNumber(funcDecl->getLocStart()) - 1;
+        const auto         columnNr = GetSM(result).getSpellingColumnNumber(GetBeginLoc(funcDecl)) - 1;
         OutputFormatHelper outputFormatHelper{columnNr};
         CodeGenerator      codeGenerator{outputFormatHelper};
 
@@ -80,7 +81,7 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
             }
         }
 
-        const auto         columnNr = GetSM(result).getSpellingColumnNumber(friendDecl->getLocStart()) - 1;
+        const auto         columnNr = GetSM(result).getSpellingColumnNumber(GetBeginLoc(friendDecl)) - 1;
         OutputFormatHelper outputFormatHelper{columnNr};
         CodeGenerator      codeGenerator{outputFormatHelper};
 

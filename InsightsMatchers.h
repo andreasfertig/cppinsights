@@ -11,6 +11,7 @@
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 
+#include "ClangCompat.h"
 #include "InsightsHelpers.h"
 //-----------------------------------------------------------------------------
 
@@ -73,7 +74,8 @@ AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPE
 {
     SILENCE;
 
-    return (insights::IsMacroLocation(Node.getLocStart()) || insights::IsInvalidLocation(Node.getLocStart()));
+    return (insights::IsMacroLocation(insights::GetBeginLoc(Node)) ||
+            insights::IsInvalidLocation(insights::GetBeginLoc(Node)));
 }
 
 }  // namespace ast_matchers
