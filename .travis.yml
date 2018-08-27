@@ -26,12 +26,12 @@ matrix:
       apt:
         sources: *all_sources
         packages:
-        - clang-7
+        - clang-8
         - libstdc++-7-dev
-        - llvm-7-dev
-        - libclang-7-dev
+        - llvm-8-dev
+        - libclang-8-dev
         - zlib1g-dev
-    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG='/usr/bin/llvm-config-7'  COVERAGE='No' STATIC='No' DEBUG='No'
+    env: COMPILER='clang++-8' COMPILER_CC='clang-8' LLVM_CONFIG='/usr/bin/llvm-config-8'  COVERAGE='No' STATIC='No' DEBUG='No'
 
   # Linux g++ Build
   - os: linux
@@ -41,12 +41,12 @@ matrix:
         sources: *all_sources
         packages:
         - g++-8
-        - clang-7
+        - clang-8
         - libc++-dev
-        - llvm-7-dev
-        - libclang-7-dev
+        - llvm-8-dev
+        - libclang-8-dev
         - zlib1g-dev
-    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7' COVERAGE='No' STATIC='No' DEBUG='No'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No'
 
   # Debug build
   - os: linux
@@ -56,12 +56,12 @@ matrix:
         sources: *all_sources
         packages:
         - g++-8
-        - clang-7
+        - clang-8
         - libc++-dev
-        - llvm-7-dev
-        - libclang-7-dev
+        - llvm-8-dev
+        - libclang-8-dev
         - zlib1g-dev
-    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-7' COVERAGE='No' STATIC='No' DEBUG='Yes'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='Yes'
 
     # Linux Clang Coverage Build
   - os: linux
@@ -71,13 +71,13 @@ matrix:
         sources: *all_sources
         packages:
         - g++-7
-        - clang-7
+        - clang-8
         - libstdc++-6-dev
-        - llvm-7-dev
-        - libclang-7-dev
+        - llvm-8-dev
+        - libclang-8-dev
         - zlib1g-dev
         - lcov
-    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG='/usr/bin/llvm-config-7' STATIC='No' COVERAGE='Yes' DEBUG='No'
+    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG='/usr/bin/llvm-config-8' STATIC='No' COVERAGE='Yes' DEBUG='No'
 
     # Clang 6.0 deployment
   - os: linux

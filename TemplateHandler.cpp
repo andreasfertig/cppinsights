@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "TemplateHandler.h"
+#include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
@@ -61,7 +62,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         outputFormatHelper.AppendNewLine("#endif");
 
         const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
-        const auto  endOfCond   = FindLocationAfterToken(clsTmplDecl->getLocEnd(), tok::semi, result);
+        const auto  endOfCond   = FindLocationAfterToken(GetEndLoc(clsTmplDecl), tok::semi, result);
 
         mRewrite.InsertText(endOfCond, outputFormatHelper.GetString(), true, true);
     }
@@ -90,7 +91,7 @@ void TemplateHandler::InsertInstantiatedTemplate(const FunctionDecl& funcDecl, c
         outputFormatHelper.AppendNewLine();
         outputFormatHelper.AppendNewLine("#endif");
 
-        const auto endOfCond = FindLocationAfterToken(funcDecl.getLocEnd(), tok::semi, result);
+        const auto endOfCond = FindLocationAfterToken(GetEndLoc(funcDecl), tok::semi, result);
 
         mRewrite.InsertText(endOfCond.getLocWithOffset(1), outputFormatHelper.GetString(), true, true);
     }

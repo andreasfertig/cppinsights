@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "InsightsHelpers.h"
+#include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "DPrint.h"
 #include "InsightsStaticStrings.h"
@@ -116,8 +117,9 @@ std::string GetLambdaName(const CXXRecordDecl& lambda)
 {
     static const std::string lambdaPrefix{"__lambda_"};
     const auto&              sm       = GetSM(lambda);
-    const auto               lineNo   = sm.getSpellingLineNumber(lambda.getLocStart());
-    const auto               columnNo = sm.getSpellingColumnNumber(lambda.getLocStart());
+    const auto               locBegin = GetBeginLoc(lambda);
+    const auto               lineNo   = sm.getSpellingLineNumber(locBegin);
+    const auto               columnNo = sm.getSpellingColumnNumber(locBegin);
 
     return StrCat(lambdaPrefix, std::to_string(lineNo), "_", std::to_string(columnNo));
 }

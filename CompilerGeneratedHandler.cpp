@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "CompilerGeneratedHandler.h"
+#include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
@@ -46,7 +47,7 @@ void CompilerGeneratedHandler::run(const MatchFinder::MatchResult& result)
 
         // add all compiler generated methods at the end of the class
         const auto* recrodDecl = result.Nodes.getNodeAs<CXXRecordDecl>("record");
-        const auto  loc        = recrodDecl->getLocEnd();
+        const auto  loc        = GetEndLoc(recrodDecl);
 
         mRewrite.InsertText(loc, outputFormatHelper.GetString(), true, true);
     }

@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "CodeGenerator.h"
+#include "ClangCompat.h"
 #include "DPrint.h"
 #include "InsightsBase.h"
 #include "InsightsMatchers.h"
@@ -495,7 +496,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
     const std::string tmpVarName = [&]() {
         if(declName && declName->getDecl()) {
-            return BuildInternalVarName(baseVarName, decompositionDeclStmt->getLocStart(), GetSM(*declName->getDecl()));
+            return BuildInternalVarName(baseVarName, GetBeginLoc(decompositionDeclStmt), GetSM(*declName->getDecl()));
         }
 
         return BuildInternalVarName(baseVarName);
