@@ -1,0 +1,31 @@
+#include <string>
+
+void func(const std::basic_string<char> & arg)
+{
+      
+  class __lambda_5_11
+  {
+    public: inline /*constexpr */ unsigned long operator()() const
+    {
+      return arg.size();
+    }
+    
+    private:
+    const std::basic_string<char> arg;
+    
+    public: __lambda_5_11(const std::basic_string<char> & _arg)
+    : arg{_arg}
+    {}
+    
+  } __lambda_5_11{arg};
+  
+  unsigned long s = __lambda_5_11.operator()();
+}
+
+
+int main()
+{
+  std::string b = std::basic_string<char>();
+  func(b);
+}
+
