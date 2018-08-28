@@ -1,0 +1,27 @@
+#include <cstdio>
+
+int main()
+{
+  int x = 22;
+      
+  class __lambda_7_14
+  {
+    public: inline /*constexpr */ int operator()()
+    {
+      ++x;
+      return x;
+    }
+    
+    private:
+    int x;
+    
+    public: __lambda_7_14(int _x)
+    : x{_x}
+    {}
+    
+  } __lambda_7_14{x};
+  
+  int z = __lambda_7_14.operator()();
+  printf("x: %d z: %d\n", x, z);
+}
+

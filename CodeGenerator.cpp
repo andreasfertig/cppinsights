@@ -2143,6 +2143,19 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
             return capturedVar->getType();
         }();
 
+        const auto& clsVarType = [&]() {
+            const auto type = (c.capturesThis()) ? captureInit->getType() : capturedVar->getType();
+
+            // http://eel.is/c++draft/expr.prim.lambda#capture-10 states, that implicitly captured variables are
+            // captured by copied. This also applies for named captures which are not prefixed with an ampersand. The
+            // clang internal type carries the ampersand, which is stripped in the following statement.
+            if((LCK_ByCopy == c.getCaptureKind()) && type->isLValueReferenceType()) {
+                return type->getPointeeType();
+            }
+
+            return type;
+        }();
+
         const std::string varNamePlain = [&]() {
             if(c.capturesThis()) {
                 return std::string{"this"};
@@ -2161,7 +2174,7 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
             return varNamePlain;
         }();
 
-        const std::string varTypeName     = GetCaptureTypeNameAsParameter(varType, varNamePlain);
+        const std::string varTypeName     = GetCaptureTypeNameAsParameter(clsVarType, varNamePlain);
         const std::string ctorVarTypeName = GetCaptureTypeNameAsParameter(varType, StrCat("_", varNamePlain));
 
         DPrint("%s\n", varTypeName);
