@@ -8,6 +8,9 @@ option(DEBUG             "Enable debug"              OFF)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
+set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 6)
+set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
+
 if(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder
   set(BUILD_INSIGHTS_OUTSIDE_LLVM 1)
 endif()
@@ -179,6 +182,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
 
     message(STATUS "Git repo url: ${GIT_REPO_URL}")
     message(STATUS "Git commit hash: ${GIT_COMMIT_HASH}")
+    message(STATUS "Min LLVM major version: ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}")
     message(STATUS "Generating version.h")
 
     configure_file(
@@ -242,8 +246,6 @@ elseif(NOT DEFINED LLVM_PACKAGE_VERSION)
     set(LLVM_PACKAGE_VERSION "${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}.${LLVM_VERSION_PATCH}")
 
 endif()
-
-set(INSIGHTS_MIN_LLVM_VERSION 6.0)
 
 # minimum clang version
 if (${LLVM_PACKAGE_VERSION} VERSION_LESS ${INSIGHTS_MIN_LLVM_VERSION})

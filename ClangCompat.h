@@ -10,61 +10,64 @@
 //-----------------------------------------------------------------------------
 
 #include <clang/Basic/Version.h>
+#include "version.h"
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
 
-#if CLANG_VERSION_MAJOR <= 7
-template<typename T>
-auto inline GetBeginLoc(const T& decl) -> decltype(decl.getLocStart())
+template<unsigned int MAJOR>
+struct IsClangNewerThan
 {
-    return decl.getLocStart();
-}
+    static_assert(INSIGHTS_MIN_LLVM_MAJOR_VERSION < MAJOR, "Remove this function, all clang versions support it now");
+    constexpr static inline bool value{CLANG_VERSION_MAJOR > MAJOR};
+};
+//-----------------------------------------------------------------------------
+
+inline constexpr bool IsClangNewerThan7 = IsClangNewerThan<7>::value;
+//-----------------------------------------------------------------------------
 
 template<typename T>
-auto inline GetBeginLoc(const T* decl) -> decltype(decl->getLocStart())
+auto inline GetBeginLoc(const T& decl)
 {
-    return decl->getLocStart();
+    if constexpr(IsClangNewerThan7) {
+        return decl.getBeginLoc();
+    } else {
+        return decl.getLocStart();
+    }
 }
+//-----------------------------------------------------------------------------
 
 template<typename T>
-auto inline GetEndLoc(const T& decl) -> decltype(decl.getLocEnd())
+auto inline GetBeginLoc(const T* decl)
 {
-    return decl.getLocEnd();
+    if constexpr(IsClangNewerThan7) {
+        return decl->getBeginLoc();
+    } else {
+        return decl->getLocStart();
+    }
 }
+//-----------------------------------------------------------------------------
 
 template<typename T>
-auto inline GetEndLoc(const T* decl) -> decltype(decl->getLocEnd())
+auto inline GetEndLoc(const T& decl)
 {
-    return decl->getLocEnd();
+    if constexpr(IsClangNewerThan7) {
+        return decl.getEndLoc();
+    } else {
+        return decl.getLocEnd();
+    }
 }
-
-#else
-template<typename T>
-auto inline GetBeginLoc(const T& decl) -> decltype(decl.getBeginLoc())
-{
-    return decl.getBeginLoc();
-}
+//-----------------------------------------------------------------------------
 
 template<typename T>
-auto inline GetBeginLoc(const T* decl) -> decltype(decl->getBeginLoc())
+auto inline GetEndLoc(const T* decl)
 {
-    return decl->getBeginLoc();
+    if constexpr(IsClangNewerThan7) {
+        return decl->getEndLoc();
+    } else {
+        return decl->getLocEnd();
+    }
 }
-
-template<typename T>
-auto inline GetEndLoc(const T& decl) -> decltype(decl.getEndLoc())
-{
-    return decl.getEndLoc();
-}
-
-template<typename T>
-auto inline GetEndLoc(const T* decl) -> decltype(decl->getEndLoc())
-{
-    return decl->getEndLoc();
-}
-
-#endif
 //-----------------------------------------------------------------------------
 
 }  // namespace clang::insights
