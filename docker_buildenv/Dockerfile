@@ -11,7 +11,7 @@ RUN echo "deb http://apt.llvm.org/stretch/ llvm-toolchain-stretch main" >> /etc/
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends llvm-7-dev libclang-7-dev libc++-dev zlib1g-dev clang-7 bzip2 unzip && \
+    apt-get install -y --no-install-recommends llvm-8-dev libclang-8-dev libc++-dev zlib1g-dev bzip2 unzip && \
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
@@ -32,7 +32,7 @@ RUN useradd builder \
     && mkdir /home/builder/clang \
     && chown -R builder:builder /home/builder
 
-RUN ln -s /usr/bin/llvm-config-7 /usr/bin/llvm-config
+RUN ln -s /usr/bin/llvm-config-8 /usr/bin/llvm-config
 
 #RUN update-alternatives --install /usr/bin/g++ c++ /usr/bin/g++-8 10
 ##RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
