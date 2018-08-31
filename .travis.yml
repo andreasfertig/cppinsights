@@ -83,6 +83,8 @@ matrix:
         - clang-6.0
         - llvm-6.0-dev
         - libclang-6.0-dev
+        - doxygen
+        - graphviz
       ssh_known_hosts: cppinsights.io
     env: COMPILER='clang++-6.0' COMPILER_CC='clang-6.0' LLVM_CONFIG='/usr/bin/llvm-config-6.0' COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes'
 
@@ -124,6 +126,10 @@ script:
     make tests
   fi  
 - |
+  if [[ "${DEPLOY}" == "Yes" ]]; then
+    make doc
+  fi
+- |
   if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
       export GZ_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-macos.tar.gz
   fi
@@ -164,15 +170,27 @@ before_deploy:
 - tar -cjf $TRAVIS_BUILD_DIR/build/include-clang.tar.bz2 /usr/lib/llvm-6.0/lib/clang/6.0.1/include
   
 deploy:
-  provider: script
+- provider: script
   skip_cleanup: true
   script: scp $TRAVIS_BUILD_DIR/build/insights ${SCP_CRED} && scp $TRAVIS_BUILD_DIR/build/include*.tar.bz2 ${SCP_CRED}
   on:
     branch: master
     condition: $DEPLOY = Yes
+- provider: pages
+  skip-cleanup: true
+  keep-history: true
+  local-dir: build/html
+  github-token: $GITHUB_TOKEN
+  repo: andreasfertig/andreasfertig.github.io
+  target-branch: master
+  on:
+    branch: master
+    condition: $DEPLOY = Yes
+#
 env:
   global:
   - LLVM_CONFIG_CURRENT='/usr/bin/llvm-config-8'
   - secure: MI6S+9up0JKkDxrW7b248Ro7auyyVogdwSj/UsTLNTKMBwNOaK4HccDNif6K2qAJmTlGt1xFHh0cHXvTkACcUc8hvZghJVGUOOCaWK9YvwR8wwQgoFi034BjG/Tg7Uj6WX6G65mv0UVv/2dxZRghDTujCnFiZOoSpApBvqFjQ/gamP7P+vjJiWQVJWJTOhYHz/oK6jQHMMlNeRJbzZhp/kgo7LPtdGZVT95+S6Xn3rHIuj5pJdgwYf/NFckWI9rkkkqn47XqYozGf5HHnBlcZEDCdGEQzI8HDngRC5mjejEMCKd2mBJP319xO8UDesplpabzZhAqucskKynVK9lqFlHtdYn7dvSLXHUF9oPAWoMckxDmNIBqarEy5kYZG+ccRm4xmP2V7JAfGpW7HAtLycXEHs5Fxf839IfyTHMIp6fF+a/t2M6SE/m4rZ3Ser7Y09EAeGqUKgvc/YQwkSSdrRxE1bMIfHES6/IRdSMGkAOa1U74ulqN3FzdfKX2Ng93EZ15zXiHqipljmlPDiC8BFXG3VEbFMubKBuvB8c5KjlpwuU5Udk9cehGWDLDcKi0K7PZpZ1p2l1aU17y8QxFEcOUw6Q/nYbZ9gEf7eF5DrpycSyv6xpGyYq59LrL5m5/XUAQ9ZLN+92rQlMXZqRncMll2ZJX5Tzb+PeO8P1y7mA=
   - secure: CFbIrswqs8U7pCMnF57QrC/KgNlybr5SNFlKE9BHA9I9WXcjLBGm3tv9JM7TvzwD5ivhe9P/MVcc1ROaTSPVRSdOI9aQuNBauDYoab1OrlO0SFnHjr6tKzvw9P+wnfuyawhH8vm6m/cdyyIKagFUKtFSKUnpLeakTEUUG6O9IBLHzBa0BTqlmviV9OjDUjD61adUSWVWe96T6A/tlGyFAWAYuAU1jvGN9HSE06mFlGC0NmbT25kq/8SGv9+9KoGgXNFB6lsQ6C5C3cWIlsaO0EtTnLGa2IfSZk4lg4CzZ97CGcraH5avrG5guSDWUGZEe8a+rxA42SvrhKVRDhu3qz0agH1BlXi+0q7k8oS7wAaRG63sjyD0DtFlA783bQmdLXh/BY5rz1FsqV9rr8qVdfo+5cVfW6sOZLrNeyF8OcxWAln5SNiuLpAb2cYTGNJ15J0KLynYBL/6e3Qe6gsUS4BIHFORr9dHMXA3TBnqEIo4hzJwnGNDixs7rLXCmdX3uxsAHUJEtSxm63AiCNvZhWq6Lm+Lf1CKQ9mNRzUT3IQGwuhCmv6XFR/ZTCFCiXwwC6lTy1ItC6c/90quMZpdxTcUVts6JmMI6i86bJgKrx4dzHpZmYkQ4D+r9LpqAOm1IgDlACZnCIjgHbTh6VOjNpU3jonzN1mHNxDP8Ezgjss=
+  - secure: g6rm6GwWwbMe70xa25WHNvZ5NepGwda9F2e3R9iIr+EUTT/1zvZATTJfeNxt6YSCUKrxkRgO7MchjpngmVeP2bIC/0XCiiCfb46ENcINCRHxQ7jHmKIxDJypUK6rTiqsleprfGLFJ9jBUj4nEUzu0+N6EPC0hAzM5WeCZxitOifzPrs9L8/ATGJ2xvpazgkrVs0+Onv6Zn2O8XsoVaYZpUXHGIqXpZWTAyUnvRG3z/LInU7dyoiSgnoEAlruXUf+OuOAKOmiIaLBBsnyXsR2cS/kXcoQZNeTmxMjyguhC3c77OJxQ0dzJgN3pWznMNZ+Va5cetpM+P8wyeqXaVTxlLwCuj0KB8gsGKDfzHno8MHcbw71eV3/9laVmxZyOAQgeQVEj8vuclcaFIvbPMUtCGahlgPCr1l8gTVrgzdtJyEK0nf/Tk0LBS+5gvHg1aYIg6G9iqvX4oodJ8mH5RCTibWP/yOP65B5MmU/FNHFmeM4qREPWiclE351SrsraSUZ9H2onoaLBnDnNiHrr9OWaKD6BEKh66MxKS1u+Gi3Bb/xhK86JXtfq4K6OiQggbBPk/JPczn07czssAesu/gnMMuXSbkJc0m1YMBt0PtUoX4/bzTgTw485wVkBxeQYby7Q+7/vc5HKjl7OQqE73kctXWlhCuTzdF1wvcALu5oF78=
 

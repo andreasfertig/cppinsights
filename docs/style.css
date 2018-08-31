@@ -1,0 +1,1104 @@
+/**
+ * Qt like CSS for doxygen based on 1.8.6
+ *
+ * Frank Enderle <frank.enderle@anamica.de>
+ */
+
+body, table, div, p, dl {
+  font: 400 13px/1.3 Verdana,DejaVu Sans,Geneva,sans-serif;
+}
+
+/* @group Heading Levels */
+
+h1.groupheader {
+  font-size: 16px;
+}
+
+.title {
+  font: 700 18px Verdana,DejaVu Sans,Geneva,sans-serif;
+  margin: 10px 2px;
+}
+
+h2.groupheader {
+  border: 0;
+  color: #363534;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+h3.groupheader {
+  font-size: 13px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+
+h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
+  text-shadow: none;
+}
+
+dt {
+}
+
+div.multicol {
+}
+
+p.startli, p.startdd {
+}
+
+p.starttd {
+}
+
+p.endli {
+}
+
+p.enddd {
+}
+
+p.endtd {
+}
+
+/* @end */
+
+caption {
+}
+
+span.legend {
+}
+
+h3.version {
+}
+
+div.qindex, div.navtab {
+  background-color: #F6F6F6;
+  border: 1px solid #E6E6E6;
+}
+
+div.qindex, div.navpath {
+  line-height: 1.5;
+}
+
+div.navtab {
+}
+
+/* @group Link Styling */
+
+a {
+  color: #2980b9;
+}
+
+.contents a:visited {
+  color: #2980b9;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a.qindex {
+}
+
+a.qindexHL {
+}
+
+.contents a.qindexHL:visited {
+}
+
+a.el {
+  font-weight: normal;
+}
+
+a.elRef {
+}
+
+a.code, a.code:visited, a.line, a.line:visited {
+  color: #2980b9;
+}
+
+a.codeRef, a.codeRef:visited, a.lineRef, a.lineRef:visited {
+  color: #2980b9;
+}
+
+/* @end */
+
+dl.el {
+}
+
+pre.fragment {
+}
+
+div.fragment {
+    background-color: initial;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+div.line {
+  -webkit-transition-duration: 0;
+  -moz-transition-duration: 0;
+  -ms-transition-duration: 0;
+  -o-transition-duration: 0;
+  transition-duration: 0;
+}
+
+div.line.glow {
+  background-color: auto;
+  box-shadow: none;
+}
+
+span.lineno {
+    padding-right: 4px;
+    text-align: right;
+    color: rgba(27,31,35,0.3);
+    border-right: none;
+    background-color: initial;
+    white-space: pre;
+}
+
+span.lineno a {
+}
+
+span.lineno a:hover {
+}
+
+div.ah {
+  background: none;
+  background-color: #F6F6F6;
+  color: #66666E;
+  border: 1px solid #E6E6E6;
+  border-radius: 7px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+}
+
+div.groupHeader {
+}
+
+div.groupText {
+}
+
+body {
+  color: #363534;
+}
+
+div.contents {
+}
+
+td.indexkey {
+}
+
+td.indexvalue {
+}
+
+tr.memlist {
+}
+
+p.formulaDsp {
+}
+
+img.formulaDsp {
+}
+
+img.formulaInl {
+}
+
+div.center {
+}
+
+div.center img {
+}
+
+address.footer {
+}
+
+img.footer {
+  display: none;
+}
+
+/* addition */
+.footer a:before {
+  content: "Doxygen";
+}
+/* --- */
+
+/* @group Code Colorization */
+
+span.keyword {
+}
+
+span.keywordtype {
+}
+
+span.keywordflow {
+}
+
+span.comment {
+}
+
+span.preprocessor {
+}
+
+span.stringliteral {
+}
+
+span.charliteral {
+}
+
+span.vhdldigit {
+}
+
+span.vhdlchar {
+}
+
+span.vhdlkeyword {
+}
+
+span.vhdllogic {
+}
+
+blockquote {
+}
+
+/* @end */
+
+.search {
+}
+
+form.search {
+}
+
+input.search {
+}
+
+td.tiny {
+}
+
+.dirtab {
+}
+
+th.dirtab {
+}
+
+hr {
+  border-top: 1px solid #E6E6E6;
+  margin: 10px 8px 0 12px;
+}
+
+hr.footer {
+}
+
+/* @group Member Descriptions */
+
+table.memberdecls {
+  font-size: 13px;
+}
+
+/* addition */
+
+table.memberdecls a {
+  font-weight: 600;
+}
+
+table.memberdecls .memItemLeft {
+  border: solid #E6E6E6;
+  border-width: 0 0 0 1px;
+}
+
+table.memberdecls .memItemRight {
+  border: solid #E6E6E6;
+  border-width: 0 1px 0 0;
+}
+
+table.memberdecls tr:nth-child(2) .memItemLeft {
+  border-top-width: 1px;
+  border-top-left-radius: 7px;
+  padding-top: 6px;
+}
+
+table.memberdecls tr:nth-child(2) .memItemRight {
+  border-top-width: 1px;
+  border-top-right-radius: 7px;
+  padding-top: 6px;
+}
+
+table.memberdecls tr:nth-last-child(2) .memItemLeft {
+  border-bottom-width: 1px;
+  border-bottom-left-radius: 7px;
+  padding-bottom: 6px;
+}
+
+table.memberdecls tr:nth-last-child(2) .memItemRight {
+  border-bottom-width: 1px;
+  border-bottom-right-radius: 7px;
+  padding-bottom: 6px;
+}
+
+/* --- */
+
+.memberdecls td, .fieldtable tr {
+  -webkit-transition-duration: 0;
+  -moz-transition-duration: 0;
+  -ms-transition-duration: 0;
+  -o-transition-duration: 0;
+  transition-duration: 0;
+}
+
+.memberdecls td.glow, .fieldtable tr.glow {
+  background-color: auto;
+  box-shadow: 0;
+}
+
+.mdescLeft, .mdescRight,
+.memItemLeft, .memItemRight,
+.memTemplItemLeft, .memTemplItemRight, .memTemplParams {
+  width: auto;
+  background-color: #F6F6F6;
+}
+
+.mdescLeft, .mdescRight {
+}
+
+/* addition */
+.mdescLeft {
+  padding: 3px 10px 3px 15px;
+}
+
+.mdescRight {
+  padding: 3px 15px 3px 10px;
+}
+/* --- */
+
+.memSeparator {
+  display: none;
+}
+
+.memItemLeft, .memTemplItemLeft {
+}
+
+.memItemRight {
+  padding-right: 8px;
+}
+
+.memTemplParams {
+}
+
+/* @end */
+
+/* @group Member Details */
+
+/* Styles for detailed member documentation */
+
+.memtemplate {
+}
+
+.memnav {
+}
+
+.mempage {
+}
+
+.memitem {
+  margin-bottom: 20px;
+  -webkit-transition-duration: 0;
+  -moz-transition-duration: 0;
+  -ms-transition-duration: 0;
+  -o-transition-duration: 0;
+  transition-duration: 0;
+}
+
+.memitem.glow {
+  box-shadow: none;
+}
+
+.memname {
+  font-size: 13px;
+}
+
+.memname td {
+}
+
+.memproto, dl.reflist dt {
+  border: 1px solid #E6E6E6;
+  padding: 5px 10px;
+  color: #363534;
+  text-shadow: none;
+  background: none;
+  background-color: #F6F6F6;
+  box-shadow: none;
+  border-radius: 7px;
+  -moz-box-shadow: none;
+  -moz-border-radius: 7px;
+  -webkit-box-shadow: none;
+  -webkit-border-radius: 7px;
+}
+
+/* additional */
+.memproto .memname {
+  font-weight: bold;
+}
+
+.memproto .memname a {
+  font-weight: bold;
+}
+/* --- */
+
+.memdoc, dl.reflist dd {
+  border: 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  -moz-border-radius: 0;
+  -moz-box-shadow: none;
+  -webkit-border-radius: 0;
+  -webkit-box-shadow: none;
+}
+
+dl.reflist dt {
+}
+
+dl.reflist dd {
+}
+
+.paramkey {
+}
+
+.paramtype {
+}
+
+.paramname {
+  color: #363534;
+}
+
+.paramname em {
+}
+
+.paramname code {
+}
+
+.params, .retval, .exception, .tparams {
+}
+
+.params .paramname, .retval .paramname {
+}
+
+.params .paramtype {
+}
+
+.params .paramdir {
+}
+
+.mlabels {
+}
+
+td.mlabels-left {
+}
+
+td.mlabels-right {
+}
+
+span.mlabels {
+}
+
+span.mlabel {
+  background-color: #E6E6E6;
+  border: 0;
+  color: #66666E;
+  padding: 4px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* @end */
+
+/* these are for tree view when not used as main index */
+
+div.directory {
+  border: none;
+}
+
+.directory table {
+}
+
+.directory td {
+}
+
+.directory td.entry {
+}
+
+.directory td.entry a {
+  font-weight: bold;
+}
+
+.directory td.entry a img {
+}
+
+.directory td.desc {
+  border-color: #E6E6E6;
+}
+
+.directory tr.even {
+  background: none;
+}
+
+.directory img {
+  vertical-align: -30%;
+}
+
+.directory .levels {
+}
+
+.directory .levels span {
+}
+
+div.dynheader {
+}
+
+address {
+}
+
+table.doxtable {
+}
+
+table.doxtable td, table.doxtable th {
+  border: 1px solid #E6E6E6;
+}
+
+table.doxtable th {
+  background-color: #F6F6F6;
+  color: #66666E;
+  font-size: 13px;
+}
+
+table.fieldtable {
+  padding: 5px 10px;
+  border: 1px solid #E6E6E6;
+  background-color: #F6F6F6;
+  box-shadow: none;
+  border-radius: 7px;
+  -moz-box-shadow: none;
+  -moz-border-radius: 7px;
+  -webkit-box-shadow: none;
+  -webkit-border-radius: 7px;
+}
+
+.fieldtable td, .fieldtable th {
+}
+
+.fieldtable td.fieldtype, .fieldtable td.fieldname {
+  border: 0;
+}
+
+.fieldtable td.fieldname {
+  font-size: 13px;
+}
+
+/* additional */
+.fieldtable td.fieldname em {
+  font-style: normal;
+}
+/* --- */
+
+.fieldtable td.fielddoc {
+  border: 0;
+  font-size: 13px;
+}
+
+/* additional */
+.fieldtable td.fielddoc * {
+  font-size: 13px;
+}
+/* --- */
+
+.fieldtable td.fielddoc p:first-child {
+  margin: auto;
+}
+
+.fieldtable td.fielddoc p:last-child {
+  margin: auto;
+}
+
+.fieldtable tr:last-child td {
+}
+
+.fieldtable th {
+  background: none;
+  background-color: #E6E6E6;
+  font-size: 13px;
+  font-weight: normal;
+  color: #363534;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border: 0;
+}
+
+.tabsearch {
+}
+
+.navpath ul {
+  background: none;
+  background-color: #E6E6E6;
+  color: #363534;
+  border: 0;
+  font-size: 13px;
+}
+
+.navpath li {
+  color: #363534;
+}
+
+.navpath li.navelem a {
+  color: #363534;
+}
+
+.navpath li.navelem a:hover {
+  color: #363534;
+}
+
+.navpath li.footer {
+  color: #363534;
+  font-size: 13px;
+}
+
+div.summary {
+  margin: 20px;
+  width: auto;
+  display: inline-block;
+  text-align: left;
+  color: transparent;
+  line-height: 0;
+  padding: 15px 25px;
+  border: 1px solid #E6E6E6;
+  background-color: #F6F6F6;
+  border-radius: 7px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  font-size: 13px;
+}
+
+div.summary a {
+  display: block;
+  line-height: 1.5;
+}
+
+div.ingroups {
+}
+
+div.ingroups a {
+}
+
+div.header {
+  background: none;
+  border: 0;
+}
+
+div.headertitle {
+}
+
+dl {
+}
+
+/* dl.note, dl.warning, dl.attention, dl.pre, dl.post, dl.invariant, dl.deprecated, dl.todo, dl.test, dl.bug */
+dl.section {
+}
+
+dl.note {
+}
+
+dl.warning, dl.attention {
+}
+
+dl.pre, dl.post, dl.invariant {
+}
+
+dl.deprecated {
+}
+
+dl.todo {
+}
+
+dl.test {
+}
+
+dl.bug {
+}
+
+dl.section dd {
+}
+
+#projectlogo {
+}
+
+#projectlogo img {
+}
+
+#projectname {
+  font: 24px Verdana,DejaVu Sans,Geneva,sans-serif;
+  font-weight: bold;
+  float: left;
+  margin-top: 10px;
+}
+
+#projectbrief {
+  font: 16px Verdana,DejaVu Sans,Geneva,sans-serif;
+  display: inline;
+}
+
+#projectnumber {
+  font: 16px Verdana,DejaVu Sans,Geneva,sans-serif;
+  display: inline;
+}
+
+#titlearea {
+  border: 0;
+  float: left;
+  width: auto;
+  margin-right: 10px;
+  padding: 10px;
+}
+
+.image {
+}
+
+.dotgraph {
+}
+
+.mscgraph {
+}
+
+.diagraph {
+}
+
+.caption {
+}
+
+div.zoom {
+}
+
+dl.citelist {
+}
+
+dl.citelist dt {
+}
+
+dl.citelist dd {
+}
+
+div.toc {
+}
+
+div.toc li {
+}
+
+div.toc h3 {
+}
+
+div.toc ul {
+}
+
+div.toc li.level1 {
+}
+
+div.toc li.level2 {
+}
+
+div.toc li.level3 {
+}
+
+div.toc li.level4 {
+}
+
+.inherit_header {
+}
+
+.inherit_header td {
+}
+
+.inherit {
+}
+
+tr.heading h2 {
+}
+
+/* tooltip related style info */
+
+.ttc {
+}
+
+#powerTip {
+}
+
+#powerTip div.ttdoc {
+}
+
+#powerTip div.ttname a {
+}
+
+#powerTip div.ttname {
+}
+
+#powerTip div.ttdeci {
+}
+
+#powerTip div {
+  font: 13px/1.3 Verdana,DejaVu Sans,Geneva,sans-serif;
+  color: #363534;
+}
+
+#powerTip:before, #powerTip:after {
+}
+
+#powerTip.n:after,  #powerTip.n:before,
+#powerTip.s:after,  #powerTip.s:before,
+#powerTip.w:after,  #powerTip.w:before,
+#powerTip.e:after,  #powerTip.e:before,
+#powerTip.ne:after, #powerTip.ne:before,
+#powerTip.se:after, #powerTip.se:before,
+#powerTip.nw:after, #powerTip.nw:before,
+#powerTip.sw:after, #powerTip.sw:before {
+}
+
+#powerTip.n:after,  #powerTip.s:after,
+#powerTip.w:after,  #powerTip.e:after,
+#powerTip.nw:after, #powerTip.ne:after,
+#powerTip.sw:after, #powerTip.se:after {
+}
+
+#powerTip.n:before,  #powerTip.s:before,
+#powerTip.w:before,  #powerTip.e:before,
+#powerTip.nw:before, #powerTip.ne:before,
+#powerTip.sw:before, #powerTip.se:before {
+}
+
+#powerTip.n:after,  #powerTip.n:before,
+#powerTip.ne:after, #powerTip.ne:before,
+#powerTip.nw:after, #powerTip.nw:before {
+}
+
+#powerTip.n:after, #powerTip.ne:after, #powerTip.nw:after {
+}
+#powerTip.n:before {
+}
+#powerTip.n:after, #powerTip.n:before {
+}
+
+#powerTip.nw:after, #powerTip.nw:before {
+}
+
+#powerTip.ne:after, #powerTip.ne:before {
+}
+
+#powerTip.s:after,  #powerTip.s:before,
+#powerTip.se:after, #powerTip.se:before,
+#powerTip.sw:after, #powerTip.sw:before {
+}
+
+#powerTip.s:after, #powerTip.se:after, #powerTip.sw:after {
+}
+
+#powerTip.s:before, #powerTip.se:before, #powerTip.sw:before {
+}
+
+#powerTip.s:after, #powerTip.s:before {
+}
+
+#powerTip.sw:after, #powerTip.sw:before {
+}
+
+#powerTip.se:after, #powerTip.se:before {
+}
+
+#powerTip.e:after, #powerTip.e:before {
+}
+
+#powerTip.e:after {
+}
+
+#powerTip.e:before {
+}
+
+#powerTip.w:after, #powerTip.w:before {
+}
+
+#powerTip.w:after {
+}
+
+#powerTip.w:before {
+}
+
+/* tabs.css */
+
+.tabs, .tabs2, .tabs3 {
+  background: none;
+  background-color: #F6F6F6;
+  font: 13px Verdana,DejaVu Sans,Geneva,sans-serif;
+  border-bottom: 1px solid #E6E6E6;
+}
+
+.tabs2 {
+  font-size: 13px;
+}
+.tabs3 {
+  font-size: 13px;
+}
+
+.tablist {
+}
+
+.tablist li {
+  background: none;
+  line-height: 1.5;
+}
+
+.tablist a {
+  padding: 0 10px;
+  font-weight: normal;
+  background: none;
+  color: #2980b9;
+  text-shadow: none;
+}
+
+.tabs3 .tablist a {
+}
+
+.tablist a:hover {
+  background: none;
+  color: #2980b9;
+  text-shadow: none;
+}
+
+.tablist li.current a {
+  background: none;
+  color: #2980b9;
+  text-shadow: none;
+}
+
+/* navtree.css */
+
+#nav-tree .children_ul {
+}
+
+#nav-tree ul {
+}
+
+#nav-tree li {
+}
+
+#nav-tree .plus {
+}
+
+#nav-tree .selected {
+  background: none;
+  background-color: #E6E6E6;
+  color: #2980b9;
+  text-shadow: none;
+}
+
+#nav-tree img {
+}
+
+#nav-tree a {
+}
+
+#nav-tree .label {
+  font: 12px Verdana,DejaVu Sans,Geneva,sans-serif;
+}
+
+#nav-tree .label a {
+}
+
+#nav-tree .selected a {
+  color: #2980b9;
+}
+
+#nav-tree .children_ul {
+}
+
+#nav-tree .item {
+}
+
+#nav-tree {
+  background-color: #F6F6F6;
+}
+
+#doc-content {
+}
+
+#side-nav {
+}
+
+.ui-resizable .ui-resizable-handle {
+}
+
+.ui-resizable-e {
+  background: none;
+  background-color: #E6E6E6;
+}
+
+.ui-resizable-handle {
+}
+
+#nav-tree-contents {
+}
+
+#nav-tree {
+  background: none;
+  background-color: #F6F6F6;
+}
+
+#nav-sync {
+}
+
+#nav-sync img {
+}
+
+#nav-sync img:hover {
+}
+
+#logo {
+  float: left;
+  margin-right: 10px;
+}
+
+.sm-dox {
+    background-image: none;
+    padding-top: 20px;
+}
+
+.sm-dox a, .sm-dox a:focus, .sm-dox a:hover, .sm-dox a:active {
+    color: #2980b9;
+    text-shadow: none;
+}
+
+.sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover, .sm-dox a.highlighted {
+    background-image: none;
+}
+
+.sm-dox ul a:hover {
+    color: initial;
+    background-image: none;
+    text-shadow: none;
+}
+
+.memtitle {
+    padding: 8px;
+    border: none;
+    margin-bottom: -1px;
+    background-image: none;
+    background-color: initial;
+}
+
+.permalink {
+    font-size: 0%;
+    visibility: hidden;
+}
