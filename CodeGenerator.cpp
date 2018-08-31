@@ -1335,8 +1335,12 @@ void CodeGenerator::InsertArg(const CXXCatchStmt* stmt)
 
     WrapInParensOrCurlys(BraceKind::Parens,
                          [&]() {
-                             mOutputFormatHelper.Append(GetTypeNameAsParameter(
-                                 stmt->getCaughtType(), stmt->getExceptionDecl()->getNameAsString()));
+                             if(!stmt->getCaughtType().isNull()) {
+                                 mOutputFormatHelper.Append(GetTypeNameAsParameter(
+                                     stmt->getCaughtType(), stmt->getExceptionDecl()->getNameAsString()));
+                             } else {
+                                 mOutputFormatHelper.Append("...");
+                             }
                          },
                          AddSpaceAtTheEnd::Yes);
 
