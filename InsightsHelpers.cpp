@@ -436,15 +436,42 @@ std::string GetNameAsFunctionPointer(const QualType& t)
 }
 //-----------------------------------------------------------------------------
 
-const char* GetNoExcept(const FunctionDecl& decl)
+const std::string GetNoExcept(const FunctionDecl& decl)
 {
     const auto* func = decl.getType()->castAs<FunctionProtoType>();
 
     if(func && func->hasNoexceptExceptionSpec()) {
-        return kwSpaceNoexcept;
+        std::string ret{kwSpaceNoexcept};
+
+        if(const auto* expr = func->getNoexceptExpr()) {
+            const auto value = [&] {
+                if(const auto* boolExpr = dyn_cast_or_null<CXXBoolLiteralExpr>(expr)) {
+                    return boolExpr->getValue();
+
+                } else if(const auto* noExceptExpr = dyn_cast_or_null<CXXNoexceptExpr>(expr)) {
+                    return noExceptExpr->getValue();
+                }
+
+                Error(expr, "Unexpected noexcept expr\n");
+
+                return false;
+            }();
+
+            ret += "(";
+
+            if(value) {
+                ret += "true";
+            } else {
+                ret += "false";
+            }
+
+            ret += ")";
+        }
+
+        return ret;
     }
 
-    return "";
+    return {};
 }
 //-----------------------------------------------------------------------------
 

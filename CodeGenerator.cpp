@@ -1660,6 +1660,21 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXNoexceptExpr* stmt)
+{
+    mOutputFormatHelper.Append("noexcept(");
+
+    if(stmt->getValue()) {
+        mOutputFormatHelper.Append("true");
+
+    } else {
+        mOutputFormatHelper.Append("false");
+    }
+
+    mOutputFormatHelper.Append(") ");
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
     if(dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {

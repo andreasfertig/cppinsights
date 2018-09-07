@@ -165,7 +165,7 @@ GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqu
 //-----------------------------------------------------------------------------
 
 const std::string EvaluateAsFloat(const FloatingLiteral& expr);
-const char*       GetNoExcept(const FunctionDecl& decl);
+const std::string GetNoExcept(const FunctionDecl& decl);
 const char*       GetConst(const FunctionDecl& decl);
 
 }  // namespace clang::insights

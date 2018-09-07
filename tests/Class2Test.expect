@@ -71,7 +71,7 @@ struct S
     
 /* public: inline S(S &); */
 /* public: inline S & operator=(S &&); */
-/* public: inline S() noexcept; */
+/* public: inline S() noexcept(false); */
 };
 
 int main()
