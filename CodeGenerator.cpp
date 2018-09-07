@@ -2446,7 +2446,15 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         mOutputFormatHelper.Append(outputFormatHelper.GetString());
     }
 
-    mOutputFormatHelper.Append(GetConst(decl), GetNoExcept(decl));
+    mOutputFormatHelper.Append(GetConst(decl));
+
+    switch(decl.getType()->getAs<FunctionProtoType>()->getRefQualifier()) {
+        case RQ_None: break;
+        case RQ_LValue: mOutputFormatHelper.Append(" &"); break;
+        case RQ_RValue: mOutputFormatHelper.Append(" &&"); break;
+    }
+
+    mOutputFormatHelper.Append(GetNoExcept(decl));
 }
 //-----------------------------------------------------------------------------
 
