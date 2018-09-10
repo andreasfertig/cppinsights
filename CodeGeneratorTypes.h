@@ -36,6 +36,8 @@ SUPPORTED_DECL(FriendDecl)
 SUPPORTED_DECL(EnumDecl)
 SUPPORTED_DECL(EnumConstantDecl)
 SUPPORTED_DECL(NamespaceAliasDecl)
+SUPPORTED_DECL(FunctionTemplateDecl)
+SUPPORTED_DECL(TypeAliasTemplateDecl)
 
 SUPPORTED_STMT(CXXDeleteExpr)
 SUPPORTED_STMT(CXXDefaultInitExpr)

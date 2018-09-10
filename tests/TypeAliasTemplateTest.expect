@@ -1,0 +1,39 @@
+template<bool B>
+struct bool_constant
+{
+  static const bool value = B;
+};
+
+template<typename... A>
+struct F
+{
+  template<typename... B>
+    using SameSize = bool_constant<sizeof...(A) == sizeof...(B)>;
+
+  template<typename... B, typename = SameSize<B...>>
+  F(B...) { }
+};
+/* First instantiated from: TypeAliasTemplateTest.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct F<int>
+{
+  using SameSize = bool_constant<sizeof...(A) == sizeof...(B)>;
+  template<>
+  inline F<int, bool_constant<1> >(int)
+  {
+  }
+  
+  inline constexpr F(const F<int> &) = default;
+  inline constexpr F(F<int> &&) = default;
+  
+};
+
+#endif
+
+
+int main()
+{
+  F<int> f1 = F<int>(3);
+}
+
