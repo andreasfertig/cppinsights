@@ -2431,7 +2431,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         mOutputFormatHelper.Append("(");
     }
 
-    mOutputFormatHelper.AppendParameterList(decl.parameters(), OutputFormatHelper::WithParameterName::Yes);
+    mOutputFormatHelper.AppendParameterList(decl.parameters());
     mOutputFormatHelper.Append(")", GetConst(decl), GetNoExcept(decl));
 }
 //-----------------------------------------------------------------------------

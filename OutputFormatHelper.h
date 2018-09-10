@@ -95,13 +95,10 @@ public:
         NewLine();
     }
 
-    STRONG_BOOL(WithParameterName);
-
     /// \brief Append a \c ParamVarDecl array.
     ///
-    /// With the parameter \c withParameterName the name will be inserted or not.
-    void AppendParameterList(const ArrayRef<ParmVarDecl*> parameters,
-                             const WithParameterName      withParameterName = WithParameterName::Yes);
+    /// The parameter name is always added as well.
+    void AppendParameterList(const ArrayRef<ParmVarDecl*> parameters);
 
     /// \brief Increase the current indention by \c SCOPE_INDENT
     void IncreaseIndent() { mDefaultIndent += SCOPE_INDENT; }
