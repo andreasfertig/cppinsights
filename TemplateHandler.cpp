@@ -23,12 +23,13 @@ namespace clang::insights {
 TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    matcher.addMatcher(functionDecl(allOf(unless(isExpansionInSystemHeader()),
-                                          unless(isMacroOrInvalidLocation()),
-                                          hasParent(functionTemplateDecl()),
-                                          isTemplateInstantiationPlain()))
-                           .bind("func"),
-                       this);
+    matcher.addMatcher(
+        functionDecl(allOf(unless(isExpansionInSystemHeader()),
+                           unless(isMacroOrInvalidLocation()),
+                           hasParent(functionTemplateDecl(unless(hasParent(classTemplateSpecializationDecl())))),
+                           isTemplateInstantiationPlain()))
+            .bind("func"),
+        this);
 
     matcher.addMatcher(classTemplateSpecializationDecl(unless(isExpansionInSystemHeader()),
                                                        hasParent(classTemplateDecl().bind("decl")))

@@ -1675,6 +1675,20 @@ void CodeGenerator::InsertArg(const CXXNoexceptExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const FunctionTemplateDecl* stmt)
+{
+    for(const auto spec : stmt->specializations()) {
+        InsertArg(spec->getAsFunction());
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const TypeAliasTemplateDecl* stmt)
+{
+    InsertArg(stmt->getTemplatedDecl());
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
     if(dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {

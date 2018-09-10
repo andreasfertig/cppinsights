@@ -1,0 +1,67 @@
+template<typename T>
+class Test
+{
+public:
+    Test() = default;
+
+    template<typename T2>
+    Test& operator=(const Test<T2>& other)
+    {
+
+        return *this;
+    }
+};
+/* First instantiated from: FunctionTemplateDeclTest.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class Test<int>
+{
+  
+  public: 
+  inline constexpr Test() noexcept = default;
+  template<>
+  inline Test<int> & operator=<char>(const Test<char> & other)
+  {
+    return *this;
+  }
+  inline constexpr Test(const Test<int> &) = default;
+  inline constexpr Test(Test<int> &&) = default;
+  inline constexpr Test<int> & operator=(const Test<int> &) = default;
+  inline constexpr Test<int> & operator=(Test<int> &&) = default;
+  
+};
+
+#endif
+
+/* First instantiated from: FunctionTemplateDeclTest.cpp:18 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class Test<char>
+{
+  
+  public: 
+  inline constexpr Test() noexcept = default;
+  template<>
+  inline Test<char> & operator=<int>(const Test<int> & other)
+  {
+    return *this;
+  }
+  inline constexpr Test(const Test<char> &) = default;
+  inline constexpr Test(Test<char> &&) = default;
+  inline constexpr Test<char> & operator=(const Test<char> &) = default;
+  inline constexpr Test<char> & operator=(Test<char> &&) = default;
+  
+};
+
+#endif
+
+
+int main()
+{
+  Test<int> ti = Test<int>();
+  Test<char> tc = Test<char>();
+  ti.operator=(tc);
+  tc.operator=(ti);
+}
+
+
