@@ -128,7 +128,11 @@ std::string GetLambdaName(const CXXRecordDecl& lambda)
 const QualType GetDesugarType(const QualType& QT)
 {
     if(QT.getTypePtrOrNull()) {
-        if(auto declType = QT->getAs<clang::DecltypeType>()) {
+        if(auto autoType = QT->getAs<clang::AutoType>()) {
+            if(autoType->isSugared()) {
+                return autoType->getDeducedType();
+            }
+        } else if(auto declType = QT->getAs<clang::DecltypeType>()) {
             return declType->desugar();
         }
     }

@@ -2377,35 +2377,31 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         }
     }
 
-    if(!isa<CXXConstructorDecl>(decl) && !isa<CXXDestructorDecl>(decl)) {
-        if(isa<CXXConversionDecl>(decl)) {
-            mOutputFormatHelper.Append("operator retType (");
-        } else {
-            mOutputFormatHelper.Append(GetName(GetDesugarReturnType(decl)), " ");
-        }
-    }
+    // temporary output to be able to handle a return value of array reference
+    OutputFormatHelper outputFormatHelper{};
 
     if(methodDecl) {
         if(!isFirstCxxMethodDecl) {
             const auto* parent = methodDecl->getParent();
-            mOutputFormatHelper.Append(parent->getNameAsString());
+            outputFormatHelper.Append(parent->getNameAsString());
 
             /* Handle a templated CXXMethod outside class which is _not_ specialized. */
             if(const auto* ct = parent->getDescribedClassTemplate()) {
-                mOutputFormatHelper.Append("<");
+                outputFormatHelper.Append("<");
 
                 OutputFormatHelper::ForEachArg(ct->getTemplateParameters()->asArray(),
-                                               mOutputFormatHelper,
-                                               [&](const auto* pm) { mOutputFormatHelper.Append(GetName(*pm)); });
+                                               outputFormatHelper,
+                                               [&](const auto* pm) { outputFormatHelper.Append(GetName(*pm)); });
 
-                mOutputFormatHelper.Append(">");
+                outputFormatHelper.Append(">");
 
                 /* Handle an explicit specialization of a single CXXMethod outside the class definition. */
             } else if(const auto* clsTmpl = dyn_cast_or_null<ClassTemplateSpecializationDecl>(parent)) {
-                InsertTemplateArgs(*clsTmpl);
+                CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
+                codeGenerator.InsertTemplateArgs(*clsTmpl);
             }
 
-            mOutputFormatHelper.Append("::");
+            outputFormatHelper.Append("::");
         }
     }
 
@@ -2413,26 +2409,40 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         if(isa<CXXConstructorDecl>(decl) || isa<CXXDestructorDecl>(decl)) {
             if(methodDecl) {
                 if(isa<CXXDestructorDecl>(decl)) {
-                    mOutputFormatHelper.Append('~');
+                    outputFormatHelper.Append('~');
                 }
 
-                mOutputFormatHelper.Append(methodDecl->getParent()->getNameAsString());
+                outputFormatHelper.Append(methodDecl->getParent()->getNameAsString());
             }
 
         } else {
-            mOutputFormatHelper.Append(GetName(decl));
+            outputFormatHelper.Append(GetName(decl));
         }
 
         if(!isLambda && isFirstCxxMethodDecl && decl.isFunctionTemplateSpecialization()) {
-            CodeGenerator codeGenerator{mOutputFormatHelper};
+            CodeGenerator codeGenerator{outputFormatHelper};
             codeGenerator.InsertTemplateArgs(decl);
         }
 
-        mOutputFormatHelper.Append("(");
+        outputFormatHelper.Append("(");
     }
 
-    mOutputFormatHelper.AppendParameterList(decl.parameters());
-    mOutputFormatHelper.Append(")", GetConst(decl), GetNoExcept(decl));
+    outputFormatHelper.AppendParameterList(decl.parameters());
+    outputFormatHelper.Append(")");
+
+    if(!isa<CXXConstructorDecl>(decl) && !isa<CXXDestructorDecl>(decl)) {
+        if(isa<CXXConversionDecl>(decl)) {
+            mOutputFormatHelper.Append("operator retType (");
+            mOutputFormatHelper.Append(outputFormatHelper.GetString());
+        } else {
+            const auto t = GetDesugarReturnType(decl);
+            mOutputFormatHelper.Append(GetTypeNameAsParameter(t, outputFormatHelper.GetString()));
+        }
+    } else {
+        mOutputFormatHelper.Append(outputFormatHelper.GetString());
+    }
+
+    mOutputFormatHelper.Append(GetConst(decl), GetNoExcept(decl));
 }
 //-----------------------------------------------------------------------------
 

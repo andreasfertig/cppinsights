@@ -1,0 +1,39 @@
+#define INSIGHTS_USE_TEMPLATE
+
+int arr[5][3];
+
+template<typename T>
+int (&f(T i))[3]
+{
+  return arr[i];
+}
+
+/* First instantiated from: Issue74Tmpl.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int (&f<long>(long i))[3]
+{
+  return arr[i];
+}
+#endif
+
+
+/* First instantiated from: Issue74Tmpl.cpp:18 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int (&f<int>(int i))[3]
+{
+  return arr[i];
+}
+#endif
+
+
+
+int main()
+{
+  long l;
+  f(l);
+  int i;
+  f(i);
+}
+
