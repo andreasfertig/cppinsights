@@ -127,12 +127,10 @@ public:
         }
     }
 
-    STRONG_BOOL(SkipConstexpr);
     STRONG_BOOL(SkipAccess);
 
     void InsertAccessModifierAndNameWithReturnType(const FunctionDecl& decl,
-                                                   const SkipConstexpr skipConstexpr = SkipConstexpr::No,
-                                                   const SkipAccess    skipAccess    = SkipAccess::No);
+                                                   const SkipAccess    skipAccess = SkipAccess::No);
 
     static const char* GetStorageClassAsString(const StorageClass& sc);
     static std::string GetStorageClassAsStringWithSpace(const StorageClass& sc);
@@ -142,7 +140,7 @@ protected:
     void HandleCompoundStmt(const CompoundStmt* stmt);
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
 
-    void InsertMethod(const Decl*          d,
+    void InsertMethod(const FunctionDecl*  d,
                       OutputFormatHelper&  outputFormatHelper,
                       const CXXMethodDecl& md,
                       bool /*skipConstexpr*/);

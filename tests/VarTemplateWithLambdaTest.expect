@@ -1,0 +1,28 @@
+// Source: https://twitter.com/bjorn_fahller/status/1039778723791335424
+#define INSIGHTS_USE_TEMPLATE
+
+template <typename T>
+constexpr auto func = [](auto x){ return T(x);};
+
+#ifdef INSIGHTS_USE_TEMPLATE
+/* First instantiated from: VarTemplateWithLambdaTest.cpp:9 */
+
+class __lambda_5_23
+{
+  public: inline /*constexpr */ double operator()(int x) const
+  {
+    return double(static_cast<double>(x));
+  }
+  
+};
+
+template<>
+constexpr const __lambda_5_23 func<double> = __lambda_5_23{};
+#endif
+
+
+double f(int x)
+{
+  return func<double>.operator()(x);
+}
+

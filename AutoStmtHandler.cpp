@@ -40,6 +40,7 @@ AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
                                             isAutoAncestor,
                                             /* don't replace auto in templates */
                                             isTemplate,
+                                            hasAncestor(varTemplateDecl()),
                                             hasAncestor(functionDecl()))),
                                anyOf(/* auto */
                                      hasType(autoType().bind("autoType")),

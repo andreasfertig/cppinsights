@@ -12,7 +12,7 @@ int main()
   {
     public: inline /*constexpr */ bool operator()(const std::basic_string<char> & str) const
     {
-      return operator==(str, "bbb");
+      return std::operator==(str, "bbb");
     }
     
   };

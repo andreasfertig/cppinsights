@@ -27,11 +27,11 @@ void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3]
   {
     public: inline /*constexpr */ void operator()(const double & arg) const
     {
-      std::operator<<(std::cout, ' ') << arg;
+      std::operator<<(std::cout, ' ').operator<<(arg);
     }
     public: inline /*constexpr */ void operator()(const std::basic_string<char> & arg) const
     {
-      std::operator<<(std::cout, ' ') << arg;
+      std::operator<<(std::operator<<(std::cout, ' '), arg);
     }
     
   };

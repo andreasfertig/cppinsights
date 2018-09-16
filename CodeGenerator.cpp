@@ -606,6 +606,12 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 {
     LAMBDA_SCOPE_HELPER(VarDecl);
 
+    const bool isTemplateSpecialization{isa<VarTemplateSpecializationDecl>(stmt)};
+
+    if(isTemplateSpecialization) {
+        mOutputFormatHelper.AppendNewLine("template<>");
+    }
+
     if(const auto* decompDecl = dyn_cast_or_null<DecompositionDecl>(stmt)) {
         InsertArg(decompDecl);
     } else if(IsTrivialStaticClassVarDecl(*stmt)) {
@@ -621,11 +627,26 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
             mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
             mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
         } else {
+            const auto varName = [&]() {
+                std::string name{GetName(*stmt)};
+
+                if(const auto* tvd = dyn_cast_or_null<VarTemplateSpecializationDecl>(stmt)) {
+                    OutputFormatHelper outputFormatHelper;
+                    CodeGenerator      codeGenerator{outputFormatHelper};
+
+                    codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
+
+                    name += outputFormatHelper.GetString();
+                }
+
+                return name;
+            }();
+
             // TODO: to keep the special handling for lambdas, do this only for template specializations
             if(stmt->getType()->getAs<TemplateSpecializationType>()) {
-                mOutputFormatHelper.Append(GetNameAsWritten(stmt->getType()), " ", GetName(*stmt));
+                mOutputFormatHelper.Append(GetNameAsWritten(stmt->getType()), " ", varName);
             } else {
-                mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
+                mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), varName));
             }
         }
 
@@ -651,7 +672,7 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         InsertArg(ctor);
     } else {
-        InsertAccessModifierAndNameWithReturnType(*stmt, SkipConstexpr::No, SkipAccess::Yes);
+        InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
 
         if(stmt->doesThisDeclarationHaveABody()) {
             mOutputFormatHelper.AppendNewLine();
@@ -1090,7 +1111,20 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 
             const std::string replace = [&]() {
                 if(isa<CXXMethodDecl>(callee->getDecl())) {
-                    return StrCat(GetName(*param1), ".", GetName(*callee), "(", GetName(*param2), ")");
+                    const std::string tmpl = [&] {
+                        if(const auto* tvd = dyn_cast_or_null<VarTemplateSpecializationDecl>(param1->getDecl())) {
+                            OutputFormatHelper outputFormatHelper;
+                            CodeGenerator      codeGenerator{outputFormatHelper};
+
+                            codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
+
+                            return outputFormatHelper.GetString();
+                        }
+
+                        return std::string{};
+                    }();
+
+                    return StrCat(GetName(*param1), tmpl, ".", GetName(*callee), "(", GetName(*param2), ")");
                 } else {
                     return StrCat(GetName(*callee), "(", GetName(*param1), ", ", GetName(*param2), ")");
                 }
@@ -1426,7 +1460,7 @@ void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 
 void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
 {
-    InsertAccessModifierAndNameWithReturnType(*stmt, SkipConstexpr::No, SkipAccess::Yes);
+    InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
 
     if(stmt->isDefaulted()) {
         mOutputFormatHelper.AppendNewLine(" = default;");
@@ -2083,22 +2117,19 @@ const char* CodeGenerator::GetBuiltinTypeSuffix(const BuiltinType::Kind& kind)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertMethod(const Decl*          d,
+void CodeGenerator::InsertMethod(const FunctionDecl*  d,
                                  OutputFormatHelper&  outputFormatHelper,
                                  const CXXMethodDecl& md,
                                  bool /*skipConstexpr*/)
 {
-    if(const auto* m = dyn_cast_or_null<CXXMethodDecl>(d)) {
+    LambdaCodeGenerator lambdaCodeGenerator{outputFormatHelper, mLambdaStack};
+    CodeGenerator&      codeGenerator{lambdaCodeGenerator};
 
-        LambdaCodeGenerator lambdaCodeGenerator{outputFormatHelper, mLambdaStack};
-        CodeGenerator&      codeGenerator{lambdaCodeGenerator};
+    codeGenerator.InsertAccessModifierAndNameWithReturnType(*d);
+    outputFormatHelper.AppendNewLine();
 
-        codeGenerator.InsertAccessModifierAndNameWithReturnType(*m, SkipConstexpr::Yes);
-        outputFormatHelper.AppendNewLine();
-
-        codeGenerator.InsertArg(md.getBody());
-        outputFormatHelper.AppendNewLine();
-    }
+    codeGenerator.InsertArg(md.getBody());
+    outputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
 
@@ -2134,24 +2165,20 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
     const auto& lambdaClass = *lambda->getLambdaClass();
 
     if(lambda->isGenericLambda()) {
-        bool       haveConversionOperator{false};
         const auto conversions = llvm::make_range(lambdaClass.conversion_begin(), lambdaClass.conversion_end());
         for(auto&& conversion : conversions) {
-            for(const auto* s : conversion->getAsFunction()->getDescribedFunctionTemplate()->specializations()) {
-                if(const auto* cxxmd = dyn_cast_or_null<CXXMethodDecl>(s)) {
-                    haveConversionOperator = true;
-                    InsertMethod(s, outputFormatHelper, *cxxmd, false);
-                }
-            }
+            CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
+
+            codeGenerator.InsertArg(conversion->getAsFunction()->getDescribedFunctionTemplate());
 
             DPrint("-----\n");
         }
 
-        for(const auto* o : lambdaClass.getLambdaCallOperator()->getDescribedFunctionTemplate()->specializations()) {
-            InsertMethod(o, outputFormatHelper, *lambdaClass.getLambdaCallOperator(), false);
-        }
+        CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
 
-        if(haveConversionOperator && lambdaClass.getLambdaStaticInvoker()) {
+        codeGenerator.InsertArg(lambdaClass.getLambdaCallOperator()->getDescribedFunctionTemplate());
+
+        if(lambdaClass.getLambdaStaticInvoker()) {
             for(const auto* iv :
                 lambdaClass.getLambdaStaticInvoker()->getDescribedFunctionTemplate()->specializations()) {
                 DPrint("invoker:\n");
@@ -2368,9 +2395,7 @@ std::string CodeGenerator::GetStorageClassAsStringWithSpace(const StorageClass& 
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl& decl,
-                                                              const SkipConstexpr skipConstexpr,
-                                                              const SkipAccess    skipAccess)
+void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl& decl, const SkipAccess skipAccess)
 {
     bool        isLambda{false};
     bool        isFirstCxxMethodDecl{true};
@@ -2383,7 +2408,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
     }
 
-    if(isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) {
+    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda) {
         mOutputFormatHelper.Append(AccessToStringWithColon(decl));
     }
 
@@ -2435,13 +2460,14 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     }
 
     if(decl.isConstexpr()) {
-        if(SkipConstexpr::Yes == skipConstexpr) {
+        const bool skipConstexpr{isLambda};
+        if(skipConstexpr) {
             mOutputFormatHelper.Append("/*");
         }
 
         mOutputFormatHelper.Append(kwConstExprSpace);
 
-        if(SkipConstexpr::Yes == skipConstexpr) {
+        if(skipConstexpr) {
             mOutputFormatHelper.Append("*/ ");
         }
     }

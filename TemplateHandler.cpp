@@ -19,6 +19,10 @@ using namespace clang;
 using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
 
+namespace clang::ast_matchers {
+const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;
+}
+
 namespace clang::insights {
 /// \brief Inserts the instantiation point of a template.
 //
@@ -63,7 +67,8 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
     matcher.addMatcher(
         functionDecl(allOf(unless(isExpansionInSystemHeader()),
                            unless(isMacroOrInvalidLocation()),
-                           hasParent(functionTemplateDecl(unless(hasParent(classTemplateSpecializationDecl())))),
+                           hasParent(functionTemplateDecl(unless(hasParent(classTemplateSpecializationDecl())),
+                                                          unless(hasParent(cxxRecordDecl(isLambda()))))),
                            isTemplateInstantiationPlain()))
             .bind("func"),
         this);
@@ -72,6 +77,9 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
                                                        hasParent(classTemplateDecl().bind("decl")))
                            .bind("class"),
                        this);
+
+    matcher.addMatcher(
+        varTemplateDecl(unless(isExpansionInSystemHeader()), unless(hasParent(classTemplateDecl()))).bind("vd"), this);
 }
 //-----------------------------------------------------------------------------
 
@@ -97,6 +105,27 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         const auto*        clsTmplDecl        = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
         const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(clsTmplDecl), tok::semi, result);
 
+        mRewrite.InsertText(endOfCond, outputFormatHelper.GetString(), true, true);
+    } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
+        OutputFormatHelper outputFormatHelper{};
+        outputFormatHelper.AppendNewLine();
+        outputFormatHelper.AppendNewLine();
+        outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
+
+        CodeGenerator codeGenerator{outputFormatHelper};
+        const auto&   sm = GetSM(result);
+
+        for(const auto& spec : vd->specializations()) {
+            InsertInstantiationPoint(outputFormatHelper, sm, spec->getPointOfInstantiation());
+            codeGenerator.InsertArg(spec);
+        }
+
+        outputFormatHelper.AppendNewLine("#endif");
+
+        // const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
+        const auto endOfCond = FindLocationAfterToken(GetEndLoc(vd), tok::semi, result);
+
+        //        mRewrite.ReplaceText({GetBeginLoc(vd), endOfCond}, outputFormatHelper.GetString());
         mRewrite.InsertText(endOfCond, outputFormatHelper.GetString(), true, true);
     }
 }
