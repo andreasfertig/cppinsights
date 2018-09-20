@@ -1,20 +1,23 @@
-#define INSIGHTS_USE_TEMPLATE
+//#define INSIGHTS_USE_TEMPLATE
 #include <utility>
 
-struct Test {};
+struct Test
+{
+};
 
-template <class T>
-void foo(T && t)
-{ }
+template<class T>
+void foo(T&& t)
+{
+}
 
 int main()
 {
     Test test;
     foo(test);
 
-  	int i=0;
-  	foo(i);
-  
+    int i = 0;
+    foo(i);
+
     long l;
     foo(std::move(l));
 }

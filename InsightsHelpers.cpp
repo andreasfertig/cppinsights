@@ -31,16 +31,7 @@ static const struct CppInsightsPrintingPolicy : PrintingPolicy
 
 static const std::string GetAsCPPStyleString(const QualType& t)
 {
-    std::string ret{t.getAsString(InsightsPrintingPolicy)};
-    // FIXME: workaround a possible clang bug. getAsString() returns && for an l-value ref. The code below checks
-    // whether t is a l-value ref and in that case does a string search and replace for && to &.
-    if(t->isLValueReferenceType()) {
-        if(const std::string::size_type i = ret.find("&&", 0); std::string::npos != i) {
-            ret = ret.replace(i, 2, "&");
-        }
-    }
-
-    return ret;
+    return t.getAsString(InsightsPrintingPolicy);
 }
 //-----------------------------------------------------------------------------
 

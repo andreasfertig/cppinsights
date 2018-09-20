@@ -1,34 +1,37 @@
-#define INSIGHTS_USE_TEMPLATE
+//#define INSIGHTS_USE_TEMPLATE
 #include <utility>
 
-struct Test {/* public: inline constexpr Test() noexcept; */
+struct Test
+{
+/* public: inline constexpr Test() noexcept; */
 /* public: inline constexpr Test(const Test &); */
 /* public: inline constexpr Test(Test &&); */
 };
 
-template <class T>
-void foo(T && t)
-{ }
-
-/* First instantiated from: Issue50_2.cpp:13 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-void foo<Test &>(Test & t)
+template<class T>
+void foo(T&& t)
 {
 }
-#endif
-
 
 /* First instantiated from: Issue50_2.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void foo<int &>(int & t)
+void foo<Test &>(Test && t)
 {
 }
 #endif
 
 
 /* First instantiated from: Issue50_2.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void foo<int &>(int && t)
+{
+}
+#endif
+
+
+/* First instantiated from: Issue50_2.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 void foo<long>(long && t)
