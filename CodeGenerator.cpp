@@ -1507,7 +1507,11 @@ void CodeGenerator::InsertArg(const StaticAssertDecl* stmt)
 
 void CodeGenerator::InsertArg(const UsingDirectiveDecl* stmt)
 {
-    std::string ns{GetName(*stmt->getQualifier()->getAsNamespace())};
+    std::string ns{};
+
+    if(const auto* qualifier = stmt->getQualifier()) {
+        ns = GetName(*qualifier->getAsNamespace());
+    }
 
     if(!ns.empty()) {
         ns.append("::");
