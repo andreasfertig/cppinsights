@@ -14,12 +14,25 @@ llvm_current_packages: &all_llvm_current_packages
 - llvm-8-dev
 - libclang-8-dev
 
+llvm_7_sources: &all_llvm_7_sources
+- ubuntu-toolchain-r-test
+
+llvm_7_packages: &all_llvm_7_packages
+- clang-7
+- llvm-7-dev
+- libclang-7-dev
+
 
 matrix:
   include:
 
     # 1/ OSX Builds
   - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='6.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes'
+    os: osx
+    osx_image: xcode9.3
+    compiler: clang
+      
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='No'
     os: osx
     osx_image: xcode9.3
     compiler: clang
@@ -36,6 +49,21 @@ matrix:
         - libstdc++-7-dev
     env: COMPILER='clang++-8' COMPILER_CC='clang-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No'
 
+  - os: linux
+    compiler: clang
+    sudo: required
+    before_install:
+    - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+    - sudo apt-add-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main"
+    - sudo apt-get update -q
+    - sudo apt-get install clang-7 llvm-7-dev libclang-7-dev
+    addons:
+      apt:
+        sources: *all_llvm_7_sources
+        packages: 
+        - libstdc++-7-dev
+    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG=/usr/bin/llvm-config-7  COVERAGE='No' STATIC='No' DEBUG='No'
+    
   # Linux g++ Build
   - os: linux
     compiler: gcc
