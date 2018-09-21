@@ -5,7 +5,7 @@ void foo(T && t)
 /* First instantiated from: Issue50.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void foo<Test &>(Test && t)
+void foo<Test &>(Test & t)
 {
 }
 #endif
