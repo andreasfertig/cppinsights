@@ -81,7 +81,7 @@ int main()
   s.count.operator++(0);
   Test t = Test();
   char * raw = reinterpret_cast<char *>(&s + 1);
-  Test * p = reinterpret_cast<Test *>(&raw[static_cast<long>(static_cast<int>(s.count.operator int()))]);
+  Test * p = reinterpret_cast<Test *>(&raw[static_cast<int>(s.count.operator int())]);
   (*p).operator=((t));
   (*p).operator=(s2.count);
   s.count.operator+=(Test(static_cast<int>(sizeof(p))));
