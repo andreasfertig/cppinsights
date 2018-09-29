@@ -302,28 +302,44 @@ std::string GetName(const QualType& t, const Unqualified unqualified)
 }
 //-----------------------------------------------------------------------------
 
+template<typename T>
+static bool TestPlainSubType(const QualType& t, T&& lambda)
+{
+    if(const auto* lref = dyn_cast_or_null<LValueReferenceType>(t.getTypePtrOrNull())) {
+        const auto  subType      = GetDesugarType(lref->getPointeeType());
+        const auto& ct           = subType.getCanonicalType();
+        const auto* plainSubType = ct.getTypePtrOrNull();
+
+        return lambda(plainSubType);
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified)
 {
-    const bool isArrayRef = [&]() {
-        if(const auto* lref = dyn_cast_or_null<LValueReferenceType>(t.getTypePtrOrNull())) {
-            const auto  subType      = GetDesugarType(lref->getPointeeType());
-            const auto& ct           = subType.getCanonicalType();
-            const auto* plainSubType = ct.getTypePtrOrNull();
-
-            if(const auto* pt = dyn_cast_or_null<ParenType>(plainSubType)) {
-                if(pt->getInnerType()->isArrayType()) {
-                    return true;
-                }
-            } else if(isa<ConstantArrayType>(plainSubType)) {
-                return true;
-            }
+    const bool isFunctionPointer = TestPlainSubType(t, [&](auto* plainSubType) {
+        if(isa<FunctionProtoType>(plainSubType)) {
+            return true;
         }
         return false;
-    }();
+    });
+
+    const bool isArrayRef = TestPlainSubType(t, [&](auto* plainSubType) {
+        if(const auto* pt = dyn_cast_or_null<ParenType>(plainSubType)) {
+            if(pt->getInnerType()->isArrayType()) {
+                return true;
+            }
+        } else if(isa<ConstantArrayType>(plainSubType)) {
+            return true;
+        }
+        return false;
+    });
 
     std::string typeName = details::GetName(t, unqualified);
 
-    // someties we get char const[2]. If we directly insert the typename we end up with char const__var[2] which is not
+    // Sometimes we get char const[2]. If we directly insert the typename we end up with char const__var[2] which is not
     // a valid type name. Hence check for this condition and, if necessary, insert a space before __var.
     auto getSpaceOrEmpty = [&](const std::string& needle) -> std::string {
         if(std::string::npos == typeName.find(needle, 0)) {
@@ -347,6 +363,12 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         } else {
             InsertBefore(typeName, "&[", "(");
             InsertAfter(typeName, "(&", StrCat(varName, ")"));
+        }
+    } else if(isFunctionPointer) {
+        if(std::string::npos != typeName.find("(&", 0)) {
+            InsertAfter(typeName, "(&", varName);
+        } else {
+            typeName += StrCat(" ", varName);
         }
 
     } else if(!t->isArrayType() && !varName.empty()) {

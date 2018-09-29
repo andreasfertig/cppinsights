@@ -1,4 +1,4 @@
-//#define INSIGHTS_USE_TEMPLATE
+#define INSIGHTS_USE_TEMPLATE
 #include <utility>
 
 struct Test
