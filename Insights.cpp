@@ -57,7 +57,8 @@ class CppInsightASTConsumer final : public ASTConsumer
 {
 public:
     explicit CppInsightASTConsumer(Rewriter& rewriter)
-    : mMatcher{}
+    : ASTConsumer()
+    , mMatcher{}
     , mCompilerGeneratedHandler{rewriter, mMatcher}
     , mStaticAssertHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
