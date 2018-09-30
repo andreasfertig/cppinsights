@@ -302,10 +302,10 @@ std::string GetName(const QualType& t, const Unqualified unqualified)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
+template<typename QT, typename T>
 static bool TestPlainSubType(const QualType& t, T&& lambda)
 {
-    if(const auto* lref = dyn_cast_or_null<LValueReferenceType>(t.getTypePtrOrNull())) {
+    if(const auto* lref = dyn_cast_or_null<QT>(t.getTypePtrOrNull())) {
         const auto  subType      = GetDesugarType(lref->getPointeeType());
         const auto& ct           = subType.getCanonicalType();
         const auto* plainSubType = ct.getTypePtrOrNull();
@@ -319,14 +319,14 @@ static bool TestPlainSubType(const QualType& t, T&& lambda)
 
 std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified)
 {
-    const bool isFunctionPointer = TestPlainSubType(t, [&](auto* plainSubType) {
+    const bool isFunctionPointer = TestPlainSubType<LValueReferenceType>(t, [&](auto* plainSubType) {
         if(isa<FunctionProtoType>(plainSubType)) {
             return true;
         }
         return false;
     });
 
-    const bool isArrayRef = TestPlainSubType(t, [&](auto* plainSubType) {
+    const bool isArrayRef = TestPlainSubType<LValueReferenceType>(t, [&](auto* plainSubType) {
         if(const auto* pt = dyn_cast_or_null<ParenType>(plainSubType)) {
             if(pt->getInnerType()->isArrayType()) {
                 return true;
@@ -334,6 +334,14 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         } else if(isa<ConstantArrayType>(plainSubType)) {
             return true;
         }
+        return false;
+    });
+
+    const bool isPointerToArray = TestPlainSubType<PointerType>(t, [&](auto* plainSubType) {
+        if(isa<ConstantArrayType>(plainSubType)) {
+            return true;
+        }
+
         return false;
     });
 
@@ -370,7 +378,15 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         } else {
             typeName += StrCat(" ", varName);
         }
-
+    } else if(isPointerToArray) {
+        if(std::string::npos != typeName.find("(*", 0)) {
+            InsertAfter(typeName, "(*", varName);
+        } else if(std::string::npos != typeName.find("*", 0)) {
+            InsertBefore(typeName, "*", "(");
+            InsertAfter(typeName, "*", StrCat(varName, ")"));
+        } else {
+            typeName += StrCat(" ", varName);
+        }
     } else if(!t->isArrayType() && !varName.empty()) {
         typeName += StrCat(" ", varName);
     }

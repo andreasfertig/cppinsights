@@ -1,0 +1,14 @@
+int (*f(int i))[3]
+{
+  static int arr[5][3];
+  return &arr[i];
+}
+
+
+int (*ff(int i))[3]
+{
+  static int arr[5][3];
+  return &arr[i];
+}
+
+
