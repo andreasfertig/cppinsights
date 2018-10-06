@@ -12,6 +12,7 @@ public:
     {
     }
 };
+
 /* First instantiated from: CXXDefaultInitExprTest.cpp:18 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -35,6 +36,7 @@ class Alloc<int, 0>
 };
 
 #endif
+
 
 /* First instantiated from: CXXDefaultInitExprTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE

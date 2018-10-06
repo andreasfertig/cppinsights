@@ -1398,7 +1398,26 @@ void CodeGenerator::InsertArg(const CXXThrowExpr* stmt)
 
 void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 {
-    mOutputFormatHelper.AppendNewLine("using ", GetName(*stmt), " = ", GetName(stmt->getUnderlyingType()), ";");
+    mOutputFormatHelper.Append("using ", GetName(*stmt), " = ");
+
+    if(auto* templateSpecializationType = stmt->getUnderlyingType()->getAs<TemplateSpecializationType>()) {
+        std::string              name{};
+        llvm::raw_string_ostream stream(name);
+        templateSpecializationType->getTemplateName().dump(stream);
+
+        mOutputFormatHelper.Append(stream.str(), "<");
+
+        for(const auto& arg : templateSpecializationType->template_arguments()) {
+            arg.getAsExpr()->dump();
+            InsertArg(arg.getAsExpr());
+        }
+
+        mOutputFormatHelper.Append(">");
+    } else {
+        mOutputFormatHelper.Append(GetName(stmt->getUnderlyingType()));
+    }
+
+    mOutputFormatHelper.AppendNewLine(';');
 }
 //-----------------------------------------------------------------------------
 
@@ -1795,6 +1814,12 @@ void CodeGenerator::InsertArg(const DeclStmt* stmt)
 void CodeGenerator::InsertArg(const SubstNonTypeTemplateParmExpr* stmt)
 {
     InsertArg(stmt->getReplacement());
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const SizeOfPackExpr* stmt)
+{
+    mOutputFormatHelper.Append(std::to_string(stmt->getPackLength()));
 }
 //-----------------------------------------------------------------------------
 

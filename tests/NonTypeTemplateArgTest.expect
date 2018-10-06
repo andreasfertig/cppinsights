@@ -8,6 +8,7 @@ struct SC
 {
     static void Print() { printf("%s\n", C); }
 };
+
 /* First instantiated from: NonTypeTemplateArgTest.cpp:14 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

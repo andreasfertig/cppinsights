@@ -1,5 +1,6 @@
 template <template <typename> class... Templates>
 struct template_tuple {};
+
 /* First instantiated from: TemplateExpansionTest.cpp:9 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -34,6 +35,7 @@ void foo2()
 
   template<typename> class A { };
   template<template<typename> class ...> class B { };
+  
   /* First instantiated from: TemplateExpansionTest.cpp:27 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -52,6 +54,7 @@ void foo2()
   
 
   template<typename> class testType { };
+  
   /* First instantiated from: TemplateExpansionTest.cpp:43 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -67,6 +70,7 @@ void foo2()
   
 
   template<int fp(void)> class testDecl { };
+  
   /* First instantiated from: TemplateExpansionTest.cpp:45 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -76,6 +80,7 @@ void foo2()
   };
   
   #endif
+  
   
   /* First instantiated from: TemplateExpansionTest.cpp:46 */
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -89,6 +94,7 @@ void foo2()
   
 
   template<int> class testIntegral { };
+  
   /* First instantiated from: TemplateExpansionTest.cpp:48 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -109,6 +115,7 @@ void foo2()
   template<template<typename> class ...T> class C {
     B<T...> testTemplateExpansion;
   };
+  
   /* First instantiated from: TemplateExpansionTest.cpp:41 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -125,6 +132,7 @@ void foo2()
   
 
   template<int, int = 0> class testExpr{};
+  
   /* First instantiated from: TemplateExpansionTest.cpp:50 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -140,6 +148,7 @@ void foo2()
   
 
   template<int, int ...> class testPack { };
+  
   /* First instantiated from: TemplateExpansionTest.cpp:52 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>

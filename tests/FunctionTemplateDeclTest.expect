@@ -11,6 +11,7 @@ public:
         return *this;
     }
 };
+
 /* First instantiated from: FunctionTemplateDeclTest.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -32,6 +33,7 @@ class Test<int>
 };
 
 #endif
+
 
 /* First instantiated from: FunctionTemplateDeclTest.cpp:18 */
 #ifdef INSIGHTS_USE_TEMPLATE

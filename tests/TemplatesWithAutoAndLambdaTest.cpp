@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 #include <iostream>
 
 // Example taken from Nicolai Josuttis slides

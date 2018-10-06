@@ -67,6 +67,7 @@ public:
 private:
     const T mX;
 };
+
 /* First instantiated from: TemplateHandlerTest.cpp:61 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -90,6 +91,7 @@ class Template<int>
 };
 
 #endif
+
 
 /* First instantiated from: TemplateHandlerTest.cpp:63 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -140,13 +142,13 @@ void tprintf(const char* format, T value, Targs... Fargs) // recursive variadic 
 /* First instantiated from: TemplateHandlerTest.cpp:65 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void tprintf<const char *, char, int>(const char * format, const char * value, char Fargs, int Fargs)
+void tprintf<const char *, char, int>(const char * format, const char * value, char __Fargs2, int __Fargs3)
 {
   for(; static_cast<int>(*format) != static_cast<int>('\0'); format++) 
   {
     if(static_cast<int>(*format) == static_cast<int>('%')) {
       std::operator<<(std::cout, value);
-      tprintf(format + 1, Fargs, Fargs);
+      tprintf(format + 1, __Fargs2, __Fargs3);
       return;
     }
     
@@ -160,13 +162,13 @@ void tprintf<const char *, char, int>(const char * format, const char * value, c
 /* First instantiated from: TemplateHandlerTest.cpp:44 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void tprintf<char, int>(const char * format, char value, int Fargs)
+void tprintf<char, int>(const char * format, char value, int __Fargs2)
 {
   for(; static_cast<int>(*format) != static_cast<int>('\0'); format++) 
   {
     if(static_cast<int>(*format) == static_cast<int>('%')) {
       std::operator<<(std::cout, value);
-      tprintf(format + 1, Fargs);
+      tprintf(format + 1, __Fargs2);
       return;
     }
     

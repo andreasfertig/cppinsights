@@ -6,6 +6,7 @@ public:
     Foo() = delete;
     Foo(int){}
 };
+
 /* First instantiated from: ClassWithDeletedSpecialFunctionTest.cpp:12 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

@@ -3,6 +3,7 @@ using size_t = decltype(sizeof(0));
 // Without this the compiler does not know a symbol tuple_size and hence can/will not decompose
 namespace std { template<typename T> struct tuple_size; }
 namespace std { template<size_t, typename> struct tuple_element;
+
 /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -14,6 +15,7 @@ struct tuple_element<0, constant::Q>
 
 #endif
 
+
 /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -24,6 +26,7 @@ struct tuple_element<1, constant::Q>
 };
 
 #endif
+
 
 /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE

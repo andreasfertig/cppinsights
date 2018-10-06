@@ -1,61 +1,61 @@
-.tmp.cpp:84:48: error: no matching function for call to 'get'
+.tmp.cpp:87:48: error: no matching function for call to 'get'
   std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(constant::__q17);
                                                ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:85:48: error: no matching function for call to 'get'
+.tmp.cpp:88:48: error: no matching function for call to 'get'
   std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(constant::__q17);
                                                ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:86:48: error: no matching function for call to 'get'
+.tmp.cpp:89:48: error: no matching function for call to 'get'
   std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(constant::__q17);
                                                ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:92:50: error: no matching function for call to 'get'
+.tmp.cpp:95:50: error: no matching function for call to 'get'
     std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q20);
                                                  ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:93:50: error: no matching function for call to 'get'
+.tmp.cpp:96:50: error: no matching function for call to 'get'
     std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q20);
                                                  ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:94:50: error: no matching function for call to 'get'
+.tmp.cpp:97:50: error: no matching function for call to 'get'
     std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q20);
                                                  ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:92:46: error: variables defined in a constexpr function must be initialized
+.tmp.cpp:95:46: error: variables defined in a constexpr function must be initialized
     std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q20);
                                              ^
-.tmp.cpp:104:52: error: no matching function for call to 'get'
+.tmp.cpp:107:52: error: no matching function for call to 'get'
       std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q27);
                                                    ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:105:52: error: no matching function for call to 'get'
+.tmp.cpp:108:52: error: no matching function for call to 'get'
       std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q27);
                                                    ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:106:52: error: no matching function for call to 'get'
+.tmp.cpp:109:52: error: no matching function for call to 'get'
       std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q27);
                                                    ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:46:33: note: candidate function not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   template<int N> constexpr int get(Q &&) { return N * N; }
                                 ^
-.tmp.cpp:104:48: error: variables defined in a constexpr function must be initialized
+.tmp.cpp:107:48: error: variables defined in a constexpr function must be initialized
       std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q27);
                                                ^
 11 errors generated.

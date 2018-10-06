@@ -1,0 +1,27 @@
+void f(int, int, int)
+{
+}
+
+
+template<typename F, typename ...Types>
+auto forward(F f, Types &&...args) {
+  return sizeof...(args);
+}
+
+/* First instantiated from: SizeOfPackExprTest.cpp:12 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+unsigned long forward<void (*)(int, int, int), int, int, int>(void (*f)(int, int, int), int && __args1, int && __args2, int && __args3)
+{
+  return 3;
+}
+#endif
+
+
+
+int main()
+{
+  forward(f, 1, 2, 3);
+}
+
+

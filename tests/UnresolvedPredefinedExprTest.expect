@@ -9,6 +9,7 @@ public:
         const char* f = __func__; // UnresolvedLookupExpr
     }
 };
+
 /* First instantiated from: UnresolvedPredefinedExprTest.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

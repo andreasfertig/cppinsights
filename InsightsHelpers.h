@@ -118,11 +118,7 @@ static inline std::string GetPlainName(const DeclRefExpr& DRE)
 //-----------------------------------------------------------------------------
 
 std::string GetName(const DeclRefExpr& DRE);
-
-static inline std::string GetName(const VarDecl& VD)
-{
-    return VD.getNameAsString();
-}
+std::string GetName(const VarDecl& VD);
 //-----------------------------------------------------------------------------
 
 static inline std::string GetName(const NamedDecl& ND)

@@ -28,17 +28,6 @@ class TemplateHandler final : public ast_matchers::MatchFinder::MatchCallback, p
 public:
     TemplateHandler(Rewriter& rewrite, ast_matchers::MatchFinder& matcher);
     void run(const ast_matchers::MatchFinder::MatchResult& result) override;
-
-private:
-    /// \brief Insert the instantiated template with the resulting code.
-    void InsertInstantiatedTemplate(const FunctionDecl& funcDecl, const ast_matchers::MatchFinder::MatchResult& result);
-
-    /// \brief Inserts the instantiation point of a template.
-    //
-    // This reveals at which place the template is first used.
-    static void InsertInstantiationPoint(OutputFormatHelper&   outputFormatHelper,
-                                         const SourceManager&  sm,
-                                         const SourceLocation& instLoc);
 };
 //-----------------------------------------------------------------------------
 

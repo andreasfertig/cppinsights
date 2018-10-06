@@ -8,6 +8,7 @@ struct A
 {
    void foo(int);
 };
+
 /* First instantiated from: ClassOperatorHandler7Test.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -22,6 +23,7 @@ struct A<int>
 };
 
 #endif
+
 
 /* First instantiated from: ClassOperatorHandler7Test.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
