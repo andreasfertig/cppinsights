@@ -200,10 +200,10 @@ int main()
     
   class __lambda_46_20
   {
-    public: inline /*constexpr */ int operator()(int & x, int b) const
+    public: inline /*constexpr */ int operator()(int & x, int bb) const
     {
       printf("%d\n", foo + x);
-      return foo + x + b;
+      return foo + x + bb;
     }
     
     private:
@@ -221,10 +221,10 @@ int main()
     
   class __lambda_48_20
   {
-    public: inline /*constexpr */ int operator()(int & x, int b) const noexcept
+    public: inline /*constexpr */ int operator()(int & x, int bb) const noexcept
     {
       printf("%d\n", foo + x);
-      return foo + x + b;
+      return foo + x + bb;
     }
     
     private:

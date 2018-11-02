@@ -36,6 +36,12 @@ struct Ints
     unsigned int ui;
 };
 
+struct Complex
+{
+    float _Complex fc;
+    int _Complex ic;    
+};
+
 int main()
 {
     // XXX wired nullptr in clang-7 on macOS
@@ -50,4 +56,6 @@ int main()
     Pointer p{};
 
     Ints i{};
+
+    Complex cc[5] = { [2].fc = 1.0, [2].ic = 3, [0].ic = 22 };
 }
