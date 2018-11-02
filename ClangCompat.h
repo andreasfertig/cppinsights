@@ -13,6 +13,9 @@
 #include "version.h"
 //-----------------------------------------------------------------------------
 
+#define IS_CLANG_NEWER_THAN(major) CLANG_VERSION_MAJOR > (major)
+//-----------------------------------------------------------------------------
+
 namespace clang::insights {
 
 template<unsigned int MAJOR>

@@ -43,7 +43,7 @@ int main()
     auto lambda73 = [&foo](int& x, const auto& b, const auto c)  { printf( "%d\n", foo+x);  return foo+x+b+c; };
     lambda73(foo, b, 44);
 
-    auto lambda8 = [foo, b](int& x, int b)  { printf( "%d\n", foo+x);  return foo+x+b; };
+    auto lambda8 = [foo, b](int& x, int bb)  { printf( "%d\n", foo+x);  return foo+x+bb; };
 
-    auto lambda9 = [foo, b](int& x, int b) noexcept { printf( "%d\n", foo+x);  return foo+x+b; };
+    auto lambda9 = [foo, b](int& x, int bb) noexcept { printf( "%d\n", foo+x);  return foo+x+bb; };
 }

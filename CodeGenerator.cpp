@@ -1297,6 +1297,10 @@ static const char* getValueOfValueInit(const QualType& t)
             }
 
             break;
+
+#if IS_CLANG_NEWER_THAN(7)
+        case Type::STK_FixedPoint: Error("STK_FixedPoint is not implemented"); break;
+#endif
     }
 
     return "0";

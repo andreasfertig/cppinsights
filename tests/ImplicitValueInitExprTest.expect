@@ -36,6 +36,12 @@ struct Ints
     unsigned int ui;
 };
 
+struct Complex
+{
+    float _Complex fc;
+    int _Complex ic;    
+};
+
 int main()
 {
   Point array[10] = {{1.0, 0.0}, {0.0, 0.0}, {2.0, 1.0}};
@@ -44,5 +50,6 @@ int main()
   Bool b = {false};
   Pointer p = {nullptr};
   Ints i = {0, 0};
+  Complex cc[5] = {{0.0f, 22}, {0.0f, 0}, {static_cast<float>(1.0), 3}};
 }
 
