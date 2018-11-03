@@ -1234,9 +1234,14 @@ void CodeGenerator::InsertArg(const CharacterLiteral* stmt)
                 value &= 0xFFu;
             }
 
-            if(value < 256 && isPrintable(static_cast<unsigned char>(value))) {
-                const std::string v{static_cast<char>(value)};
-                mOutputFormatHelper.Append("'", v, "'");
+            if(value < 256) {
+                if(isPrintable(static_cast<unsigned char>(value))) {
+                    const std::string v{static_cast<char>(value)};
+                    mOutputFormatHelper.Append("'", v, "'");
+                } else {
+                    const std::string v{std::to_string(static_cast<unsigned char>(value))};
+                    mOutputFormatHelper.Append(v);
+                }
             }
     }
 }
