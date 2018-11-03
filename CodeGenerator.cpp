@@ -1249,7 +1249,18 @@ void CodeGenerator::InsertArg(const CharacterLiteral* stmt)
 
 void CodeGenerator::InsertArg(const PredefinedExpr* stmt)
 {
-    InsertArg(stmt->getFunctionName());
+    // Check if getFunctionName returns a valid StringLiteral. It does return a nullptr, if this PredefinedExpr is in a
+    // UnresolvedLookupExpr. In that case, print the identifier, e.g. __func__.
+    if(const auto* functionName = stmt->getFunctionName()) {
+        InsertArg(functionName);
+    } else {
+#if IS_CLANG_NEWER_THAN(7)
+        const auto name = PredefinedExpr::getIdentKindName(stmt->getIdentKind());
+#else
+        const auto name = PredefinedExpr::getIdentTypeName(stmt->getIdentType());
+#endif
+        mOutputFormatHelper.Append(name.str());
+    }
 }
 //-----------------------------------------------------------------------------
 
