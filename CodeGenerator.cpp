@@ -1512,7 +1512,7 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 
 void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
-    mOutputFormatHelper.AppendNewLine(GetName(stmt->getType()), " ", GetName(*stmt), ";");
+    mOutputFormatHelper.AppendNewLine(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)), ";");
 }
 //-----------------------------------------------------------------------------
 
@@ -1841,8 +1841,6 @@ void CodeGenerator::InsertArg(const CXXNullPtrLiteralExpr* /*stmt*/)
 void CodeGenerator::InsertArg(const LabelDecl* stmt)
 {
     mOutputFormatHelper.Append(stmt->getNameAsString());
-
-    // InsertArg(stmt->get);
 }
 //-----------------------------------------------------------------------------
 
