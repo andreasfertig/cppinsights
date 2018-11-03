@@ -484,6 +484,8 @@ static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
         if(const auto* arrayDeclRefExpr = dyn_cast_or_null<DeclRefExpr>(srcExpr)) {
             return arrayDeclRefExpr;
         }
+    } else if(const auto func = dyn_cast_or_null<CXXFunctionalCastExpr>(stmt)) {
+        //        TODO(stmt, "");
     }
 
     if(stmt) {
@@ -500,9 +502,8 @@ static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
 
 void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 {
-    const auto* declName = FindDeclRef(decompositionDeclStmt->getInit());
-    const auto  baseVarName{[&]() {
-        if(declName) {
+    const auto baseVarName{[&]() {
+        if(const auto* declName = FindDeclRef(decompositionDeclStmt->getInit())) {
             std::string name = GetPlainName(*declName);
 
             const std::string operatorName{"operator"};
@@ -513,17 +514,12 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
             return name;
         }
 
-        Error(decompositionDeclStmt, "unknown decl\n");
+        // We approached an unnamed decl. This happens for example like this: auto& [x, y] = Point{};
         return std::string{""};
     }()};
 
-    const std::string tmpVarName = [&]() {
-        if(declName && declName->getDecl()) {
-            return BuildInternalVarName(baseVarName, GetBeginLoc(decompositionDeclStmt), GetSM(*declName->getDecl()));
-        }
-
-        return BuildInternalVarName(baseVarName);
-    }();
+    const std::string tmpVarName{
+        BuildInternalVarName(baseVarName, GetBeginLoc(decompositionDeclStmt), GetSM(*decompositionDeclStmt))};
 
     mOutputFormatHelper.Append(GetTypeNameAsParameter(decompositionDeclStmt->getType(), tmpVarName), " = ");
 
