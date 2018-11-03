@@ -1512,7 +1512,7 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 
 void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
-    mOutputFormatHelper.AppendNewLine(GetName(stmt->getType()), " ", GetName(*stmt), ";");
+    mOutputFormatHelper.AppendNewLine(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)), ";");
 }
 //-----------------------------------------------------------------------------
 
