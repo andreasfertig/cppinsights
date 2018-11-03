@@ -1841,8 +1841,6 @@ void CodeGenerator::InsertArg(const CXXNullPtrLiteralExpr* /*stmt*/)
 void CodeGenerator::InsertArg(const LabelDecl* stmt)
 {
     mOutputFormatHelper.Append(stmt->getNameAsString());
-
-    // InsertArg(stmt->get);
 }
 //-----------------------------------------------------------------------------
 
