@@ -238,6 +238,29 @@ void CodeGenerator::InsertArg(const DefaultStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const ContinueStmt* /*stmt*/)
+{
+    mOutputFormatHelper.Append("continue");
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const GotoStmt* stmt)
+{
+    mOutputFormatHelper.Append("goto ");
+    InsertArg(stmt->getLabel());
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const LabelStmt* stmt)
+{
+    mOutputFormatHelper.AppendNewLine(stmt->getName(), ":");
+
+    if(stmt->getSubStmt()) {
+        InsertArg(stmt->getSubStmt());
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 {
     const bool hasInit{stmt->getInit() || stmt->getConditionVariable()};
@@ -1816,6 +1839,14 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 void CodeGenerator::InsertArg(const CXXNullPtrLiteralExpr* /*stmt*/)
 {
     mOutputFormatHelper.Append("nullptr");
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const LabelDecl* stmt)
+{
+    mOutputFormatHelper.Append(stmt->getNameAsString());
+
+    // InsertArg(stmt->get);
 }
 //-----------------------------------------------------------------------------
 

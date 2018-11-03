@@ -1,0 +1,13 @@
+int main()
+{
+  int i = 10;
+  if(true) {
+    while(static_cast<bool>(i)) {
+      --i;
+      continue;
+    }
+    
+  }
+  
+}
+
