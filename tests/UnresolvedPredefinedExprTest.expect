@@ -1,0 +1,35 @@
+template<typename T>
+class Test
+{
+public:
+    Test()
+    {
+        const char* f = __func__; // UnresolvedLookupExpr
+    }
+};
+/* First instantiated from: UnresolvedPredefinedExprTest.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class Test<int>
+{
+  
+  public: 
+  inline Test()
+  {
+    const char * f = "Test";
+  }
+  
+  inline constexpr Test(const Test<int> &) = default;
+  inline constexpr Test(Test<int> &&) = default;
+  
+};
+
+#endif
+
+
+int main()
+{
+  const char * f = "main";
+  Test<int> t = Test<int>();
+}
+
