@@ -295,14 +295,14 @@ std::string GetName(const QualType& t, const Unqualified unqualified)
 //-----------------------------------------------------------------------------
 
 template<typename QT, typename T>
-static bool TestPlainSubType(const QualType& t, T&& lambda)
+static bool TestPlainSubType(const QualType& t)
 {
     if(const auto* lref = dyn_cast_or_null<QT>(t.getTypePtrOrNull())) {
         const auto  subType      = GetDesugarType(lref->getPointeeType());
         const auto& ct           = subType.getCanonicalType();
         const auto* plainSubType = ct.getTypePtrOrNull();
 
-        return lambda(plainSubType);
+        return isa<T>(plainSubType);
     }
 
     return false;
@@ -311,27 +311,9 @@ static bool TestPlainSubType(const QualType& t, T&& lambda)
 
 std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified)
 {
-    const bool isFunctionPointer = TestPlainSubType<LValueReferenceType>(t, [&](auto* plainSubType) {
-        if(isa<FunctionProtoType>(plainSubType)) {
-            return true;
-        }
-        return false;
-    });
-
-    const bool isArrayRef = TestPlainSubType<LValueReferenceType>(t, [&](auto* plainSubType) {
-        if(isa<ConstantArrayType>(plainSubType)) {
-            return true;
-        }
-        return false;
-    });
-
-    const bool isPointerToArray = TestPlainSubType<PointerType>(t, [&](auto* plainSubType) {
-        if(isa<ConstantArrayType>(plainSubType)) {
-            return true;
-        }
-
-        return false;
-    });
+    const bool isFunctionPointer = TestPlainSubType<LValueReferenceType, FunctionProtoType>(t);
+    const bool isArrayRef        = TestPlainSubType<LValueReferenceType, ConstantArrayType>(t);
+    const bool isPointerToArray  = TestPlainSubType<PointerType, ConstantArrayType>(t);
 
     std::string typeName = details::GetName(t, unqualified);
 
@@ -504,6 +486,16 @@ std::string GetName(const VarDecl& VD)
 }
 //-----------------------------------------------------------------------------
 
+static bool EvaluateAsBoolenCondition(const Expr& expr, const Decl& decl)
+{
+    bool r{false};
+
+    expr.EvaluateAsBooleanCondition(r, decl.getASTContext());
+
+    return r;
+}
+//-----------------------------------------------------------------------------
+
 const std::string GetNoExcept(const FunctionDecl& decl)
 {
     const auto* func = decl.getType()->castAs<FunctionProtoType>();
@@ -518,18 +510,17 @@ const std::string GetNoExcept(const FunctionDecl& decl)
 
                 } else if(const auto* noExceptExpr = dyn_cast_or_null<CXXNoexceptExpr>(expr)) {
                     return noExceptExpr->getValue();
+
                 } else if(const auto* bExpr = dyn_cast_or_null<BinaryOperator>(expr)) {
-                    bool r{false};
+                    return EvaluateAsBoolenCondition(*bExpr, decl);
 
-                    if(bExpr->EvaluateAsBooleanCondition(r, decl.getASTContext())) {
-                        return r;
-                    }
-                } else if(const auto* bExpr = dyn_cast_or_null<ConditionalOperator>(expr)) {
-                    bool r{false};
+                } else if(const auto* coExpr = dyn_cast_or_null<ConditionalOperator>(expr)) {
+                    return EvaluateAsBoolenCondition(*coExpr, decl);
 
-                    if(bExpr->EvaluateAsBooleanCondition(r, decl.getASTContext())) {
-                        return r;
-                    }
+#if IS_CLANG_NEWER_THAN(7)
+                } else if(const auto* cExpr = dyn_cast_or_null<ConstantExpr>(expr)) {
+                    return EvaluateAsBoolenCondition(*cExpr, decl);
+#endif
                 }
 
                 Error(expr, "INSIGHTS: Unexpected noexcept expr\n");

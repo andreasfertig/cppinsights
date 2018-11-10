@@ -1433,11 +1433,18 @@ void CodeGenerator::InsertArg(const CXXCatchStmt* stmt)
 
 void CodeGenerator::InsertArg(const CXXThrowExpr* stmt)
 {
-
     mOutputFormatHelper.Append("throw ");
 
     InsertArg(stmt->getSubExpr());
 }
+//-----------------------------------------------------------------------------
+
+#if IS_CLANG_NEWER_THAN(7)
+void CodeGenerator::InsertArg(const ConstantExpr* stmt)
+{
+    InsertArg(stmt->getSubExpr());
+}
+#endif
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
