@@ -71,7 +71,7 @@ public:
     }
 
     void InsertArg(const Stmt* stmt) override { CodeGenerator::InsertArg(stmt); }
-    void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(std::to_string(mIndex)); }
+    void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(mIndex); }
 };
 //-----------------------------------------------------------------------------
 
@@ -616,7 +616,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
         if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
             const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
-            const std::string funcPtrName{StrCat("FuncPtr_", std::to_string(lineNo), " ")};
+            const std::string funcPtrName{StrCat("FuncPtr_", lineNo, " ")};
 
             mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
             mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
@@ -841,8 +841,6 @@ void CodeGenerator::InsertArg(const CXXNamedCastExpr* stmt)
 {
     const QualType castDestType = stmt->getTypeAsWritten();
     const Expr*    subExpr      = stmt->getSubExpr();
-
-    // DPrint("ref: %s\n", stmt->getTypeAsWritten().getAsString());
 
     FormatCast(stmt->getCastName(), castDestType, subExpr, stmt->getCastKind());
 }
@@ -1080,9 +1078,6 @@ void CodeGenerator::InsertArg(const MaterializeTemporaryExpr* stmt)
 void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 {
     LAMBDA_SCOPE_HELPER(OperatorCallExpr);
-
-    // DPrint("args: %d\n", stmt->getNumArgs());
-    // Dump(stmt);
 
     const auto* callee = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts());
     const bool  isCXXMethod{callee && isa<CXXMethodDecl>(callee->getDecl())};
@@ -1819,7 +1814,7 @@ void CodeGenerator::InsertArg(const SubstNonTypeTemplateParmExpr* stmt)
 
 void CodeGenerator::InsertArg(const SizeOfPackExpr* stmt)
 {
-    mOutputFormatHelper.Append(std::to_string(stmt->getPackLength()));
+    mOutputFormatHelper.Append(stmt->getPackLength());
 }
 //-----------------------------------------------------------------------------
 

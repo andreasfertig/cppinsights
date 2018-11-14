@@ -45,7 +45,7 @@ std::string BuildInternalVarName(const std::string& varName, const SourceLocatio
 {
     const auto lineNo = sm.getSpellingLineNumber(loc);
 
-    return StrCat(BuildInternalVarName(varName), std::to_string(lineNo));
+    return StrCat(BuildInternalVarName(varName), lineNo);
 }
 //-----------------------------------------------------------------------------
 
@@ -74,11 +74,7 @@ SourceRange GetSourceRangeAfterToken(const SourceRange                          
                                      const tok::TokenKind                          tokenKind,
                                      const ast_matchers::MatchFinder::MatchResult& result)
 {
-    SourceLocation locEnd = FindLocationAfterToken(range.getEnd(), tokenKind, result);
-
-    if(locEnd.isInvalid()) {
-        locEnd = range.getEnd();
-    }
+    const SourceLocation locEnd = FindLocationAfterToken(range.getEnd(), tokenKind, result);
 
     return {range.getBegin(), locEnd};
 }
@@ -112,7 +108,7 @@ std::string GetLambdaName(const CXXRecordDecl& lambda)
     const auto               lineNo   = sm.getSpellingLineNumber(locBegin);
     const auto               columnNo = sm.getSpellingColumnNumber(locBegin);
 
-    return StrCat(lambdaPrefix, std::to_string(lineNo), "_", std::to_string(columnNo));
+    return StrCat(lambdaPrefix, lineNo, "_", columnNo);
 }
 //-----------------------------------------------------------------------------
 
@@ -327,11 +323,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
     });
 
     const bool isArrayRef = TestPlainSubType<LValueReferenceType>(t, [&](auto* plainSubType) {
-        if(const auto* pt = dyn_cast_or_null<ParenType>(plainSubType)) {
-            if(pt->getInnerType()->isArrayType()) {
-                return true;
-            }
-        } else if(isa<ConstantArrayType>(plainSubType)) {
+        if(isa<ConstantArrayType>(plainSubType)) {
             return true;
         }
         return false;
@@ -357,11 +349,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         return "";
     };
 
-    if(t->isArrayType() && t->isLValueReferenceType()) {
-        std::string space = getSpaceOrEmpty(" [");
-        InsertBefore(typeName, "[", StrCat(space, "(&", varName, ")"));
-
-    } else if(t->isArrayType() && !t->isLValueReferenceType()) {
+    if(t->isArrayType() && !t->isLValueReferenceType()) {
         std::string space = getSpaceOrEmpty(" [");
         InsertBefore(typeName, "[", StrCat(space, varName));
 
@@ -464,7 +452,7 @@ static std::string GetTemplateParameterPackArgumentName(std::string& name, const
         if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {
             if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull())) {
                 if(substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
-                    name = StrCat(BuildInternalVarName(name), std::to_string(parmVarDecl->getFunctionScopeIndex()));
+                    name = StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
                 }
             }
         }
