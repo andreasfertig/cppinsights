@@ -45,7 +45,7 @@ std::string BuildInternalVarName(const std::string& varName, const SourceLocatio
 {
     const auto lineNo = sm.getSpellingLineNumber(loc);
 
-    return StrCat(BuildInternalVarName(varName), std::to_string(lineNo));
+    return StrCat(BuildInternalVarName(varName), lineNo);
 }
 //-----------------------------------------------------------------------------
 
@@ -112,7 +112,7 @@ std::string GetLambdaName(const CXXRecordDecl& lambda)
     const auto               lineNo   = sm.getSpellingLineNumber(locBegin);
     const auto               columnNo = sm.getSpellingColumnNumber(locBegin);
 
-    return StrCat(lambdaPrefix, std::to_string(lineNo), "_", std::to_string(columnNo));
+    return StrCat(lambdaPrefix, lineNo, "_", columnNo);
 }
 //-----------------------------------------------------------------------------
 
@@ -464,7 +464,7 @@ static std::string GetTemplateParameterPackArgumentName(std::string& name, const
         if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {
             if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull())) {
                 if(substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
-                    name = StrCat(BuildInternalVarName(name), std::to_string(parmVarDecl->getFunctionScopeIndex()));
+                    name = StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
                 }
             }
         }

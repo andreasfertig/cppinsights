@@ -71,7 +71,7 @@ public:
     }
 
     void InsertArg(const Stmt* stmt) override { CodeGenerator::InsertArg(stmt); }
-    void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(std::to_string(mIndex)); }
+    void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(mIndex); }
 };
 //-----------------------------------------------------------------------------
 
@@ -616,7 +616,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
         if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
             const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
-            const std::string funcPtrName{StrCat("FuncPtr_", std::to_string(lineNo), " ")};
+            const std::string funcPtrName{StrCat("FuncPtr_", lineNo, " ")};
 
             mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
             mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
@@ -1819,7 +1819,7 @@ void CodeGenerator::InsertArg(const SubstNonTypeTemplateParmExpr* stmt)
 
 void CodeGenerator::InsertArg(const SizeOfPackExpr* stmt)
 {
-    mOutputFormatHelper.Append(std::to_string(stmt->getPackLength()));
+    mOutputFormatHelper.Append(stmt->getPackLength());
 }
 //-----------------------------------------------------------------------------
 

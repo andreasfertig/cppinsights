@@ -45,6 +45,30 @@ static inline const std::string Normalize(StringRef&& arg)
 }
 //-----------------------------------------------------------------------------
 
+static inline const std::string Normalize(const int& arg)
+{
+    return std::to_string(arg);
+}
+//-----------------------------------------------------------------------------
+
+static inline const std::string Normalize(const unsigned int& arg)
+{
+    return std::to_string(arg);
+}
+//-----------------------------------------------------------------------------
+
+static inline const std::string Normalize(const unsigned long& arg)
+{
+    return std::to_string(arg);
+}
+//-----------------------------------------------------------------------------
+
+static inline const std::string Normalize(const unsigned long long& arg)
+{
+    return std::to_string(arg);
+}
+//-----------------------------------------------------------------------------
+
 template<class T>
 static inline const T& Normalize(const T& arg)
 {

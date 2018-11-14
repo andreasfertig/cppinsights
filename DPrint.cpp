@@ -25,7 +25,7 @@ static void ToDo(const char* name, OutputFormatHelper& outputFormatHelper, const
         return file;
     }();
 
-    outputFormatHelper.Append("/* INSIGHTS-TODO: ", fileName, ":", std::to_string(line), " stmt: ", name, " */");
+    outputFormatHelper.Append("/* INSIGHTS-TODO: ", fileName, ":", line, " stmt: ", name, " */");
 }
 //-----------------------------------------------------------------------------
 

@@ -26,14 +26,14 @@ namespace clang::insights {
 static void
 InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceManager& sm, const SourceLocation& instLoc)
 {
-    const auto  lineNr = sm.getSpellingLineNumber(instLoc);
+    const auto  lineNo = sm.getSpellingLineNumber(instLoc);
     const auto& fileId = sm.getFileID(instLoc);
     const auto* file   = sm.getFileEntryForID(fileId);
     if(file) {
         const auto fileWithDirName = file->getName();
         const auto fileName        = llvm::sys::path::filename(fileWithDirName);
 
-        outputFormatHelper.AppendNewLine("/* First instantiated from: ", fileName, ":", std::to_string(lineNr), " */");
+        outputFormatHelper.AppendNewLine("/* First instantiated from: ", fileName, ":", lineNo, " */");
     }
 }
 //-----------------------------------------------------------------------------
