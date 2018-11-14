@@ -74,11 +74,7 @@ SourceRange GetSourceRangeAfterToken(const SourceRange                          
                                      const tok::TokenKind                          tokenKind,
                                      const ast_matchers::MatchFinder::MatchResult& result)
 {
-    SourceLocation locEnd = FindLocationAfterToken(range.getEnd(), tokenKind, result);
-
-    if(locEnd.isInvalid()) {
-        locEnd = range.getEnd();
-    }
+    const SourceLocation locEnd = FindLocationAfterToken(range.getEnd(), tokenKind, result);
 
     return {range.getBegin(), locEnd};
 }
@@ -327,11 +323,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
     });
 
     const bool isArrayRef = TestPlainSubType<LValueReferenceType>(t, [&](auto* plainSubType) {
-        if(const auto* pt = dyn_cast_or_null<ParenType>(plainSubType)) {
-            if(pt->getInnerType()->isArrayType()) {
-                return true;
-            }
-        } else if(isa<ConstantArrayType>(plainSubType)) {
+        if(isa<ConstantArrayType>(plainSubType)) {
             return true;
         }
         return false;
@@ -357,11 +349,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         return "";
     };
 
-    if(t->isArrayType() && t->isLValueReferenceType()) {
-        std::string space = getSpaceOrEmpty(" [");
-        InsertBefore(typeName, "[", StrCat(space, "(&", varName, ")"));
-
-    } else if(t->isArrayType() && !t->isLValueReferenceType()) {
+    if(t->isArrayType() && !t->isLValueReferenceType()) {
         std::string space = getSpaceOrEmpty(" [");
         InsertBefore(typeName, "[", StrCat(space, varName));
 

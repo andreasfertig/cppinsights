@@ -842,8 +842,6 @@ void CodeGenerator::InsertArg(const CXXNamedCastExpr* stmt)
     const QualType castDestType = stmt->getTypeAsWritten();
     const Expr*    subExpr      = stmt->getSubExpr();
 
-    // DPrint("ref: %s\n", stmt->getTypeAsWritten().getAsString());
-
     FormatCast(stmt->getCastName(), castDestType, subExpr, stmt->getCastKind());
 }
 //-----------------------------------------------------------------------------
@@ -1080,9 +1078,6 @@ void CodeGenerator::InsertArg(const MaterializeTemporaryExpr* stmt)
 void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 {
     LAMBDA_SCOPE_HELPER(OperatorCallExpr);
-
-    // DPrint("args: %d\n", stmt->getNumArgs());
-    // Dump(stmt);
 
     const auto* callee = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts());
     const bool  isCXXMethod{callee && isa<CXXMethodDecl>(callee->getDecl())};
