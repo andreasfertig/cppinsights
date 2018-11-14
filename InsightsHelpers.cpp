@@ -387,6 +387,8 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         } else {
             typeName += StrCat(" ", varName);
         }
+    } else if(t->isFunctionPointerType()) {
+        InsertAfter(typeName, "(*", varName);
     } else if(!t->isArrayType() && !varName.empty()) {
         typeName += StrCat(" ", varName);
     }
@@ -416,6 +418,59 @@ bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl)
     }
 
     return false;
+}
+//-----------------------------------------------------------------------------
+
+static const SubstTemplateTypeParmType* GetSubstTemplateTypeParmType(const Type* t)
+{
+    if(const auto* substTemplateTypeParmType = dyn_cast_or_null<SubstTemplateTypeParmType>(t)) {
+        return substTemplateTypeParmType;
+    } else if(const auto& pointeeType = t->getPointeeType(); not pointeeType.isNull()) {
+        return GetSubstTemplateTypeParmType(pointeeType.getTypePtrOrNull());
+    }
+
+    return nullptr;
+}
+//-----------------------------------------------------------------------------
+
+/*
+ * \brief Get a usable name from a template parameter pack.
+ *
+ * A template parameter pack, args, as in:
+ * \code
+template<typename F, typename ...Types>
+auto forward(F f, Types &&...args) {
+  f(args...);
+}
+
+forward(f,1, 2,3);
+ * \endcode
+ *
+ * gets expanded by clang as
+ * \code
+f(args, args, args);
+ * \endcode
+ *
+ * which would obviously not compile. For clang AST dump it is the right thing. For C++ Insights where the resulting
+ * code should be compilable it is not. What this function does is, figure out whether it is a pack expansion and if so,
+ * make the parameters unique, such that \c args becomes \c __args1 to \c __args3.
+ *
+ * The expected type for \c T currently is \c ValueDecl or \c VarDecl.
+ */
+template<typename T>
+static std::string GetTemplateParameterPackArgumentName(std::string& name, const T* decl)
+{
+    if(const auto* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(decl)) {
+        if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {
+            if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull())) {
+                if(substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
+                    name = StrCat(BuildInternalVarName(name), std::to_string(parmVarDecl->getFunctionScopeIndex()));
+                }
+            }
+        }
+    }
+
+    return name;
 }
 //-----------------------------------------------------------------------------
 
@@ -453,19 +508,15 @@ std::string GetName(const DeclRefExpr& declRefExpr)
         name.append(plainName);
     }
 
-    return name;
+    return GetTemplateParameterPackArgumentName(name, declRefDecl);
 }
 //-----------------------------------------------------------------------------
 
-std::string GetNameAsFunctionPointer(const QualType& t)
+std::string GetName(const VarDecl& VD)
 {
-    std::string typeName{GetName(t)};
+    std::string name{VD.getNameAsString()};
 
-    if(!t->isFunctionPointerType()) {
-        InsertBefore(typeName, "(", "(*)");
-    }
-
-    return typeName;
+    return GetTemplateParameterPackArgumentName(name, &VD);
 }
 //-----------------------------------------------------------------------------
 

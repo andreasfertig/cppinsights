@@ -20,6 +20,43 @@ using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
+/// \brief Inserts the instantiation point of a template.
+//
+// This reveals at which place the template is first used.
+static void
+InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceManager& sm, const SourceLocation& instLoc)
+{
+    const auto  lineNr = sm.getSpellingLineNumber(instLoc);
+    const auto& fileId = sm.getFileID(instLoc);
+    const auto* file   = sm.getFileEntryForID(fileId);
+    if(file) {
+        const auto fileWithDirName = file->getName();
+        const auto fileName        = llvm::sys::path::filename(fileWithDirName);
+
+        outputFormatHelper.AppendNewLine("/* First instantiated from: ", fileName, ":", std::to_string(lineNr), " */");
+    }
+}
+//-----------------------------------------------------------------------------
+
+/// \brief Insert the instantiated template with the resulting code.
+template<typename T>
+static OutputFormatHelper InsertInstantiatedTemplate(const T& decl, const MatchFinder::MatchResult& result)
+{
+    OutputFormatHelper outputFormatHelper{};
+    outputFormatHelper.AppendNewLine();
+    outputFormatHelper.AppendNewLine();
+
+    const auto& sm = GetSM(result);
+    InsertInstantiationPoint(outputFormatHelper, sm, decl.getPointOfInstantiation());
+    outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
+    CodeGenerator codeGenerator{outputFormatHelper};
+    codeGenerator.InsertArg(&decl);
+    outputFormatHelper.AppendNewLine("#endif");
+
+    return outputFormatHelper;
+}
+//-----------------------------------------------------------------------------
+
 TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
@@ -41,7 +78,14 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
 void TemplateHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* functionDecl = result.Nodes.getNodeAs<FunctionDecl>("func")) {
-        InsertInstantiatedTemplate(*functionDecl, result);
+        if(!functionDecl->getBody()) {
+            return;
+        }
+
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*functionDecl, result);
+        const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(*functionDecl), tok::semi, result);
+
+        mRewrite.InsertText(endOfCond.getLocWithOffset(1), outputFormatHelper.GetString(), true, true);
 
     } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("class")) {
         // skip classes/struct's without a definition
@@ -49,68 +93,11 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
             return;
         }
 
-        OutputFormatHelper outputFormatHelper{};
-        outputFormatHelper.AppendNewLine();
-
-        const auto& sm = GetSM(result);
-        InsertInstantiationPoint(outputFormatHelper, sm, clsTmplSpecDecl->getPointOfInstantiation());
-
-        outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
-
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(clsTmplSpecDecl);
-
-        outputFormatHelper.AppendNewLine("#endif");
-
-        const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
-        const auto  endOfCond   = FindLocationAfterToken(GetEndLoc(clsTmplDecl), tok::semi, result);
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl, result);
+        const auto*        clsTmplDecl        = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
+        const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(clsTmplDecl), tok::semi, result);
 
         mRewrite.InsertText(endOfCond, outputFormatHelper.GetString(), true, true);
-    }
-}
-//-----------------------------------------------------------------------------
-
-void TemplateHandler::InsertInstantiatedTemplate(const FunctionDecl& funcDecl, const MatchFinder::MatchResult& result)
-{
-    if(const auto* body = funcDecl.getBody()) {
-        OutputFormatHelper outputFormatHelper{};
-        outputFormatHelper.AppendNewLine();
-        outputFormatHelper.AppendNewLine();
-
-        const auto& sm = GetSM(result);
-        InsertInstantiationPoint(outputFormatHelper, sm, funcDecl.getPointOfInstantiation());
-        outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
-        CodeGenerator codeGenerator{outputFormatHelper};
-
-        codeGenerator.InsertAccessModifierAndNameWithReturnType(
-            funcDecl, CodeGenerator::SkipConstexpr::No, CodeGenerator::SkipAccess::Yes);
-
-        outputFormatHelper.AppendNewLine();
-
-        codeGenerator.InsertArg(body);
-
-        outputFormatHelper.AppendNewLine();
-        outputFormatHelper.AppendNewLine("#endif");
-
-        const auto endOfCond = FindLocationAfterToken(GetEndLoc(funcDecl), tok::semi, result);
-
-        mRewrite.InsertText(endOfCond.getLocWithOffset(1), outputFormatHelper.GetString(), true, true);
-    }
-}
-//-----------------------------------------------------------------------------
-
-void TemplateHandler::InsertInstantiationPoint(OutputFormatHelper&   outputFormatHelper,
-                                               const SourceManager&  sm,
-                                               const SourceLocation& instLoc)
-{
-    const auto  lineNr = sm.getSpellingLineNumber(instLoc);
-    const auto& fileId = sm.getFileID(instLoc);
-    const auto* file   = sm.getFileEntryForID(fileId);
-    if(file) {
-        const auto fileWithDirName = file->getName();
-        const auto fileName        = llvm::sys::path::filename(fileWithDirName);
-
-        outputFormatHelper.AppendNewLine("/* First instantiated from: ", fileName, ":", std::to_string(lineNr), " */");
     }
 }
 //-----------------------------------------------------------------------------

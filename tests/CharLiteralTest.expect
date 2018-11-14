@@ -19,6 +19,7 @@ struct Foo
     }
     void operator=(BT v) volatile { this->raw = v; }
 };
+
 /* First instantiated from: CharLiteralTest.cpp:61 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -45,6 +46,7 @@ struct Foo<int>
 };
 
 #endif
+
 
 /* First instantiated from: CharLiteralTest.cpp:60 */
 #ifdef INSIGHTS_USE_TEMPLATE

@@ -60,9 +60,9 @@ void Log(const char* fmt, const Ts&... ts)
 /* First instantiated from: TemplateArgumentsTest.cpp:23 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void Log<char [8]>(const char * fmt, char const (&ts)[8])
+void Log<char [8]>(const char * fmt, char const (&__ts1)[8])
 {
-  printf(fmt, Normalize(ts));
+  printf(fmt, Normalize(__ts1));
 }
 #endif
 
@@ -70,9 +70,9 @@ void Log<char [8]>(const char * fmt, char const (&ts)[8])
 /* First instantiated from: TemplateArgumentsTest.cpp:25 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void Log<int>(const char * fmt, const int & ts)
+void Log<int>(const char * fmt, const int & __ts1)
 {
-  printf(fmt, Normalize(ts));
+  printf(fmt, Normalize(__ts1));
 }
 #endif
 
@@ -80,9 +80,9 @@ void Log<int>(const char * fmt, const int & ts)
 /* First instantiated from: TemplateArgumentsTest.cpp:28 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void Log<std::basic_string<char> >(const char * fmt, const std::basic_string<char> & ts)
+void Log<std::basic_string<char> >(const char * fmt, const std::basic_string<char> & __ts1)
 {
-  printf(fmt, Normalize(ts));
+  printf(fmt, Normalize(__ts1));
 }
 #endif
 

@@ -32,6 +32,7 @@ struct Index {
     return pod.*pmember;
   }
 };
+
 /* First instantiated from: Issue60.cpp:34 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

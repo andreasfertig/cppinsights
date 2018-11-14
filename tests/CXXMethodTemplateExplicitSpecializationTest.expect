@@ -4,6 +4,7 @@ class Foo
 public:
     void Func();
 };
+
 /* First instantiated from: CXXMethodTemplateExplicitSpecializationTest.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -20,6 +21,7 @@ class Foo<int>
 };
 
 #endif
+
 
 /* First instantiated from: CXXMethodTemplateExplicitSpecializationTest.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE

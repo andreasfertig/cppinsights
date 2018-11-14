@@ -42,6 +42,7 @@ struct D : B {
     using B::h;
     void h(int) { std::cout << "D::h\n"; } // D::h(int) hides B::h(int)
 };
+
 /* First instantiated from: UsingDeclTest.cpp:56 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

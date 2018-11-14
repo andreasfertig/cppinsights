@@ -1,3 +1,5 @@
+#define INSIGHTS_USE_TEMPLATE
+
 #include <iostream>
 
 // Example taken from Nicolai Josuttis slides
@@ -14,14 +16,14 @@ void print(const T1& arg1, const Types&... args)
    (..., coutSpaceAndArg(args));     
 }
 
-/* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:20 */
+/* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3], const double & args, const std::basic_string<char> & args)
+void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3], const double & __args1, const std::basic_string<char> & __args2)
 {
   std::operator<<(std::cout, arg1);
     
-  class __lambda_9_28
+  class __lambda_11_28
   {
     public: inline /*constexpr */ void operator()(const double & arg) const
     {
@@ -34,8 +36,8 @@ void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3]
     
   };
   
-  __lambda_9_28 coutSpaceAndArg = __lambda_9_28{};
-  coutSpaceAndArg.operator()(args) , coutSpaceAndArg.operator()(args);
+  __lambda_11_28 coutSpaceAndArg = __lambda_11_28{};
+  coutSpaceAndArg.operator()(__args1) , coutSpaceAndArg.operator()(__args2);
 }
 #endif
 

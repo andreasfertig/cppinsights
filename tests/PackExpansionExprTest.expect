@@ -11,9 +11,9 @@ void forward(F f, Types &&...args) {
 /* First instantiated from: PackExpansionExprTest.cpp:12 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void forward<void (*)(int, int, int), int, int, int>(void (*)(int, int, int) f, int && args, int && args, int && args)
+void forward<void (*)(int, int, int), int, int, int>(void (*f)(int, int, int), int && __args1, int && __args2, int && __args3)
 {
-  f(static_cast<int &&>(args), static_cast<int &&>(args), static_cast<int &&>(args));
+  f(static_cast<int &&>(__args1), static_cast<int &&>(__args2), static_cast<int &&>(__args3));
 }
 #endif
 

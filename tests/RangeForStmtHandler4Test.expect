@@ -10,6 +10,7 @@ public:
    int* begin() { return size>0 ? &data[0] : nullptr; }
    int* end()   { return size>0 ? &data[size-1] : nullptr; }
 };
+
 /* First instantiated from: RangeForStmtHandler4Test.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

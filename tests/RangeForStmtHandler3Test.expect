@@ -72,6 +72,7 @@ struct str_view {
     Char const* begin() const { return ptr; }
     null_sentinal_t end() const { return {}; }
 };
+
 /* First instantiated from: RangeForStmtHandler3Test.cpp:49 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

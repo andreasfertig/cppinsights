@@ -11,6 +11,7 @@ public:
     }
 
 };
+
 /* First instantiated from: TypeIdInTemplateTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

@@ -13,14 +13,15 @@ struct F
   template<typename... B, typename = SameSize<B...>>
   F(B...) { }
 };
+
 /* First instantiated from: TypeAliasTemplateTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct F<int>
 {
-  using SameSize = bool_constant<sizeof...(A) == sizeof...(B)>;
+  using SameSize = bool_constant<1 == 0>;
   template<>
-  inline F<int, bool_constant<1> >(int)
+  inline F<int, bool_constant<1> >(int __0)
   {
   }
   

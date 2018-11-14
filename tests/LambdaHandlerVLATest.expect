@@ -26,6 +26,7 @@ struct SA
   bool Test();
   int nt;
 };
+
 /* First instantiated from: LambdaHandlerVLATest.cpp:59 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

@@ -28,6 +28,7 @@ public:
 
     T& operator[](const std::size_t i) { return v[i]; }
 };
+
 /* First instantiated from: ClassOperatorHandler9Test.cpp:34 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

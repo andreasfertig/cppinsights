@@ -11,6 +11,7 @@ public:
     array() : data(x) { }
     array(T (&reference)[SIZE]) : data(reference) { }
 };
+
 /* First instantiated from: FieldDeclArrayRefTest.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
