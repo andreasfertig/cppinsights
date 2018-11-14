@@ -39,8 +39,6 @@ def testCompile(tmpFileName, f, args, fileName):
 
     compileErrorFile = os.path.join(mypath, fileName + '.cerr')
     if 0 != p.returncode:
-
-
         if os.path.isfile(compileErrorFile):
             ce = open(compileErrorFile, 'r').read()
             stderr = stderr.replace(tmpFileName, '.tmp.cpp')
@@ -64,6 +62,9 @@ def testCompile(tmpFileName, f, args, fileName):
     else:
         if os.path.isfile(compileErrorFile):
             print 'unused file: %s' %(compileErrorFile)
+
+        objFileName = '%s.o' %(os.path.splitext(os.path.basename(tmpFileName))[0])
+        os.remove(objFileName)
 
         print '[PASSED] Compile: %s' %(f)
         return True
