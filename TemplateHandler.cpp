@@ -105,7 +105,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         }
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*functionDecl, result);
-        const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(*functionDecl), tok::semi, result);
+        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(*functionDecl), result);
 
         InsertIndentedText(endOfCond.getLocWithOffset(1), outputFormatHelper);
 
@@ -117,14 +117,14 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl, result);
         const auto*        clsTmplDecl        = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
-        const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(clsTmplDecl), tok::semi, result);
+        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(clsTmplDecl), result);
 
         InsertIndentedText(endOfCond, outputFormatHelper);
 
     } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*vd, result);
 
-        const auto endOfCond = FindLocationAfterToken(GetEndLoc(vd), tok::semi, result);
+        const auto endOfCond = FindLocationAfterSemi(GetEndLoc(vd), result);
         InsertIndentedText(endOfCond, outputFormatHelper);
     }
 }

@@ -37,7 +37,7 @@ void StaticAssertHandler::run(const MatchFinder::MatchResult& result)
         CodeGenerator      codeGenerator{outputFormatHelper};
         codeGenerator.InsertArg(matchedDecl);
 
-        const auto sr = GetSourceRangeAfterToken(matchedDecl->getSourceRange(), tok::semi, result);
+        const auto sr = GetSourceRangeAfterSemi(matchedDecl->getSourceRange(), result);
 
         mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
     }

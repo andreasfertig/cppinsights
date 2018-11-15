@@ -31,13 +31,8 @@ static inline bool IsNewLine(const char c)
 std::string BuildInternalVarName(const std::string& varName);
 std::string BuildInternalVarName(const std::string& varName, const SourceLocation& loc, const SourceManager& SM);
 
-SourceLocation FindLocationAfterToken(const SourceLocation                          loc,
-                                      const tok::TokenKind                          TKind,
-                                      const ast_matchers::MatchFinder::MatchResult& Result);
-
-SourceRange GetSourceRangeAfterToken(const SourceRange                             range,
-                                     const tok::TokenKind                          TKind,
-                                     const ast_matchers::MatchFinder::MatchResult& Result);
+SourceLocation FindLocationAfterSemi(const SourceLocation loc, const ast_matchers::MatchFinder::MatchResult& Result);
+SourceRange    GetSourceRangeAfterSemi(const SourceRange range, const ast_matchers::MatchFinder::MatchResult& Result);
 //-----------------------------------------------------------------------------
 
 static inline bool IsMacroLocation(const SourceLocation& loc)
