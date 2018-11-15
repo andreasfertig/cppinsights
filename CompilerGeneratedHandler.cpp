@@ -49,7 +49,7 @@ void CompilerGeneratedHandler::run(const MatchFinder::MatchResult& result)
         const auto* recrodDecl = result.Nodes.getNodeAs<CXXRecordDecl>("record");
         const auto  loc        = GetEndLoc(recrodDecl);
 
-        mRewrite.InsertText(loc, outputFormatHelper.GetString(), true, true);
+        InsertIndentedText(loc, outputFormatHelper);
     }
 }
 //-----------------------------------------------------------------------------

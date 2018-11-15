@@ -107,7 +107,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*functionDecl, result);
         const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(*functionDecl), tok::semi, result);
 
-        mRewrite.InsertText(endOfCond.getLocWithOffset(1), outputFormatHelper.GetString(), true, true);
+        InsertIndentedText(endOfCond.getLocWithOffset(1), outputFormatHelper);
 
     } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("class")) {
         // skip classes/struct's without a definition
@@ -119,13 +119,13 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         const auto*        clsTmplDecl        = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
         const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(clsTmplDecl), tok::semi, result);
 
-        mRewrite.InsertText(endOfCond, outputFormatHelper.GetString(), true, true);
+        InsertIndentedText(endOfCond, outputFormatHelper);
 
     } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*vd, result);
 
         const auto endOfCond = FindLocationAfterToken(GetEndLoc(vd), tok::semi, result);
-        mRewrite.InsertText(endOfCond, outputFormatHelper.GetString(), true, true);
+        InsertIndentedText(endOfCond, outputFormatHelper);
     }
 }
 //-----------------------------------------------------------------------------
