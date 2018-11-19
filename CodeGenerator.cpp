@@ -2120,10 +2120,11 @@ const char* CodeGenerator::GetBuiltinTypeSuffix(const BuiltinType::Kind& kind)
 void CodeGenerator::InsertMethod(const FunctionDecl*  d,
                                  OutputFormatHelper&  outputFormatHelper,
                                  const CXXMethodDecl& md,
-                                 bool /*skipConstexpr*/)
+                                 bool                 capturesThisByCopy)
 {
     LambdaCodeGenerator lambdaCodeGenerator{outputFormatHelper, mLambdaStack};
-    CodeGenerator&      codeGenerator{lambdaCodeGenerator};
+    lambdaCodeGenerator.mCapturedThisAsCopy = capturesThisByCopy;
+    CodeGenerator& codeGenerator{lambdaCodeGenerator};
 
     codeGenerator.InsertAccessModifierAndNameWithReturnType(*d);
     outputFormatHelper.AppendNewLine();
@@ -2161,8 +2162,21 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
     outputFormatHelper.AppendNewLine(kwClassSpace, lambdaTypeName);
     outputFormatHelper.OpenScope();
 
-    const auto& callOp      = *lambda->getCallOperator();
-    const auto& lambdaClass = *lambda->getLambdaClass();
+    const auto& callOp                = *lambda->getCallOperator();
+    const auto& lambdaClass           = *lambda->getLambdaClass();
+    const bool  isCapturingThisByCopy = [&] {
+        for(const auto& c : lambda->captures()) {
+            const auto captureKind = c.getCaptureKind();
+
+            // If we initialize by copy we can assign a variable: [a=b[1]], get this assigned variable (b[1]) and not a
+            // in this case.
+            if(c.capturesThis() && (captureKind == LCK_StarThis)) {
+                return true;
+            }
+        }
+
+        return false;
+    }();
 
     if(lambda->isGenericLambda()) {
         const auto conversions = llvm::make_range(lambdaClass.conversion_begin(), lambdaClass.conversion_end());
@@ -2183,7 +2197,7 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
                 lambdaClass.getLambdaStaticInvoker()->getDescribedFunctionTemplate()->specializations()) {
                 DPrint("invoker:\n");
 
-                InsertMethod(iv, outputFormatHelper, *lambdaClass.getLambdaCallOperator(), false);
+                InsertMethod(iv, outputFormatHelper, *lambdaClass.getLambdaCallOperator(), isCapturingThisByCopy);
             }
         }
 
@@ -2198,18 +2212,20 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
                  * type auto and no body. We do not want these functions. */
                 if(cxxmd->hasBody()) {
                     haveConversionOperator = true;
-                    InsertMethod(func, outputFormatHelper, *cxxmd, false);
+                    InsertMethod(func, outputFormatHelper, *cxxmd, isCapturingThisByCopy);
                 }
             }
 
             DPrint("-----\n");
         }
 
-        InsertMethod(&callOp, outputFormatHelper, callOp, false);
+        InsertMethod(&callOp, outputFormatHelper, callOp, isCapturingThisByCopy);
 
         if(haveConversionOperator && lambdaClass.getLambdaStaticInvoker()) {
-            InsertMethod(
-                lambdaClass.getLambdaStaticInvoker(), outputFormatHelper, *lambdaClass.getLambdaCallOperator(), false);
+            InsertMethod(lambdaClass.getLambdaStaticInvoker(),
+                         outputFormatHelper,
+                         *lambdaClass.getLambdaCallOperator(),
+                         isCapturingThisByCopy);
         }
     }
 
@@ -2264,25 +2280,17 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
         }
 
         const auto* capturedVar = c.getCapturedVar();
-        const auto& varType     = [&]() {
-            if(c.capturesThis()) {
-                return captureInit->getType();
-            }
-
-            return capturedVar->getType();
-        }();
+        const auto& varType     = (c.capturesThis()) ? captureInit->getType() : capturedVar->getType();
 
         const auto& clsVarType = [&]() {
-            const auto type = (c.capturesThis()) ? captureInit->getType() : capturedVar->getType();
-
             // http://eel.is/c++draft/expr.prim.lambda#capture-10 states, that implicitly captured variables are
             // captured by copied. This also applies for named captures which are not prefixed with an ampersand. The
             // clang internal type carries the ampersand, which is stripped in the following statement.
-            if((LCK_ByCopy == c.getCaptureKind()) && type->isLValueReferenceType()) {
-                return type->getPointeeType();
+            if((LCK_ByCopy == c.getCaptureKind()) && varType->isLValueReferenceType()) {
+                return varType->getPointeeType();
             }
 
-            return type;
+            return varType;
         }();
 
         const std::string varNamePlain = [&]() {
@@ -2605,7 +2613,12 @@ void LambdaCodeGenerator::InsertArg(const CXXThisExpr* stmt)
 {
     DPrint("thisExpr: imlicit=%d %s\n", stmt->isImplicit(), GetName(GetDesugarType(stmt->getType())));
 
-    mOutputFormatHelper.Append("__this");
+    if(mCapturedThisAsCopy) {
+        mOutputFormatHelper.Append("(&__this)");
+
+    } else {
+        mOutputFormatHelper.Append("__this");
+    }
 }
 //-----------------------------------------------------------------------------
 

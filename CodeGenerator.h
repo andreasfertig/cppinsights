@@ -229,6 +229,8 @@ public:
     using CodeGenerator::CodeGenerator;
 
     void InsertArg(const CXXThisExpr* stmt) override;
+
+    bool mCapturedThisAsCopy;
 };
 //-----------------------------------------------------------------------------
 

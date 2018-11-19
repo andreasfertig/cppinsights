@@ -44,7 +44,7 @@ class Foo
       {
         public: inline /*constexpr */ void operator()() const
         {
-          __this->Get();
+          (&__this)->Get();
         }
         
         private:
