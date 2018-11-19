@@ -132,9 +132,6 @@ public:
     void InsertAccessModifierAndNameWithReturnType(const FunctionDecl& decl,
                                                    const SkipAccess    skipAccess = SkipAccess::No);
 
-    static const char* GetStorageClassAsString(const StorageClass& sc);
-    static std::string GetStorageClassAsStringWithSpace(const StorageClass& sc);
-
 protected:
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
     void HandleCompoundStmt(const CompoundStmt* stmt);

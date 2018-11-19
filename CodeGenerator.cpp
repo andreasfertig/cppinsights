@@ -527,8 +527,6 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
     mOutputFormatHelper.AppendNewLine(';');
 
-    const bool isRefToObject = IsReference(*decompositionDeclStmt);
-
     for(const auto* bindingDecl : decompositionDeclStmt->bindings()) {
         if(const auto* binding = bindingDecl->getBinding()) {
 
@@ -543,6 +541,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
             }();
 
             const std::string refOrRefRef = [&]() -> std::string {
+                const bool isRefToObject{IsReference(*decompositionDeclStmt)};
                 const bool isArrayBinding{isa<ArraySubscriptExpr>(binding) && isRefToObject};
                 const bool isNotTemporary{holdingVarOrMemberExpr && !isa<ExprWithCleanups>(holdingVarOrMemberExpr)};
                 if(isArrayBinding || isNotTemporary) {
@@ -578,6 +577,28 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 }
 //-----------------------------------------------------------------------------
 
+static const char* GetStorageClassAsString(const StorageClass& sc)
+{
+    if(SC_None != sc) {
+        return VarDecl::getStorageClassSpecifierString(sc);
+    }
+
+    return "";
+}
+//-----------------------------------------------------------------------------
+
+static std::string GetStorageClassAsStringWithSpace(const StorageClass& sc)
+{
+    std::string ret{GetStorageClassAsString(sc)};
+
+    if(!ret.empty()) {
+        ret.append(" ");
+    }
+
+    return ret;
+}
+//-----------------------------------------------------------------------------
+
 static std::string GetQualifiers(const VarDecl& vd)
 {
     std::string qualifiers{};
@@ -586,13 +607,7 @@ static std::string GetQualifiers(const VarDecl& vd)
         qualifiers += "inline ";
     }
 
-    if(SC_Extern == vd.getStorageClass()) {
-        qualifiers += "extern ";
-    }
-
-    if(SC_Static == vd.getStorageClass()) {
-        qualifiers += "static ";
-    }
+    qualifiers += GetStorageClassAsStringWithSpace(vd.getStorageClass());
 
     if(vd.isConstexpr()) {
         qualifiers += "constexpr ";
@@ -2168,8 +2183,6 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
         for(const auto& c : lambda->captures()) {
             const auto captureKind = c.getCaptureKind();
 
-            // If we initialize by copy we can assign a variable: [a=b[1]], get this assigned variable (b[1]) and not a
-            // in this case.
             if(c.capturesThis() && (captureKind == LCK_StarThis)) {
                 return true;
             }
@@ -2182,14 +2195,12 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
         const auto conversions = llvm::make_range(lambdaClass.conversion_begin(), lambdaClass.conversion_end());
         for(auto&& conversion : conversions) {
             CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
-
             codeGenerator.InsertArg(conversion->getAsFunction()->getDescribedFunctionTemplate());
 
             DPrint("-----\n");
         }
 
         CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
-
         codeGenerator.InsertArg(lambdaClass.getLambdaCallOperator()->getDescribedFunctionTemplate());
 
         if(lambdaClass.getLambdaStaticInvoker()) {
@@ -2378,28 +2389,6 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
 
     outputFormatHelper.AppendNewLine(';');
     outputFormatHelper.AppendNewLine();
-}
-//-----------------------------------------------------------------------------
-
-const char* CodeGenerator::GetStorageClassAsString(const StorageClass& sc)
-{
-    if(SC_None != sc) {
-        return VarDecl::getStorageClassSpecifierString(sc);
-    }
-
-    return "";
-}
-//-----------------------------------------------------------------------------
-
-std::string CodeGenerator::GetStorageClassAsStringWithSpace(const StorageClass& sc)
-{
-    std::string ret{GetStorageClassAsString(sc)};
-
-    if(!ret.empty()) {
-        ret.append(" ");
-    }
-
-    return ret;
 }
 //-----------------------------------------------------------------------------
 
