@@ -107,12 +107,12 @@ inline constexpr std::string_view kwReinterpretCast{KW_REINTERPRET_CAST};
 inline constexpr std::string_view kwStaticCast{KW_STATIC_CAST};
 inline constexpr std::string_view kwSizeof{KW_SIZEOF};
 inline constexpr std::string_view kwAlignof{KW_ALIGNOF};
-inline constexpr std::string_view kwUnkown{"unkown"};
+inline constexpr std::string_view kwUnkown{"unkown"sv};
 inline constexpr std::string_view emptySV{};
 inline constexpr std::string_view kwOperator{KwWithNoSpace(KW_OPERATOR_ALL)};
 // inline constexpr std::string_view kwOperator{KW_OPERATOR};
 inline constexpr std::string_view kwTemplate{KW_TEMPLATE};
-inline constexpr std::string_view kwCommentStart{"/*"};
+inline constexpr std::string_view kwCommentStart{"/*"sv};
 inline constexpr std::string_view kwNullptr{KW_NULLPTR};
 inline constexpr std::string_view kwNull{KW_NULL};
 inline constexpr std::string_view kwNamespace{KW_NAMESPACE};
@@ -131,6 +131,8 @@ inline constexpr std::string_view kwThis{KwWithSpaceAfter(KwWithSpaceAfter(kwInt
 
 inline constexpr std::string_view hlpAssing{HLP_ASSIGN};
 inline constexpr std::string_view hlpArrow{HLP_ARROW};
+inline constexpr std::string_view hlpResumeFn{"resume_fn"sv};
+inline constexpr std::string_view hlpDestroyFn{"destroy_fn"sv};
 //-----------------------------------------------------------------------------
 
 #define BUILD_WITH_SPACE_AFTER(kw) kw " "

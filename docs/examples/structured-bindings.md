@@ -26,9 +26,7 @@ struct Point
 {
   int x;
   int y;
-  // inline Point() = default;
   // inline constexpr Point(const Point &) noexcept = default;
-  // inline constexpr Point(Point &&) = default;
 };
 
 
@@ -37,15 +35,15 @@ Point pt = {1, 2};
 
 // Here we get an additional object injected to which ax and ay refer.
 Point __pt9 = Point(pt);
-int& ax = __pt9.x;
-int& ay = __pt9.y;
+int & ax = __pt9.x;
+int & ay = __pt9.y;
 
 
 // In case of an reference the injected object is just a reference to
 // the original one.
 Point & __pt13 = pt;
-int& a2x = __pt13.x;
-int& a2y = __pt13.y;
+int & a2x = __pt13.x;
+int & a2y = __pt13.y;
 
 
 ```

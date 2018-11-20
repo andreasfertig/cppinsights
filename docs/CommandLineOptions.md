@@ -2,6 +2,7 @@
 
 * [alt-syntax-for](@ref alt_syntax_for)
 * [alt-syntax-subscription](@ref alt_syntax_subscription)
+* [edu-show-coroutine-transformation](@ref edu_show_coroutine_transformation)
 * [edu-show-initlist](@ref edu_show_initlist)
 * [edu-show-noexcept](@ref edu_show_noexcept)
 * [edu-show-padding](@ref edu_show_padding)

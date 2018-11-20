@@ -10,7 +10,11 @@
 #define INSIGHTS_OPT(opt, name, deflt, description, category)
 #endif
 
-INSIGHTS_OPT("alt-syntax-for", UseAltForSyntax, false, "Transform all for-loops into their equivalent while-loop.", gInsightCategory)
+INSIGHTS_OPT("alt-syntax-for",
+             UseAltForSyntax,
+             false,
+             "Transform all for-loops into their equivalent while-loop.",
+             gInsightCategory)
 INSIGHTS_OPT("alt-syntax-subscription",
              UseAltArraySubscriptionSyntax,
              false,
@@ -19,4 +23,9 @@ INSIGHTS_OPT("show-all-implicit-casts", ShowAllImplicitCasts, false, "Show all i
 INSIGHTS_OPT("edu-show-initlist", UseShowInitializerList, false, "Transform a std::initializer list", gInsightEduCategory)
 INSIGHTS_OPT("edu-show-noexcept", UseShowNoexcept, false, "Transform a noexcept function", gInsightEduCategory)
 INSIGHTS_OPT("edu-show-padding", UseShowPadding, false, "Show the padding bytes in a struct/class", gInsightEduCategory)
+INSIGHTS_OPT("edu-show-coroutine-transformation",
+             ShowCoroutineTransformation,
+             false,
+             "Show transformations of coroutines.",
+             gInsightEduCategory)
 #undef INSIGHTS_OPT

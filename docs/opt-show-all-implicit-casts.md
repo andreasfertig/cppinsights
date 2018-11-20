@@ -18,6 +18,7 @@ transforms into this:
 int main()
 {
   short s = static_cast<short>(2);
+  return 0;
 }
 
 

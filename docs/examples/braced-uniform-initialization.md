@@ -45,8 +45,6 @@ struct A
   
   int i;
   int j;
-  // inline constexpr A(const A &) = default;
-  // inline constexpr A(A &&) = default;
 };
 
 
@@ -56,8 +54,6 @@ struct B
   int i;
   int j;
   // inline B() noexcept = default;
-  // inline constexpr B(const B &) = default;
-  // inline constexpr B(B &&) = default;
 };
 
 
@@ -68,6 +64,7 @@ int main()
   A a2 = A{};
   B b = B();
   B b2 = {0, 0};
+  return 0;
 }
 
 

@@ -118,11 +118,21 @@ public:
 
         // Check whether we had static local variables which we transformed. Then for the placement-new we need to
         // include the header <new>.
-        if(CodeGenerator::NeedToInsertNewHeader() || CodeGenerator::NeedToInsertExceptionHeader() ||
-           CodeGenerator::NeedToInsertUtilityHeader()) {
+        if(CodeGenerator::NeedToInsertNewHeader() or CodeGenerator::NeedToInsertExceptionHeader() or
+           CodeGenerator::NeedToInsertUtilityHeader() or GetInsightsOptions().ShowCoroutineTransformation) {
             const auto& sm         = context.getSourceManager();
             const auto& mainFileId = sm.getMainFileID();
             const auto  loc        = sm.translateFileLineCol(sm.getFileEntryForID(mainFileId), 1, 1);
+
+            if(GetInsightsOptions().ShowCoroutineTransformation) {
+                mRewriter.InsertText(
+                    loc,
+                    R"(/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+)"sv);
+            }
 
             if(CodeGenerator::NeedToInsertNewHeader()) {
                 mRewriter.InsertText(

@@ -99,6 +99,28 @@ public:
         NewLine();
     }
 
+    void AppendComment(const std::string_view& arg)
+    {
+        Append("/* "sv);
+        Append(arg);
+        Append(" */"sv);
+    }
+
+    void AppendCommentNewLine(const std::string_view& arg)
+    {
+        AppendComment(arg);
+        NewLine();
+    }
+
+    void AppendCommentNewLine(const auto&... args)
+    {
+        if constexpr(0 < sizeof...(args)) {
+            AppendComment(StrCat(args...));
+        }
+
+        NewLine();
+    }
+
     STRONG_BOOL(NameOnly);
     STRONG_BOOL(GenMissingParamName);
 

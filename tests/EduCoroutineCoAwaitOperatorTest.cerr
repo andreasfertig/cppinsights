@@ -1,0 +1,4 @@
+.tmp.cpp:139:3: error: unknown type name 'awaiter'
+  awaiter __suspend_51_5;
+  ^
+1 error generated.

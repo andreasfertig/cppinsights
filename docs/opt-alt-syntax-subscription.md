@@ -21,6 +21,7 @@ int main()
 {
   int array[4] = {0, 0, 0, 0};
   (*(array + 0)) = 1;
+  return 0;
 }
 
 
