@@ -29,6 +29,8 @@ static const auto isTemplate = anyOf(hasAncestor(classTemplateDecl()),
     (void)Finder;                                                                                                      \
     (void)Builder
 
+extern const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;
+
 // \brief Matches AST nodes of type \c FunctionDecl which is a template instantiation.
 AST_MATCHER(FunctionDecl, isTemplateInstantiationPlain)
 {

@@ -40,6 +40,7 @@ AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
                                             isAutoAncestor,
                                             /* don't replace auto in templates */
                                             isTemplate,
+                                            hasAncestor(varTemplateDecl()),
                                             hasAncestor(functionDecl()))),
                                anyOf(/* auto */
                                      hasType(autoType().bind("autoType")),
@@ -66,7 +67,7 @@ void AutoStmtHandler::run(const MatchFinder::MatchResult& result)
         // 1              2   3
         // the SourceRange starts at (1) end ends at (3). The Location in the other hand starts at (1) and ends
         // at (2)
-        const auto sr = GetSourceRangeAfterToken(autoDecl->getSourceRange(), tok::semi, result);
+        const auto sr = GetSourceRangeAfterSemi(autoDecl->getSourceRange(), result);
 
         mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
     }

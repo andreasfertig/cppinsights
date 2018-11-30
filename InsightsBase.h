@@ -33,6 +33,8 @@ protected:
 protected:
     bool SkipIfAlreadySeen(const Stmt* stmt);
 
+    void InsertIndentedText(SourceLocation loc, OutputFormatHelper& outputFormatHelper);
+
 private:
     std::unordered_map<intptr_t, bool> mMap;
 };

@@ -55,12 +55,10 @@ static const LangOptions& GetLangOpts(const ast_matchers::MatchFinder::MatchResu
 }
 //-----------------------------------------------------------------------------
 
-SourceLocation FindLocationAfterToken(const SourceLocation                          loc,
-                                      const tok::TokenKind                          tokenKind,
-                                      const ast_matchers::MatchFinder::MatchResult& result)
+SourceLocation FindLocationAfterSemi(const SourceLocation loc, const ast_matchers::MatchFinder::MatchResult& result)
 {
     const SourceLocation locEnd =
-        clang::Lexer::findLocationAfterToken(loc, tokenKind, GetSM(result), GetLangOpts(result), false);
+        clang::Lexer::findLocationAfterToken(loc, tok::semi, GetSM(result), GetLangOpts(result), false);
 
     if(locEnd.isValid()) {
         return locEnd;
@@ -70,11 +68,9 @@ SourceLocation FindLocationAfterToken(const SourceLocation                      
 }
 //-----------------------------------------------------------------------------
 
-SourceRange GetSourceRangeAfterToken(const SourceRange                             range,
-                                     const tok::TokenKind                          tokenKind,
-                                     const ast_matchers::MatchFinder::MatchResult& result)
+SourceRange GetSourceRangeAfterSemi(const SourceRange range, const ast_matchers::MatchFinder::MatchResult& result)
 {
-    const SourceLocation locEnd = FindLocationAfterToken(range.getEnd(), tokenKind, result);
+    const SourceLocation locEnd = FindLocationAfterSemi(range.getEnd(), result);
 
     return {range.getBegin(), locEnd};
 }

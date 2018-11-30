@@ -64,7 +64,7 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
         // otherwise the provided source range is correct.
         const auto sr = [&]() {
             if(!funcDecl->doesThisDeclarationHaveABody()) {
-                return GetSourceRangeAfterToken(funcDecl->getSourceRange(), tok::semi, result);
+                return GetSourceRangeAfterSemi(funcDecl->getSourceRange(), result);
             }
 
             return funcDecl->getSourceRange();

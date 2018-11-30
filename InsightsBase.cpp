@@ -25,4 +25,10 @@ bool InsightsBase::SkipIfAlreadySeen(const Stmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void InsightsBase::InsertIndentedText(SourceLocation loc, OutputFormatHelper& outputFormatHelper)
+{
+    mRewrite.InsertText(loc, outputFormatHelper.GetString(), true, true);
+}
+//-----------------------------------------------------------------------------
+
 }  // namespace clang::insights

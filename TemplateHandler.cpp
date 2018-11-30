@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "TemplateHandler.h"
+#include <type_traits>
 #include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
@@ -18,6 +19,10 @@
 using namespace clang;
 using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
+
+namespace clang::ast_matchers {
+const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;
+}
 
 namespace clang::insights {
 /// \brief Inserts the instantiation point of a template.
@@ -38,6 +43,11 @@ InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceMan
 }
 //-----------------------------------------------------------------------------
 
+// Workaround to keep clang 6 Linux build alive
+template<class T, class U>
+inline constexpr bool is_same_v = std::is_same<T, U>::value;
+//-----------------------------------------------------------------------------
+
 /// \brief Insert the instantiated template with the resulting code.
 template<typename T>
 static OutputFormatHelper InsertInstantiatedTemplate(const T& decl, const MatchFinder::MatchResult& result)
@@ -47,10 +57,23 @@ static OutputFormatHelper InsertInstantiatedTemplate(const T& decl, const MatchF
     outputFormatHelper.AppendNewLine();
 
     const auto& sm = GetSM(result);
-    InsertInstantiationPoint(outputFormatHelper, sm, decl.getPointOfInstantiation());
+
+    if constexpr(not is_same_v<VarTemplateDecl, T>) {
+        InsertInstantiationPoint(outputFormatHelper, sm, decl.getPointOfInstantiation());
+    }
+
     outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
     CodeGenerator codeGenerator{outputFormatHelper};
-    codeGenerator.InsertArg(&decl);
+
+    if constexpr(is_same_v<VarTemplateDecl, T>) {
+        for(const auto& spec : decl.specializations()) {
+            InsertInstantiationPoint(outputFormatHelper, sm, spec->getPointOfInstantiation());
+            codeGenerator.InsertArg(spec);
+        }
+    } else {
+        codeGenerator.InsertArg(&decl);
+    }
+
     outputFormatHelper.AppendNewLine("#endif");
 
     return outputFormatHelper;
@@ -63,7 +86,8 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
     matcher.addMatcher(
         functionDecl(allOf(unless(isExpansionInSystemHeader()),
                            unless(isMacroOrInvalidLocation()),
-                           hasParent(functionTemplateDecl(unless(hasParent(classTemplateSpecializationDecl())))),
+                           hasParent(functionTemplateDecl(unless(hasParent(classTemplateSpecializationDecl())),
+                                                          unless(hasParent(cxxRecordDecl(isLambda()))))),
                            isTemplateInstantiationPlain()))
             .bind("func"),
         this);
@@ -72,32 +96,41 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
                                                        hasParent(classTemplateDecl().bind("decl")))
                            .bind("class"),
                        this);
+
+    matcher.addMatcher(
+        varTemplateDecl(unless(isExpansionInSystemHeader()), unless(hasParent(classTemplateDecl()))).bind("vd"), this);
 }
 //-----------------------------------------------------------------------------
 
 void TemplateHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* functionDecl = result.Nodes.getNodeAs<FunctionDecl>("func")) {
-        if(!functionDecl->getBody()) {
+        if(not functionDecl->getBody()) {
             return;
         }
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*functionDecl, result);
-        const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(*functionDecl), tok::semi, result);
+        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(*functionDecl), result);
 
-        mRewrite.InsertText(endOfCond.getLocWithOffset(1), outputFormatHelper.GetString(), true, true);
+        InsertIndentedText(endOfCond.getLocWithOffset(1), outputFormatHelper);
 
     } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("class")) {
         // skip classes/struct's without a definition
-        if(!clsTmplSpecDecl->hasDefinition()) {
+        if(not clsTmplSpecDecl->hasDefinition()) {
             return;
         }
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl, result);
         const auto*        clsTmplDecl        = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
-        const auto         endOfCond          = FindLocationAfterToken(GetEndLoc(clsTmplDecl), tok::semi, result);
+        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(clsTmplDecl), result);
 
-        mRewrite.InsertText(endOfCond, outputFormatHelper.GetString(), true, true);
+        InsertIndentedText(endOfCond, outputFormatHelper);
+
+    } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*vd, result);
+
+        const auto endOfCond = FindLocationAfterSemi(GetEndLoc(vd), result);
+        InsertIndentedText(endOfCond, outputFormatHelper);
     }
 }
 //-----------------------------------------------------------------------------
