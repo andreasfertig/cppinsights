@@ -43,6 +43,11 @@ InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceMan
 }
 //-----------------------------------------------------------------------------
 
+// Workaround to keep clang 6 Linux build alive
+template<class T, class U>
+inline constexpr bool is_same_v = std::is_same<T, U>::value;
+//-----------------------------------------------------------------------------
+
 /// \brief Insert the instantiated template with the resulting code.
 template<typename T>
 static OutputFormatHelper InsertInstantiatedTemplate(const T& decl, const MatchFinder::MatchResult& result)
@@ -53,14 +58,14 @@ static OutputFormatHelper InsertInstantiatedTemplate(const T& decl, const MatchF
 
     const auto& sm = GetSM(result);
 
-    if constexpr(not std::is_same_v<VarTemplateDecl, T>) {
+    if constexpr(not is_same_v<VarTemplateDecl, T>) {
         InsertInstantiationPoint(outputFormatHelper, sm, decl.getPointOfInstantiation());
     }
 
     outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
     CodeGenerator codeGenerator{outputFormatHelper};
 
-    if constexpr(std::is_same_v<VarTemplateDecl, T>) {
+    if constexpr(is_same_v<VarTemplateDecl, T>) {
         for(const auto& spec : decl.specializations()) {
             InsertInstantiationPoint(outputFormatHelper, sm, spec->getPointOfInstantiation());
             codeGenerator.InsertArg(spec);
