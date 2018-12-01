@@ -14,6 +14,7 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 
+#include "ClangCompat.h"
 #include "InsightsHelpers.h"
 #include "InsightsStaticStrings.h"
 #include "InsightsStrongTypes.h"
