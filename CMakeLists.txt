@@ -175,36 +175,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         add_definitions(-O0)
     endif()
 
-    if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
-      execute_process(
-        COMMAND git log -1 --format=%H
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_COMMIT_HASH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-      )
 
-      execute_process(
-        COMMAND git config --get remote.origin.url
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_REPO_URL
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-      )
-  
-    else()
-      set(GIT_REPO_URL "")
-      set(GIT_COMMIT_HASH "")
-    endif()
-
-    message(STATUS "Git repo url: ${GIT_REPO_URL}")
-    message(STATUS "Git commit hash: ${GIT_COMMIT_HASH}")
-    message(STATUS "Generating version.h")
-
-    configure_file(
-      ${CMAKE_SOURCE_DIR}/version.h.in
-      ${CMAKE_BINARY_DIR}/generated/version.h
-    )
-
-    include_directories(${CMAKE_BINARY_DIR}/generated)
     include_directories(${LLVM_INCLUDE_DIR} .)
     link_directories(${LLVM_LIBDIR})    
 
@@ -224,9 +195,9 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     endif()
 
     # copied from: llvm/tools/clang/cmake/modules/AddClang.cmake
-    macro(add_clang_executable name)
+    macro(add_clang_tool name)
       add_executable( ${name} ${ARGN} )
-    endmacro(add_clang_executable)
+    endmacro(add_clang_tool)
 
     # additional libs required when building insights outside llvm
     set(ADDITIONAL_LIBS         
@@ -259,6 +230,37 @@ if (${LLVM_PACKAGE_VERSION} VERSION_LESS ${INSIGHTS_MIN_LLVM_VERSION})
     message(FATAL_ERROR "LLVM version ${INSIGHTS_MIN_LLVM_VERSION} or higher required. Current version is: ${LLVM_PACKAGE_VERSION}.")
 endif()
 
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
+  execute_process(
+    COMMAND git log -1 --format=%H
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  execute_process(
+    COMMAND git config --get remote.origin.url
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_REPO_URL
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  
+else()
+  set(GIT_REPO_URL "")
+  set(GIT_COMMIT_HASH "")
+endif()
+
+message(STATUS "Generating version.h")
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+  ${CMAKE_BINARY_DIR}/generated/version.h
+)
+
+include_directories(${CMAKE_BINARY_DIR}/generated)
+
+
 # http://www.mariobadr.com/using-clang-tidy-with-cmake-36.html
 find_program( 
   CLANG_TIDY_EXE
@@ -285,7 +287,7 @@ endif()
 
 
 # name the executable and all source files
-add_clang_executable(insights
+add_clang_tool(insights
     AutoStmtHandler.cpp
     CodeGenerator.cpp
     CompilerGeneratedHandler.cpp
@@ -427,6 +429,8 @@ message(STATUS "Min LLVM major version: ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}")
 message(STATUS "Install path          : ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "CMAKE_SOURCE_DIR      : ${CMAKE_SOURCE_DIR}")
 message(STATUS "CMAKE_BINARY_DIR      : ${CMAKE_BINARY_DIR}")
+message(STATUS "Git repo url          : ${GIT_REPO_URL}")
+message(STATUS "Git commit hash       : ${GIT_COMMIT_HASH}")
 message(STATUS "Debug                 : ${DEBUG}")
 message(STATUS "Code Coverage         : ${INSIGHTS_COVERAGE}")
 message(STATUS "Static linking        : ${INSIGHTS_STATIC}")
