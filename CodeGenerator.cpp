@@ -762,6 +762,17 @@ void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
+{
+    const auto& constructorDecl = *stmt->getConstructor();
+
+    mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
+    WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+        mOutputFormatHelper.AppendParameterList(constructorDecl.parameters(), OutputFormatHelper::NameOnly::Yes);
+    });
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 {
     LAMBDA_SCOPE_HELPER(MemberCallExpr);
@@ -1485,7 +1496,42 @@ void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 
 void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
 {
-    InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
+    OutputFormatHelper initOutputFormatHelper{};
+    initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
+    CXXConstructorDecl* cxxInheritedCtorDecl{nullptr};
+
+    // travers the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the name
+    // and the type. The CXXMethodDecl above knows only the type.
+    if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
+        CodeGenerator codeGenerator{initOutputFormatHelper};
+        bool          first = true;
+
+        for(const auto* init : ctor->inits()) {
+            initOutputFormatHelper.AppendNewLine();
+            if(first) {
+                first = false;
+                initOutputFormatHelper.Append(": ");
+            } else {
+                initOutputFormatHelper.Append(", ");
+            }
+
+            // in case of delegating or base initializer there is no member.
+            if(const auto* member = init->getMember()) {
+                initOutputFormatHelper.Append(member->getNameAsString());
+                codeGenerator.InsertCurlysIfRequired(init->getInit());
+            } else {
+                const auto* inlineInit = init->getInit();
+
+                if(const auto* cxxInheritedCtorInitExpr = dyn_cast_or_null<CXXInheritedCtorInitExpr>(inlineInit)) {
+                    cxxInheritedCtorDecl = cxxInheritedCtorInitExpr->getConstructor();
+                }
+
+                codeGenerator.InsertArg(inlineInit);
+            }
+        }
+    }
+
+    InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes, cxxInheritedCtorDecl);
 
     if(stmt->isDefaulted()) {
         mOutputFormatHelper.AppendNewLine(" = default;");
@@ -1497,27 +1543,7 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         return;
     }
 
-    if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
-        bool first = true;
-
-        for(const auto* init : ctor->inits()) {
-            mOutputFormatHelper.AppendNewLine();
-            if(first) {
-                first = false;
-                mOutputFormatHelper.Append(": ");
-            } else {
-                mOutputFormatHelper.Append(", ");
-            }
-
-            // in case of delegating or base initializer there is no member.
-            if(const auto* member = init->getMember()) {
-                mOutputFormatHelper.Append(member->getNameAsString());
-                InsertCurlysIfRequired(init->getInit());
-            } else {
-                InsertArg(init->getInit());
-            }
-        }
-    }
+    mOutputFormatHelper.Append(initOutputFormatHelper.GetString());
 
     if(stmt->doesThisDeclarationHaveABody()) {
         mOutputFormatHelper.AppendNewLine();
@@ -2402,7 +2428,9 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl& decl, const SkipAccess skipAccess)
+void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl&       decl,
+                                                              const SkipAccess          skipAccess,
+                                                              const CXXConstructorDecl* cxxInheritedCtorDecl)
 {
     bool        isLambda{false};
     bool        isFirstCxxMethodDecl{true};
@@ -2529,7 +2557,12 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         outputFormatHelper.Append("(");
     }
 
-    outputFormatHelper.AppendParameterList(decl.parameters());
+    // if a CXXInheritedCtorDecl was passed as a pointer us this to get the parameters from.
+    if(cxxInheritedCtorDecl) {
+        outputFormatHelper.AppendParameterList(cxxInheritedCtorDecl->parameters());
+    } else {
+        outputFormatHelper.AppendParameterList(decl.parameters());
+    }
     outputFormatHelper.Append(")");
 
     if(!isa<CXXConstructorDecl>(decl) && !isa<CXXDestructorDecl>(decl)) {

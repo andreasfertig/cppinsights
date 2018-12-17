@@ -1,0 +1,43 @@
+class Foo{ 
+public:
+    inline Foo(double amount)
+    {
+    }
+    
+     
+    inline Foo(int x, int y)
+    {
+    }
+    
+    
+/* public: inline constexpr Foo(const Foo &); */
+/* public: inline constexpr Foo(Foo &&); */
+/* public: inline ~Foo(); */
+};
+
+class Bar: public Foo{ 
+public:
+      inline Bar(double amount) noexcept(false)
+                       : Foo(amount)
+                       {
+                       }
+                       
+                       inline Bar(int x, int y) noexcept(false)
+                       : Foo(x, y)
+                       {
+                       }
+                       
+                       
+
+int mX;
+/* public: inline constexpr Bar(const Bar &); */
+/* public: inline constexpr Bar(Bar &&); */
+};
+
+int main()
+{
+  Bar bar0 = Bar{100.0};
+  Bar bar1 = Bar(100.0);
+  Bar bar2 = Bar(1, 2);
+}
+

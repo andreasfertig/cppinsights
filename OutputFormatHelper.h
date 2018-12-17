@@ -42,12 +42,17 @@ public:
     /// \brief Insert a string before the position \c atPos
     void InsertAt(const size_t atPos, const std::string& data) { mOutput.insert(atPos, data); }
 
+    STRONG_BOOL(SkipIndenting);
+
     /// \brief Set the indent level of this class to that of \c rhs.
-    void SetIndent(const OutputFormatHelper& rhs)
+    void SetIndent(const OutputFormatHelper& rhs, const SkipIndenting skipIndenting = SkipIndenting::No)
     {
         if(&rhs != this) {
             mDefaultIndent = rhs.mDefaultIndent;
-            Indent(mDefaultIndent);
+
+            if(SkipIndenting::No == skipIndenting) {
+                Indent(mDefaultIndent);
+            }
         }
     }
 
@@ -95,10 +100,12 @@ public:
         NewLine();
     }
 
+    STRONG_BOOL(NameOnly);
+
     /// \brief Append a \c ParamVarDecl array.
     ///
     /// The parameter name is always added as well.
-    void AppendParameterList(const ArrayRef<ParmVarDecl*> parameters);
+    void AppendParameterList(const ArrayRef<ParmVarDecl*> parameters, const NameOnly nameOnly = NameOnly::No);
 
     /// \brief Increase the current indention by \c SCOPE_INDENT
     void IncreaseIndent() { mDefaultIndent += SCOPE_INDENT; }
