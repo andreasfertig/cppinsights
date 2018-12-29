@@ -1458,10 +1458,13 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 
         mOutputFormatHelper.Append(stream.str(), "<");
 
-        for(const auto& arg : templateSpecializationType->template_arguments()) {
-            arg.getAsExpr()->dump();
-            InsertArg(arg.getAsExpr());
-        }
+        ForEachArg(templateSpecializationType->template_arguments(), [&](const auto& arg) {
+            if(arg.getKind() == TemplateArgument::Expression) {
+                InsertArg(arg.getAsExpr());
+            } else {
+                InsertTemplateArg(arg);
+            }
+        });
 
         mOutputFormatHelper.Append(">");
     } else {
