@@ -190,6 +190,27 @@ static std::string GetScope(const DeclContext* declCtx)
 
 static std::string GetNameInternal(const QualType& t, const Unqualified unqualified)
 {
+    if(const auto* memberPointerType = t->getAs<MemberPointerType>()) {
+        if(const auto* recordType2 = dyn_cast_or_null<RecordType>(memberPointerType->getClass())) {
+            if(const auto* decl = recordType2->getDecl()) {
+                if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(decl)) {
+                    if(cxxRecordDecl->isLambda()) {
+                        std::string result{GetAsCPPStyleString(t)};
+
+                        static const std::string clangLambdaName{"(lambda)::*"};
+                        if(auto pos = result.find(clangLambdaName); std::string::npos != pos) {
+                            std::string lambdaName = GetLambdaName(*cxxRecordDecl);
+                            lambdaName += "::*";
+
+                            result.replace(pos, clangLambdaName.length(), lambdaName);
+                            return result;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if(t.getTypePtrOrNull()) {
         std::string       refOrPointer{};
         const RecordType* recordType = [&]() -> const RecordType* {

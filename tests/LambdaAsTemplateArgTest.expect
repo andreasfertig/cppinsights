@@ -1,0 +1,46 @@
+template <typename T>
+struct FunctionArgs  {};
+
+/* First instantiated from: LambdaAsTemplateArgTest.cpp:14 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<int (__lambda_12_14::*)(int) const>
+{
+  inline constexpr FunctionArgs() noexcept = default;
+  inline constexpr FunctionArgs(const FunctionArgs<int (__lambda_12_14::*)(int) const> &) = default;
+  inline constexpr FunctionArgs(FunctionArgs<int (__lambda_12_14::*)(int) const> &&) = default;
+  
+};
+
+#endif
+
+
+template <typename R, typename C, typename... Args>
+struct FunctionArgs<R(C::*)(Args...) const>  {};
+
+
+int main()
+{
+  int y = 2;
+  int z = 3;
+    
+  class __lambda_12_14
+  {
+    public: inline /*constexpr */ int operator()(int x) const
+    {
+      return x + y;
+    }
+    
+    private:
+    int& y;
+    
+    public: __lambda_12_14(int& _y)
+    : y{_y}
+    {}
+    
+  };
+  
+  __lambda_12_14 l = __lambda_12_14{y};
+  FunctionArgs<decltype(&decltype(l)::operator())> a = FunctionArgs<int (__lambda_12_14::*)(int) const>();
+}
+
