@@ -178,6 +178,21 @@ insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
 There is also another github project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
+
+## Compatibility
+
+Currently the most recent stable version is clang is supported as well as the current development branch. 
+
+
+## ToDo's
+
++ Catch insights crashes and provide easy issue reporting including error output.
++ Short links (public database?)
++ Time tests to see performance changes
++ Provide easy local installation (via docker)
++ short links
+
+
 ## Get Involved
 + Report bugs/issues by submitting a [Github issue](https://github.com/andreasfertig/cppinsights/issues).
 + Submit contributions using [pull requests](https://github.com/andreasfertig/cppinsights/pulls). See [Contributing](CONTRIBUTING.md)

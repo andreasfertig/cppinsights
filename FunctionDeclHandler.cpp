@@ -48,6 +48,9 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
                                 isMacroOrInvalidLocation())))
             .bind("friendDecl"),
         this);
+
+    // Match the using Base::Base statement and remove it.
+    matcher.addMatcher(usingDecl(hasParent(cxxRecordDecl())).bind("using"), this);
 }
 //-----------------------------------------------------------------------------
 
@@ -70,8 +73,15 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
             return funcDecl->getSourceRange();
         }();
 
-        // DPrint("fd rw: %s\n", outputFormatHelper.GetString());
-        mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
+        // DPrint("fd rw:  %d %s\n", (sr.getBegin() == sr.getEnd()), outputFormatHelper.GetString());
+
+        if(sr.getBegin() != sr.getEnd()) {
+            mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
+        } else {
+            // special handling for at least using Base::Base for inheriting ctors from Base class.
+            const auto ssr = GetSourceRangeAfterSemi(funcDecl->getSourceRange(), result);
+            InsertIndentedText(ssr.getEnd(), outputFormatHelper);
+        }
 
     } else if(const auto* friendDecl = result.Nodes.getNodeAs<FriendDecl>("friendDecl")) {
         if(const auto* fd = friendDecl->getFriendDecl()) {
@@ -89,6 +99,17 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 
         DPrint("fd rw: %s\n", outputFormatHelper.GetString());
         mRewrite.ReplaceText(friendDecl->getSourceRange(), outputFormatHelper.GetString());
+    } else if(const auto* usingDecl = result.Nodes.getNodeAs<UsingDecl>("using")) {
+        // Check if one of the shadows contains a ConstructorUsingShadowDecl which implies Base::Base.
+        for(const auto& shadow : usingDecl->shadows()) {
+            if(const auto* usingShadow = dyn_cast_or_null<ConstructorUsingShadowDecl>(shadow)) {
+                // This is a base ctor using. Remove this using. The actual code is inserted by the FunctionDecl
+                // matcher.
+                const auto sr = GetSourceRangeAfterSemi(usingDecl->getSourceRange(), result);
+                mRewrite.RemoveText(sr);
+                break;
+            }
+        }
     }
 }
 //-----------------------------------------------------------------------------

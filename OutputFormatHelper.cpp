@@ -28,13 +28,18 @@ void OutputFormatHelper::Indent(unsigned count)
 }
 //-----------------------------------------------------------------------------
 
-void OutputFormatHelper::AppendParameterList(const ArrayRef<ParmVarDecl*> parameters)
+void OutputFormatHelper::AppendParameterList(const ArrayRef<ParmVarDecl*> parameters, const NameOnly nameOnly)
 {
     ForEachArg(parameters, [&](const auto& p) {
-        const auto& type{p->getType()};
         const auto& name{GetName(*p)};
 
-        Append(GetTypeNameAsParameter(type, name));
+        if(NameOnly::No == nameOnly) {
+            const auto& type{p->getType()};
+
+            Append(GetTypeNameAsParameter(type, name));
+        } else {
+            Append(name);
+        }
     });
 }
 //-----------------------------------------------------------------------------

@@ -130,8 +130,17 @@ public:
 
     STRONG_BOOL(SkipAccess);
 
-    void InsertAccessModifierAndNameWithReturnType(const FunctionDecl& decl,
-                                                   const SkipAccess    skipAccess = SkipAccess::No);
+    /// \brief Insert the code for a FunctionDecl.
+    ///
+    /// This inserts the code of a FunctionDecl (and everything which is derived from one). It takes care of
+    /// CXXMethodDecl's access modifier as well as things like constexpr, noexcept, static and more.
+    ///
+    /// @param decl The FunctionDecl to process.
+    /// @param skipAccess Show or hide access modifiers (public, private, protected). The default is to show them.
+    /// @param cxxInheritedCtorDecl If not null, the type and name of this decl is used for the parameters.
+    void InsertAccessModifierAndNameWithReturnType(const FunctionDecl&       decl,
+                                                   const SkipAccess          skipAccess           = SkipAccess::No,
+                                                   const CXXConstructorDecl* cxxInheritedCtorDecl = nullptr);
 
 protected:
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
