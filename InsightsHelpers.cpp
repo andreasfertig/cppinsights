@@ -334,7 +334,10 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
 {
     const bool isFunctionPointer = TestPlainSubType<LValueReferenceType, FunctionProtoType>(t);
     const bool isArrayRef        = TestPlainSubType<LValueReferenceType, ConstantArrayType>(t);
-    const bool isPointerToArray  = TestPlainSubType<PointerType, ConstantArrayType>(t);
+    // Special case for Issue81, auto returns an array-ref and to catch auto deducing an array (Issue106)
+    const bool isAutoType             = dyn_cast_or_null<AutoType>(t.getTypePtrOrNull());
+    const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
+    const bool isPointerToArray       = TestPlainSubType<PointerType, ConstantArrayType>(pointerToArrayBaseType);
 
     std::string typeName = details::GetName(t, unqualified);
 
