@@ -1094,20 +1094,32 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
         });
     }
 
-    Dump(stmt);
-    Dump(stmt->getOperatorNew());
-
     if(const auto* ctorExpr = stmt->getConstructExpr()) {
         InsertArg(ctorExpr);
 
     } else {
-        mOutputFormatHelper.Append(GetName(stmt->getAllocatedType()));
+        auto name = GetName(stmt->getAllocatedType());
 
+        // Special handling for arrays. They differ from one to more dimensions.
         if(stmt->isArray()) {
-            mOutputFormatHelper.Append('[');
-            InsertArg(stmt->getArraySize());
-            mOutputFormatHelper.Append(']');
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm};
+
+            ofm.Append("[");
+            codeGenerator.InsertArg(stmt->getArraySize());
+            ofm.Append(']');
+
+            // In case of multi dimension the first dimension is the getArraySize() while the others are part of the
+            // type included in GetName(...).
+            if(std::string::npos != name.find("[", 0)) {
+                InsertBefore(name, "[", ofm.GetString());
+            } else {
+                // here we have the single dimension case, the dimension is not part of GetName, so add it.
+                name.append(ofm.GetString());
+            }
         }
+
+        mOutputFormatHelper.Append(name);
 
         if(stmt->hasInitializer()) {
             InsertCurlysIfRequired(stmt->getInitializer());
