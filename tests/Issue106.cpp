@@ -1,9 +1,8 @@
 int main()
 {
-    auto p = new int[2][3][4];
+    auto p = new int[3][3][4];
 
-//    auto z = new int[1];
+    auto z = new int[1];
 
-//    auto x = new int;
+    auto x = new int;
 }
-

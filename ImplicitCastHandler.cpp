@@ -25,6 +25,7 @@ ImplicitCastHandler::ImplicitCastHandler(Rewriter& rewrite, MatchFinder& matcher
         anyOf(isExpansionInSystemHeader(),
               isMacroOrInvalidLocation(),
               isTemplate,
+              isAutoAncestor,
               hasAncestor(functionDecl()),
               hasAncestor(userDefinedLiteral()),
               hasAncestor(implicitCastExpr(hasMatchingCast())), /* will be catch by the walk down */

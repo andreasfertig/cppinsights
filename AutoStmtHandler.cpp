@@ -18,23 +18,18 @@ using namespace clang;
 using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
 
+namespace clang::ast_matchers {
+
 // XXX: recent clang source has a declType matcher. Try to figure out a migration path.
 const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType> myDecltypeType;
 //-----------------------------------------------------------------------------
+}  // namespace clang::ast_matchers
 
 namespace clang::insights {
 
 AutoStmtHandler::AutoStmtHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-
-    static const auto isAutoAncestor =
-        hasAncestor(varDecl(anyOf(hasType(autoType().bind("autoType")),
-                                  hasType(qualType(hasDescendant(autoType().bind("autoType")))),
-                                  /* decltype and decltype(auto) */
-                                  hasType(myDecltypeType().bind("dt")),
-                                  hasType(qualType(hasDescendant(myDecltypeType().bind("dt")))))));
-
     matcher.addMatcher(varDecl(unless(anyOf(isExpansionInSystemHeader(),
                                             isMacroOrInvalidLocation(),
                                             isAutoAncestor,

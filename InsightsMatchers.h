@@ -18,10 +18,22 @@
 namespace clang {
 namespace ast_matchers {
 
+// XXX: recent clang source has a declType matcher. Try to figure out a migration path.
+extern const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType> myDecltypeType;
+//-----------------------------------------------------------------------------
+
 /* don't replace stuff in template definitions */
 static const auto isTemplate = anyOf(hasAncestor(classTemplateDecl()),
                                      hasAncestor(functionTemplateDecl()),
                                      hasAncestor(classTemplateSpecializationDecl()));
+//-----------------------------------------------------------------------------
+
+static const auto isAutoAncestor =
+    hasAncestor(varDecl(anyOf(hasType(autoType().bind("autoType")),
+                              hasType(qualType(hasDescendant(autoType().bind("autoType")))),
+                              /* decltype and decltype(auto) */
+                              hasType(myDecltypeType().bind("dt")),
+                              hasType(qualType(hasDescendant(myDecltypeType().bind("dt")))))));
 //-----------------------------------------------------------------------------
 
 /// \brief Shut up a unused variable warnings
