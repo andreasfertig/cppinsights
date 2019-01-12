@@ -1623,7 +1623,18 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 
 void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
-    mOutputFormatHelper.AppendNewLine(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)), ";");
+    mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
+
+    const auto* initializer = stmt->getInClassInitializer();
+    if(stmt->hasInClassInitializer() && initializer) {
+        if(ICIS_ListInit != stmt->getInClassInitStyle()) {
+            mOutputFormatHelper.Append(" = ");
+        }
+
+        InsertArg(initializer);
+    }
+
+    mOutputFormatHelper.AppendNewLine(";");
 }
 //-----------------------------------------------------------------------------
 
@@ -2370,6 +2381,19 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
             return varNamePlain;
         }();
 
+        const auto captureKind = c.getCaptureKind();
+
+        // If we initialize by copy we can assign a variable: [a=b[1]], get this assigned variable (b[1]) and not a in
+        // this case.
+        if(!c.capturesThis() && capturedVar->hasInit() && (captureKind == LCK_ByCopy)) {
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm, mLambdaStack};
+            codeGenerator.InsertArg(captureInit);
+            inits.append(ofm.GetString());
+        } else {
+            inits.append(StrCat(((c.getCaptureKind() == LCK_StarThis) ? "*" : ""), varNamePlain));
+        }
+
         const std::string varTypeName     = GetCaptureTypeNameAsParameter(clsVarType, varNamePlain);
         const std::string ctorVarTypeName = GetCaptureTypeNameAsParameter(varType, StrCat("_", varNamePlain));
 
@@ -2379,7 +2403,6 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
 
         outputFormatHelper.Append(varTypeName);
 
-        const auto captureKind = c.getCaptureKind();
         switch(captureKind) {
             case LCK_This: break;
             case LCK_StarThis: break;
@@ -2393,17 +2416,6 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
                     outputFormatHelper.Append("&");
                 }
                 break;
-        }
-
-        // If we initialize by copy we can assign a variable: [a=b[1]], get this assigned variable (b[1]) and not a in
-        // this case.
-        if(!c.capturesThis() && capturedVar->hasInit() && (captureKind == LCK_ByCopy)) {
-            OutputFormatHelper ofm{};
-            CodeGenerator      codeGenerator{ofm, mLambdaStack};
-            codeGenerator.InsertArg(captureInit);
-            inits.append(ofm.GetString());
-        } else {
-            inits.append(StrCat(((c.getCaptureKind() == LCK_StarThis) ? "*" : ""), varNamePlain));
         }
 
         if(!varType->isArrayType()) {
