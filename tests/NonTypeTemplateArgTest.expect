@@ -1,7 +1,8 @@
 #define INSIGHTS_USE_TEMPLATE
 #include <cstdio>
 
-static const char c[] = "Hello World";
+static const char c[12] = "Hello World";
+
 
 template<auto C>
 struct SC

@@ -293,6 +293,7 @@ add_clang_tool(insights
     CompilerGeneratedHandler.cpp
     DPrint.cpp
     FunctionDeclHandler.cpp
+    GlobalVariableHandler.cpp
     ImplicitCastHandler.cpp
     Insights.cpp
     InsightsBase.cpp

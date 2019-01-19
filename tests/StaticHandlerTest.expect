@@ -35,6 +35,7 @@ private:
 
 static size_t counter = 0;
 
+
 Singleton & Singleton::Instance()
 {
   static bool __singletonB;

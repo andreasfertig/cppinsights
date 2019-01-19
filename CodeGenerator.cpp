@@ -603,7 +603,7 @@ static std::string GetQualifiers(const VarDecl& vd)
 {
     std::string qualifiers{};
 
-    if(vd.isInline()) {
+    if(vd.isInline() || vd.isInlineSpecified()) {
         qualifiers += "inline ";
     }
 

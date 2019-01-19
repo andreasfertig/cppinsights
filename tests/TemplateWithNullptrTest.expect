@@ -27,8 +27,10 @@ class B<A, void (A::*)()>
 #endif
 
 
-B<A> b1; //OK
+B<A> b1 = B<A, void (A::*)()>();
+ //OK
 //B<A, static_cast<SomeMethod_t>(0)> b2; //OK
-B<A, nullptr> b3; //OK
+B<A, nullptr> b3 = B<A, void (A::*)()>();
+ //OK
 //B<A, 0> b4; // error: could not convert template argument ‘0’ to ‘void (A::*)()’
 

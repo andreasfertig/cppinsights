@@ -28,6 +28,7 @@ UserDefinedLiteralHandler::UserDefinedLiteralHandler(Rewriter& rewrite, MatchFin
                                         /* if we match the top-most CXXOperatorCallExpr we will see all
                                            descendants. So filter them here to avoid getting them multiple times */
                                         hasAncestor(functionDecl()),
+                                        hasAncestor(varDecl(hasParent(translationUnitDecl()))),
                                         hasAncestor(implicitCastExpr(hasMatchingCast())))))
             .bind("udl"),
         this);

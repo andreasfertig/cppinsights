@@ -16,5 +16,6 @@ inline constexpr std::chrono::duration<long double, std::ratio<1, 1> > operator"
 
 //------------------------------------------------------------------------------
 
-static constexpr const seconds_t TIMEOUT      {operator""_s(1ull)};
+static constexpr const seconds_t TIMEOUT = {operator""_s(1ull)};
+
 
