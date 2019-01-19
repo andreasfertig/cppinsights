@@ -139,6 +139,12 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
     auto&      langOpts{GetLangOpts(*rangeForStmt->getLoopVariable())};
     const bool onlyCpp11{not langOpts.CPlusPlus14};
 
+#if IS_CLANG_NEWER_THAN(7)
+    // C++20 init-statement
+    InsertArg(rangeForStmt->getInit());
+#endif
+
+    // range statement
     InsertArg(rangeForStmt->getRangeStmt());
 
     if(not onlyCpp11) {
