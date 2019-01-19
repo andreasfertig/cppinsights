@@ -94,6 +94,8 @@ public:
     : mOutputFormatHelper{_outputFormatHelper}
     , mLambdaStackThis{}
     , mLambdaStack{mLambdaStackThis}
+    , mSkipVarDecl{SkipVarDecl::No}
+    , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
     {
     }
 
@@ -101,6 +103,8 @@ public:
     : mOutputFormatHelper{_outputFormatHelper}
     , mLambdaStackThis{}
     , mLambdaStack{lambdaStack}
+    , mSkipVarDecl{SkipVarDecl::No}
+    , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
     {
     }
 
@@ -212,6 +216,12 @@ protected:
 
     LambdaStackType  mLambdaStackThis;
     LambdaStackType& mLambdaStack;
+
+    STRONG_BOOL(SkipVarDecl);
+    STRONG_BOOL(UseCommaInsteadOfSemi);
+
+    SkipVarDecl           mSkipVarDecl;
+    UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
 };
 //-----------------------------------------------------------------------------
 

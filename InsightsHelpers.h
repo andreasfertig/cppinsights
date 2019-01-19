@@ -98,6 +98,12 @@ static inline const SourceManager& GetSM(const Decl& decl)
 }
 //-----------------------------------------------------------------------------
 
+static inline const LangOptions& GetLangOpts(const Decl& decl)
+{
+    return decl.getASTContext().getLangOpts();
+}
+//-----------------------------------------------------------------------------
+
 std::string GetNameAsWritten(const QualType& t);
 
 bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl);
