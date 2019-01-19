@@ -414,7 +414,10 @@ static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 
 bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl)
 {
-    if(varDecl.isStaticLocal()) {
+    auto&      langOpts{GetLangOpts(varDecl)};
+    const bool haveCpp11{true == langOpts.CPlusPlus11};
+
+    if(haveCpp11 && varDecl.isStaticLocal()) {
         if(const auto* cxxRecordDecl = varDecl.getType()->getAsCXXRecordDecl()) {
             if(cxxRecordDecl->hasNonTrivialDestructor()) {
                 return true;
