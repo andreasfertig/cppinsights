@@ -181,7 +181,7 @@ Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
 ## Compatibility
 
-Currently the most recent stable version is clang is supported as well as the current development branch. 
+Currently the most recent stable version of clang is supported as well as the current development branch. 
 
 
 ## ToDo's
