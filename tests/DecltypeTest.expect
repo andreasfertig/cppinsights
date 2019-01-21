@@ -1,0 +1,7 @@
+int main()
+{
+  const char s[6] = "Hello";
+  const char *const cs = s;
+  const char *const cas = cs;
+}
+
