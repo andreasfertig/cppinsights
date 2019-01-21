@@ -289,6 +289,18 @@ static std::string GetNameInternal(const QualType& t, const Unqualified unqualif
 }
 //-----------------------------------------------------------------------------
 
+static bool IsDecltypeType(const QualType& t)
+{
+    if(t.getTypePtrOrNull()) {
+        if(isa<clang::DecltypeType>(t)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 static std::string GetName(const QualType& t, const Unqualified unqualified = Unqualified::No)
 {
     const auto  t2 = GetDesugarType(t);
@@ -302,6 +314,9 @@ static std::string GetName(const QualType& t, const Unqualified unqualified = Un
         if(dt->isLValueReferenceType()) {
             return GetNameInternal(dt, unqualified);
         }
+
+    } else if(IsDecltypeType(t)) {  // Handle decltype(var)
+        return GetNameInternal(t2, unqualified);
     }
 
     return GetNameInternal(t, unqualified);

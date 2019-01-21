@@ -1625,13 +1625,18 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
     mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
 
-    const auto* initializer = stmt->getInClassInitializer();
-    if(stmt->hasInClassInitializer() && initializer) {
-        if(ICIS_ListInit != stmt->getInClassInitStyle()) {
-            mOutputFormatHelper.Append(" = ");
-        }
+    if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(stmt->getParent())) {
+        // Keep the inline init for aggregates, as we do not see it somewhere else.
+        if(cxxRecordDecl->isAggregate()) {
+            const auto* initializer = stmt->getInClassInitializer();
+            if(stmt->hasInClassInitializer() && initializer) {
+                if(ICIS_ListInit != stmt->getInClassInitStyle()) {
+                    mOutputFormatHelper.Append(" = ");
+                }
 
-        InsertArg(initializer);
+                InsertArg(initializer);
+            }
+        }
     }
 
     mOutputFormatHelper.AppendNewLine(";");
@@ -2467,7 +2472,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
     }
 
-    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda) {
+    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda || cxxInheritedCtorDecl) {
         mOutputFormatHelper.Append(AccessToStringWithColon(decl));
     }
 

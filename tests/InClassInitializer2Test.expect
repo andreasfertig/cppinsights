@@ -1,0 +1,19 @@
+int main()
+{
+  struct S
+  {
+    inline S()
+    : x{3}
+    {
+    }
+    
+    int x;
+    inline constexpr S(const S &) = default;
+    inline constexpr S(S &&) = default;
+    
+  };
+  
+  S s = S();
+}
+
+

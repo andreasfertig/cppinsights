@@ -11,8 +11,8 @@ common_sources: &all_sources
 - llvm-toolchain-trusty
 
 llvm_current_packages: &all_llvm_current_packages
-- llvm-8-dev
-- libclang-8-dev
+- llvm-9-dev
+- libclang-9-dev
 
 llvm_7_sources: &all_llvm_7_sources
 - ubuntu-toolchain-r-test
@@ -44,10 +44,10 @@ matrix:
       apt:
         sources: *all_sources
         packages: 
-        - clang-8
+        - clang-9
         - *all_llvm_current_packages
         - libstdc++-7-dev
-    env: COMPILER='clang++-8' COMPILER_CC='clang-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No'
+    env: COMPILER='clang++-9' COMPILER_CC='clang-9' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No'
 
   - os: linux
     sudo: required
@@ -217,7 +217,7 @@ deploy:
 #
 env:
   global:
-  - LLVM_CONFIG_CURRENT='/usr/bin/llvm-config-8'
+  - LLVM_CONFIG_CURRENT='/usr/bin/llvm-config-9'
   - secure: MI6S+9up0JKkDxrW7b248Ro7auyyVogdwSj/UsTLNTKMBwNOaK4HccDNif6K2qAJmTlGt1xFHh0cHXvTkACcUc8hvZghJVGUOOCaWK9YvwR8wwQgoFi034BjG/Tg7Uj6WX6G65mv0UVv/2dxZRghDTujCnFiZOoSpApBvqFjQ/gamP7P+vjJiWQVJWJTOhYHz/oK6jQHMMlNeRJbzZhp/kgo7LPtdGZVT95+S6Xn3rHIuj5pJdgwYf/NFckWI9rkkkqn47XqYozGf5HHnBlcZEDCdGEQzI8HDngRC5mjejEMCKd2mBJP319xO8UDesplpabzZhAqucskKynVK9lqFlHtdYn7dvSLXHUF9oPAWoMckxDmNIBqarEy5kYZG+ccRm4xmP2V7JAfGpW7HAtLycXEHs5Fxf839IfyTHMIp6fF+a/t2M6SE/m4rZ3Ser7Y09EAeGqUKgvc/YQwkSSdrRxE1bMIfHES6/IRdSMGkAOa1U74ulqN3FzdfKX2Ng93EZ15zXiHqipljmlPDiC8BFXG3VEbFMubKBuvB8c5KjlpwuU5Udk9cehGWDLDcKi0K7PZpZ1p2l1aU17y8QxFEcOUw6Q/nYbZ9gEf7eF5DrpycSyv6xpGyYq59LrL5m5/XUAQ9ZLN+92rQlMXZqRncMll2ZJX5Tzb+PeO8P1y7mA=
   - secure: CFbIrswqs8U7pCMnF57QrC/KgNlybr5SNFlKE9BHA9I9WXcjLBGm3tv9JM7TvzwD5ivhe9P/MVcc1ROaTSPVRSdOI9aQuNBauDYoab1OrlO0SFnHjr6tKzvw9P+wnfuyawhH8vm6m/cdyyIKagFUKtFSKUnpLeakTEUUG6O9IBLHzBa0BTqlmviV9OjDUjD61adUSWVWe96T6A/tlGyFAWAYuAU1jvGN9HSE06mFlGC0NmbT25kq/8SGv9+9KoGgXNFB6lsQ6C5C3cWIlsaO0EtTnLGa2IfSZk4lg4CzZ97CGcraH5avrG5guSDWUGZEe8a+rxA42SvrhKVRDhu3qz0agH1BlXi+0q7k8oS7wAaRG63sjyD0DtFlA783bQmdLXh/BY5rz1FsqV9rr8qVdfo+5cVfW6sOZLrNeyF8OcxWAln5SNiuLpAb2cYTGNJ15J0KLynYBL/6e3Qe6gsUS4BIHFORr9dHMXA3TBnqEIo4hzJwnGNDixs7rLXCmdX3uxsAHUJEtSxm63AiCNvZhWq6Lm+Lf1CKQ9mNRzUT3IQGwuhCmv6XFR/ZTCFCiXwwC6lTy1ItC6c/90quMZpdxTcUVts6JmMI6i86bJgKrx4dzHpZmYkQ4D+r9LpqAOm1IgDlACZnCIjgHbTh6VOjNpU3jonzN1mHNxDP8Ezgjss=
   - secure: g6rm6GwWwbMe70xa25WHNvZ5NepGwda9F2e3R9iIr+EUTT/1zvZATTJfeNxt6YSCUKrxkRgO7MchjpngmVeP2bIC/0XCiiCfb46ENcINCRHxQ7jHmKIxDJypUK6rTiqsleprfGLFJ9jBUj4nEUzu0+N6EPC0hAzM5WeCZxitOifzPrs9L8/ATGJ2xvpazgkrVs0+Onv6Zn2O8XsoVaYZpUXHGIqXpZWTAyUnvRG3z/LInU7dyoiSgnoEAlruXUf+OuOAKOmiIaLBBsnyXsR2cS/kXcoQZNeTmxMjyguhC3c77OJxQ0dzJgN3pWznMNZ+Va5cetpM+P8wyeqXaVTxlLwCuj0KB8gsGKDfzHno8MHcbw71eV3/9laVmxZyOAQgeQVEj8vuclcaFIvbPMUtCGahlgPCr1l8gTVrgzdtJyEK0nf/Tk0LBS+5gvHg1aYIg6G9iqvX4oodJ8mH5RCTibWP/yOP65B5MmU/FNHFmeM4qREPWiclE351SrsraSUZ9H2onoaLBnDnNiHrr9OWaKD6BEKh66MxKS1u+Gi3Bb/xhK86JXtfq4K6OiQggbBPk/JPczn07czssAesu/gnMMuXSbkJc0m1YMBt0PtUoX4/bzTgTw485wVkBxeQYby7Q+7/vc5HKjl7OQqE73kctXWlhCuTzdF1wvcALu5oF78=
