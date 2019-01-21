@@ -17,12 +17,12 @@ public:
 
 class Bar: public Foo{ 
 public:
-      inline Bar(double amount) noexcept(false)
+      public: inline Bar(double amount) noexcept(false)
                        : Foo(amount)
                        {
                        }
                        
-                       inline Bar(int x, int y) noexcept(false)
+                       public: inline Bar(int x, int y) noexcept(false)
                        : Foo(x, y)
                        {
                        }
@@ -34,10 +34,26 @@ int mX;
 /* public: inline constexpr Bar(Bar &&); */
 };
 
+class Bla: public Foo{ 
+private:
+      public: inline Bla(int x, int y) noexcept(false)
+                       : Foo(x, y)
+                       {
+                       }
+                       
+                       
+
+int mX;
+/* public: inline constexpr Bla(const Bla &); */
+/* public: inline constexpr Bla(Bla &&); */
+};
+
+
 int main()
 {
   Bar bar0 = Bar{100.0};
   Bar bar1 = Bar(100.0);
   Bar bar2 = Bar(1, 2);
+  Bla bla = Bla(1, 2);
 }
 

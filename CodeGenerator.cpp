@@ -2472,7 +2472,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
     }
 
-    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda) {
+    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda || cxxInheritedCtorDecl) {
         mOutputFormatHelper.Append(AccessToStringWithColon(decl));
     }
 
