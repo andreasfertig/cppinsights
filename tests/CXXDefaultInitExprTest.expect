@@ -19,8 +19,8 @@ template<>
 class Alloc<int, 0>
 {
   const int z;
-  int * data{nullptr};
-  const bool x{false};
+  int * data;
+  const bool x;
   
   public: 
   inline Alloc()
@@ -44,8 +44,8 @@ template<>
 class Alloc<char, 1>
 {
   const int z;
-  char * data{nullptr};
-  const bool x{false};
+  char * data;
+  const bool x;
   
   public: 
   inline Alloc()
