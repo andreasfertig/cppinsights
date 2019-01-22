@@ -53,6 +53,11 @@ const InsightsOptions& GetInsightsOptions()
 static llvm::cl::OptionCategory gInsightCategory("Insights");
 //-----------------------------------------------------------------------------
 
+static llvm::cl::OptionCategory gInsightEduCategory(
+    "Insights- Educational",
+    "This transformations are only for education purposes. The resulting code most likely does not compile.");
+//-----------------------------------------------------------------------------
+
 static llvm::cl::opt<bool> gStdinMode("stdin",
                                       llvm::cl::desc("Override source file's content (in the overlaying\n"
                                                      "virtual file system) with input from <stdin> and run\n"
@@ -67,13 +72,13 @@ static llvm::cl::opt<bool>
     gUseLibCpp("use-libc++", llvm::cl::desc("Use libc++."), llvm::cl::init(false), llvm::cl::cat(gInsightCategory));
 //-----------------------------------------------------------------------------
 
-#define INSIGHTS_OPT(option, name, deflt, description)                                                                 \
+#define INSIGHTS_OPT(option, name, deflt, description, category)                                                       \
     static llvm::cl::opt<bool, true> g##name(option,                                                                   \
                                              llvm::cl::desc(description),                                              \
                                              llvm::cl::NotHidden,                                                      \
                                              llvm::cl::location(gInsightsOptions.name),                                \
                                              llvm::cl::init(deflt),                                                    \
-                                             llvm::cl::cat(gInsightCategory));
+                                             llvm::cl::cat(category));
 //-----------------------------------------------------------------------------
 
 #include "InsightsOptions.def"

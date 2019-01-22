@@ -744,6 +744,7 @@ static std::string FormatVarTemplateSpecializationDecl(const Decl* decl, std::st
 void CodeGenerator::InsertArg(const VarDecl* stmt)
 {
     LAMBDA_SCOPE_HELPER(VarDecl);
+    UpdateCurrentPos();
 
     if(InsertComma()) {
         mOutputFormatHelper.Append(',');
@@ -1297,6 +1298,7 @@ void CodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 void CodeGenerator::InsertArg(const CallExpr* stmt)
 {
     LAMBDA_SCOPE_HELPER(CallExpr);
+    UpdateCurrentPos();
 
     InsertArg(stmt->getCallee());
 
@@ -1990,7 +1992,11 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
     // name and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         CodeGenerator codeGenerator{initOutputFormatHelper, mLambdaStack};
-        OnceTrue      first{};
+        codeGenerator.mCurrentPos                = mCurrentPos;
+        codeGenerator.mCurrentFieldPos           = mCurrentFieldPos;
+        codeGenerator.mOutputFormatHelperOutside = &mOutputFormatHelper;
+
+        OnceTrue first{};
 
         for(const auto* init : ctor->inits()) {
             initOutputFormatHelper.AppendNewLine();
@@ -2472,6 +2478,8 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.OpenScope();
 
+    mCurrentFieldPos = mOutputFormatHelper.CurrentPos();
+
     OnceTrue        firstRecordDecl{};
     OnceTrue        firstDecl{};
     Decl::Kind      formerKind{};
@@ -2687,6 +2695,7 @@ void CodeGenerator::InsertArg(const SizeOfPackExpr* stmt)
 void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 {
     LAMBDA_SCOPE_HELPER(ReturnStmt);
+    UpdateCurrentPos();
 
     mOutputFormatHelper.Append("return");
 
@@ -2711,10 +2720,61 @@ void CodeGenerator::InsertArg(const CXXDefaultArgExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 {
-    // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's
-    // are not allowed there.
-    mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
-    InsertArg(stmt->getSubExpr());
+    if(GetInsightsOptions().UseShowInitializerList) {
+        if(not mCurrentPos.hasValue() && not mCurrentFieldPos.hasValue()) {
+            return;
+        }
+
+        std::string modifiers{};
+
+        size_t variableInsertPos = mCurrentPos.getValueOr(0);
+        size_t argumentInsertPos = mCurrentPos.getValueOr(0);
+
+        auto& ofmToInsert = [&]() -> decltype(auto) {
+            if(not mCurrentPos.hasValue()) {
+                variableInsertPos = mCurrentFieldPos.getValueOr(0);
+                argumentInsertPos = mCurrentPos.getValueOr(0);
+                mCurrentPos       = variableInsertPos;
+                modifiers         = kwStaticSpace;
+                modifiers += kwInlineSpace;
+                return (*mOutputFormatHelperOutside);
+            }
+
+            return (mOutputFormatHelper);
+        }();
+
+        OutputFormatHelper ofm{};
+        ofm.SetIndent(ofmToInsert, OutputFormatHelper::SkipIndenting::Yes);
+
+        const auto* mat  = dyn_cast<MaterializeTemporaryExpr>(stmt->getSubExpr());
+        const auto  size = [&]() -> size_t {
+            if(const auto* list = dyn_cast_or_null<InitListExpr>(mat->GetTemporaryExpr())) {
+                return list->getNumInits();
+            }
+
+            return 0;
+        }();
+
+        const auto& internalListName = BuildInternalVarName("list").append(std::to_string(variableInsertPos));
+
+        ofm.Append(modifiers, GetTypeNameAsParameter(mat->getType(), internalListName));
+        CodeGenerator codeGenerator{ofm};
+        codeGenerator.InsertArg(stmt->getSubExpr());
+        ofm.AppendSemiNewLine();
+
+        ofmToInsert.InsertAt(variableInsertPos, ofm.GetString());
+
+        // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's
+        // are not allowed there.
+        mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes), "{", internalListName, ", ", size, "}");
+
+        mCurrentPos = mCurrentPos.getValue() + ofm.GetString().size();
+    } else {
+        // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's
+        // are not allowed there.
+        mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
+        InsertArg(stmt->getSubExpr());
+    }
 }
 //-----------------------------------------------------------------------------
 

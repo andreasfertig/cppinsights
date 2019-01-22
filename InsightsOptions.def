@@ -7,14 +7,14 @@
 
 /// \brief C++ Insights options definition
 #ifndef INSIGHTS_OPT
-#define INSIGHTS_OPT(opt, name, deflt, description)
+#define INSIGHTS_OPT(opt, name, deflt, description, category)
 #endif
 
-INSIGHTS_OPT("alt-syntax-for", UseAltForSyntax, false, "Transform all for-loops into their equivalent while-loop.")
+INSIGHTS_OPT("alt-syntax-for", UseAltForSyntax, false, "Transform all for-loops into their equivalent while-loop.", gInsightCategory)
 INSIGHTS_OPT("alt-syntax-subscription",
              UseAltArraySubscriptionSyntax,
              false,
-             "Transform array subscriptions E1[E2] into (*(E1 + E2)).")
-INSIGHTS_OPT("show-all-implicit-casts", ShowAllImplicitCasts, false, "Show all implicit casts which can be noisy.")
-
+             "Transform array subscriptions E1[E2] into (*(E1 + E2)).", gInsightCategory)
+INSIGHTS_OPT("show-all-implicit-casts", ShowAllImplicitCasts, false, "Show all implicit casts which can be noisy.", gInsightCategory)
+INSIGHTS_OPT("edu-show-initlist", UseShowInitializerList, false, "Transform a std::initializer list", gInsightEduCategory)
 #undef INSIGHTS_OPT

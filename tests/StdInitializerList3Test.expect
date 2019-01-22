@@ -1,0 +1,58 @@
+// cmdlineinsights:-edu-show-initlist
+#include <initializer_list>
+
+struct Foo
+{
+  inline Foo(std::initializer_list<int> l)
+  {
+  }
+  
+};
+
+
+
+class Test
+{
+  static inline const int __list15[3]{1, 2, 3};
+  
+  public: 
+  inline Test()
+  : v{Foo{std::initializer_list<int>{__list15, 3}}}
+  {
+  }
+  
+  Foo v;
+};
+
+
+
+
+class Best
+{
+  static inline const int __list15[2]{1, 2};
+  
+  public: 
+  inline Best()
+  : v{Foo{std::initializer_list<int>{__list15, 2}}}
+  {
+  }
+  
+  Foo v;
+};
+
+
+
+class WestE
+{
+  static inline const int __list16[2]{1, 2};
+  Foo v;
+  
+  public: 
+  inline WestE()
+  : v{Foo{std::initializer_list<int>{__list16, 2}}}
+  {
+  }
+  
+};
+
+

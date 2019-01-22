@@ -1,0 +1,58 @@
+// cmdlineinsights:-edu-show-initlist
+#include <initializer_list>
+
+int main(int argc, const char **)
+{
+  int i;
+  int x;
+  const int __list56[2]{i, x};
+  std::initializer_list<int> list = std::initializer_list<int>{__list56, 2};
+    
+  class __lambda_10_17
+  {
+    public: 
+    inline /*constexpr */ std::initializer_list<int> operator()() const
+    {
+      return std::initializer_list<int>(list);
+    }
+    
+    private: 
+    std::initializer_list<int> list;
+    
+    public:
+    __lambda_10_17(std::initializer_list<int> _list)
+    : list{_list}
+    {}
+    
+  };
+  
+  __lambda_10_17 lamb = __lambda_10_17{std::initializer_list<int>(list)};
+  std::initializer_list<int> l = lamb.operator()();
+    
+  class __lambda_14_18
+  {
+    public: 
+    inline /*constexpr */ std::initializer_list<int> operator()() const
+    {
+      const int __list127[2]{i, x};
+      return std::initializer_list<int>{__list127, 2};
+    }
+    
+    private: 
+    int i;
+    int x;
+    
+    public:
+    __lambda_14_18(int _i, int _x)
+    : i{_i}
+    , x{_x}
+    {}
+    
+  };
+  
+  __lambda_14_18 lamb2 = __lambda_14_18{i, x};
+  std::initializer_list<int> l2 = lamb2.operator()();
+}
+
+
+
