@@ -151,7 +151,9 @@ script:
 - |
   if [[ "${DEPLOY}" == "Yes" ]]; then
     docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cmake --build /home/builder/build"
+    mkdir ${TRAVIS_BUILD_DIR}/build/html
     docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cmake --build /home/builder/build --target doc"
+    echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
   else
     make -j 2
   fi
