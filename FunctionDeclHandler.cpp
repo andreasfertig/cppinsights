@@ -102,7 +102,7 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
     } else if(const auto* usingDecl = result.Nodes.getNodeAs<UsingDecl>("using")) {
         // Check if one of the shadows contains a ConstructorUsingShadowDecl which implies Base::Base.
         for(const auto& shadow : usingDecl->shadows()) {
-            if(const auto* usingShadow = dyn_cast_or_null<ConstructorUsingShadowDecl>(shadow)) {
+            if(isa<ConstructorUsingShadowDecl>(shadow)) {
                 // This is a base ctor using. Remove this using. The actual code is inserted by the FunctionDecl
                 // matcher.
                 const auto sr = GetSourceRangeAfterSemi(usingDecl->getSourceRange(), result);
