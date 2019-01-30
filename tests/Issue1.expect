@@ -24,4 +24,6 @@ int fooGood<int>()
  
 
 int a = foo<int>();
+
 int b = fooGood<int>();
+

@@ -1,5 +1,7 @@
 const unsigned short FOO_BASE = 2;
+
 const unsigned short FOO = static_cast<const unsigned short>(static_cast<int>(FOO_BASE) + 1);
+
 
 int main()
 {

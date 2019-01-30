@@ -54,4 +54,5 @@ struct Index<&Person::age>
 #endif
 
 
-Index<&Person::age> myAgeIndex;
+Index<&Person::age> myAgeIndex = Index<&Person::age>();
+

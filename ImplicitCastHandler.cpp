@@ -33,7 +33,11 @@ ImplicitCastHandler::ImplicitCastHandler(Rewriter& rewrite, MatchFinder& matcher
                  we have a template parameter with a base class. CharLiteralTest.cpp */
               hasAncestor(parmVarDecl()));
 
-    matcher.addMatcher(implicitCastExpr(unless(implicitCastMatch), hasMatchingCast()).bind("implicitCast"), this);
+    matcher.addMatcher(
+        implicitCastExpr(unless(anyOf(implicitCastMatch, hasAncestor(varDecl(hasParent(translationUnitDecl()))))),
+                         hasMatchingCast())
+            .bind("implicitCast"),
+        this);
 }
 //-----------------------------------------------------------------------------
 

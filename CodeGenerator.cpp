@@ -12,6 +12,7 @@
 #include "InsightsMatchers.h"
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
+#include "clang/Frontend/CompilerInstance.h"
 //-----------------------------------------------------------------------------
 
 /// \brief Convenience macro to create a \ref LambdaScopeHandler on the stack.
@@ -135,14 +136,39 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 {
     mOutputFormatHelper.OpenScope();
 
+    auto&      langOpts{GetLangOpts(*rangeForStmt->getLoopVariable())};
+    const bool onlyCpp11{not langOpts.CPlusPlus14};
+
+#if IS_CLANG_NEWER_THAN(7)
+    // C++20 init-statement
+    InsertArg(rangeForStmt->getInit());
+#endif
+
+    // range statement
     InsertArg(rangeForStmt->getRangeStmt());
-    InsertArg(rangeForStmt->getBeginStmt());
-    InsertArg(rangeForStmt->getEndStmt());
+
+    if(not onlyCpp11) {
+        InsertArg(rangeForStmt->getBeginStmt());
+        InsertArg(rangeForStmt->getEndStmt());
+    }
 
     // add blank line after the declarations
     mOutputFormatHelper.AppendNewLine();
 
-    mOutputFormatHelper.Append("for( ; ");
+    mOutputFormatHelper.Append("for( ");
+
+    if(not onlyCpp11) {
+        mOutputFormatHelper.Append("; ");
+    } else {
+        mUseCommaInsteadOfSemi = UseCommaInsteadOfSemi::Yes;
+
+        InsertArg(rangeForStmt->getBeginStmt());
+
+        mUseCommaInsteadOfSemi = UseCommaInsteadOfSemi::No;
+        mSkipVarDecl           = SkipVarDecl::Yes;
+        InsertArg(rangeForStmt->getEndStmt());
+        mSkipVarDecl = SkipVarDecl::No;
+    }
 
     InsertArg(rangeForStmt->getCond());
 
@@ -603,7 +629,7 @@ static std::string GetQualifiers(const VarDecl& vd)
 {
     std::string qualifiers{};
 
-    if(vd.isInline()) {
+    if(vd.isInline() || vd.isInlineSpecified()) {
         qualifiers += "inline ";
     }
 
@@ -633,36 +659,47 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         HandleLocalStaticNonTrivialClass(stmt);
 
     } else {
-        mOutputFormatHelper.Append(GetQualifiers(*stmt));
+        if(SkipVarDecl::No == mSkipVarDecl) {
+            mOutputFormatHelper.Append(GetQualifiers(*stmt));
 
-        if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
-            const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
-            const std::string funcPtrName{StrCat("FuncPtr_", lineNo, " ")};
+            if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
+                const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
+                const std::string funcPtrName{StrCat("FuncPtr_", lineNo, " ")};
 
-            mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
-            mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
-        } else {
-            const auto varName = [&]() {
-                std::string name{GetName(*stmt)};
+                mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
+                mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
+            } else {
+                const auto varName = [&]() {
+                    std::string name{GetName(*stmt)};
 
-                if(const auto* tvd = dyn_cast_or_null<VarTemplateSpecializationDecl>(stmt)) {
-                    OutputFormatHelper outputFormatHelper;
-                    CodeGenerator      codeGenerator{outputFormatHelper};
+                    if(const auto* tvd = dyn_cast_or_null<VarTemplateSpecializationDecl>(stmt)) {
+                        OutputFormatHelper outputFormatHelper;
+                        CodeGenerator      codeGenerator{outputFormatHelper};
 
-                    codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
+                        codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
 
-                    name += outputFormatHelper.GetString();
+                        name += outputFormatHelper.GetString();
+                    }
+
+                    return name;
+                }();
+
+                // TODO: to keep the special handling for lambdas, do this only for template specializations
+                if(stmt->getType()->getAs<TemplateSpecializationType>()) {
+                    mOutputFormatHelper.Append(GetNameAsWritten(stmt->getType()), " ", varName);
+                } else {
+                    mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), varName));
                 }
-
-                return name;
+            }
+        } else {
+            const std::string pointer = [&]() {
+                if(stmt->getType()->isAnyPointerType()) {
+                    return " *";
+                }
+                return " ";
             }();
 
-            // TODO: to keep the special handling for lambdas, do this only for template specializations
-            if(stmt->getType()->getAs<TemplateSpecializationType>()) {
-                mOutputFormatHelper.Append(GetNameAsWritten(stmt->getType()), " ", varName);
-            } else {
-                mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), varName));
-            }
+            mOutputFormatHelper.Append(pointer, GetName(*stmt));
         }
 
         if(stmt->hasInit()) {
@@ -675,7 +712,11 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
             mOutputFormatHelper.Append(" /* NRVO variable */");
         }
 
-        mOutputFormatHelper.AppendNewLine(';');
+        if(UseCommaInsteadOfSemi::No == mUseCommaInsteadOfSemi) {
+            mOutputFormatHelper.AppendNewLine(';');
+        } else {
+            mOutputFormatHelper.Append(',');
+        }
     }
 }
 //-----------------------------------------------------------------------------
@@ -1036,8 +1077,8 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
                              if(const auto* init = stmt->getInit()) {
                                  InsertArg(init);
 
-                                 // the init-stmt carries a ; at the end plus a newline. Remove and replace it with a
-                                 // space
+                                 // the init-stmt carries a ; at the end plus a newline. Remove and replace it with
+                                 // a space
                                  mOutputFormatHelper.RemoveIndentIncludingLastNewLine();
                              } else {
                                  mOutputFormatHelper.Append("; ");
@@ -1335,8 +1376,8 @@ void CodeGenerator::InsertArg(const CharacterLiteral* stmt)
 
 void CodeGenerator::InsertArg(const PredefinedExpr* stmt)
 {
-    // Check if getFunctionName returns a valid StringLiteral. It does return a nullptr, if this PredefinedExpr is in a
-    // UnresolvedLookupExpr. In that case, print the identifier, e.g. __func__.
+    // Check if getFunctionName returns a valid StringLiteral. It does return a nullptr, if this PredefinedExpr is
+    // in a UnresolvedLookupExpr. In that case, print the identifier, e.g. __func__.
     if(const auto* functionName = stmt->getFunctionName()) {
         InsertArg(functionName);
     } else {
@@ -1501,7 +1542,8 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 {
     /* function pointer typedefs are special. Ease up things using "using" */
-    //    outputFormatHelper.AppendNewLine("typedef ", GetName(stmt->getUnderlyingType()), " ", GetName(*stmt), ";");
+    //    outputFormatHelper.AppendNewLine("typedef ", GetName(stmt->getUnderlyingType()), " ", GetName(*stmt),
+    //    ";");
     mOutputFormatHelper.AppendNewLine("using ", GetName(*stmt), " = ", GetName(stmt->getUnderlyingType()), ";");
 }
 //-----------------------------------------------------------------------------
@@ -1958,8 +2000,8 @@ void CodeGenerator::InsertArg(const CXXDefaultArgExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 {
-    // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's are
-    // not allowed there.
+    // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's
+    // are not allowed there.
     mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
     InsertArg(stmt->getSubExpr());
 }
@@ -2215,9 +2257,9 @@ void CodeGenerator::InsertMethod(const FunctionDecl*  d,
 
 /// \brief Get a correct type for an array.
 ///
-/// This is a special case for lambdas. The QualType of the VarDecl we are looking at could be a plain type. But if we
-/// capture via reference, obviously we need to a a reference. This is why the more general version does not work here.
-/// Probably needs improvement.
+/// This is a special case for lambdas. The QualType of the VarDecl we are looking at could be a plain type. But if
+/// we capture via reference, obviously we need to a a reference. This is why the more general version does not work
+/// here. Probably needs improvement.
 static std::string GetCaptureTypeNameAsParameter(const QualType& t, const std::string& varName)
 {
     std::string typeName = GetName(t);
@@ -2359,8 +2401,8 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
 
         const auto& clsVarType = [&]() {
             // http://eel.is/c++draft/expr.prim.lambda#capture-10 states, that implicitly captured variables are
-            // captured by copied. This also applies for named captures which are not prefixed with an ampersand. The
-            // clang internal type carries the ampersand, which is stripped in the following statement.
+            // captured by copied. This also applies for named captures which are not prefixed with an ampersand.
+            // The clang internal type carries the ampersand, which is stripped in the following statement.
             if((LCK_ByCopy == c.getCaptureKind()) && varType->isLValueReferenceType()) {
                 return varType->getPointeeType();
             }
@@ -2414,8 +2456,8 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
             case LCK_ByCopy: break;
             case LCK_VLAType: break;  //  unreachable
             case LCK_ByRef:
-                /* varTypeName already carries the & in case we capture a reference by reference, we need to skip it in
-                 * case of an array */
+                /* varTypeName already carries the & in case we capture a reference by reference, we need to skip it
+                 * in case of an array */
                 if(!varType->isReferenceType() && !varType->isArrayType()) {
                     ctor.append("&");
                     outputFormatHelper.Append("&");

@@ -2,6 +2,7 @@
 
 int arr[5][3];
 
+
 template<typename T>
 int (&f(T i))[3]
 {

@@ -1,6 +1,7 @@
 #define INSIGHTS_USE_TEMPLATE
 
-static int x[2]{1,2};
+static int x[2] = {1, 2};
+
 
 template <typename T, unsigned int SIZE>
 class array
