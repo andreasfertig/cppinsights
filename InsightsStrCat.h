@@ -33,6 +33,12 @@ static inline std::string ToString(const llvm::APSInt& val)
 }
 //-----------------------------------------------------------------------------
 
+static inline uint64_t Normalize(const llvm::APInt& arg)
+{
+    return arg.getZExtValue();
+}
+//-----------------------------------------------------------------------------
+
 static inline const std::string Normalize(const llvm::APSInt& arg)
 {
     return ToString(arg);

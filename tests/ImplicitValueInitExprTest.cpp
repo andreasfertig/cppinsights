@@ -44,8 +44,7 @@ struct Complex
 
 int main()
 {
-    // XXX wired nullptr in clang-7 on macOS
-    //std::array<int, 10> arr{};
+    std::array<int, 10> arr{};
 
     Point array[10] = { [2].y = 1.0, [2].x = 2.0, [0].x = 1.0 };
 

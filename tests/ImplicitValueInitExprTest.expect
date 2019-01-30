@@ -44,12 +44,13 @@ struct Complex
 
 int main()
 {
-  Point array[10] = {{1.0, 0.0}, {0.0, 0.0}, {2.0, 1.0}};
+  std::array<int, 10> arr = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  Point array[10] = {{1.0, 0}, {0, 0}, {2.0, 1.0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
   Float ff = {0.0f};
   Char c = {'\0', L'\0', u'\0', U'\0'};
   Bool b = {false};
   Pointer p = {nullptr};
   Ints i = {0, 0};
-  Complex cc[5] = {{0.0f, 22}, {0.0f, 0}, {static_cast<float>(1.0), 3}};
+  Complex cc[5] = {{0.0f, 22}, {0.0f, 0}, {static_cast<float>(1.0), 3}, {0.0f, 0}, {0.0f, 0}};
 }
 
