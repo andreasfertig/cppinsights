@@ -1,0 +1,387 @@
+#include <iostream>
+
+
+template<class T, class Case, class ...Cases>
+decltype(auto) match(T&& value, const Case& _case, const Cases&... cases) {
+	return 1;
+}
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int match<int &, __lambda_13_4, __lambda_14_4, __lambda_15_4>(int & value, const __lambda_13_4 & _case, const __lambda_14_4 & __cases2, const __lambda_15_4 & __cases3)
+{
+  return 1;
+}
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int match<char const (&)[3], __lambda_13_4, __lambda_14_4, __lambda_15_4>(char const (&value)[3], const __lambda_13_4 & _case, const __lambda_14_4 & __cases2, const __lambda_15_4 & __cases3)
+{
+  return 1;
+}
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int match<std::basic_string<char, std::char_traits<char>, std::allocator<char> > &, __lambda_13_4, __lambda_14_4, __lambda_15_4>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > & value, const __lambda_13_4 & _case, const __lambda_14_4 & __cases2, const __lambda_15_4 & __cases3)
+{
+  return 1;
+}
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int match<float &, __lambda_13_4, __lambda_14_4, __lambda_15_4>(float & value, const __lambda_13_4 & _case, const __lambda_14_4 & __cases2, const __lambda_15_4 & __cases3)
+{
+  return 1;
+}
+#endif
+
+
+
+template<class T>
+decltype(auto) test(T&& value) {
+    return match(value
+		,[](std::string value)	{ std::cout <<"This is string "; return value + " Hi!"; }
+		,[](int i)				{ std::cout << "This is int ";	 return i * 100; }
+		,[](auto a)				{ std::cout << "This is default ";return 0; }
+	);
+}
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int test<int>(int && value)
+{
+      
+  class __lambda_13_4
+  {
+    public: 
+    inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    using retType_13_4 = std::string (*)(std::string);
+    inline /*constexpr */ operator retType_13_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    
+  };
+  
+  
+  class __lambda_14_4
+  {
+    public: 
+    inline /*constexpr */ int operator()(int i) const
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    using retType_14_4 = int (*)(int);
+    inline /*constexpr */ operator retType_14_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline int __invoke(int i)
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    
+  };
+  
+  
+  class __lambda_15_4
+  {
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 a) const
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(type_parameter_0_0 a)
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    
+  };
+  
+  return match(value, __lambda_13_4{}, __lambda_14_4{}, __lambda_15_4{});
+}
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int test<char const (&)[3]>(char const (&value)[3])
+{
+      
+  class __lambda_13_4
+  {
+    public: 
+    inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    using retType_13_4 = std::string (*)(std::string);
+    inline /*constexpr */ operator retType_13_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    
+  };
+  
+  
+  class __lambda_14_4
+  {
+    public: 
+    inline /*constexpr */ int operator()(int i) const
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    using retType_14_4 = int (*)(int);
+    inline /*constexpr */ operator retType_14_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline int __invoke(int i)
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    
+  };
+  
+  
+  class __lambda_15_4
+  {
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 a) const
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(type_parameter_0_0 a)
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    
+  };
+  
+  return match(value, __lambda_13_4{}, __lambda_14_4{}, __lambda_15_4{});
+}
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(std::basic_string<char, std::char_traits<char>, std::allocator<char> > && value)
+{
+      
+  class __lambda_13_4
+  {
+    public: 
+    inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    using retType_13_4 = std::string (*)(std::string);
+    inline /*constexpr */ operator retType_13_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    
+  };
+  
+  
+  class __lambda_14_4
+  {
+    public: 
+    inline /*constexpr */ int operator()(int i) const
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    using retType_14_4 = int (*)(int);
+    inline /*constexpr */ operator retType_14_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline int __invoke(int i)
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    
+  };
+  
+  
+  class __lambda_15_4
+  {
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 a) const
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(type_parameter_0_0 a)
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    
+  };
+  
+  return match(value, __lambda_13_4{}, __lambda_14_4{}, __lambda_15_4{});
+}
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int test<float>(float && value)
+{
+      
+  class __lambda_13_4
+  {
+    public: 
+    inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    using retType_13_4 = std::string (*)(std::string);
+    inline /*constexpr */ operator retType_13_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    
+  };
+  
+  
+  class __lambda_14_4
+  {
+    public: 
+    inline /*constexpr */ int operator()(int i) const
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    using retType_14_4 = int (*)(int);
+    inline /*constexpr */ operator retType_14_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline int __invoke(int i)
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    
+  };
+  
+  
+  class __lambda_15_4
+  {
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 a) const
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(type_parameter_0_0 a)
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    
+  };
+  
+  return match(value, __lambda_13_4{}, __lambda_14_4{}, __lambda_15_4{});
+}
+#endif
+
+
+int main()
+{
+  std::cout.operator<<(test(200)).operator<<(std::endl);
+  std::cout.operator<<(test("RR")).operator<<(std::endl);
+  std::cout.operator<<(test(std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"ARR"})).operator<<(std::endl);
+  std::cout.operator<<(test(2.0F)).operator<<(std::endl);
+}
+
+
