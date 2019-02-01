@@ -240,7 +240,7 @@ static std::string GetNameInternal(const QualType& t, const Unqualified unqualif
                         return refType->getPointeeTypeAsWritten().getLocalQualifiers().getAsString();
                     }
 
-                    return t.getLocalQualifiers().getAsString();
+                    return t.getCanonicalType().getLocalQualifiers().getAsString();
                 }()};
 
                 if(const auto* tt = dyn_cast_or_null<ClassTemplateSpecializationDecl>(decl)) {
