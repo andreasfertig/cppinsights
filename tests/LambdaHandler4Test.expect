@@ -6,16 +6,15 @@ class Foo
             
       class __lambda_6_18
       {
+        Foo * __this;
         public: inline /*constexpr */ void operator()() const
         {
           __this->Get();
         }
         
-        private:
-        Foo * __this;
-        
-        public: __lambda_6_18(Foo * ___this)
-        : __this{___this}
+        public: __lambda_6_18(Foo * _this)
+        : __this{_this}
+
         {}
         
       };
@@ -24,16 +23,15 @@ class Foo
             
       class __lambda_10_18
       {
+        Foo * __this;
         public: inline /*constexpr */ void operator()() const
         {
           __this->Get();
         }
         
-        private:
-        Foo * __this;
-        
-        public: __lambda_10_18(Foo * ___this)
-        : __this{___this}
+        public: __lambda_10_18(Foo * _this)
+        : __this{_this}
+
         {}
         
       };
@@ -42,16 +40,15 @@ class Foo
             
       class __lambda_14_18
       {
+        Foo __this;
         public: inline /*constexpr */ void operator()() const
         {
           (&__this)->Get();
         }
         
-        private:
-        Foo __this;
-        
-        public: __lambda_14_18(Foo ___this)
-        : __this{___this}
+        public: __lambda_14_18(Foo _this)
+        : __this{_this}
+
         {}
         
       };
@@ -86,16 +83,15 @@ struct X {
             
       class __lambda_35_9
       {
+        X * __this;
         public: inline /*constexpr */ int operator()() const
         {
           return __this->operator()(__this->x + __this->y);
         }
         
-        private:
-        X * __this;
-        
-        public: __lambda_35_9(X * ___this)
-        : __this{___this}
+        public: __lambda_35_9(X * _this)
+        : __this{_this}
+
         {}
         
       } __lambda_35_9{this};

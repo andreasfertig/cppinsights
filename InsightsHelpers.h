@@ -142,6 +142,26 @@ static inline std::string GetLambdaName(const LambdaExpr& lambda)
 }
 //-----------------------------------------------------------------------------
 
+static inline std::string GetName(const CXXRecordDecl& RD)
+{
+    if(RD.isLambda()) {
+        return GetLambdaName(RD);
+    }
+
+    return RD.getNameAsString();
+}
+//-----------------------------------------------------------------------------
+
+static inline std::string GetName(const CXXMethodDecl& RD)
+{
+    if(RD.getParent()->isLambda()) {
+        return GetLambdaName(*RD.getParent());
+    }
+
+    return RD.getNameAsString();
+}
+//-----------------------------------------------------------------------------
+
 /// \brief Remove decltype from a QualType, if possible.
 const QualType GetDesugarType(const QualType& QT);
 // -----------------------------------------------------------------------------

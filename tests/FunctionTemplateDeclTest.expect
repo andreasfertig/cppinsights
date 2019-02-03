@@ -19,17 +19,16 @@ class Test<int>
 {
   
   public: 
-  inline constexpr Test() noexcept = default;
+  // inline constexpr Test() noexcept = default;
   template<>
   inline Test<int> & operator=<char>(const Test<char> & other)
   {
     return *this;
   }
-  inline constexpr Test(const Test<int> &) = default;
-  inline constexpr Test(Test<int> &&) = default;
-  inline constexpr Test<int> & operator=(const Test<int> &) = default;
-  inline constexpr Test<int> & operator=(Test<int> &&) = default;
-  
+  // inline constexpr Test(const Test<int> &) = default;
+  // inline constexpr Test(Test<int> &&) = default;
+  // inline constexpr Test<int> & operator=(const Test<int> &) = default;
+  // inline constexpr Test<int> & operator=(Test<int> &&) = default;
 };
 
 #endif
@@ -42,17 +41,16 @@ class Test<char>
 {
   
   public: 
-  inline constexpr Test() noexcept = default;
+  // inline constexpr Test() noexcept = default;
   template<>
   inline Test<char> & operator=<int>(const Test<int> & other)
   {
     return *this;
   }
-  inline constexpr Test(const Test<char> &) = default;
-  inline constexpr Test(Test<char> &&) = default;
-  inline constexpr Test<char> & operator=(const Test<char> &) = default;
-  inline constexpr Test<char> & operator=(Test<char> &&) = default;
-  
+  // inline constexpr Test(const Test<char> &) = default;
+  // inline constexpr Test(Test<char> &&) = default;
+  // inline constexpr Test<char> & operator=(const Test<char> &) = default;
+  // inline constexpr Test<char> & operator=(Test<char> &&) = default;
 };
 
 #endif

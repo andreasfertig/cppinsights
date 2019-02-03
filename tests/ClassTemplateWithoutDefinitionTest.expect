@@ -6,10 +6,9 @@ class Foo{};
 template<>
 class Foo<double>
 {
-  inline constexpr Foo() noexcept = default;
-  inline constexpr Foo(const Foo<double> &) = default;
-  inline constexpr Foo(Foo<double> &&) = default;
-  
+  // inline constexpr Foo() noexcept = default;
+  // inline constexpr Foo(const Foo<double> &) = default;
+  // inline constexpr Foo(Foo<double> &&) = default;
 };
 
 #endif

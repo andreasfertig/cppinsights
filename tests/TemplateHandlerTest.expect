@@ -85,9 +85,8 @@ class Template<int>
   
   private: 
   const int mX;
-  inline constexpr Template(const Template<int> &) = default;
-  inline constexpr Template(Template<int> &&) = default;
-  
+  // inline constexpr Template(const Template<int> &) = default;
+  // inline constexpr Template(Template<int> &&) = default;
 };
 
 #endif
@@ -110,9 +109,8 @@ class Template<double>
   
   private: 
   const double mX;
-  inline constexpr Template(const Template<double> &) = default;
-  inline constexpr Template(Template<double> &&) = default;
-  
+  // inline constexpr Template(const Template<double> &) = default;
+  // inline constexpr Template(Template<double> &&) = default;
 };
 
 #endif

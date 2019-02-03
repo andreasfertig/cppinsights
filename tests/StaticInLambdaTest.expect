@@ -103,6 +103,30 @@ int main()
       return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
     }
     
+    public: using retType = Bingleton (*)(bool);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline Bingleton __invoke(bool c)
+    {
+      static bool __bbB;
+      static char __bb[sizeof(Bingleton)];
+      
+      if( ! __bbB )
+      {
+        new (&__bb) Bingleton;
+        __bbB = true;
+      }
+      if(c) {
+        return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
+      }
+      
+      return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
+    }
+    
+    
   };
   
   __lambda_52_14 x = __lambda_52_14{};
@@ -125,6 +149,30 @@ int main()
       
       return &*reinterpret_cast<Bingleton*>(__bb);
     }
+    
+    public: using retType = Bingleton *(*)(bool);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline Bingleton * __invoke(bool c)
+    {
+      static bool __bbB;
+      static char __bb[sizeof(Bingleton)];
+      
+      if( ! __bbB )
+      {
+        new (&__bb) Bingleton;
+        __bbB = true;
+      }
+      if(c) {
+        return &*reinterpret_cast<Bingleton*>(__bb);
+      }
+      
+      return &*reinterpret_cast<Bingleton*>(__bb);
+    }
+    
     
   };
   

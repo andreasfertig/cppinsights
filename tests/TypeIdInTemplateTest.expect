@@ -25,10 +25,9 @@ class Foo<int>
     return std::basic_string<char>(typeId);
   }
   
-  inline constexpr Foo() noexcept = default;
-  inline constexpr Foo(const Foo<int> &) = default;
-  inline constexpr Foo(Foo<int> &&) = default;
-  
+  // inline constexpr Foo() noexcept = default;
+  // inline constexpr Foo(const Foo<int> &) = default;
+  // inline constexpr Foo(Foo<int> &&) = default;
 };
 
 #endif

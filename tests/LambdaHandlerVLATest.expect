@@ -38,13 +38,12 @@ struct SA<2>
         
     class __lambda_40_8
     {
+      unsigned long;
+      float (&e)[this->nt];
       public: inline /*constexpr */ bool operator()(int i, int j) const
       {
         return e[i] < e[j];
       }
-      
-      private:
-      float (&e)[this->nt];
       
       public: __lambda_40_8(float (&_e)[this->nt])
       : e{_e}
@@ -62,8 +61,7 @@ struct SA<2>
   bool Test();
   
   int nt;
-  inline constexpr SA(const SA<2> &) = default;
-  
+  // inline constexpr SA(const SA<2> &) = default;
 };
 
 #endif
@@ -90,13 +88,11 @@ inline SA<TA>::SA(const int & PA)
     
   class __lambda_40_8
   {
+    float (&e)[this->nt];
     public: inline auto operator()(int i, int j) const
     {
       return e[i] < e[j];
     }
-    
-    private:
-    float (&e)[this->nt];
     
     public: __lambda_40_8(float (&_e)[this->nt])
     : e{_e}
@@ -104,7 +100,7 @@ inline SA<TA>::SA(const int & PA)
     
   };
   
-  test(__lambda_40_8{e});
+  test(__lambda_40_8{/* INSIGHTS-TODO: CodeGenerator.cpp:2296 stmt: ParenListExpr */});
 }
 
 

@@ -5,18 +5,18 @@ int main()
       
   class __lambda_4_28
   {
+    public: inline /*constexpr */ int operator()(int a, char b) const
+    {
+      return a + static_cast<int>(b);
+    }
     public: using retType = int (*)(int, char);
     inline /*constexpr */ operator retType () const
     {
       return __invoke;
     }
-    public: inline /*constexpr */ int operator()(int a, char b) const
-    {
-      return a + static_cast<int>(b);
-    }
     private: static inline int __invoke(int a, char b)
     {
-      return a + b;
+      return a + static_cast<int>(b);
     }
     
   } __lambda_4_28{};

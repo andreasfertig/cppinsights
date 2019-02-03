@@ -7,6 +7,17 @@ int main()
     {
     }
     
+    public: using retType = auto (*)() -> void;
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+    }
+    
+    
   } __lambda_4_5{};
   
   __lambda_4_5.operator()();
@@ -17,6 +28,18 @@ int main()
     {
       1 * 2;
     }
+    
+    public: using retType = auto (*)() -> void;
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      1 * 2;
+    }
+    
     
   } __lambda_7_5{};
   
@@ -30,6 +53,18 @@ int main()
     {
       x = x + y;
     }
+    
+    public: using retType = void (*)(int &, int &);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke(int & x, int & y)
+    {
+      x = x + y;
+    }
+    
     
   } __lambda_13_5{};
   

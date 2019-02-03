@@ -12,10 +12,53 @@ void x()
         {
         }
         
+        public: using retType = void (*)();
+        inline /*constexpr */ operator retType () const
+        {
+          return __invoke;
+        };
+        
+        private: static inline void __invoke()
+        {
+        }
+        
+        
       };
       
       __lambda_4_5{};
     }
+    
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      
+      class __lambda_4_5
+      {
+        public: inline /*constexpr */ void operator()() const
+        {
+        }
+        
+        public: using retType = void (*)();
+        inline /*constexpr */ operator retType () const
+        {
+          return __invoke;
+        };
+        
+        private: static inline void __invoke()
+        {
+        }
+        
+        
+      };
+      
+      __lambda_4_5{};
+    }
+    
     
   };
   

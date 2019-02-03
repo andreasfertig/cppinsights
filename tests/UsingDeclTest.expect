@@ -62,13 +62,12 @@ struct D<int> : public B
   using D<int>::h;
   inline void h(int);
   
-  inline D<int> & operator=(const D<int> &) = default;
-  inline D<int> & operator=(D<int> &&) = default;
-  inline ~D() = default;
-  inline D() noexcept = default;
-  inline constexpr D(const D<int> &) = default;
-  inline constexpr D(D<int> &&) = default;
-  
+  // inline D<int> & operator=(const D<int> &) = default;
+  // inline D<int> & operator=(D<int> &&) = default;
+  // inline ~D() = default;
+  // inline D() noexcept = default;
+  // inline constexpr D(const D<int> &) = default;
+  // inline constexpr D(D<int> &&) = default;
 };
 
 #endif

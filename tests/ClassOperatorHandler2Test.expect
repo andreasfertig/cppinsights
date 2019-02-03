@@ -103,6 +103,39 @@ int main()
       printf("%d\n", f.Get());
     }
     
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      int n = 10;
+      f(n);
+      f(42);
+      f(int{});
+      Foo f = Foo(1);
+      f.operator++();
+      f.operator++(0);
+      f.operator--();
+      f.operator--(0);
+      printf("%d\n", f.operator++(0));
+      printf("%d %d\n", f.operator++(0), 1);
+      printf("%d\n", f.operator--(0));
+      printf("%d %d\n", f.operator--(0), 1);
+      Foo * ff = &f;
+      printf("%d\n", ff->Get());
+      ++ff;
+      ff++;
+      ++++ff;
+      --ff;
+      ff--;
+      ----ff;
+      printf("%d\n", f.Get());
+    }
+    
+    
   } __lambda_60_5{};
   
   __lambda_60_5.operator()();

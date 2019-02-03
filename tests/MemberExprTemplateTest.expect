@@ -11,16 +11,14 @@
         
     class __lambda_10_5
     {
+      X & x;
       public: inline /*constexpr */ void operator()() const
       {
         x.f(17);
         x.ff(17, 2, 55.5);
       }
       
-      private:
-      X& x;
-      
-      public: __lambda_10_5(X& _x)
+      public: __lambda_10_5(X & _x)
       : x{_x}
       {}
       

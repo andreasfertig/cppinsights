@@ -96,6 +96,7 @@ public:
     , mLambdaStack{mLambdaStackThis}
     , mSkipVarDecl{SkipVarDecl::No}
     , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
+    , mLambdaExpr{nullptr}
     {
     }
 
@@ -105,6 +106,7 @@ public:
     , mLambdaStack{lambdaStack}
     , mSkipVarDecl{SkipVarDecl::No}
     , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
+    , mLambdaExpr{nullptr}
     {
     }
 
@@ -222,6 +224,8 @@ protected:
 
     SkipVarDecl           mSkipVarDecl;
     UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
+
+    const LambdaExpr* mLambdaExpr;
 };
 //-----------------------------------------------------------------------------
 

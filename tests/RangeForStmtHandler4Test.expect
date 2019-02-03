@@ -30,10 +30,9 @@ class MyArrayWrapper<int>
     return this->size > 0 ? &this->data[this->size - 1] : nullptr;
   }
   
-  inline MyArrayWrapper() noexcept = default;
-  inline constexpr MyArrayWrapper(const MyArrayWrapper<int> &) = default;
-  inline constexpr MyArrayWrapper(MyArrayWrapper<int> &&) = default;
-  
+  // inline MyArrayWrapper() noexcept = default;
+  // inline constexpr MyArrayWrapper(const MyArrayWrapper<int> &) = default;
+  // inline constexpr MyArrayWrapper(MyArrayWrapper<int> &&) = default;
 };
 
 #endif

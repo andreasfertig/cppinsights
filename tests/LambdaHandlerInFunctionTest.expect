@@ -33,6 +33,18 @@ int main()
       printf("Hello");
     }
     
+    public: using retType = auto (*)() -> void;
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("Hello");
+    }
+    
+    
   };
   
   Test(__lambda_10_10{});
@@ -44,6 +56,19 @@ int main()
       printf("Bello");
       return 1;
     }
+    
+    public: using retType = auto (*)() -> int;
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline int __invoke()
+    {
+      printf("Bello");
+      return 1;
+    }
+    
     
   } __lambda_12_10{};
   

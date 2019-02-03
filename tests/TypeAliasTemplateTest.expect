@@ -25,9 +25,8 @@ struct F<int>
   {
   }
   
-  inline constexpr F(const F<int> &) = default;
-  inline constexpr F(F<int> &&) = default;
-  
+  // inline constexpr F(const F<int> &) = default;
+  // inline constexpr F(F<int> &&) = default;
 };
 
 #endif

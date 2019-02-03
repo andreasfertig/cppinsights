@@ -26,8 +26,8 @@ template<>
 struct Foo<int>
 {
   int raw;
-  inline Foo() noexcept = default;
-  inline constexpr Foo(const Foo<int> & v) noexcept = default;
+  // inline Foo() noexcept = default;
+  // inline constexpr Foo(const Foo<int> & v) noexcept = default;
   inline constexpr Foo(int v);
   
   using retType = int;
@@ -36,13 +36,12 @@ struct Foo<int>
     return this->raw;
   }
   
-  inline constexpr Foo<int> & operator=(const Foo<int> & rhs) = default;
+  // inline constexpr Foo<int> & operator=(const Foo<int> & rhs) = default;
   inline Foo<int> & operator=(int v);
   
   inline volatile void operator=(int v);
   
-  inline ~Foo() noexcept = default;
-  
+  // inline ~Foo() noexcept = default;
 };
 
 #endif
@@ -54,14 +53,14 @@ template<>
 struct Foo<char>
 {
   char raw;
-  inline Foo() noexcept = default;
-  inline constexpr Foo(const Foo<char> & v) = default;
+  // inline Foo() noexcept = default;
+  // inline constexpr Foo(const Foo<char> & v) = default;
   inline constexpr Foo(char v);
   
   using retType = char;
   inline constexpr operator retType () const;
   
-  inline constexpr Foo<char> & operator=(const Foo<char> & rhs) = default;
+  // inline constexpr Foo<char> & operator=(const Foo<char> & rhs) = default;
   inline Foo<char> & operator=(char v)
   {
     this->raw = v;
@@ -70,8 +69,7 @@ struct Foo<char>
   
   inline volatile void operator=(char v);
   
-  inline ~Foo() = default;
-  
+  // inline ~Foo() = default;
 };
 
 #endif

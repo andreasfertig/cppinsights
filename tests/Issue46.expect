@@ -6,6 +6,18 @@ class __lambda_1_10
     return 5;
   }
   
+  public: using retType = int (*)();
+  inline /*constexpr */ operator retType () const
+  {
+    return __invoke;
+  };
+  
+  private: static inline int __invoke()
+  {
+    return 5;
+  }
+  
+  
 };
 
 __lambda_1_10 x = __lambda_1_10{};
@@ -14,13 +26,11 @@ __lambda_1_10 x = __lambda_1_10{};
 
 class __lambda_5_11
 {
+  int a;
   public: inline /*constexpr */ int operator()(int b) const
   {
     return b * a;
   }
-  
-  private:
-  int a;
   
   public: __lambda_5_11(int _a)
   : a{_a}
