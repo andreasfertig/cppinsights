@@ -2127,11 +2127,12 @@ void CodeGenerator::FormatCast(const std::string castName,
 void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
 {
     const bool needParens = [&]() {
-        if(const auto* dest = dyn_cast_or_null<UnaryOperator>(stmt->IgnoreImplicit())) {
-            if(dest->getOpcode() == clang::UO_Deref) {
-                return true;
+        if(const auto* expr = dyn_cast_or_null<Expr>(stmt))
+            if(const auto* dest = dyn_cast_or_null<UnaryOperator>(expr->IgnoreImplicit())) {
+                if(dest->getOpcode() == clang::UO_Deref) {
+                    return true;
+                }
             }
-        }
 
         return false;
     }();
