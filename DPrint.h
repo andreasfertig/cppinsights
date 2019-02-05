@@ -27,6 +27,12 @@ static inline const char* Normalize(const std::string& arg)
 }
 //-----------------------------------------------------------------------------
 
+static inline uint64_t Normalize(const llvm::APInt& arg)
+{
+    return arg.getZExtValue();
+}
+//-----------------------------------------------------------------------------
+
 static inline const char* Normalize(const llvm::APSInt& arg)
 {
     return Normalize(ToString(arg));

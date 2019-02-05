@@ -1,0 +1,74 @@
+// http://coliru.stacked-crooked.com/a/8cbbd3c00d92d0a3
+// https://stackoverflow.com/questions/8164567/how-to-make-my-custom-type-to-work-with-range-based-for-loops
+#include <type_traits>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
+
+    struct null_sentinal_t {
+      template<class Rhs,
+        std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>{},int> =0
+      >
+      friend bool operator==(Rhs const& ptr, null_sentinal_t) {
+        return !*ptr;
+      }
+      template<class Rhs,
+        std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>{},int> =0
+      >
+      friend bool operator!=(Rhs const& ptr, null_sentinal_t) {
+        return !(ptr==null_sentinal_t{});
+      }
+      template<class Lhs,
+        std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>{},int> =0
+      >
+      friend bool operator==(null_sentinal_t, Lhs const& ptr) {
+        return !*ptr;
+      }
+      template<class Lhs,
+        std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>{},int> =0
+      >
+      friend bool operator!=(null_sentinal_t, Lhs const& ptr) {
+        return !(null_sentinal_t{}==ptr);
+      }
+      friend inline bool operator==(null_sentinal_t, null_sentinal_t)
+      {
+        return true;
+      }
+      
+      friend inline bool operator!=(null_sentinal_t, null_sentinal_t)
+      {
+        return false;
+      }
+      
+    /* public: inline ~null_sentinal_t() noexcept; */
+    };
+
+template<class Char>
+struct str_view {
+    Char const* ptr = 0;
+    Char const* begin() const { return ptr; }
+    null_sentinal_t end() const { return {}; }
+};
+
+/* First instantiated from: RangeForStmtHandler3Test.cpp:49 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct str_view<char>
+{
+  const char * ptr;
+  inline const char * begin() const;
+  
+  inline null_sentinal_t end() const;
+  
+  inline constexpr str_view() = default;
+  inline constexpr str_view(const str_view<char> &) = default;
+  inline constexpr str_view(str_view<char> &&) = default;
+  
+};
+
+#endif
+
+int main()
+{
+}
+

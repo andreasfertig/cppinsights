@@ -747,6 +747,36 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
         mOutputFormatHelper.IncreaseIndent();
 
         ForEachArg(stmt->inits(), [&](const auto& init) { InsertArg(init); });
+
+        // If we have a filler, fill the rest of the array with the filler expr.
+        if(const auto* filler = stmt->getArrayFiller()) {
+            const auto fullWidth = [&]() -> uint64_t {
+                if(const auto* ct = dyn_cast_or_null<ConstantArrayType>(stmt->getType().getTypePtrOrNull())) {
+                    const auto v = ct->getSize().getZExtValue();
+
+                    // clamp here to survive large arrays.
+                    if(100 < v) {
+                        return 100;
+                    }
+
+                    return v;
+                }
+
+                return 0;
+            }();
+
+            // now fill the remaining array slots.
+            bool bFirst{0 == stmt->getNumInits()};
+            for(uint64_t i = stmt->getNumInits(); i < fullWidth; ++i) {
+                if(bFirst) {
+                    bFirst = false;
+                } else {
+                    mOutputFormatHelper.Append(", ");
+                }
+
+                InsertArg(filler);
+            }
+        }
     });
 
     mOutputFormatHelper.DecreaseIndent();
@@ -1397,53 +1427,74 @@ void CodeGenerator::InsertArg(const ExprWithCleanups* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static const char* getValueOfValueInit(const QualType& t)
+static std::string getValueOfValueInit(const QualType& t)
 {
     const QualType& type = t.getCanonicalType();
 
-    switch(type->getScalarTypeKind()) {
-        case Type::STK_CPointer:
-        case Type::STK_BlockPointer:
-        case Type::STK_ObjCObjectPointer:
-        case Type::STK_MemberPointer: return "nullptr";
+    if(type->isScalarType()) {
+        switch(type->getScalarTypeKind()) {
+            case Type::STK_CPointer:
+            case Type::STK_BlockPointer:
+            case Type::STK_ObjCObjectPointer:
+            case Type::STK_MemberPointer: return "nullptr";
 
-        case Type::STK_Bool: return "false";
+            case Type::STK_Bool: return "false";
 
-        case Type::STK_Integral:
-            if(const auto* bt = type->getAs<BuiltinType>()) {
-                switch(bt->getKind()) {
-                    case BuiltinType::Char_U:
-                    case BuiltinType::UChar:
-                    case BuiltinType::Char_S:
-                    case BuiltinType::SChar: return "'\\0'";
-                    case BuiltinType::WChar_U:
-                    case BuiltinType::WChar_S: return "L'\\0'";
-                    case BuiltinType::Char16: return "u'\\0'";
-                    case BuiltinType::Char32: return "U'\\0'";
-                    default: break;
+            case Type::STK_Integral:
+            case Type::STK_Floating:
+                if(const auto* bt = type->getAs<BuiltinType>()) {
+                    switch(bt->getKind()) {
+                            // Type::STK_Integral
+                        case BuiltinType::Char_U:
+                        case BuiltinType::UChar:
+                        case BuiltinType::Char_S:
+                        case BuiltinType::SChar: return "'\\0'";
+                        case BuiltinType::WChar_U:
+                        case BuiltinType::WChar_S: return "L'\\0'";
+                        case BuiltinType::Char16: return "u'\\0'";
+                        case BuiltinType::Char32: return "U'\\0'";
+                        // Type::STK_Floating
+                        case BuiltinType::Half:
+                        case BuiltinType::Float: return "0.0f";
+                        default: break;
+                    }
                 }
-            }
 
-            break;
+                break;
 
-        case Type::STK_Floating:
-            switch(type->getAs<BuiltinType>()->getKind()) {
-                case BuiltinType::Half:
-                case BuiltinType::Float: return "0.0f";
-                default: return "0.0";
-            }
+            case Type::STK_FloatingComplex:
+            case Type::STK_IntegralComplex:
+                if(const auto* complexType = type->getAs<ComplexType>()) {
+                    return getValueOfValueInit(complexType->getElementType());
+                }
 
-        case Type::STK_FloatingComplex:
-        case Type::STK_IntegralComplex:
-            if(const auto* complexType = type->getAs<ComplexType>()) {
-                return getValueOfValueInit(complexType->getElementType());
-            }
-
-            break;
+                break;
 
 #if IS_CLANG_NEWER_THAN(7)
-        case Type::STK_FixedPoint: Error("STK_FixedPoint is not implemented"); break;
+            case Type::STK_FixedPoint: Error("STK_FixedPoint is not implemented"); break;
 #endif
+        }
+
+    } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
+        tt->dump();
+        DPrint("scalar: %d\n", type->isScalarType());
+        const auto&       elementType{tt->getElementType()};
+        const std::string elementTypeInitValue{getValueOfValueInit(elementType)};
+        const auto        size{tt->getSize().getZExtValue()};
+        std::string       ret{};
+
+        bool first{true};
+        for(uint64_t i = 0; i < size; ++i) {
+            if(first) {
+                first = false;
+            } else {
+                ret.append(", ");
+            }
+
+            ret.append(elementTypeInitValue);
+        }
+
+        return ret;
     }
 
     return "0";
@@ -2076,11 +2127,12 @@ void CodeGenerator::FormatCast(const std::string castName,
 void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
 {
     const bool needParens = [&]() {
-        if(const auto* dest = dyn_cast_or_null<UnaryOperator>(stmt->IgnoreImplicit())) {
-            if(dest->getOpcode() == clang::UO_Deref) {
-                return true;
+        if(const auto* expr = dyn_cast_or_null<Expr>(stmt))
+            if(const auto* dest = dyn_cast_or_null<UnaryOperator>(expr->IgnoreImplicit())) {
+                if(dest->getOpcode() == clang::UO_Deref) {
+                    return true;
+                }
             }
-        }
 
         return false;
     }();

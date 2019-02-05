@@ -38,7 +38,7 @@ class Alloc<int, 0>
   {
     if(false) {
       this->data = new int[10];
-      this->data = new int[10]{1, 2, 3};
+      this->data = new int[10]{1, 2, 3, 0, 0, 0, 0, 0, 0, 0};
     } else {
       this->data = new int;
       this->data = new int{2};
@@ -76,7 +76,7 @@ class Alloc<char, 1>
   {
     if(true) {
       this->data = new char[10];
-      this->data = new char[10]{1, 2, 3};
+      this->data = new char[10]{1, 2, 3, '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
     } else {
       this->data = new char;
       this->data = new char{2};

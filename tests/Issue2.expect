@@ -1,0 +1,69 @@
+#include <utility>
+
+struct Movable
+{
+  inline Movable()
+  {
+  }
+  
+  
+  inline Movable(Movable && other)
+  {
+  }
+  
+  
+  inline Movable & operator=(Movable && other)
+  {
+    return *this;
+  }
+  
+  
+  Movable(const Movable&) = delete;
+  Movable& operator=(const Movable&) = delete;
+/* public: inline ~Movable() noexcept; */
+};
+
+int main()
+{
+  Movable m = Movable();
+  int e;
+    
+  class __lambda_20_16
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    private:
+    Movable x;
+    int c;
+    
+    public: __lambda_20_16(Movable _x, int _c)
+    : x{_x}
+, c{_c}
+    {}
+    
+  };
+  
+  __lambda_20_16 fun = __lambda_20_16{Movable(std::move(m)), e};
+  fun.operator()();
+    
+  class __lambda_24_16
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    private:
+    int c;
+    
+    public: __lambda_24_16(int _c)
+    : c{_c}
+    {}
+    
+  };
+  
+  __lambda_24_16 bun = __lambda_24_16{std::move(e)};
+  bun.operator()();
+}
+
