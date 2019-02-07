@@ -34,7 +34,12 @@ def testCompare(tmpFileName, stdout, expectFile, f, args, time):
 #------------------------------------------------------------------------------
 
 def testCompile(tmpFileName, f, args, fileName, cppStd):
-    cmd = [args['cxx'], cppStd, '-m64', '-c', tmpFileName]
+    alignAs = ''
+
+    if '-std=c++98' == cppStd:
+        alignAs = '-Dalignas(x)='
+
+    cmd = [args['cxx'], cppStd, '-m64', '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)', alignAs, '-c', tmpFileName]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
@@ -146,7 +151,7 @@ def main():
         else:
                 cmd   = [insightsPath, f, '--', cppStd, '-m64'] + defaultIncludeDirs
                 begin = datetime.datetime.now()
-                p     = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 end   = datetime.datetime.now()
                 stdout, stderr = p.communicate()
 

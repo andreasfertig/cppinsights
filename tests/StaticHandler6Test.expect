@@ -1,0 +1,34 @@
+#include <new> // for thread-safe static's placement new
+void X() noexcept(true);
+
+
+class Sing
+{
+public:
+    inline Sing() noexcept
+    {
+      X();
+    }
+    
+    
+// public: inline constexpr Sing(const Sing &);
+// public: inline constexpr Sing(Sing &&);
+};
+
+Sing & Test()
+{
+  static uint64_t __sGuard;
+  alignas(Sing) static char __s[sizeof(Sing)];
+  
+  if( ! __sGuard )
+  {
+    if( __cxa_guard_acquire(&__sGuard) )
+    {
+      new (&__s) Sing();
+      __sGuard = true;
+      __cxa_guard_release(&__sGuard);
+    }
+  }
+  return *reinterpret_cast<Sing*>(__s);
+}
+

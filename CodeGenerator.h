@@ -148,9 +148,19 @@ public:
                                                    const SkipAccess          skipAccess           = SkipAccess::No,
                                                    const CXXConstructorDecl* cxxInheritedCtorDecl = nullptr);
 
+    /// Track whether we have at least one local static variable in this TU.
+    /// If so we need to insert the <new> header for the placement-new.
+    static bool NeedToInsertNewHeader() { return mHaveLocalStatic; }
+
 protected:
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
     void HandleCompoundStmt(const CompoundStmt* stmt);
+    /// \brief Show what is behind a local static variable.
+    ///
+    /// [stmt.dcl] p4: Initialization of a block-scope variable with static storage duration is thread-safe since C++11.
+    /// Regardless of that, as long as it is a non-trivally construct and destructable class the compiler adds code to
+    /// track the initialization state. Reference:
+    /// - www.opensource.apple.com/source/libcppabi/libcppabi-14/src/cxa_guard.cxx
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
 
     STRONG_BOOL(AsComment);
@@ -229,8 +239,9 @@ protected:
 
     SkipVarDecl           mSkipVarDecl;
     UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
-
-    const LambdaExpr* mLambdaExpr;
+    const LambdaExpr*     mLambdaExpr;
+    static inline bool
+        mHaveLocalStatic;  // Track whether there was a thread-safe in the code. This requires adding the <new> header.
 };
 //-----------------------------------------------------------------------------
 

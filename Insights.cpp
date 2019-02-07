@@ -24,6 +24,7 @@
 #include "DPrint.h"
 
 #include "AutoStmtHandler.h"
+#include "CodeGenerator.h"
 #include "CompilerGeneratedHandler.h"
 #include "FunctionDeclHandler.h"
 #include "GlobalVariableHandler.h"
@@ -66,10 +67,24 @@ public:
     , mImplicitCastHandler{rewriter, mMatcher}
     , mAutoStmtHandler{rewriter, mMatcher}
     , mFunctionDeclHandler{rewriter, mMatcher}
+    , mRewriter{rewriter}
     {
     }
 
-    void HandleTranslationUnit(ASTContext& context) override { mMatcher.matchAST(context); }
+    void HandleTranslationUnit(ASTContext& context) override
+    {
+        mMatcher.matchAST(context);
+
+        // Check whether we had static local variables which we transformed. Then for the placement-new we need to
+        // include the header <new>.
+        if(CodeGenerator::NeedToInsertNewHeader()) {
+            const auto& sm         = context.getSourceManager();
+            const auto& mainFileId = sm.getMainFileID();
+            const auto  loc        = sm.translateFileLineCol(sm.getFileEntryForID(mainFileId), 1, 1);
+
+            mRewriter.InsertText(loc, "#include <new> // for thread-safe static's placement new\n");
+        }
+    }
 
 private:
     MatchFinder              mMatcher;
@@ -80,6 +95,7 @@ private:
     ImplicitCastHandler      mImplicitCastHandler;
     AutoStmtHandler          mAutoStmtHandler;
     FunctionDeclHandler      mFunctionDeclHandler;
+    Rewriter&                mRewriter;
 };
 //-----------------------------------------------------------------------------
 
