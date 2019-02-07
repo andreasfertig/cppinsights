@@ -2535,6 +2535,12 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         if(methodDecl->isVolatile()) {
             mOutputFormatHelper.Append(kwVolatileSpace);
         }
+
+        if(const auto* ctorDecl = dyn_cast_or_null<CXXConstructorDecl>(methodDecl)) {
+            if(isFirstCxxMethodDecl && ctorDecl->isExplicit()) {
+                mOutputFormatHelper.Append("explicit ");
+            }
+        }
     }
 
     if(decl.isConstexpr()) {
