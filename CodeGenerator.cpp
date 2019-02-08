@@ -2184,14 +2184,12 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             mLambdaStack.back().inits().append(ctorInitializers);
         }
 
-        mOutputFormatHelper.AppendNewLine(';');
-        mOutputFormatHelper.AppendNewLine();
-
     } else {
-        mOutputFormatHelper.CloseScopeWithSemi();
-        mOutputFormatHelper.AppendNewLine();
-        mOutputFormatHelper.AppendNewLine();
+        mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
     }
+
+    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
 
