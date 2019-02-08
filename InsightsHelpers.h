@@ -184,6 +184,16 @@ GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqu
 const std::string EvaluateAsFloat(const FloatingLiteral& expr);
 const std::string GetNoExcept(const FunctionDecl& decl);
 const char*       GetConst(const FunctionDecl& decl);
+//-----------------------------------------------------------------------------
+
+template<typename T, typename TFunc>
+void for_each(T start, T end, TFunc&& func)
+{
+    for(; start < end; ++start) {
+        func(start);
+    }
+}
+//-----------------------------------------------------------------------------
 
 }  // namespace clang::insights
 

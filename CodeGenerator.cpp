@@ -11,6 +11,7 @@
 #include "DPrint.h"
 #include "InsightsBase.h"
 #include "InsightsMatchers.h"
+#include "InsightsOnce.h"
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -394,14 +395,12 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
 
                 ofm.Append('<');
 
-                bool haveArg{false};
-                bool first{true};
+                bool      haveArg{false};
+                OnceFalse needsComma{};
                 for(const auto& arg : tmplArgs->asArray()) {
 
                     if(arg.getKind() == TemplateArgument::Integral) {
-                        if(first) {
-                            first = false;
-                        } else {
+                        if(needsComma) {
                             ofm.Append(", ");
                         }
 
@@ -783,16 +782,14 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
             }();
 
             // now fill the remaining array slots.
-            bool bFirst{0 == stmt->getNumInits()};
-            for(uint64_t i = stmt->getNumInits(); i < fullWidth; ++i) {
-                if(bFirst) {
-                    bFirst = false;
-                } else {
+            OnceFalse needsComma{0 != stmt->getNumInits()};
+            for_each(static_cast<uint64_t>(stmt->getNumInits()), fullWidth, [&](auto) {
+                if(needsComma) {
                     mOutputFormatHelper.Append(", ");
                 }
 
                 InsertArg(filler);
-            }
+            });
         }
     });
 
@@ -1493,23 +1490,19 @@ static std::string getValueOfValueInit(const QualType& t)
         }
 
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
-        tt->dump();
-        DPrint("scalar: %d\n", type->isScalarType());
         const auto&       elementType{tt->getElementType()};
         const std::string elementTypeInitValue{getValueOfValueInit(elementType)};
         const auto        size{tt->getSize().getZExtValue()};
         std::string       ret{};
 
-        bool first{true};
-        for(uint64_t i = 0; i < size; ++i) {
-            if(first) {
-                first = false;
-            } else {
+        OnceFalse needsComma{};
+        for_each(static_cast<uint64_t>(0), size, [&](auto) {
+            if(needsComma) {
                 ret.append(", ");
             }
 
             ret.append(elementTypeInitValue);
-        }
+        });
 
         return ret;
     }
@@ -1630,12 +1623,11 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
     // and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         CodeGenerator codeGenerator{initOutputFormatHelper};
-        bool          first = true;
+        OnceTrue      first{};
 
         for(const auto* init : ctor->inits()) {
             initOutputFormatHelper.AppendNewLine();
             if(first) {
-                first = false;
                 initOutputFormatHelper.Append(": ");
             } else {
                 initOutputFormatHelper.Append(", ");
@@ -2063,20 +2055,17 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.OpenScope();
 
-    bool       firstRecordDecl{true};
-    bool       firstDecl{true};
+    OnceTrue   firstRecordDecl{};
+    OnceTrue   firstDecl{};
     Decl::Kind formerKind{};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) && firstRecordDecl) {
-            firstRecordDecl = false;
             continue;
         }
 
         // Insert a newline when the decl kind changes. This for example, inserts a newline when after a FieldDecl we
         // see a CXXMethodDecl.
-        if(firstDecl) {
-            firstDecl = false;
-        } else if(d->getKind() != formerKind) {
+        if(not firstDecl && (d->getKind() != formerKind)) {
             // mOutputFormatHelper.AppendNewLine();
         }
 
@@ -2099,15 +2088,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         std::string ctorInitializerList{};
         std::string ctorInitializers{"{"};
 
-        bool                                       bFirst{true};
-        llvm::DenseMap<const VarDecl*, FieldDecl*> Captures{};
-        FieldDecl*                                 ThisCapture{};
-
-        stmt->getCaptureFields(Captures, ThisCapture);
+        OnceTrue bFirst{};
 
         auto addToInits = [&](std::string name, const FieldDecl* fd, bool isThis, const Expr* expr) {
             if(bFirst) {
-                bFirst = false;
                 ctorInitializerList.append(": ");
             } else {
                 mOutputFormatHelper.Append(", ");
@@ -2137,6 +2121,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
             mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat("_", name)));
         };
+
+        llvm::DenseMap<const VarDecl*, FieldDecl*> Captures{};
+        FieldDecl*                                 ThisCapture{};
+
+        stmt->getCaptureFields(Captures, ThisCapture);
 
         const auto* captureInits = mLambdaExpr->capture_init_begin();
         const auto* captureInit  = *captureInits;
