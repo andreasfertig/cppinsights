@@ -2,15 +2,17 @@
 
 class Foo
 {
-public:
-    inline Foo(std::initializer_list<int> x, const bool b, const int z)
-    {
-    }
-    
-    
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
+  
+  public: 
+  inline Foo(std::initializer_list<int> x, const bool b, const int z)
+  {
+  }
+  
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
 };
+
+
 
 int main()
 {

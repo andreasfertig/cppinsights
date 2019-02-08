@@ -4,18 +4,20 @@ int main()
             
     class __lambda_3_14
     {
-      public: inline /*constexpr */ int operator()() const
+      public: 
+      inline /*constexpr */ int operator()() const
       {
         return 2;
       }
       
-      public: using retType_3_14 = auto (*)() -> int;
+      using retType_3_14 = auto (*)() -> int;
       inline /*constexpr */ operator retType_3_14 () const
       {
         return __invoke;
       };
       
-      private: static inline int __invoke()
+      private: 
+      static inline int __invoke()
       {
         return 2;
       }
@@ -27,18 +29,20 @@ int main()
             
     class __lambda_3_34
     {
-      public: inline /*constexpr */ int operator()() const
+      public: 
+      inline /*constexpr */ int operator()() const
       {
         return 3;
       }
       
-      public: using retType_3_34 = auto (*)() -> int;
+      using retType_3_34 = auto (*)() -> int;
       inline /*constexpr */ operator retType_3_34 () const
       {
         return __invoke;
       };
       
-      private: static inline int __invoke()
+      private: 
+      static inline int __invoke()
       {
         return 3;
       }
@@ -50,18 +54,20 @@ int main()
             
     class __lambda_3_53
     {
-      public: inline /*constexpr */ int operator()() const
+      public: 
+      inline /*constexpr */ int operator()() const
       {
         return 4;
       }
       
-      public: using retType_3_53 = auto (*)() -> int;
+      using retType_3_53 = auto (*)() -> int;
       inline /*constexpr */ operator retType_3_53 () const
       {
         return __invoke;
       };
       
-      private: static inline int __invoke()
+      private: 
+      static inline int __invoke()
       {
         return 4;
       }

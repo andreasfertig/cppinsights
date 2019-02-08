@@ -7,18 +7,20 @@ int main()
       
   class __lambda_8_57
   {
-    public: inline /*constexpr */ int operator()(int fir, int sec) const
+    public: 
+    inline /*constexpr */ int operator()(int fir, int sec) const
     {
       return fir * sec;
     }
     
-    public: using retType_8_57 = int (*)(int, int);
+    using retType_8_57 = int (*)(int, int);
     inline /*constexpr */ operator retType_8_57 () const
     {
       return __invoke;
     };
     
-    private: static inline int __invoke(int fir, int sec)
+    private: 
+    static inline int __invoke(int fir, int sec)
     {
       return fir * sec;
     }

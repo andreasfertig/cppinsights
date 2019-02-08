@@ -25,23 +25,6 @@ const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDe
 }
 
 namespace clang::insights {
-/// \brief Inserts the instantiation point of a template.
-//
-// This reveals at which place the template is first used.
-static void
-InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceManager& sm, const SourceLocation& instLoc)
-{
-    const auto  lineNo = sm.getSpellingLineNumber(instLoc);
-    const auto& fileId = sm.getFileID(instLoc);
-    const auto* file   = sm.getFileEntryForID(fileId);
-    if(file) {
-        const auto fileWithDirName = file->getName();
-        const auto fileName        = llvm::sys::path::filename(fileWithDirName);
-
-        outputFormatHelper.AppendNewLine("/* First instantiated from: ", fileName, ":", lineNo, " */");
-    }
-}
-//-----------------------------------------------------------------------------
 
 // Workaround to keep clang 6 Linux build alive
 template<class T, class U>
@@ -50,31 +33,21 @@ inline constexpr bool is_same_v = std::is_same<T, U>::value;  // NOLINT
 
 /// \brief Insert the instantiated template with the resulting code.
 template<typename T>
-static OutputFormatHelper InsertInstantiatedTemplate(const T& decl, const MatchFinder::MatchResult& result)
+static OutputFormatHelper InsertInstantiatedTemplate(const T& decl)
 {
     OutputFormatHelper outputFormatHelper{};
     outputFormatHelper.AppendNewLine();
     outputFormatHelper.AppendNewLine();
 
-    const auto& sm = GetSM(result);
-
-    if constexpr(not is_same_v<VarTemplateDecl, T>) {  // NOLINT
-        InsertInstantiationPoint(outputFormatHelper, sm, decl.getPointOfInstantiation());
-    }
-
-    outputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
     CodeGenerator codeGenerator{outputFormatHelper};
 
     if constexpr(is_same_v<VarTemplateDecl, T>) {
         for(const auto& spec : decl.specializations()) {
-            InsertInstantiationPoint(outputFormatHelper, sm, spec->getPointOfInstantiation());
             codeGenerator.InsertArg(spec);
         }
     } else {
         codeGenerator.InsertArg(&decl);
     }
-
-    outputFormatHelper.AppendNewLine("#endif");
 
     return outputFormatHelper;
 }
@@ -87,16 +60,17 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
         functionDecl(allOf(unless(isExpansionInSystemHeader()),
                            unless(isMacroOrInvalidLocation()),
                            hasParent(functionTemplateDecl(unless(hasParent(classTemplateSpecializationDecl())),
-                                                          unless(hasParent(cxxRecordDecl(isLambda()))))),
+                                                          unless(hasAncestor(cxxRecordDecl())))),
                            isTemplateInstantiationPlain()))
             .bind("func"),
         this);
 
     // match typical use where a class template is defined and it is used later.
-    matcher.addMatcher(classTemplateSpecializationDecl(unless(isExpansionInSystemHeader()),
-                                                       hasParent(classTemplateDecl().bind("decl")))
-                           .bind("class"),
-                       this);
+    matcher.addMatcher(
+        classTemplateSpecializationDecl(unless(anyOf(isExpansionInSystemHeader(), hasAncestor(cxxRecordDecl()))),
+                                        hasParent(classTemplateDecl().bind("decl")))
+            .bind("class"),
+        this);
 
     // special case, where a class template is defined and somewhere else we request an explicit instantiation
     matcher.addMatcher(classTemplateSpecializationDecl(unless(anyOf(isExpansionInSystemHeader(),
@@ -113,11 +87,11 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
 void TemplateHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* functionDecl = result.Nodes.getNodeAs<FunctionDecl>("func")) {
-        if(not functionDecl->getBody()) {
+        if(not functionDecl->getBody() && not isa<CXXDeductionGuideDecl>(functionDecl)) {
             return;
         }
 
-        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*functionDecl, result);
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*functionDecl);
         const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(*functionDecl), result);
 
         InsertIndentedText(endOfCond.getLocWithOffset(1), outputFormatHelper);
@@ -128,7 +102,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
             return;
         }
 
-        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl, result);
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl);
 
         if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl")) {
             const auto endOfCond = FindLocationAfterSemi(GetEndLoc(clsTmplDecl), result);
@@ -139,7 +113,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         }
 
     } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
-        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*vd, result);
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*vd);
 
         const auto endOfCond = FindLocationAfterSemi(GetEndLoc(vd), result);
         InsertIndentedText(endOfCond, outputFormatHelper);

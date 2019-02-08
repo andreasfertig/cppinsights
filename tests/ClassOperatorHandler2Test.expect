@@ -13,71 +13,72 @@ void f(int &)
 
 class Foo
 {
-public:
-    inline Foo(int x)
-    : mX{x}
-    {
-    }
-    
-    
-
-    using retType_23_5 = const int;
-    inline operator retType_23_5 () const
-    {
-      return this->mX;
-    }
-    
-    inline Foo operator++(int)
-    {
-      Foo old = Foo(*this) /* NRVO variable */;
-      printf("  ======\n");
-      ++this->mX;
-      printf("  ++++++\n");
-      return Foo(old);
-    }
-    
-    inline Foo & operator++()
-    {
-      ++this->mX;
-      return *this;
-    }
-    
-
-    inline Foo operator--(int)
-    {
-      Foo old = Foo(*this) /* NRVO variable */;
-      printf("  ======\n");
-      --this->mX;
-      printf("  ++++++\n");
-      return Foo(old);
-    }
-    
-    inline Foo & operator--()
-    {
-      --this->mX;
-      return *this;
-    }
-    
-    
-    inline int Get() const
-    {
-      return this->mX;
-    }
-    
-
-private:
-    int mX;
-// public: inline constexpr Foo(const Foo &) noexcept;
-// public: inline constexpr Foo(Foo &&) noexcept;
-// public: inline ~Foo() noexcept;
+  
+  public: 
+  inline Foo(int x)
+  : mX{x}
+  {
+  }
+  
+  using retType_23_5 = const int;
+  inline operator retType_23_5 () const
+  {
+    return this->mX;
+  }
+  
+  inline Foo operator++(int)
+  {
+    Foo old = Foo(*this) /* NRVO variable */;
+    printf("  ======\n");
+    ++this->mX;
+    printf("  ++++++\n");
+    return Foo(old);
+  }
+  
+  inline Foo & operator++()
+  {
+    ++this->mX;
+    return *this;
+  }
+  
+  inline Foo operator--(int)
+  {
+    Foo old = Foo(*this) /* NRVO variable */;
+    printf("  ======\n");
+    --this->mX;
+    printf("  ++++++\n");
+    return Foo(old);
+  }
+  
+  inline Foo & operator--()
+  {
+    --this->mX;
+    return *this;
+  }
+  
+  inline int Get() const
+  {
+    return this->mX;
+  }
+  
+  
+  private: 
+  int mX;
+  public: 
+  // inline constexpr Foo(const Foo &) noexcept = default;
+  // inline constexpr Foo(Foo &&) noexcept = default;
+  // inline ~Foo() noexcept = default;
 };
+
+
 
 int main()
 {
     
   class __lambda_60_5
   {
-    public: inline void operator()() const
+    public: 
+    inline void operator()() const
     {
       int n = 10;
       f(n);
@@ -103,13 +104,14 @@ int main()
       printf("%d\n", f.Get());
     }
     
-    public: using retType_60_5 = void (*)();
+    using retType_60_5 = void (*)();
     inline /*constexpr */ operator retType_60_5 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       int n = 10;
       f(n);

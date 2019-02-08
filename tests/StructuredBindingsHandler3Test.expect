@@ -39,10 +39,14 @@ struct tuple_element<2, constant::Q>
 
 
 namespace constant {
-  struct Q {// public: inline constexpr Q() noexcept;
-  // public: inline constexpr Q(const constant::Q &) noexcept;
-  // public: inline constexpr Q(constant::Q &&);
-  };
+  struct Q
+{
+  // inline constexpr Q() noexcept = default;
+  // inline constexpr Q(const constant::Q &) noexcept = default;
+  // inline constexpr Q(constant::Q &&) = default;
+};
+
+
   template<int N> constexpr int get(Q &&) { return N * N; }
   
   /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
@@ -75,8 +79,22 @@ namespace constant {
   #endif
   
 }
-template<> struct std::tuple_size<constant::Q> { static const int value = 3; };
-template<size_t N> struct std::tuple_element<N, constant::Q> { typedef int type; };
+template<>
+struct tuple_size<constant::Q>
+{
+  static const int value = 3;
+};
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<size_t N>
+struct tuple_element<N, constant::Q>
+{
+  using type = int;
+};
+
+#endif
+
 namespace constant {
   constant::Q q = constant::Q();
 
@@ -89,13 +107,12 @@ ntstd::tuple_element<1, constant::Q>::type && b = constant::get<1ul>(constant::)
 :_std::tuple_element<2, constant::Q>::type && c = constant::get<2ul>(constant::);
 q17);
     // expected-note {{temporary}}
-
   inline constexpr bool f()
   {
-    constant::Q __q20 = constant::Q(constant::q);
-    std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q20);
-    std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q20);
-    std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q20);
+    constant::Q __q19 = constant::Q(constant::q);
+    std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q19);
+    std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q19);
+    std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q19);
     return a == 0 && b == 1 && c == 4;
   }
   
@@ -104,10 +121,10 @@ q17);
   {
     int * p = nullptr;
     {
-      constant::Q __q27 = constant::Q(constant::q);
-      std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q27);
-      std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q27);
-      std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q27);
+      constant::Q __q26 = constant::Q(constant::q);
+      std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q26);
+      std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q26);
+      std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q26);
       p = &c;
     };
     return *p;

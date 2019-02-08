@@ -3,22 +3,25 @@ void x()
     
   class __lambda_3_12
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       
       class __lambda_4_5
       {
-        public: inline /*constexpr */ void operator()() const
+        public: 
+        inline /*constexpr */ void operator()() const
         {
         }
         
-        public: using retType_4_5 = void (*)();
+        using retType_4_5 = void (*)();
         inline /*constexpr */ operator retType_4_5 () const
         {
           return __invoke;
         };
         
-        private: static inline void __invoke()
+        private: 
+        static inline void __invoke()
         {
         }
         
@@ -28,28 +31,31 @@ void x()
       __lambda_4_5{};
     }
     
-    public: using retType_3_12 = void (*)();
+    using retType_3_12 = void (*)();
     inline /*constexpr */ operator retType_3_12 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       
       class __lambda_4_5
       {
-        public: inline /*constexpr */ void operator()() const
+        public: 
+        inline /*constexpr */ void operator()() const
         {
         }
         
-        public: using retType_4_5 = void (*)();
+        using retType_4_5 = void (*)();
         inline /*constexpr */ operator retType_4_5 () const
         {
           return __invoke;
         };
         
-        private: static inline void __invoke()
+        private: 
+        static inline void __invoke()
         {
         }
         

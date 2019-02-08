@@ -7,7 +7,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates gnupg \
           wget cmake g++-8 python2.7 ninja-build
 
-RUN echo "deb http://apt.llvm.org/stretch/ llvm-toolchain-stretch main" >> /etc/apt/sources.list
+RUN echo "deb http://apt.llvm.org/buster/ llvm-toolchain-buster-8 main" >> /etc/apt/sources.list
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 
 RUN apt-get update && \

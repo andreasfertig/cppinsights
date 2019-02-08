@@ -3,10 +3,12 @@
 
 struct Test
 {
-// public: inline constexpr Test() noexcept;
-// public: inline constexpr Test(const Test &);
-// public: inline constexpr Test(Test &&);
+  // inline constexpr Test() noexcept = default;
+  // inline constexpr Test(const Test &) = default;
+  // inline constexpr Test(Test &&) = default;
 };
+
+
 
 template<class T>
 void foo(T&& t)

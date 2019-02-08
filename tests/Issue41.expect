@@ -10,9 +10,27 @@ int main()
       
   class __lambda_12_26
   {
-    public: inline /*constexpr */ bool operator()(const std::basic_string<char> & str) const
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(const type_parameter_0_0 & str) const
+    {
+      return operator==(str, "bbb");
+    }
+    
+    /* First instantiated from: algorithm:877 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ bool operator()(const std::basic_string<char> & str) const
     {
       return std::operator==(str, "bbb");
+    }
+    #endif
+    
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(const type_parameter_0_0 & str)
+    {
+      return operator==(str, "bbb");
     }
     
   };

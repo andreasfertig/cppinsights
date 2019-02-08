@@ -1,5 +1,7 @@
-#include <type_traits>
+#define INSIGHTS_USE_TEMPLATE
+
 #include <cstddef>
+#include <type_traits>
 
 namespace details {
   template<class T>

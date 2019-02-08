@@ -1,21 +1,22 @@
 struct Foo
 {
-    int mem= 0;
-    int x{2};
-    char c[2]{1, 2};
-
- public:
-    inline Foo()
-    : mem{0}
-    , x{2}
-    , c{1, 2}
-    {
-    }
-    
-    
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
+  int mem;
+  int x;
+  char c[2];
+  
+  public: 
+  inline Foo()
+  : mem{0}
+  , x{2}
+  , c{1, 2}
+  {
+  }
+  
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
 };
+
+
  
 int main()
 {

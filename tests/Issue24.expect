@@ -1,10 +1,13 @@
-class Simple 
+class Simple
 {
-    int p;
-  public:
-    inline double get()
-    {
-      return static_cast<double>(this->p);
-    }
-    
+  int p;
+  
+  public: 
+  inline double get()
+  {
+    return static_cast<double>(this->p);
+  }
+  
 };
+
+

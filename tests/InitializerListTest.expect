@@ -2,63 +2,64 @@
 
 #include <utility>
 
-class X {
-public:
+class X
+{
+  
+  public: 
   inline ~X() noexcept
   {
   }
-  
   
   inline X(std::initializer_list<int> x)
   {
   }
   
-  
-
   inline X(int z, std::initializer_list<int> x)
   {
   }
   
-  
-
   inline X(std::initializer_list<int> x, int z)
   {
   }
-  
-  
   
   inline X(void * x, int y)
   {
   }
   
-  
-
   inline X & operator+=(const std::initializer_list<int> & x)
   {
     return *this;
   }
   
-// public: inline constexpr X(const X &);
+  // inline constexpr X(const X &) = default;
 };
 
-struct V {
+
+
+struct V
+{
   inline V(int x)
   {
   }
-  
   
   inline V(std::initializer_list<int> x)
   {
   }
   
-  
-
-// public: inline constexpr V(const V &);
-// public: inline constexpr V(V &&);
+  // inline constexpr V(const V &) = default;
+  // inline constexpr V(V &&) = default;
 };
 
-struct Y { int x, y; // public: inline ~Y() noexcept;
+
+
+struct Y
+{
+  int x;
+  int y;
+  // inline ~Y() noexcept = default;
 };
+
+
 
 void takes_y(Y y);
 

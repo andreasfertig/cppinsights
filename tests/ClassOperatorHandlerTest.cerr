@@ -1,0 +1,61 @@
+.tmp.cpp:106:21: error: no class named 'Fest' in namespace 'Hello::Bello'
+class Hello::Bello::Fest
+      ~~~~~~~~~~~~~~^
+.tmp.cpp:106:21: warning: extra qualification on member 'Fest' [-Wextra-qualification]
+.tmp.cpp:141:29: error: no type named 'Fest' in namespace 'Hello::Bello'; did you mean simply 'Fest'?
+inline bool operator<(const Hello::Bello::Fest & LHS, const Hello::Bello::Fest & RHS)
+                            ^~~~~~~~~~~~~~~~~~
+                            Fest
+.tmp.cpp:74:7: note: 'Fest' declared here
+class Fest
+      ^
+.tmp.cpp:141:61: error: no type named 'Fest' in namespace 'Hello::Bello'; did you mean simply 'Fest'?
+inline bool operator<(const Hello::Bello::Fest & LHS, const Hello::Bello::Fest & RHS)
+                                                            ^~~~~~~~~~~~~~~~~~
+                                                            Fest
+.tmp.cpp:74:7: note: 'Fest' declared here
+class Fest
+      ^
+.tmp.cpp:147:8: error: no type named 'Fest' in namespace 'Hello::Bello'; did you mean simply 'Fest'?
+static Hello::Bello::Fest sF = Hello::Bello::Fest{3};
+       ^~~~~~~~~~~~~~~~~~
+       Fest
+.tmp.cpp:74:7: note: 'Fest' declared here
+class Fest
+      ^
+.tmp.cpp:147:46: error: no member named 'Fest' in namespace 'Hello::Bello'
+static Hello::Bello::Fest sF = Hello::Bello::Fest{3};
+                               ~~~~~~~~~~~~~~^
+.tmp.cpp:147:50: error: expected ';' after top level declarator
+static Hello::Bello::Fest sF = Hello::Bello::Fest{3};
+                                                 ^
+                                                 ;
+.tmp.cpp:190:3: error: no type named 'Fest' in namespace 'Hello::Bello'; did you mean simply 'Fest'?
+  Hello::Bello::Fest f3 = Hello::Bello::Fest{3};
+  ^~~~~~~~~~~~~~~~~~
+  Fest
+.tmp.cpp:74:7: note: 'Fest' declared here
+class Fest
+      ^
+.tmp.cpp:190:41: error: no member named 'Fest' in namespace 'Hello::Bello'
+  Hello::Bello::Fest f3 = Hello::Bello::Fest{3};
+                          ~~~~~~~~~~~~~~^
+.tmp.cpp:190:45: error: expected ';' at end of declaration
+  Hello::Bello::Fest f3 = Hello::Bello::Fest{3};
+                                            ^
+                                            ;
+.tmp.cpp:191:3: error: no type named 'Fest' in namespace 'Hello::Bello'; did you mean simply 'Fest'?
+  Hello::Bello::Fest f4 = Hello::Bello::Fest{3};
+  ^~~~~~~~~~~~~~~~~~
+  Fest
+.tmp.cpp:74:7: note: 'Fest' declared here
+class Fest
+      ^
+.tmp.cpp:191:41: error: no member named 'Fest' in namespace 'Hello::Bello'
+  Hello::Bello::Fest f4 = Hello::Bello::Fest{3};
+                          ~~~~~~~~~~~~~~^
+.tmp.cpp:191:45: error: expected ';' at end of declaration
+  Hello::Bello::Fest f4 = Hello::Bello::Fest{3};
+                                            ^
+                                            ;
+1 warning and 12 errors generated.

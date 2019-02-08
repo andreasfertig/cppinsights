@@ -2,36 +2,44 @@
 using namespace std;
 
 class A
-    {
-    // public: inline constexpr A() noexcept;
-    // public: inline constexpr A(const A &);
-    // public: inline constexpr A(A &&);
-    // public: inline ~A() noexcept;
-    };
+{
+  public: 
+  // inline constexpr A() noexcept = default;
+  // inline constexpr A(const A &) = default;
+  // inline constexpr A(A &&) = default;
+  // inline ~A() noexcept = default;
+};
+
+
 
 class B
-    {
-    public:
-        using retType_11_9 = A;
-        inline operator retType_11_9 () const
-        {
-          return A();
-        }
-        
-    // public: inline constexpr B() noexcept;
-    // public: inline ~B() noexcept;
-    // public: inline constexpr B(const B &);
-    // public: inline constexpr B(B &&);
-    };
+{
+  
+  public: 
+  using retType_11_9 = A;
+  inline operator retType_11_9 () const
+  {
+    return A();
+  }
+  
+  // inline constexpr B() noexcept = default;
+  // inline ~B() noexcept = default;
+  // inline constexpr B(const B &) = default;
+  // inline constexpr B(B &&) = default;
+};
 
-class C
-    : public B
-    {
-    // public: inline constexpr C() noexcept;
-    // public: inline constexpr C(const C &);
-    // public: inline constexpr C(C &&);
-    // public: inline ~C() noexcept;
-    };
+
+
+class C : public B
+{
+  public: 
+  // inline constexpr C() noexcept = default;
+  // inline constexpr C(const C &) = default;
+  // inline constexpr C(C &&) = default;
+  // inline ~C() noexcept = default;
+};
+
+
 
 void foo(const A &)
 {

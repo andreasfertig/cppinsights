@@ -1,22 +1,25 @@
 #include <cstdio>
 #include <utility>
 
-struct Foo {
-    inline void bar() &
-    {
-      printf("lvalue\n");
-    }
-    
-    inline void bar() &&
-    {
-      printf("rvalue\n");
-    }
-    
-// public: inline constexpr Foo() noexcept;
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
-// public: inline ~Foo() noexcept;
+struct Foo
+{
+  inline void bar() &
+  {
+    printf("lvalue\n");
+  }
+  
+  inline void bar() &&
+  {
+    printf("rvalue\n");
+  }
+  
+  // inline constexpr Foo() noexcept = default;
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
+  // inline ~Foo() noexcept = default;
 };
+
+
 
 int main()
 {

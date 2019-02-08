@@ -2,37 +2,33 @@
 
 struct A
 {
-    A() = default;
-
-    inline A & begin()
-    {
-      return *this;
-    }
-    
-
-    inline const int end()
-    {
-      return this->v[9];
-    }
-    
-
-    inline A & operator++()
-    {
-      return *this;
-    }
-    
-
-    inline int operator*()
-    {
-      return 1;
-    }
-    
-
-    int v[10]{};
-// public: inline constexpr A() noexcept;
-// public: inline constexpr A(const A &) noexcept;
-// public: inline constexpr A(A &&);
+  inline constexpr A() noexcept = default;
+  inline A & begin()
+  {
+    return *this;
+  }
+  
+  inline const int end()
+  {
+    return this->v[9];
+  }
+  
+  inline A & operator++()
+  {
+    return *this;
+  }
+  
+  inline int operator*()
+  {
+    return 1;
+  }
+  
+  int v[10]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  // inline constexpr A(const A &) noexcept = default;
+  // inline constexpr A(A &&) = default;
 };
+
+
 
 bool operator!=(const A &, const int &)
 {

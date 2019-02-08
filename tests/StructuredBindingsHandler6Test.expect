@@ -7,102 +7,115 @@
 using namespace std;
 
 class Point;
+
 template<>
-struct std::tuple_size<Point> : std::integral_constant<size_t, 2>
+struct std::tuple_size<Point> : public std::integral_constant<unsigned long, 2>
 {
 };
+
+
 template<>
 struct std::tuple_element<0, Point>
 {
-    using type = double;
+  using type = double;
 };
+
+
 template<>
 struct std::tuple_element<1, Point>
 {
-    using type = double;
+  using type = double;
 };
+
+
 
 class Point
 {
-public:
-    inline constexpr Point(double x, double y) noexcept
-    : mX{x}
-    , mY{y}
-    {
-    }
-    
-    
-
-    inline constexpr double GetX() const noexcept
-    {
-      return this->mX;
-    }
-    
-    inline constexpr double GetY() const noexcept
-    {
-      return this->mY;
-    }
-    
-
-    inline constexpr void SetX(double x) noexcept
-    {
-      this->mX = x;
-    }
-    
-    inline constexpr void SetY(double y) noexcept
-    {
-      this->mY = y;
-    }
-    
-
-private:
-    double mX, mY;
-
-public:
-    template<size_t N>
-    constexpr decltype(auto) get() const noexcept
-    {
-        if constexpr(N == 1) {
-            return GetX();
-        } else if constexpr(N == 0) {
-            return mY;
-        }
-    }
-    
-    /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    inline constexpr double get<0>() const noexcept
-    {
-      if constexpr(0ul == 1) ;
-      else /* constexpr */ {
-        if constexpr(0ul == 0) {
-          return this->mY;
-        }
-        
-        
+  
+  public: 
+  inline constexpr Point(double x, double y) noexcept
+  : mX{x}
+  , mY{y}
+  {
+  }
+  
+  inline constexpr double GetX() const noexcept
+  {
+    return this->mX;
+  }
+  
+  inline constexpr double GetY() const noexcept
+  {
+    return this->mY;
+  }
+  
+  inline constexpr void SetX(double x) noexcept
+  {
+    this->mX = x;
+  }
+  
+  inline constexpr void SetY(double y) noexcept
+  {
+    this->mY = y;
+  }
+  
+  
+  private: 
+  double mX;
+  double mY;
+  
+  public: 
+  template<size_t N>
+  inline constexpr decltype(auto) get() const noexcept
+  {
+    if constexpr(N == 1) {
+      return this->GetX();
+    } else /* constexpr */ {
+      if constexpr(N == 0) {
+        return this->mY;
       }
       
-    }
-    #endif
-    
-    
-    /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    inline constexpr double get<1>() const noexcept
-    {
-      if constexpr(1ul == 1) {
-        return this->GetX();
-      }
       
     }
-    #endif
     
-// public: inline constexpr Point(const Point &) noexcept;
-// public: inline constexpr Point(Point &&);
-// public: inline ~Point() noexcept;
+  }
+  
+  /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline constexpr double get<0>() const noexcept
+  {
+    if constexpr(0ul == 1) ;
+    else /* constexpr */ {
+      if constexpr(0ul == 0) {
+        return this->mY;
+      }
+      
+      
+    }
+    
+  }
+  #endif
+  
+  
+  /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline constexpr double get<1>() const noexcept
+  {
+    if constexpr(1ul == 1) {
+      return this->GetX();
+    }
+    
+  }
+  #endif
+  
+  // inline constexpr Point(const Point &) noexcept = default;
+  // inline constexpr Point(Point &&) = default;
+  // inline ~Point() noexcept = default;
 };
+
+
 
 int main()
 {

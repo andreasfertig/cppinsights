@@ -3,7 +3,25 @@
 
 class __lambda_3_12
 {
-  public: inline /*constexpr */ int operator()(int (*fp)(int), int a) const
+  public: 
+  template<class type_parameter_0_0>
+  inline /*constexpr */ auto operator()(int (*fp)(int), type_parameter_0_0 a) const
+  {
+    return fp(a);
+  }
+  
+  /* First instantiated from: LambdaWithFunctionPointerTest.cpp:7 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()(int (*fp)(int), int a) const
+  {
+    return fp(a);
+  }
+  #endif
+  
+  private: 
+  template<class type_parameter_0_0>
+  static inline auto __invoke(int (*fp)(int), type_parameter_0_0 a)
   {
     return fp(a);
   }
@@ -16,19 +34,48 @@ __lambda_3_12 Fwd = __lambda_3_12{};
 
 class __lambda_5_10
 {
-  public: inline /*constexpr */ int operator()(int a) const
+  public: 
+  template<class type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0 a) const
   {
     return a;
   }
-  public: using retType_5_10 = int (*)(int);
+  
+  /* First instantiated from: LambdaWithFunctionPointerTest.cpp:7 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()(int a) const
+  {
+    return a;
+  }
+  #endif
+  
+  
+  /* First instantiated from: LambdaWithFunctionPointerTest.cpp:7 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  using retType_5_10 = int (*)(int);
+  template<>
   inline /*constexpr */ operator retType_5_10 () const
   {
     return __invoke;
   }
-  private: static inline int __invoke(int a)
+  #endif
+  
+  private: 
+  template<class type_parameter_0_0>
+  static inline auto __invoke(type_parameter_0_0 a)
   {
     return a;
   }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  static inline int __invoke(int a)
+  {
+    return a;
+  }
+  #endif
+  
   
 };
 

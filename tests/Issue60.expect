@@ -2,14 +2,17 @@
 
 #include <map>
 
-struct Person {
-    int age;
-    inline int yob() const
-    {
-      return 2018 - this->age;
-    }
-    
+struct Person
+{
+  int age;
+  inline int yob() const
+  {
+    return 2018 - this->age;
+  }
+  
 };
+
+
 
 template<typename Key, typename POD>
 Key extractKey(Key POD::* pMember);

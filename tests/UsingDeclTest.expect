@@ -1,33 +1,37 @@
 #include <string>
 #include <iostream>
 
-struct B {
-    inline virtual void f(int)
-    {
-      std::operator<<(std::cout, "B::f\n");
-    }
-    
-    inline void g(char)
-    {
-      std::operator<<(std::cout, "B::g\n");
-    }
-    
-    inline void h(int)
-    {
-      std::operator<<(std::cout, "B::h\n");
-    }
-    
-
- protected:
-    int m; // B::m is protected
-    typedef int value_type;
-// public: inline B & operator=(const B &);
-// public: inline B & operator=(B &&);
-// public: inline ~B();
-// public: inline B() noexcept;
-// public: inline constexpr B(const B &);
-// public: inline constexpr B(B &&);
+struct B
+{
+  inline virtual void f(int)
+  {
+    std::operator<<(std::cout, "B::f\n");
+  }
+  
+  inline void g(char)
+  {
+    std::operator<<(std::cout, "B::g\n");
+  }
+  
+  inline void h(int)
+  {
+    std::operator<<(std::cout, "B::h\n");
+  }
+  
+  
+  protected: 
+  int m;
+  using value_type = int;
+  public: 
+  // inline B & operator=(const B &) = default;
+  // inline B & operator=(B &&) = default;
+  // inline ~B() = default;
+  // inline B() noexcept = default;
+  // inline constexpr B(const B &) = default;
+  // inline constexpr B(B &&) = default;
 };
+
+
  
 template<typename T>
 struct D : B {
@@ -77,10 +81,14 @@ struct D<int> : public B
 
 namespace Test
 {
-    struct Alloc { // public: inline constexpr Alloc() noexcept;
-    // public: inline constexpr Alloc(const Test::Alloc &);
-    // public: inline constexpr Alloc(Test::Alloc &&);
-    };
+    struct Alloc
+{
+  // inline constexpr Alloc() noexcept = default;
+  // inline constexpr Alloc(const Test::Alloc &) = default;
+  // inline constexpr Alloc(Test::Alloc &&) = default;
+};
+
+
 
     enum class West { north };
     enum struct Best { north };
@@ -94,7 +102,11 @@ namespace Test
             using type = int;
 
             namespace /*anonymous namespace*/ {
-                class Void{};
+                class Void
+{
+};
+
+
             }
         }
     }

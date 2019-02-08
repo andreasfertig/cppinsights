@@ -1,0 +1,14 @@
+struct DefaultedCtorAndConstexpr
+{
+  inline constexpr DefaultedCtorAndConstexpr() noexcept = default;
+  // inline constexpr DefaultedCtorAndConstexpr(const DefaultedCtorAndConstexpr &) = default;
+  // inline constexpr DefaultedCtorAndConstexpr(DefaultedCtorAndConstexpr &&) = default;
+};
+
+
+
+int main()
+{
+  DefaultedCtorAndConstexpr t = DefaultedCtorAndConstexpr();
+}
+

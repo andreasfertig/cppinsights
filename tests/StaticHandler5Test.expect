@@ -8,15 +8,17 @@ void X()
 
 class Sing
 {
-public:
-    inline Sing()
-    {
-      X();
-    }
-    
-    
-// public: inline Sing(const Sing &);
+  
+  public: 
+  inline Sing()
+  {
+    X();
+  }
+  
+  // inline Sing(const Sing &) = default;
 };
+
+
 
 Sing & Test()
 {

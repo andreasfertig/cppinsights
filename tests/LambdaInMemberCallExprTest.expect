@@ -1,22 +1,26 @@
 class Test
 {
-public:
-
-    template<typename T>
-    void foo(T&&){}
-    
-    /* First instantiated from: LambdaInMemberCallExprTest.cpp:13 */
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    inline void foo<__lambda_13_12>(__lambda_13_12 &&)
-    {
-    }
-    #endif
-    
-// public: inline constexpr Test() noexcept;
-// public: inline constexpr Test(const Test &);
-// public: inline constexpr Test(Test &&);
+  
+  public: 
+  template<typename T>
+  inline void foo(T &&)
+  {
+  }
+  
+  /* First instantiated from: LambdaInMemberCallExprTest.cpp:13 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline void foo<__lambda_13_12>(__lambda_13_12 &&)
+  {
+  }
+  #endif
+  
+  // inline constexpr Test() noexcept = default;
+  // inline constexpr Test(const Test &) = default;
+  // inline constexpr Test(Test &&) = default;
 };
+
+
 
 int main()
 {
@@ -24,7 +28,8 @@ int main()
     
   class __lambda_13_12
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
     }
     

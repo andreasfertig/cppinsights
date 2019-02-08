@@ -4,25 +4,81 @@
 template <typename T>
 constexpr auto func = [](auto x){ return T(x);};
 
-#ifdef INSIGHTS_USE_TEMPLATE
-/* First instantiated from: VarTemplateWithLambdaTest.cpp:9 */
 
 class __lambda_5_23
 {
-  public: inline /*constexpr */ double operator()(int x) const
+  public: 
+  template<class type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0 x) const
+  {
+    return double(x);
+  }
+  
+  /* First instantiated from: VarTemplateWithLambdaTest.cpp:12 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ double operator()(int x) const
   {
     return double(static_cast<double>(x));
+  }
+  #endif
+  
+  private: 
+  template<class type_parameter_0_0>
+  static inline auto __invoke(type_parameter_0_0 x)
+  {
+    return double(x);
   }
   
 };
 
 template<>
 constexpr const __lambda_5_23 func<double> = __lambda_5_23{};
-#endif
+
+
+template <typename T>
+constexpr auto funcBraced = [](auto x){ return T{x};};
+
+
+class __lambda_8_29
+{
+  public: 
+  template<class type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0 x) const
+  {
+    return int{{x}};
+  }
+  
+  /* First instantiated from: VarTemplateWithLambdaTest.cpp:17 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()(int x) const
+  {
+    return int{x};
+  }
+  #endif
+  
+  private: 
+  template<class type_parameter_0_0>
+  static inline auto __invoke(type_parameter_0_0 x)
+  {
+    return int{{x}};
+  }
+  
+};
+
+template<>
+constexpr const __lambda_8_29 funcBraced<int> = __lambda_8_29{};
 
 
 double f(int x)
 {
   return func<double>.operator()(x);
+}
+
+
+double fBraced(int x)
+{
+  return static_cast<double>(funcBraced<int>.operator()(x));
 }
 

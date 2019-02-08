@@ -1,102 +1,110 @@
 class Foo
 {
-    inline Foo()
-    : mX{0}
+  inline Foo()
+  : mX{0}
+  {
+        
+    class __lambda_6_18
     {
-            
-      class __lambda_6_18
+      Foo * __this;
+      public: 
+      inline /*constexpr */ void operator()() const
       {
-        Foo * __this;
-        public: inline /*constexpr */ void operator()() const
-        {
-          __this->Get();
-        }
-        
-        public: __lambda_6_18(Foo * _this)
-        : __this{_this}
-
-        {}
-        
-      };
+        __this->Get();
+      }
       
-      __lambda_6_18 f = __lambda_6_18{this};
-            
-      class __lambda_10_18
-      {
-        Foo * __this;
-        public: inline /*constexpr */ void operator()() const
-        {
-          __this->Get();
-        }
-        
-        public: __lambda_10_18(Foo * _this)
-        : __this{_this}
+      public: __lambda_6_18(Foo * _this)
+      : __this{_this}
 
-        {}
-        
-      };
+      {}
       
-      __lambda_10_18 g = __lambda_10_18{this};
-            
-      class __lambda_14_18
-      {
-        Foo __this;
-        public: inline /*constexpr */ void operator()() const
-        {
-          (&__this)->Get();
-        }
-        
-        public: __lambda_14_18(Foo _this)
-        : __this{_this}
-
-        {}
-        
-      };
-      
-      __lambda_14_18 h = __lambda_14_18{*this};
-    }
+    };
     
-    
-
-    inline int Get() const
+    __lambda_6_18 f = __lambda_6_18{this};
+        
+    class __lambda_10_18
     {
-      return 22;
-    }
+      Foo * __this;
+      public: 
+      inline /*constexpr */ void operator()() const
+      {
+        __this->Get();
+      }
+      
+      public: __lambda_10_18(Foo * _this)
+      : __this{_this}
+
+      {}
+      
+    };
     
+    __lambda_10_18 g = __lambda_10_18{this};
+        
+    class __lambda_14_18
+    {
+      Foo __this;
+      public: 
+      inline /*constexpr */ void operator()() const
+      {
+        (&__this)->Get();
+      }
+      
+      public: __lambda_14_18(Foo _this)
+      : __this{_this}
 
- private:
-    int mX;
-
-// public: inline constexpr Foo(const Foo &) noexcept;
-// public: inline constexpr Foo(Foo &&);
-// public: inline ~Foo() noexcept;
+      {}
+      
+    };
+    
+    __lambda_14_18 h = __lambda_14_18{*this};
+  }
+  
+  inline int Get() const
+  {
+    return 22;
+  }
+  
+  
+  private: 
+  int mX;
+  public: 
+  // inline constexpr Foo(const Foo &) noexcept = default;
+  // inline constexpr Foo(Foo &&) = default;
+  // inline ~Foo() noexcept = default;
 };
+
+
 
 
 // http://en.cppreference.com/w/cpp/language/lambda
-struct X {
-    int x, y;
-    int operator()(int);
-    
-    inline void f()
+struct X
+{
+  int x;
+  int y;
+  int operator()(int);
+  
+  inline void f()
+  {
+        
+    class __lambda_35_9
     {
-            
-      class __lambda_35_9
+      X * __this;
+      public: 
+      inline /*constexpr */ int operator()() const
       {
-        X * __this;
-        public: inline /*constexpr */ int operator()() const
-        {
-          return __this->operator()(__this->x + __this->y);
-        }
-        
-        public: __lambda_35_9(X * _this)
-        : __this{_this}
-
-        {}
-        
-      } __lambda_35_9{this};
+        return __this->operator()(__this->x + __this->y);
+      }
       
-      ;
-    }
+      public: __lambda_35_9(X * _this)
+      : __this{_this}
+
+      {}
+      
+    } __lambda_35_9{this};
     
+    ;
+  }
+  
 };
+
+

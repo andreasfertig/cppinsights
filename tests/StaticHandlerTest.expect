@@ -5,85 +5,75 @@
 
 class Singleton
 {
-public:
-    static Singleton & Instance();
-    
-
-    inline int Get() const
-    {
-      return this->mX;
-    }
-    
-    inline void Set(int x)
-    {
-      this->mX = x;
-    }
-    
-
-private:
-    Singleton() = default;
-    inline ~Singleton() noexcept
-    {
-    }
-    
-
-    int mX;
-
-// private: inline Singleton() noexcept;
-// public: inline constexpr Singleton(const Singleton &);
+  
+  public: 
+  static Singleton & Instance();
+  
+  inline int Get() const
+  {
+    return this->mX;
+  }
+  
+  inline void Set(int x)
+  {
+    this->mX = x;
+  }
+  
+  
+  private: 
+  inline Singleton() noexcept = default;
+  inline ~Singleton() noexcept
+  {
+  }
+  
+  int mX;
+  public: 
+  // inline constexpr Singleton(const Singleton &) = default;
 };
+
+
 
 
 static size_t counter = 0;
 
 
-Singleton & Singleton::Instance()
+Singleton& Singleton::Instance()
 {
-  static uint64_t __singletonGuard;
-  alignas(Singleton) static char __singleton[sizeof(Singleton)];
-  
-  if( ! __singletonGuard )
-  {
-    if( __cxa_guard_acquire(&__singletonGuard) )
-    {
-      new (&__singleton) Singleton();
-      __singletonGuard = true;
-      __cxa_guard_release(&__singletonGuard);
-    }
-  }
-  static bool passed = true;
-  return *reinterpret_cast<Singleton*>(__singleton);
-}
+  static Singleton singleton;
 
+  static bool passed = true;
+
+  return singleton;
+}
 
 
 class Bingleton
 {
-public:
-
-    inline int Get() const
-    {
-      return this->mX;
-    }
-    
-    inline void Set(int x)
-    {
-      this->mX = x;
-    }
-    
-
-    Bingleton() = default;
-    inline ~Bingleton() noexcept
-    {
-    }
-    
-
-private:
-    int mX;
-
-// public: inline Bingleton() noexcept;
-// public: inline constexpr Bingleton(const Bingleton &);
+  
+  public: 
+  inline int Get() const
+  {
+    return this->mX;
+  }
+  
+  inline void Set(int x)
+  {
+    this->mX = x;
+  }
+  
+  inline Bingleton() noexcept = default;
+  inline ~Bingleton() noexcept
+  {
+  }
+  
+  
+  private: 
+  int mX;
+  public: 
+  // inline constexpr Bingleton(const Bingleton &) = default;
 };
+
+
 
 
 void B()

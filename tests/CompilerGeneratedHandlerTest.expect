@@ -2,59 +2,72 @@
 
 struct S
 {
-    int i;
-// public: inline S();
-// public: inline constexpr S(const S &) noexcept;
-// public: inline constexpr S(S &&) noexcept;
+  int i;
+  // inline S() = default;
+  // inline constexpr S(const S &) noexcept = default;
+  // inline constexpr S(S &&) noexcept = default;
 };
+
+
 
 struct SS
 {
-    int i;
-// public: inline SS() noexcept;
-// public: inline constexpr SS(const SS &) noexcept;
-// public: inline constexpr SS(SS &&) noexcept;
-// public: inline constexpr SS & operator=(const SS &) noexcept;
-// public: inline constexpr SS & operator=(SS &&);
+  int i;
+  // inline SS() noexcept = default;
+  // inline constexpr SS(const SS &) noexcept = default;
+  // inline constexpr SS(SS &&) noexcept = default;
+  // inline constexpr SS & operator=(const SS &) noexcept = default;
+  // inline constexpr SS & operator=(SS &&) = default;
 };
+
+
 
 
 class C
 {
-public:
-    int i;
-// public: inline C();
-// public: inline constexpr C(const C &) noexcept;
-// public: inline constexpr C(C &&) noexcept;
+  
+  public: 
+  int i;
+  // inline C() = default;
+  // inline constexpr C(const C &) noexcept = default;
+  // inline constexpr C(C &&) noexcept = default;
 };
+
+
 
 class D
 {
-public:
-    int i;
-// public: inline D() noexcept;
-// public: inline constexpr D(const D &) noexcept;
-// public: inline constexpr D(D &&) noexcept;
-// public: inline constexpr D & operator=(const D &) noexcept;
-// public: inline constexpr D & operator=(D &&);
-// public: inline ~D();
+  
+  public: 
+  int i;
+  // inline D() noexcept = default;
+  // inline constexpr D(const D &) noexcept = default;
+  // inline constexpr D(D &&) noexcept = default;
+  // inline constexpr D & operator=(const D &) noexcept = default;
+  // inline constexpr D & operator=(D &&) = default;
+  // inline ~D() = default;
 };
+
+
 
 class E
 {
-public:
-    
-    inline E(int x)
-    : i{x}
-    {
-    }
-    
-    
-private:
-    int i;
-// public: inline constexpr E(const E &);
-// public: inline constexpr E(E &&);
+  
+  public: 
+  inline E(int x)
+  : i{x}
+  {
+  }
+  
+  
+  private: 
+  int i;
+  public: 
+  // inline constexpr E(const E &) = default;
+  // inline constexpr E(E &&) = default;
 };
+
+
 
 int main()
 {

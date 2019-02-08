@@ -2,10 +2,12 @@ using X = void (*) ();
 
 struct RET
 {
-    X x;
-    int r;
-// public: inline ~RET() noexcept;
+  X x;
+  int r;
+  // inline ~RET() noexcept = default;
 };
+
+
 
 int main()
 {

@@ -6,7 +6,8 @@ void Test(int n)
   {
     unsigned long;
     char (&buffer)[n];
-    public: inline /*constexpr */ bool operator()(int i, int x) const
+    public: 
+    inline /*constexpr */ bool operator()(int i, int x) const
     {
       return static_cast<int>(buffer[i]) > static_cast<int>(buffer[x]);
     }

@@ -1,11 +1,13 @@
 class CTest
 {
-    inline int Test()
-    {
-      return 22;
-    }
-    
+  inline int Test()
+  {
+    return 22;
+  }
+  
 };
+
+
 
 int Test();
 

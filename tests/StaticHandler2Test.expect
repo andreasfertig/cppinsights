@@ -3,42 +3,43 @@
 
 class Singleton
 {
-public:
-    static Singleton & Instance();
-    
-
-    inline int Get() const
-    {
-      return this->mX;
-    }
-    
-    inline void Set(int x)
-    {
-      this->mX = x;
-    }
-    
-
-private:
-    Singleton() = default;
-
-    int mX;
-
-// private: inline Singleton() noexcept;
-// public: inline constexpr Singleton(const Singleton &);
-// public: inline constexpr Singleton(Singleton &&);
+  
+  public: 
+  static Singleton & Instance();
+  
+  inline int Get() const
+  {
+    return this->mX;
+  }
+  
+  inline void Set(int x)
+  {
+    this->mX = x;
+  }
+  
+  
+  private: 
+  inline Singleton() noexcept = default;
+  int mX;
+  public: 
+  // inline constexpr Singleton(const Singleton &) = default;
+  // inline constexpr Singleton(Singleton &&) = default;
 };
+
+
 
 
 static size_t counter = 0;
 
 
-Singleton & Singleton::Instance()
+Singleton& Singleton::Instance()
 {
-  static Singleton singleton = Singleton();
+  static Singleton singleton;
+
   static bool passed = true;
+
   return singleton;
 }
-
 
 
 int main()

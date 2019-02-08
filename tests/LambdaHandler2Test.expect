@@ -3,18 +3,20 @@ int main()
       
   class __lambda_8_26
   {
-    public: inline /*constexpr */ int operator()(int a, char b) const
+    public: 
+    inline /*constexpr */ int operator()(int a, char b) const
     {
       return a + static_cast<int>(b);
     }
     
-    public: using retType_8_26 = int (*)(int, char);
+    using retType_8_26 = int (*)(int, char);
     inline /*constexpr */ operator retType_8_26 () const
     {
       return __invoke;
     }
     
-    private: static inline int __invoke(int a, char b)
+    private: 
+    static inline int __invoke(int a, char b)
     {
       return a + static_cast<int>(b);
     }

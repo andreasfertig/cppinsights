@@ -10,7 +10,8 @@ int main()
   class __lambda_9_11
   {
     char uuu;
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("a: %c\n", static_cast<int>(uuu));
     }

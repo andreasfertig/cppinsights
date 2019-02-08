@@ -1,0 +1,159 @@
+class Test
+{
+  
+  public: 
+  template<int N, int ... Rest>
+  inline int sum()
+  {
+    if constexpr(sizeof...(Rest) > 0) {
+      return N + sum<Rest... >();
+    } else /* constexpr */ {
+      return N;
+    }
+    
+  }
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:44 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int sum<1, 5, 7>()
+  {
+    if constexpr(2 > 0) {
+      return 1 + this->sum<5>();
+    }
+    
+  }
+  #endif
+  
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:7 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int sum<5, 7>()
+  {
+    if constexpr(1 > 0) {
+      return 5 + this->sum<7>();
+    }
+    
+  }
+  #endif
+  
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:7 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int sum<7, >()
+  {
+    if constexpr(0 > 0) ;
+    else /* constexpr */ {
+      return 7;
+    }
+    
+  }
+  #endif
+  
+  template<typename I, typename ... Rest>
+  inline int summ(I && i, Rest &&... rest)
+  {
+    if constexpr(sizeof...(rest) > 0) {
+      return i + summ(rest... );
+    } else /* constexpr */ {
+      return i;
+    }
+    
+  }
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:40 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int summ<int, int, int>(int && i, int && __rest1, int && __rest2)
+  {
+    if constexpr(2 > 0) {
+      return i + this->summ(__rest1, __rest2);
+    }
+    
+  }
+  #endif
+  
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:18 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int summ<int &, int &>(int & i, int & rest)
+  {
+    if constexpr(1 > 0) {
+      return i + this->summ(rest);
+    }
+    
+  }
+  #endif
+  
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:18 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int summ<int &, >(int & i)
+  {
+    if constexpr(0 > 0) ;
+    else /* constexpr */ {
+      return i;
+    }
+    
+  }
+  #endif
+  
+  template<typename T>
+  class my_array
+  {
+  };
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:31 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  class my_array<int>
+  {
+    public: 
+    // inline constexpr my_array() noexcept = default;
+    // inline ~my_array() = default;
+    // inline constexpr my_array(const my_array<int> &) = default;
+    // inline constexpr my_array(my_array<int> &&) = default;
+  };
+  
+  #endif
+  template<typename K, typename V, template <typename> typename C = my_array>
+  class Map
+  {
+    C<K> key;
+    C<V> value;
+  };
+  
+  /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:42 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  class Map<int, int, my_array>
+  {
+    my_array<int> key;
+    my_array<int> value;
+    public: 
+    // inline constexpr Map() noexcept = default;
+    // inline constexpr Map(const Map<int, int, my_array> &) = default;
+    // inline constexpr Map(Map<int, int, my_array> &&) = default;
+  };
+  
+  #endif
+  // inline constexpr Test() noexcept = default;
+  // inline constexpr Test(const Test &) = default;
+  // inline constexpr Test(Test &&) = default;
+};
+
+
+
+
+int main()
+{
+  Test t = Test();
+  t.summ(1, 2, 3);
+  Test::Map<int, int> a = Map<int, int, my_array>();
+  return t.sum<1>();
+}
+

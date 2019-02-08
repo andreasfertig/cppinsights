@@ -2,31 +2,35 @@
 
 class Foo
 {
-public:
-    inline Foo()
-    : mI{0}
-    {
-    }
-    
-    
-
-    inline void Print()
-    {
-      printf("%d\n", this->mI);
-    }
-    
-
-private:
-    class Secrect {};
-    friend class DearFriend;
-
-    int mI;
-
-    friend void ChangePrivate(Foo &);
-    ;
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
+  
+  public: 
+  inline Foo()
+  : mI{0}
+  {
+  }
+  
+  inline void Print()
+  {
+    printf("%d\n", this->mI);
+  }
+  
+  
+  private: 
+  class Secrect
+  {
+  };
+  
+  public: 
+  friend class DearFriend;
+  private: 
+  int mI;
+  public: 
+  friend void ChangePrivate(Foo &);
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
 };
+
+
 
 void ChangePrivate(Foo & i)
 {
@@ -35,7 +39,10 @@ void ChangePrivate(Foo & i)
 
 
 class DearFriend : public Foo::Secrect
-{};
+{
+};
+
+
 
 
 int main()

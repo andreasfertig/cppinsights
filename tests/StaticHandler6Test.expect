@@ -4,16 +4,18 @@ void X() noexcept(true);
 
 class Sing
 {
-public:
-    inline Sing() noexcept
-    {
-      X();
-    }
-    
-    
-// public: inline constexpr Sing(const Sing &);
-// public: inline constexpr Sing(Sing &&);
+  
+  public: 
+  inline Sing() noexcept
+  {
+    X();
+  }
+  
+  // inline constexpr Sing(const Sing &) = default;
+  // inline constexpr Sing(Sing &&) = default;
 };
+
+
 
 Sing & Test()
 {

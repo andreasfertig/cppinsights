@@ -5,7 +5,8 @@ void Test()
   class __lambda_4_18
   {
     const int Size;
-    public: inline void operator()() const
+    public: 
+    inline void operator()() const
     {
       int Dim[3];
     }

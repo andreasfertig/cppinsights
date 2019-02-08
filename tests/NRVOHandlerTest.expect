@@ -2,16 +2,16 @@
 
 struct C
 {
-    C() = default;
-    inline C(const C &)
-    {
-      printf("Copy\n");
-    }
-    
-    
-// public: inline constexpr C() noexcept;
-// public: inline ~C() noexcept;
+  inline constexpr C() noexcept = default;
+  inline C(const C &)
+  {
+    printf("Copy\n");
+  }
+  
+  // inline ~C() noexcept = default;
 };
+
+
 
 C f()
 {

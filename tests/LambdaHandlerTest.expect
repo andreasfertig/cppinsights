@@ -2,33 +2,33 @@
 
 class Bar
 {
-    inline Bar()
-    : a{1}
+  inline Bar()
+  : a{1}
+  {
+        
+    class __lambda_8_18
     {
-            
-      class __lambda_8_18
+      Bar * __this;
+      public: 
+      inline /*constexpr */ void operator()() const
       {
-        Bar * __this;
-        public: inline /*constexpr */ void operator()() const
-        {
-          printf("%d\n", __this->a);
-        }
-        
-        public: __lambda_8_18(Bar * _this)
-        : __this{_this}
-
-        {}
-        
-      };
+        printf("%d\n", __this->a);
+      }
       
-      __lambda_8_18 x = __lambda_8_18{this};
-    }
-    
-    
+      public: __lambda_8_18(Bar * _this)
+      : __this{_this}
 
-    int a;
-
+      {}
+      
+    };
+    
+    __lambda_8_18 x = __lambda_8_18{this};
+  }
+  
+  int a;
 };
+
+
 
 int main()
 {
@@ -38,7 +38,8 @@ int main()
   class __lambda_20_19
   {
     int & foo;
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("%d\n", foo);
     }
@@ -54,18 +55,20 @@ int main()
     
   class __lambda_24_20
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("%d\n", 1);
     }
     
-    public: using retType_24_20 = void (*)();
+    using retType_24_20 = void (*)();
     inline /*constexpr */ operator retType_24_20 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("%d\n", 1);
     }
@@ -79,7 +82,8 @@ int main()
   class __lambda_28_20
   {
     int & foo;
-    public: inline /*constexpr */ int operator()()
+    public: 
+    inline /*constexpr */ int operator()()
     {
       printf("%d\n", ++foo);
       return foo;
@@ -97,7 +101,8 @@ int main()
   class __lambda_32_20
   {
     int & foo;
-    public: inline /*constexpr */ int operator()(int x) const
+    public: 
+    inline /*constexpr */ int operator()(int x) const
     {
       printf("%d\n", foo + x);
       return foo + x;
@@ -114,7 +119,8 @@ int main()
   class __lambda_34_20
   {
     int & foo;
-    public: inline /*constexpr */ int operator()(const int x) const
+    public: 
+    inline /*constexpr */ int operator()(const int x) const
     {
       printf("%d\n", foo + x);
       return foo + x;
@@ -131,7 +137,8 @@ int main()
   class __lambda_36_20
   {
     int & foo;
-    public: inline /*constexpr */ int operator()(int & x, int b) const
+    public: 
+    inline /*constexpr */ int operator()(int & x, int b) const
     {
       printf("%d\n", foo + x);
       return foo + x + b;
@@ -148,11 +155,24 @@ int main()
   class __lambda_38_20
   {
     int & foo;
-    public: inline /*constexpr */ int operator()(int & x, int b) const
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(int & x, type_parameter_0_0 b) const
     {
       printf("%d\n", foo + x);
       return foo + x + b;
     }
+    
+    /* First instantiated from: LambdaHandlerTest.cpp:39 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ int operator()(int & x, int b) const
+    {
+      printf("%d\n", foo + x);
+      return foo + x + b;
+    }
+    #endif
+    
     public: __lambda_38_20(int & _foo)
     : foo{_foo}
     {}
@@ -165,6 +185,13 @@ int main()
   class __lambda_41_21
   {
     int & foo;
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(int & x, const type_parameter_0_0 & b) const
+    {
+      printf("%d\n", foo + x);
+      return foo + x + b;
+    }
     public: __lambda_41_21(int & _foo)
     : foo{_foo}
     {}
@@ -176,11 +203,24 @@ int main()
   class __lambda_43_21
   {
     int & foo;
-    public: inline /*constexpr */ int operator()(int & x, const int & b, const int c) const
+    public: 
+    template<class type_parameter_0_0, class type_parameter_0_1>
+    inline /*constexpr */ auto operator()(int & x, const type_parameter_0_0 & b, const type_parameter_0_1 c) const
     {
       printf("%d\n", foo + x);
       return foo + x + b + c;
     }
+    
+    /* First instantiated from: LambdaHandlerTest.cpp:44 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ int operator()(int & x, const int & b, const int c) const
+    {
+      printf("%d\n", foo + x);
+      return foo + x + b + c;
+    }
+    #endif
+    
     public: __lambda_43_21(int & _foo)
     : foo{_foo}
     {}
@@ -194,7 +234,8 @@ int main()
   {
     int foo;
     int b;
-    public: inline /*constexpr */ int operator()(int & x, int bb) const
+    public: 
+    inline /*constexpr */ int operator()(int & x, int bb) const
     {
       printf("%d\n", foo + x);
       return foo + x + bb;
@@ -213,7 +254,8 @@ int main()
   {
     int foo;
     int b;
-    public: inline /*constexpr */ int operator()(int & x, int bb) const noexcept
+    public: 
+    inline /*constexpr */ int operator()(int & x, int bb) const noexcept
     {
       printf("%d\n", foo + x);
       return foo + x + bb;

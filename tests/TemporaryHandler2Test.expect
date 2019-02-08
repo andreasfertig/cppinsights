@@ -3,33 +3,31 @@
 // Result cannot be used as an lvalue
 class X
 {
-    int i;
-
-public:
-    X(int ii);
-    
-    
-    void modify();
-    
-// public: inline constexpr X(const X &);
-// public: inline constexpr X(X &&);
-// public: inline ~X() noexcept;
-// public: inline X & operator=(const X &);
-// public: inline X & operator=(X &&) noexcept;
+  int i;
+  
+  public: 
+  X(int ii);
+  
+  void modify();
+  
+  // inline constexpr X(const X &) = default;
+  // inline constexpr X(X &&) = default;
+  // inline ~X() noexcept = default;
+  // inline X & operator=(const X &) = default;
+  // inline X & operator=(X &&) noexcept = default;
 };
+
+
 
 X::X(int ii)
 {
-  this->i = ii;
+    i = ii;
 }
-
-
 
 void X::modify()
 {
-  this->i++;
+    i++;
 }
-
 
 X f5()
 {
@@ -73,26 +71,31 @@ int main()
 
 class Base
 {
-public:
-    inline ~Base() noexcept
-    {
-      std::operator<<(std::cout, "Base dtor").operator<<(std::endl);
-    }
-    
-// public: inline constexpr Base(const Base &);
+  
+  public: 
+  inline ~Base() noexcept
+  {
+    std::operator<<(std::cout, "Base dtor").operator<<(std::endl);
+  }
+  
+  // inline constexpr Base(const Base &) = default;
 };
+
+
 
 class Foo : public Base
 {
-public:
-    // Note: No virtual dtors 
-    inline ~Foo() noexcept
-    {
-      std::operator<<(std::cout, "Foo dtor").operator<<(std::endl);
-    }
-    
-// public: inline constexpr Foo(const Foo &);
+  
+  public: 
+  inline ~Foo() noexcept
+  {
+    std::operator<<(std::cout, "Foo dtor").operator<<(std::endl);
+  }
+  
+  // inline constexpr Foo(const Foo &) = default;
 };
+
+
 
 Base return_base()
 {
@@ -112,18 +115,20 @@ int main2()
 }
 
 
-struct S {
+struct S
+{
   inline S()
   {
   }
   
-    // User defined constructor makes S non-POD.
   inline ~S() noexcept
   {
   }
-   // User defined destructor makes it non-trivial.
-// public: inline constexpr S(const S &);
+  
+  // inline constexpr S(const S &) = default;
 };
+
+
 void test()
 {
   const S & s_ref = S();

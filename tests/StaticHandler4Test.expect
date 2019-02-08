@@ -7,16 +7,18 @@ void X() noexcept(false)
 
 class Sing
 {
-public:
-    inline Sing()
-    {
-      X();
-    }
-    
-    
-// public: inline constexpr Sing(const Sing &);
-// public: inline constexpr Sing(Sing &&);
+  
+  public: 
+  inline Sing()
+  {
+    X();
+  }
+  
+  // inline constexpr Sing(const Sing &) = default;
+  // inline constexpr Sing(Sing &&) = default;
 };
+
+
 
 Sing & Test()
 {

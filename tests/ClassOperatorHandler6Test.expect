@@ -5,113 +5,109 @@
 
 #include <new>
 
-class Bar {// public: inline constexpr Bar() noexcept;
-// public: inline constexpr Bar(const Bar &);
-// public: inline constexpr Bar(Bar &&);
-// public: inline constexpr Bar & operator=(const Bar &);
-// public: inline constexpr Bar & operator=(Bar &&);
-// public: inline ~Bar();
+class Bar
+{
+  public: 
+  // inline constexpr Bar() noexcept = default;
+  // inline constexpr Bar(const Bar &) = default;
+  // inline constexpr Bar(Bar &&) = default;
+  // inline constexpr Bar & operator=(const Bar &) = default;
+  // inline constexpr Bar & operator=(Bar &&) = default;
+  // inline ~Bar() = default;
 };
+
+
 
 class Woo
 {
-public:
-    inline Woo(int x, char c)
-    : mX{x}
-    {
-    }
-    
-    
-
-    int mX;
-// public: inline constexpr Woo(const Woo &);
-// public: inline constexpr Woo(Woo &&);
-// public: inline ~Woo() noexcept;
+  
+  public: 
+  inline Woo(int x, char c)
+  : mX{x}
+  {
+  }
+  
+  int mX;
+  // inline constexpr Woo(const Woo &) = default;
+  // inline constexpr Woo(Woo &&) = default;
+  // inline ~Woo() noexcept = default;
 };
+
+
 
 
 
 class Foo : public Bar
 {
-public:
-    inline Foo(int x)
-    : Bar()
-    , mX{x}
-    {
-    }
-    
-    
-
-     inline Foo(const char c)
-     : Bar()
-     , mX{0}
-     {
-       (*this).operator=(c);
-     }
-     
-     
-
-    inline bool operator==(const Foo & right)
-    {
-      return this->mX == right.mX;
-    }
-    
-
-    inline bool operator==(const char * right)
-    {
-      return false;
-    }
-    
-
-    inline bool operator==(const Bar * right)
-    {
-      return false;
-    }
-    
-
-    inline bool operator==(const int & right)
-    {
-      return false;
-    }
-    
-
-    inline bool operator==(const long & right)
-    {
-      return false;
-    }
-    
-
-    inline bool operator==(const std::type_info & right)
-    {
-      return false;
-    }
-    
-
-    inline Foo & operator=(const char & ref)
-    {
-      this->mX = static_cast<int>(ref);
-      return *this;
-    }
-    
-
-    inline bool operator==(const Woo * right)
-    {
-      return this->mX == right->mX;
-    }
-    
-
-    inline bool operator==(const Woo & right)
-    {
-      return this->mX == right.mX;
-    }
-    
-    
-    int mX;
-// public: inline Foo & operator=(const Foo &);
-// public: inline Foo & operator=(Foo &&);
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
+  
+  public: 
+  inline Foo(int x)
+  : Bar()
+  , mX{x}
+  {
+  }
+  
+  inline Foo(const char c)
+  : Bar()
+  , mX{0}
+  {
+    (*this).operator=(c);
+  }
+  
+  inline bool operator==(const Foo & right)
+  {
+    return this->mX == right.mX;
+  }
+  
+  inline bool operator==(const char * right)
+  {
+    return false;
+  }
+  
+  inline bool operator==(const Bar * right)
+  {
+    return false;
+  }
+  
+  inline bool operator==(const int & right)
+  {
+    return false;
+  }
+  
+  inline bool operator==(const long & right)
+  {
+    return false;
+  }
+  
+  inline bool operator==(const std::type_info & right)
+  {
+    return false;
+  }
+  
+  inline Foo & operator=(const char & ref)
+  {
+    this->mX = static_cast<int>(ref);
+    return *this;
+  }
+  
+  inline bool operator==(const Woo * right)
+  {
+    return this->mX == right->mX;
+  }
+  
+  inline bool operator==(const Woo & right)
+  {
+    return this->mX == right.mX;
+  }
+  
+  int mX;
+  // inline Foo & operator=(const Foo &) = default;
+  // inline Foo & operator=(Foo &&) = default;
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
 };
+
+
 
 
 

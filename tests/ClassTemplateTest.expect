@@ -16,7 +16,7 @@ class Foo<int>
 {
   
   public: 
-  // inline constexpr Foo() noexcept = default;
+  inline constexpr Foo() noexcept = default;
   
   protected: 
   inline bool Mo()
@@ -24,6 +24,7 @@ class Foo<int>
     return false;
   }
   
+  public: 
   // inline ~Foo() = default;
   // inline constexpr Foo(const Foo<int> &) = default;
   // inline constexpr Foo(Foo<int> &&) = default;
@@ -34,16 +35,19 @@ class Foo<int>
 
 class Bar : public Foo<int>
 {
-public:
-    inline bool Do()
-    {
-      return /* static_cast<Foo<int> *>(this)-> */ Mo();
-    }
-    
-// public: inline constexpr Bar() noexcept;
-// public: inline constexpr Bar(const Bar &);
-// public: inline constexpr Bar(Bar &&);
+  
+  public: 
+  inline bool Do()
+  {
+    return /* static_cast<Foo<int> *>(this)-> */ Mo();
+  }
+  
+  // inline constexpr Bar() noexcept = default;
+  // inline constexpr Bar(const Bar &) = default;
+  // inline constexpr Bar(Bar &&) = default;
 };
+
+
 
 
 int main()

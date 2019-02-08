@@ -29,9 +29,26 @@ static const struct CppInsightsPrintingPolicy : PrintingPolicy
 } InsightsPrintingPolicy{};  // NOLINT
 //-----------------------------------------------------------------------------
 
+static std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
+{
+    if(Contains(str, "type-parameter-")) {
+        for(size_t startPos = 0; (startPos = str.find(from, startPos)) != std::string::npos; startPos += to.length()) {
+            str.replace(startPos, from.length(), to);
+        }
+    }
+
+    return str;
+}
+//-----------------------------------------------------------------------------
+
+std::string ReplaceDash(std::string&& str)
+{
+    return ReplaceAll(str, "-", "_");
+}
+
 static const std::string GetAsCPPStyleString(const QualType& t)
 {
-    return t.getAsString(InsightsPrintingPolicy);
+    return ReplaceDash(t.getAsString(InsightsPrintingPolicy));
 }
 //-----------------------------------------------------------------------------
 
@@ -349,6 +366,26 @@ static std::string GetName(const QualType& t, const Unqualified unqualified = Un
 }  // namespace details
 //-----------------------------------------------------------------------------
 
+std::string GetName(const CXXRecordDecl& RD)
+{
+    if(RD.isLambda()) {
+        return GetLambdaName(RD);
+    }
+
+    const auto* declCtx = RD.getDeclContext()->getLexicalParent();
+    const bool  isFriend{(RD.getFriendObjectKind() != Decl::FOK_None)};
+    const bool  hasNamespace{(declCtx && (declCtx->isNamespace() && not declCtx->isInlineNamespace()) &&
+                             !declCtx->isTransparentContext() && !isFriend)};
+
+    // get the namespace as well
+    if(hasNamespace) {
+        return ReplaceDash(details::GetQualifiedName(RD));
+    }
+
+    return ReplaceDash(RD.getNameAsString());
+}
+//-----------------------------------------------------------------------------
+
 std::string GetName(const QualType& t, const Unqualified unqualified)
 {
     return details::GetName(t, unqualified);
@@ -428,7 +465,12 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
             typeName += StrCat(" ", varName);
         }
     } else if(t->isFunctionPointerType()) {
-        InsertAfter(typeName, "(*", varName);
+        if(Contains(typeName, "(*")) {
+            InsertAfter(typeName, "(*", varName);
+        } else {
+            typeName += StrCat(" ", varName);
+        }
+
     } else if(!t->isArrayType() && !varName.empty()) {
         typeName += StrCat(" ", varName);
     }

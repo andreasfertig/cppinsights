@@ -18,6 +18,7 @@
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "llvm/Support/Path.h"
 //-----------------------------------------------------------------------------
 
 /// \brief Convenience macro to create a \ref LambdaScopeHandler on the stack.
@@ -675,13 +676,57 @@ bool CodeGenerator::InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl
 }
 //-----------------------------------------------------------------------------
 
+/// \brief Inserts the instantiation point of a template.
+//
+// This reveals at which place the template is first used.
+static void
+InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceManager& sm, const SourceLocation& instLoc)
+{
+    const auto  lineNo = sm.getSpellingLineNumber(instLoc);
+    const auto& fileId = sm.getFileID(instLoc);
+    const auto* file   = sm.getFileEntryForID(fileId);
+    if(file) {
+        const auto fileWithDirName = file->getName();
+        const auto fileName        = llvm::sys::path::filename(fileWithDirName);
+
+        outputFormatHelper.AppendNewLine("/* First instantiated from: ", fileName, ":", lineNo, " */");
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
+{
+    if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
+        InsertInstantiationPoint(mOutputFormatHelper, GetSM(*stmt), stmt->getPointOfInstantiation());
+        mOutputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertTemplateGuardEnd(const FunctionDecl* stmt)
+{
+    if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
+        mOutputFormatHelper.AppendNewLine("#endif");
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 {
     //    LAMBDA_SCOPE_HELPER(VarDecl);
 
-    if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
+    if(const auto* deductionGuide = dyn_cast_or_null<CXXDeductionGuideDecl>(stmt)) {
+        InsertArg(deductionGuide);
+    } else if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         InsertArg(ctor);
     } else {
+        // skip a case at least in lambdas with a templated conversion operator which is not used and has auto return
+        // type. This is hard to build wih using.
+        if(isa<CXXConversionDecl>(stmt) && not stmt->hasBody()) {
+            return;
+        }
+
+        InsertTemplateGuardBegin(stmt);
         InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
 
         if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
@@ -693,6 +738,76 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
                 mOutputFormatHelper.AppendSemiNewLine();
             }
         }
+
+        InsertTemplateGuardEnd(stmt);
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
+{
+    mOutputFormatHelper.Append("template<");
+
+    OnceFalse needsComma{};
+    for(const auto* param : list) {
+        mOutputFormatHelper.AppendComma(needsComma);
+
+        const auto& typeName = GetName(*param);
+
+        if(const auto* tt = dyn_cast_or_null<TemplateTypeParmDecl>(param)) {
+            if(tt->wasDeclaredWithTypename()) {
+                mOutputFormatHelper.Append("typename ");
+            } else {
+                mOutputFormatHelper.Append("class ");
+            }
+
+            if(tt->isParameterPack()) {
+                mOutputFormatHelper.Append("... ");
+            }
+
+            if(0 == typeName.size()) {
+                mOutputFormatHelper.Append("type_parameter_", tt->getDepth(), "_", tt->getIndex());
+            } else {
+                mOutputFormatHelper.Append(typeName);
+            }
+
+            if(tt->hasDefaultArgument()) {
+                mOutputFormatHelper.Append(" = ", GetName(tt->getDefaultArgument()));
+            }
+        } else if(const auto* nonTmplParam = dyn_cast_or_null<NonTypeTemplateParmDecl>(param)) {
+
+            mOutputFormatHelper.Append(GetName(nonTmplParam->getType()), " ");
+            if(nonTmplParam->isParameterPack()) {
+                mOutputFormatHelper.Append("... ");
+            }
+
+            mOutputFormatHelper.Append(typeName);
+
+            if(nonTmplParam->hasDefaultArgument()) {
+                mOutputFormatHelper.Append(" = ");
+                InsertArg(nonTmplParam->getDefaultArgument());
+            }
+        } else if(const auto* tmplTmplParam = dyn_cast_or_null<TemplateTemplateParmDecl>(param)) {
+            mOutputFormatHelper.Append("template <typename> typename ", typeName);
+
+            if(tmplTmplParam->hasDefaultArgument()) {
+                mOutputFormatHelper.Append(" = ");
+                InsertTemplateArg(tmplTmplParam->getDefaultArgument().getArgument());
+            }
+        }
+    }
+
+    mOutputFormatHelper.AppendNewLine(">");
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
+{
+    InsertTemplateParameters(*stmt->getTemplateParameters());
+    InsertArg(stmt->getTemplatedDecl());
+
+    for(const auto* spec : stmt->specializations()) {
+        InsertArg(spec);
     }
 }
 //-----------------------------------------------------------------------------
@@ -781,6 +896,45 @@ void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
             ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
         }
     });
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CXXUnresolvedConstructExpr* stmt)
+{
+    mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
+
+    const BraceKind braceKind = [&]() {
+        if(stmt->isListInitialization()) {
+            return BraceKind::Curlys;
+        }
+        return BraceKind::Parens;
+    }();
+
+    WrapInParensOrCurlys(braceKind, [&]() {
+        if(stmt->arg_size()) {
+            ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
+        }
+    });
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const UnresolvedMemberExpr* stmt)
+{
+    // InsertArg(stmt->getBase());
+    const std::string op{};  // stmt->isArrow() ? "->" : "."};
+
+    mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getAsString());
+
+    if(stmt->getNumTemplateArgs()) {
+        InsertTemplateArgs(stmt->template_arguments());
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const PackExpansionExpr* stmt)
+{
+    InsertArg(stmt->getPattern());
+    mOutputFormatHelper.Append("... ");
 }
 //-----------------------------------------------------------------------------
 
@@ -946,7 +1100,8 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
 {
     const auto* ctx = stmt->getDecl()->getDeclContext();
-    if(!ctx->isFunctionOrMethod()) {
+
+    if(!ctx->isFunctionOrMethod() && not isa<NonTypeTemplateParmDecl>(stmt->getDecl())) {
         ParseDeclContext(ctx);
 
         mOutputFormatHelper.Append(GetPlainName(*stmt));
@@ -1178,7 +1333,11 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
             CodeGenerator      codeGenerator{ofm};
 
             ofm.Append("[");
+#if IS_CLANG_NEWER_THAN(8)
+            codeGenerator.InsertArg(stmt->getArraySize().getValue());
+#else
             codeGenerator.InsertArg(stmt->getArraySize());
+#endif
             ofm.Append(']');
 
             // In case of multi dimension the first dimension is the getArraySize() while the others are part of the
@@ -1258,7 +1417,21 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 
     // operators in a namespace but outside a class so operator goes first
     if(!isCXXMethod) {
-        mOutputFormatHelper.Append(GetName(*callee), "(");
+        // happens for UnresolvedLooupExpr
+        if(not callee) {
+            if(stmt->getCallee()) {
+
+                if(const auto* adl = dyn_cast_or_null<UnresolvedLookupExpr>(stmt->getCallee())) {
+                    mOutputFormatHelper.Append(adl->getName().getAsString());
+                } else {
+                    stmt->getCallee()->dump();
+                }
+            }
+        } else {
+            mOutputFormatHelper.Append(GetName(*callee));
+        }
+
+        mOutputFormatHelper.Append("(");
     }
 
     // insert the arguments
@@ -1612,6 +1785,7 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         }
     }
 
+    InsertTemplateGuardBegin(stmt);
     InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes, cxxInheritedCtorDecl);
 
     if(stmt->isDefaulted()) {
@@ -1620,7 +1794,8 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         mOutputFormatHelper.AppendNewLine(" = delete;");
     }
 
-    if(!stmt->isUserProvided()) {
+    if(not stmt->isUserProvided()) {
+        InsertTemplateGuardEnd(stmt);
         return;
     }
 
@@ -1646,6 +1821,8 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
     } else if(not InsertLambdaStaticInvoker(stmt)) {
         mOutputFormatHelper.AppendSemiNewLine();
     }
+
+    InsertTemplateGuardEnd(stmt);
 
     mOutputFormatHelper.AppendNewLine();
 }
@@ -1735,7 +1912,8 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
         if(cxxRecordDecl->isAggregate()) {
             const auto* initializer = stmt->getInClassInitializer();
             if(stmt->hasInClassInitializer() && initializer) {
-                if(ICIS_ListInit != stmt->getInClassInitStyle()) {
+                const bool isConstructorExpr{isa<CXXConstructExpr>(initializer) || isa<ExprWithCleanups>(initializer)};
+                if(ICIS_ListInit != stmt->getInClassInitStyle() || isConstructorExpr) {
                     mOutputFormatHelper.Append(" = ");
                 }
 
@@ -1888,6 +2066,17 @@ void CodeGenerator::ParseDeclContext(const DeclContext* ctx)
 
 void CodeGenerator::InsertArg(const UsingDecl* stmt)
 {
+    // Skip UsingDecl's which have ConstructorUsingShadowDecl attached. This means that we will create the associated
+    // constructors from the base class later. Having this \c using still in the code prevents compiling the transformed
+    // code.
+    if(stmt->shadow_size()) {
+        for(const auto* shadow : stmt->shadows()) {
+            if(isa<ConstructorUsingShadowDecl>(shadow)) {
+                return;
+            }
+        }
+    }
+
     mOutputFormatHelper.Append("using ");
 
     // own implementation due to lambdas
@@ -1916,20 +2105,13 @@ void CodeGenerator::InsertArg(const NamespaceAliasDecl* stmt)
 
 void CodeGenerator::InsertArg(const FriendDecl* stmt)
 {
-    mOutputFormatHelper.Append("friend ");
-
     if(const auto* typeInfo = stmt->getFriendType()) {
+        mOutputFormatHelper.Append("friend ");
         mOutputFormatHelper.Append(GetName(typeInfo->getType()));
+        mOutputFormatHelper.AppendSemiNewLine();
 
     } else {
-        if(const auto* fd = stmt->getFriendDecl()) {
-            if(const auto* functionDecl = dyn_cast_or_null<FunctionDecl>(fd)) {
-                InsertArg(functionDecl);
-
-            } else {
-                TODO(stmt, mOutputFormatHelper);
-            }
-        }
+        InsertArg(stmt->getFriendDecl());
     }
 }
 //-----------------------------------------------------------------------------
@@ -1949,10 +2131,40 @@ void CodeGenerator::InsertArg(const CXXNoexceptExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
+{
+    const bool isSpecialization{stmt->isFunctionTemplateSpecialization()};
+
+    if(isSpecialization) {
+        InsertTemplateGuardBegin(stmt);
+    }
+
+    InsertTemplateParameters(*stmt->getDeducedTemplate()->getTemplateParameters());
+
+    mOutputFormatHelper.Append(GetName(*stmt->getDeducedTemplate()));
+
+    if(stmt->getNumParams()) {
+        WrapInParens([&] { mOutputFormatHelper.AppendParameterList(stmt->parameters()); });
+    }
+
+    mOutputFormatHelper.Append(" -> ", GetName(stmt->getReturnType()));
+    mOutputFormatHelper.AppendSemiNewLine();
+
+    if(isSpecialization) {
+        InsertTemplateGuardEnd(stmt);
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const FunctionTemplateDecl* stmt)
 {
-    for(const auto spec : stmt->specializations()) {
-        InsertArg(spec->getAsFunction());
+    // InsertTemplateParameters(*stmt->getTemplateParameters());
+    InsertArg(stmt->getTemplatedDecl());
+
+    for(const auto* spec : stmt->specializations()) {
+        mOutputFormatHelper.AppendNewLine();
+        InsertArg(spec);
+        mOutputFormatHelper.AppendNewLine();
     }
 }
 //-----------------------------------------------------------------------------
@@ -1965,11 +2177,48 @@ void CodeGenerator::InsertArg(const TypeAliasTemplateDecl* stmt)
 
 void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
-    if(dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {
-        mOutputFormatHelper.AppendNewLine("template<>");
+    // we require the if-guard only if it is a compiler generated specialization. If it is a hand-written variant it
+    // should compile.
+    const bool isClassTemplateSpecialization{[&] {
+        if(const auto* spec = dyn_cast_or_null<ClassTemplatePartialSpecializationDecl>(stmt)) {
+            return true;
+
+        } else if(const auto* spec = dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {
+            return true;
+        }
+
+        return false;
+    }()};
+
+    const bool tmplRequiresIfDef{[&] {
+        if(const auto* spec = dyn_cast_or_null<ClassTemplatePartialSpecializationDecl>(stmt)) {
+            return true;
+
+        } else if(const auto* spec = dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {
+            return not spec->isExplicitInstantiationOrSpecialization();
+        }
+
+        return false;
+    }()};
+
+    if(isClassTemplateSpecialization) {
+        const auto* spec = dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt);
+
+        if(tmplRequiresIfDef) {
+            InsertInstantiationPoint(mOutputFormatHelper, GetSM(*spec), spec->getPointOfInstantiation());
+            mOutputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
+        }
+
+        if(const auto* spec = dyn_cast_or_null<ClassTemplatePartialSpecializationDecl>(stmt)) {
+            InsertTemplateParameters(*spec->getTemplateParameters());
+        } else {
+            mOutputFormatHelper.AppendNewLine("template<>");
+        }
     }
 
-    if(stmt->isClass()) {
+    const bool isClass{stmt->isClass()};
+
+    if(isClass) {
         mOutputFormatHelper.Append(kwClassSpace);
 
     } else {
@@ -1979,7 +2228,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     mOutputFormatHelper.Append(GetName(*stmt));
 
     // skip classes/struct's without a definition
-    if(!stmt->hasDefinition()) {
+    if(not stmt->hasDefinition() || not stmt->isCompleteDefinition()) {
         mOutputFormatHelper.AppendSemiNewLine();
         return;
     }
@@ -1999,9 +2248,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.OpenScope();
 
-    OnceTrue   firstRecordDecl{};
-    OnceTrue   firstDecl{};
-    Decl::Kind formerKind{};
+    OnceTrue        firstRecordDecl{};
+    OnceTrue        firstDecl{};
+    Decl::Kind      formerKind{};
+    AccessSpecifier lastAccess{isClass ? AS_private : AS_public};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) && firstRecordDecl) {
             continue;
@@ -2015,6 +2265,17 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
         if((stmt->isLambda() && isa<CXXDestructorDecl>(d))) {
             continue;
+        }
+
+        // Insert the access modifier, as at least some of the compiler generated classes do not contain an access
+        // specifier which results in a default ctor being private if we do not insert the access modifier.
+        if(lastAccess != d->getAccess()) {
+            lastAccess = d->getAccess();
+
+            // skip inserting an access specifier of our own, if there is a real one coming.
+            if(not isa<AccessSpecDecl>(d)) {
+                mOutputFormatHelper.AppendNewLine(AccessToStringWithColon(lastAccess));
+            }
         }
 
         InsertArg(d);
@@ -2123,6 +2384,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
+
+    if(tmplRequiresIfDef) {
+        mOutputFormatHelper.AppendNewLine("#endif");
+    }
 }
 //-----------------------------------------------------------------------------
 
@@ -2324,6 +2589,21 @@ void CodeGenerator::InsertTemplateArgs(const ArrayRef<TemplateArgument>& array)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertTemplateArgs(const ArrayRef<TemplateArgumentLoc>& array)
+{
+    mOutputFormatHelper.Append('<');
+
+    ForEachArg(array, [&](const auto& arg) { InsertTemplateArg(arg.getArgument()); });
+
+    /* put as space between to closing brackets: >> -> > > */
+    if(mOutputFormatHelper.GetString().back() == '>') {
+        mOutputFormatHelper.Append(' ');
+    }
+
+    mOutputFormatHelper.Append('>');
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args)
 {
     ForEachArg(args, [&](const auto& arg) { InsertTemplateArg(arg); });
@@ -2496,9 +2776,11 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     const auto* methodDecl{dyn_cast_or_null<CXXMethodDecl>(&decl)};
     bool        isCXXMethodDecl{nullptr != methodDecl};
     const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
+    const bool  requiresComment{isCXXMethodDecl && not methodDecl->isUserProvided() &&
+                               not methodDecl->isExplicitlyDefaulted()};
 
     if(methodDecl) {
-        if(not methodDecl->isUserProvided()) {
+        if(requiresComment) {
             mOutputFormatHelper.Append("// ");
         }
 
@@ -2506,13 +2788,8 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
     }
 
-    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda || cxxInheritedCtorDecl) {
+    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || cxxInheritedCtorDecl) {
         mOutputFormatHelper.Append(AccessToStringWithColon(decl));
-    }
-
-    if(!isLambda && ((isFirstCxxMethodDecl && decl.isFunctionTemplateSpecialization()) ||
-                     (!isFirstCxxMethodDecl && isClassTemplateSpec))) {
-        mOutputFormatHelper.AppendNewLine("template<>");
     }
 
     // types of conversion decls can be invalid to type at this place. So introduce a using
@@ -2521,27 +2798,21 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
             "using ", BuildRetTypeName(decl), " = ", GetName(GetDesugarReturnType(decl)), ";");
     }
 
+    if(decl.isTemplated()) {
+        if(decl.getDescribedTemplate()) {
+            InsertTemplateParameters(*decl.getDescribedTemplate()->getTemplateParameters());
+        }
+
+    } else if(decl.isTemplateInstantiation() && decl.isFunctionTemplateSpecialization()) {
+        mOutputFormatHelper.AppendNewLine("template<>");
+    }
+
     if(!decl.isFunctionTemplateSpecialization() || (isCXXMethodDecl && isFirstCxxMethodDecl)) {
         mOutputFormatHelper.Append(GetStorageClassAsStringWithSpace(decl.getStorageClass()));
     }
 
-    if(methodDecl) {
-        if(methodDecl->getPreviousDecl()) {
-            if(const auto* ct = methodDecl->getParent()->getDescribedClassTemplate()) {
-                mOutputFormatHelper.Append("template<");
-
-                OutputFormatHelper::ForEachArg(
-                    ct->getTemplateParameters()->asArray(), mOutputFormatHelper, [&](const auto* pm) {
-                        if(const auto* vd = dyn_cast_or_null<ValueDecl>(pm)) {
-                            mOutputFormatHelper.Append(GetName(vd->getType()), " ");
-                        }
-
-                        mOutputFormatHelper.Append(GetName(*pm));
-                    });
-
-                mOutputFormatHelper.AppendNewLine(">");
-            }
-        }
+    if(Decl::FOK_None != decl.getFriendObjectKind()) {
+        mOutputFormatHelper.Append("friend ");
     }
 
     if(decl.isInlined()) {
@@ -2584,22 +2855,6 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
         if(!isFirstCxxMethodDecl) {
             const auto* parent = methodDecl->getParent();
             outputFormatHelper.Append(parent->getNameAsString());
-
-            /* Handle a templated CXXMethod outside class which is _not_ specialized. */
-            if(const auto* ct = parent->getDescribedClassTemplate()) {
-                outputFormatHelper.Append("<");
-
-                OutputFormatHelper::ForEachArg(ct->getTemplateParameters()->asArray(),
-                                               outputFormatHelper,
-                                               [&](const auto* pm) { outputFormatHelper.Append(GetName(*pm)); });
-
-                outputFormatHelper.Append(">");
-
-                /* Handle an explicit specialization of a single CXXMethod outside the class definition. */
-            } else if(const auto* clsTmpl = dyn_cast_or_null<ClassTemplateSpecializationDecl>(parent)) {
-                CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
-                codeGenerator.InsertTemplateArgs(*clsTmpl);
-            }
 
             outputFormatHelper.Append("::");
         }

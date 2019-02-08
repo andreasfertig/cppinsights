@@ -1,14 +1,14 @@
 struct Base
 {
-    Base();
-    
-    
-    Base(const Base &);
-    
-    
-    ~Base() noexcept;
-    
+  Base();
+  
+  Base(const Base &);
+  
+  ~Base() noexcept;
+  
 };
+
+
 
 Base::Base() = default;
 Base::Base(const Base &) = default;

@@ -48,12 +48,21 @@ struct A<int *>
 #endif
 
 
-template <typename T>
-struct A<T*>
+#ifdef INSIGHTS_USE_TEMPLATE
+template<typename T>
+struct A<T *>
 {
-  struct B { void operator()(int); };
-  B foo;
+  struct B
+  {
+    void operator()(int);
+    
+  };
+  
+  A<type_parameter_0_0 *>::B foo;
 };
+
+#endif
+
 
 template <typename T>
 void foo()

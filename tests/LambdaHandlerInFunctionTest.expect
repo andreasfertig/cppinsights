@@ -28,18 +28,20 @@ int main()
     
   class __lambda_10_10
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("Hello");
     }
     
-    public: using retType_10_10 = auto (*)() -> void;
+    using retType_10_10 = auto (*)() -> void;
     inline /*constexpr */ operator retType_10_10 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("Hello");
     }
@@ -51,19 +53,21 @@ int main()
       
   class __lambda_12_10
   {
-    public: inline /*constexpr */ int operator()() const
+    public: 
+    inline /*constexpr */ int operator()() const
     {
       printf("Bello");
       return 1;
     }
     
-    public: using retType_12_10 = auto (*)() -> int;
+    using retType_12_10 = auto (*)() -> int;
     inline /*constexpr */ operator retType_12_10 () const
     {
       return __invoke;
     };
     
-    private: static inline int __invoke()
+    private: 
+    static inline int __invoke()
     {
       printf("Bello");
       return 1;

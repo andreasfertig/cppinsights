@@ -1,29 +1,27 @@
 class X
 {
-    int i;
-
-public:
-    X(int ii);
-    
-    
-    void modify();
-    
-// public: inline constexpr X(const X &);
-// public: inline constexpr X(X &&);
+  int i;
+  
+  public: 
+  X(int ii);
+  
+  void modify();
+  
+  // inline constexpr X(const X &) = default;
+  // inline constexpr X(X &&) = default;
 };
+
+
 
 X::X(int ii)
 {
-  this->i = ii;
+    i = ii;
 }
-
-
 
 void X::modify()
 {
-  this->i++;
+    i++;
 }
-
 
 int main()
 {

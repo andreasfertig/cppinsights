@@ -12,18 +12,20 @@ int main()
     
   class __lambda_11_5
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       int x = mine::x;
     }
     
-    public: using retType_11_5 = void (*)();
+    using retType_11_5 = void (*)();
     inline /*constexpr */ operator retType_11_5 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       int x = mine::x;
     }

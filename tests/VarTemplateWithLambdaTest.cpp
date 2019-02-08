@@ -4,7 +4,15 @@
 template <typename T>
 constexpr auto func = [](auto x){ return T(x);};
 
+template <typename T>
+constexpr auto funcBraced = [](auto x){ return T{x};};
+
 double f(int x)
 {
     return func<double>(x);
+}
+
+double fBraced(int x)
+{
+    return funcBraced<int>(x);
 }

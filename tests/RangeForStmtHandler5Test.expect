@@ -1,23 +1,26 @@
 // https://mbevin.wordpress.com/2012/11/14/range-based-for/
-class MyArrayWrapper {
-   int* data;
-   int size;
-
-public:
-   inline int * begin()
-   {
-     return this->size > 0 ? &this->data[0] : nullptr;
-   }
-   
-   inline int * end()
-   {
-     return this->size > 0 ? &this->data[this->size - 1] : nullptr;
-   }
-   
-// public: inline MyArrayWrapper() noexcept;
-// public: inline constexpr MyArrayWrapper(const MyArrayWrapper &);
-// public: inline constexpr MyArrayWrapper(MyArrayWrapper &&);
+class MyArrayWrapper
+{
+  int * data;
+  int size;
+  
+  public: 
+  inline int * begin()
+  {
+    return this->size > 0 ? &this->data[0] : nullptr;
+  }
+  
+  inline int * end()
+  {
+    return this->size > 0 ? &this->data[this->size - 1] : nullptr;
+  }
+  
+  // inline MyArrayWrapper() noexcept = default;
+  // inline constexpr MyArrayWrapper(const MyArrayWrapper &) = default;
+  // inline constexpr MyArrayWrapper(MyArrayWrapper &&) = default;
 };
+
+
 
 
 int main()

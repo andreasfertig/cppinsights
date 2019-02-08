@@ -2,45 +2,59 @@
 
 struct Point
 {
-    double x;
-    double y;
+  double x;
+  double y;
 };
+
+
 
 struct Float
 {
-    float f;
+  float f;
 };
+
+
 
 struct Char
 {
-    char c;
-    wchar_t w;
-    char16_t c16;
-    char32_t c32;
+  char c;
+  wchar_t w;
+  char16_t c16;
+  char32_t c32;
 };
+
+
 
 struct Bool
 {
-    bool b;
+  bool b;
 };
+
+
 
 struct Pointer
 {
-    char* p;
+  char * p;
 };
+
+
 
 
 struct Ints
 {
-    int i;
-    unsigned int ui;
+  int i;
+  unsigned int ui;
 };
+
+
 
 struct Complex
 {
-    float _Complex fc;
-    int _Complex ic;    
+  _Complex float fc;
+  _Complex int ic;
 };
+
+
 
 int main()
 {

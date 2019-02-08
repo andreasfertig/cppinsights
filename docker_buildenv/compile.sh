@@ -14,5 +14,5 @@ mkdir build_docker
 
 echo `pwd`
 
-docker run -v $INSIGHTS_PATH:/home/builder/clang -v `pwd`/build_docker/:/home/builder/build_docker --rm -it --security-opt seccomp=unconfined  cppinsights-buildenv /home/builder/build_docker/build_insights.sh
+docker run -v $INSIGHTS_PATH:/home/builder/clang -v `pwd`/build_docker/:/home/builder/build_docker --rm -it --security-opt seccomp=unconfined  cppinsights-buildenv2 /home/builder/build_docker/build_insights.sh
 

@@ -5,19 +5,48 @@ int main()
       
   class __lambda_4_28
   {
-    public: inline /*constexpr */ int operator()(int a, char b) const
+    public: 
+    template<class type_parameter_0_0, class type_parameter_0_1>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 a, type_parameter_0_1 b) const
+    {
+      return a + b;
+    }
+    
+    /* First instantiated from: LambdaHandlerCaptureLessTest.cpp:4 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ int operator()(int a, char b) const
     {
       return a + static_cast<int>(b);
     }
-    public: using retType_4_28 = int (*)(int, char);
+    #endif
+    
+    
+    /* First instantiated from: LambdaHandlerCaptureLessTest.cpp:4 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    using retType_4_28 = int (*)(int, char);
+    template<>
     inline /*constexpr */ operator retType_4_28 () const
     {
       return __invoke;
     }
-    private: static inline int __invoke(int a, char b)
+    #endif
+    
+    private: 
+    template<class type_parameter_0_0, class type_parameter_0_1>
+    static inline auto __invoke(type_parameter_0_0 a, type_parameter_0_1 b)
+    {
+      return a + b;
+    }
+    
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    static inline int __invoke(int a, char b)
     {
       return a + static_cast<int>(b);
     }
+    #endif
+    
     
   } __lambda_4_28{};
   

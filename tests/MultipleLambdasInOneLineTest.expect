@@ -5,18 +5,20 @@ int main()
       
   class __lambda_5_3
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("Hello ");
     }
     
-    public: using retType_5_3 = void (*)();
+    using retType_5_3 = void (*)();
     inline /*constexpr */ operator retType_5_3 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("Hello ");
     }
@@ -27,18 +29,20 @@ int main()
     
   class __lambda_5_33
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("world");
     }
     
-    public: using retType_5_33 = void (*)();
+    using retType_5_33 = void (*)();
     inline /*constexpr */ operator retType_5_33 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("world");
     }
