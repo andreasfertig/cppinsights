@@ -757,6 +757,20 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const ParenListExpr* stmt)
+{
+    OnceFalse needsComma{};
+
+    for(const auto& expr : stmt->children()) {
+        if(needsComma) {
+            mOutputFormatHelper.Append(", ");
+        }
+
+        InsertArg(expr);
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
     WrapInParensOrCurlys(BraceKind::Curlys, [&]() {

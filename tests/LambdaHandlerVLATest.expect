@@ -100,7 +100,7 @@ inline SA<TA>::SA(const int & PA)
     
   };
   
-  test(__lambda_40_8{/* INSIGHTS-TODO: CodeGenerator.cpp:2296 stmt: ParenListExpr */});
+  test(__lambda_40_8{e});
 }
 
 
