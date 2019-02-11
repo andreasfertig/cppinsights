@@ -236,7 +236,7 @@ void CodeGenerator::InsertArg(const DoStmt* stmt)
     }
 
     mOutputFormatHelper.Append("while");
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::No);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::No);
 
     mOutputFormatHelper.AppendNewLine(';');
     mOutputFormatHelper.AppendNewLine();
@@ -307,7 +307,7 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 
     mOutputFormatHelper.Append("switch");
 
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     InsertArg(stmt->getBody());
 
@@ -322,7 +322,7 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 void CodeGenerator::InsertArg(const WhileStmt* stmt)
 {
     mOutputFormatHelper.Append("while");
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     const auto* body = stmt->getBody();
     const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
@@ -429,17 +429,10 @@ void CodeGenerator::InsertArg(const UnaryExprOrTypeTraitExpr* stmt)
         const auto* argExpr = stmt->getArgumentExpr();
         const bool  needsParens{!isa<ParenExpr>(argExpr)};
 
-        if(needsParens) {
-            mOutputFormatHelper.Append('(');
-        }
+        WrapInParensIfNeeded(needsParens, [&] { InsertArg(argExpr); });
 
-        InsertArg(argExpr);
-
-        if(needsParens) {
-            mOutputFormatHelper.Append(')');
-        }
     } else {
-        mOutputFormatHelper.Append("(", GetName(stmt->getTypeOfArgument()), ")");
+        WrapInParens([&] { mOutputFormatHelper.Append(GetName(stmt->getTypeOfArgument())); });
     }
 }
 //-----------------------------------------------------------------------------
@@ -465,7 +458,7 @@ void CodeGenerator::InsertArg(const FloatingLiteral* stmt)
 void CodeGenerator::InsertArg(const CXXTypeidExpr* stmt)
 {
     mOutputFormatHelper.Append("typeid");
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+    WrapInParens([&]() {
         if(stmt->isTypeOperand()) {
             mOutputFormatHelper.Append(GetName(stmt->getType()));
         } else {
@@ -772,7 +765,7 @@ void CodeGenerator::InsertArg(const ParenListExpr* stmt)
 
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, [&]() {
+    WrapInCurlys([&]() {
         mOutputFormatHelper.IncreaseIndent();
 
         ForEachArg(stmt->inits(), [&](const auto& init) { InsertArg(init); });
@@ -813,17 +806,8 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
 void CodeGenerator::InsertArg(const CXXDefaultInitExpr* stmt)
 {
     const auto* subExpr = stmt->getExpr();
-    const bool  needsBraces{isa<InitListExpr>(subExpr) ? false : true};
 
-    if(needsBraces) {
-        mOutputFormatHelper.Append('{');
-    }
-
-    InsertArg(subExpr);
-
-    if(needsBraces) {
-        mOutputFormatHelper.Append('}');
-    }
+    InsertCurlysIfRequired(subExpr);
 }
 //-----------------------------------------------------------------------------
 
@@ -865,7 +849,7 @@ void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
     const auto& constructorDecl = *stmt->getConstructor();
 
     mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+    WrapInParens([&]() {
         mOutputFormatHelper.AppendParameterList(constructorDecl.parameters(), OutputFormatHelper::NameOnly::Yes);
     });
 }
@@ -877,14 +861,13 @@ void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 
     InsertArg(stmt->getCallee());
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
+    WrapInParens([&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const ParenExpr* stmt)
 {
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getSubExpr()); });
+    WrapInParens([&]() { InsertArg(stmt->getSubExpr()); });
 }
 //-----------------------------------------------------------------------------
 
@@ -933,7 +916,7 @@ void CodeGenerator::InsertArg(const ArraySubscriptExpr* stmt)
 
 void CodeGenerator::InsertArg(const ArrayInitLoopExpr* stmt)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, [&]() {
+    WrapInCurlys([&]() {
         const uint64_t size = stmt->getArraySize().getZExtValue();
 
         ForEachArg(NumberIterator(size), [&](const auto& i) {
@@ -977,8 +960,7 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
         }
     }
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
+    WrapInParens([&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
 }
 //-----------------------------------------------------------------------------
 
@@ -1074,7 +1056,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
     mOutputFormatHelper.Append("if", cexpr);
 
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     const auto* body = stmt->getThen();
 
@@ -1129,24 +1111,24 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
 {
     mOutputFormatHelper.Append("for");
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() {
-                             if(const auto* init = stmt->getInit()) {
-                                 InsertArg(init);
+    WrapInParens(
+        [&]() {
+            if(const auto* init = stmt->getInit()) {
+                InsertArg(init);
 
-                                 // the init-stmt carries a ; at the end plus a newline. Remove and replace it with
-                                 // a space
-                                 mOutputFormatHelper.RemoveIndentIncludingLastNewLine();
-                             } else {
-                                 mOutputFormatHelper.Append("; ");
-                             }
+                // the init-stmt carries a ; at the end plus a newline. Remove and replace it with
+                // a space
+                mOutputFormatHelper.RemoveIndentIncludingLastNewLine();
+            } else {
+                mOutputFormatHelper.Append("; ");
+            }
 
-                             InsertArg(stmt->getCond());
-                             mOutputFormatHelper.Append("; ");
+            InsertArg(stmt->getCond());
+            mOutputFormatHelper.Append("; ");
 
-                             InsertArg(stmt->getInc());
-                         },
-                         AddSpaceAtTheEnd::Yes);
+            InsertArg(stmt->getInc());
+        },
+        AddSpaceAtTheEnd::Yes);
 
     const auto* body = stmt->getBody();
     const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
@@ -1187,7 +1169,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
     if(stmt->getNumPlacementArgs()) {
         /* we have a placement new */
 
-        WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+        WrapInParens([&]() {
             ForEachArg(stmt->placement_arguments(), [&](const auto& placementArg) { InsertArg(placementArg); });
         });
     }
@@ -1249,7 +1231,7 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
                 if(isa<CXXMethodDecl>(callee->getDecl())) {
                     const std::string tmpl = [&] {
                         if(const auto* tvd = dyn_cast_or_null<VarTemplateSpecializationDecl>(param1->getDecl())) {
-                            OutputFormatHelper outputFormatHelper;
+                            OutputFormatHelper outputFormatHelper{};
                             CodeGenerator      codeGenerator{outputFormatHelper};
 
                             codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
@@ -1285,11 +1267,12 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
     // operators in a namespace but outside a class so operator goes first
     if(!isCXXMethod) {
         if(callee) {
-            mOutputFormatHelper.Append(GetName(*callee), "(");
+            mOutputFormatHelper.Append(GetName(*callee));
         } else {
             InsertArg(stmt->getCallee()->IgnoreImpCasts());
-            mOutputFormatHelper.Append("(");
         }
+
+        mOutputFormatHelper.Append('(');
     }
 
     // insert the arguments
@@ -1366,15 +1349,7 @@ void CodeGenerator::InsertArg(const CXXFunctionalCastExpr* stmt)
         mOutputFormatHelper.Append(GetName(stmt->getTypeAsWritten()));
     }
 
-    if(needsParens) {
-        mOutputFormatHelper.Append('(');
-    }
-
-    InsertArg(stmt->getSubExpr());
-
-    if(needsParens) {
-        mOutputFormatHelper.Append(')');
-    }
+    WrapInParensIfNeeded(needsParens, [&] { InsertArg(stmt->getSubExpr()); });
 }
 //-----------------------------------------------------------------------------
 
@@ -1554,16 +1529,16 @@ void CodeGenerator::InsertArg(const CXXCatchStmt* stmt)
 {
     mOutputFormatHelper.Append(" catch");
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() {
-                             if(!stmt->getCaughtType().isNull()) {
-                                 mOutputFormatHelper.Append(GetTypeNameAsParameter(
-                                     stmt->getCaughtType(), stmt->getExceptionDecl()->getNameAsString()));
-                             } else {
-                                 mOutputFormatHelper.Append("...");
-                             }
-                         },
-                         AddSpaceAtTheEnd::Yes);
+    WrapInParens(
+        [&]() {
+            if(!stmt->getCaughtType().isNull()) {
+                mOutputFormatHelper.Append(
+                    GetTypeNameAsParameter(stmt->getCaughtType(), stmt->getExceptionDecl()->getNameAsString()));
+            } else {
+                mOutputFormatHelper.Append("...");
+            }
+        },
+        AddSpaceAtTheEnd::Yes);
 
     InsertArg(stmt->getHandlerBlock());
 }
@@ -1679,7 +1654,7 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
     if(const auto* con = dyn_cast_or_null<CXXConversionDecl>(stmt)) {
         if(stmt->getParent()->isLambda() && not stmt->doesThisDeclarationHaveABody()) {
             mOutputFormatHelper.AppendNewLine();
-            WrapInParensOrCurlys(BraceKind::Curlys, [&]() {
+            WrapInCurlys([&]() {
                 mOutputFormatHelper.AppendNewLine();
 
                 mOutputFormatHelper.AppendNewLine(
@@ -1737,19 +1712,19 @@ void CodeGenerator::InsertArg(const EnumDecl* stmt)
 
     mOutputFormatHelper.AppendNewLine();
 
-    WrapInParensOrCurlys(BraceKind::Curlys,
-                         [&]() {
-                             mOutputFormatHelper.IncreaseIndent();
-                             mOutputFormatHelper.AppendNewLine();
+    WrapInCurlys(
+        [&]() {
+            mOutputFormatHelper.IncreaseIndent();
+            mOutputFormatHelper.AppendNewLine();
 
-                             ForEachArg(stmt->enumerators(), [&](const auto* value) { InsertArg(value); });
+            ForEachArg(stmt->enumerators(), [&](const auto* value) { InsertArg(value); });
 
-                             InsertArg(stmt->getBody());
+            InsertArg(stmt->getBody());
 
-                             mOutputFormatHelper.DecreaseIndent();
-                             mOutputFormatHelper.AppendNewLine();
-                         },
-                         AddSpaceAtTheEnd::No);
+            mOutputFormatHelper.DecreaseIndent();
+            mOutputFormatHelper.AppendNewLine();
+        },
+        AddSpaceAtTheEnd::No);
 
     mOutputFormatHelper.AppendNewLine(';');
     mOutputFormatHelper.AppendNewLine();
@@ -2317,7 +2292,7 @@ void CodeGenerator::FormatCast(const std::string castName,
 
 void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
 {
-    const bool needParens = [&]() {
+    const bool needsParens = [&]() {
         if(const auto* expr = dyn_cast_or_null<Expr>(stmt))
             if(const auto* dest = dyn_cast_or_null<UnaryOperator>(expr->IgnoreImplicit())) {
                 if(dest->getOpcode() == clang::UO_Deref) {
@@ -2328,15 +2303,7 @@ void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
         return false;
     }();
 
-    if(needParens) {
-        mOutputFormatHelper.Append('(');
-    }
-
-    InsertArg(stmt);
-
-    if(needParens) {
-        mOutputFormatHelper.Append(')');
-    }
+    WrapInParensIfNeeded(needsParens, [&] { InsertArg(stmt); });
 }
 //-----------------------------------------------------------------------------
 
@@ -2707,6 +2674,31 @@ void CodeGenerator::WrapInParensOrCurlys(const BraceKind braceKind, T&& lambda, 
     if(AddSpaceAtTheEnd::Yes == addSpaceAtTheEnd) {
         mOutputFormatHelper.Append(' ');
     }
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    if(needsParens) {
+        WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+    } else {
+        lambda();
+    }
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    WrapInParensOrCurlys(BraceKind::Curlys, std::move(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 

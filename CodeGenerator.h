@@ -186,6 +186,16 @@ protected:
     };
 
     template<typename T>
+    void WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+
+    template<typename T>
+    void
+    WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+
+    template<typename T>
+    void WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+
+    template<typename T>
     void WrapInParensOrCurlys(const BraceKind        curlys,
                               T&&                    lambda,
                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
