@@ -153,11 +153,6 @@ protected:
     void HandleCompoundStmt(const CompoundStmt* stmt);
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
 
-    void InsertMethod(const FunctionDecl*  d,
-                      OutputFormatHelper&  outputFormatHelper,
-                      const CXXMethodDecl& md,
-                      bool /*skipConstexpr*/);
-
     STRONG_BOOL(AsComment);
     void FormatCast(const std::string castName,
                     const QualType&   CastDestType,
@@ -240,6 +235,7 @@ public:
     {
     }
 
+    using CodeGenerator::InsertArg;
     void InsertArg(const DeclRefExpr* stmt) override;
 };
 //-----------------------------------------------------------------------------
@@ -249,6 +245,7 @@ class LambdaCodeGenerator final : public CodeGenerator
 public:
     using CodeGenerator::CodeGenerator;
 
+    using CodeGenerator::InsertArg;
     void InsertArg(const CXXThisExpr* stmt) override;
 
     bool mCapturedThisAsCopy;

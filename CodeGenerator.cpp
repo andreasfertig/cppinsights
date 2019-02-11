@@ -73,7 +73,7 @@ public:
     {
     }
 
-    void InsertArg(const Stmt* stmt) override { CodeGenerator::InsertArg(stmt); }
+    using CodeGenerator::InsertArg;
     void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(mIndex); }
 };
 //-----------------------------------------------------------------------------
@@ -583,8 +583,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
             if(holdingVarOrMemberExpr) {
                 DPrint("4444\n");
 
-                StructuredBindingsCodeGenerator structuredBindingsCodeGenerator{mOutputFormatHelper, tmpVarName};
-                CodeGenerator&                  codeGenerator = structuredBindingsCodeGenerator;
+                StructuredBindingsCodeGenerator codeGenerator{mOutputFormatHelper, tmpVarName};
                 codeGenerator.InsertArg(holdingVarOrMemberExpr);
 
                 // array decomposition
@@ -2482,30 +2481,13 @@ const char* CodeGenerator::GetBuiltinTypeSuffix(const BuiltinType::Kind& kind)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertMethod(const FunctionDecl*  d,
-                                 OutputFormatHelper&  outputFormatHelper,
-                                 const CXXMethodDecl& md,
-                                 bool                 capturesThisByCopy)
-{
-    LambdaCodeGenerator lambdaCodeGenerator{outputFormatHelper, mLambdaStack};
-    lambdaCodeGenerator.mCapturedThisAsCopy = capturesThisByCopy;
-    CodeGenerator& codeGenerator{lambdaCodeGenerator};
-
-    codeGenerator.InsertAccessModifierAndNameWithReturnType(*d);
-    outputFormatHelper.AppendNewLine();
-
-    codeGenerator.InsertArg(md.getBody());
-    outputFormatHelper.AppendNewLine();
-}
-//-----------------------------------------------------------------------------
-
 void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lambdaHelper)
 {
     OutputFormatHelper& outputFormatHelper = lambdaHelper.buffer();
 
     outputFormatHelper.AppendNewLine();
-    LambdaCodeGenerator lambdaCodeGenerator{outputFormatHelper, mLambdaStack};
-    lambdaCodeGenerator.mCapturedThisAsCopy = [&] {
+    LambdaCodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
+    codeGenerator.mCapturedThisAsCopy = [&] {
         for(const auto& c : lambda->captures()) {
             const auto captureKind = c.getCaptureKind();
 
@@ -2517,8 +2499,7 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
         return false;
     }();
 
-    lambdaCodeGenerator.mLambdaExpr = lambda;
-    CodeGenerator& codeGenerator    = lambdaCodeGenerator;
+    codeGenerator.mLambdaExpr = lambda;
     codeGenerator.InsertArg(lambda->getLambdaClass());
 }
 //-----------------------------------------------------------------------------
@@ -2529,8 +2510,8 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 {
     bool        isLambda{false};
     bool        isFirstCxxMethodDecl{true};
-    bool        isCXXMethodDecl{isa<CXXMethodDecl>(&decl)};
     const auto* methodDecl{dyn_cast_or_null<CXXMethodDecl>(&decl)};
+    bool        isCXXMethodDecl{nullptr != methodDecl};
     const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
 
     if(methodDecl) {

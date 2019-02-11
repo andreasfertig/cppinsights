@@ -162,7 +162,6 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         add_definitions(-Wsuggest-override)
         #        add_definitions(-Wsuggest-final-types)
         add_definitions(-Wuseless-cast)
-        add_definitions(-Wno-overloaded-virtual)
     elseif(IS_CLANG)
         # -Wno-maybe-uninitialized is a g++ option which is (currently) unknown to clang
         add_definitions(-Wno-unknown-warning-option)
