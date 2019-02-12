@@ -777,11 +777,7 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
                     const auto v = ct->getSize().getZExtValue();
 
                     // clamp here to survive large arrays.
-                    if(100 < v) {
-                        return 100;
-                    }
-
-                    return v;
+                    return std::clamp(v, uint64_t(0), uint64_t(100));
                 }
 
                 return 0;
@@ -1480,7 +1476,7 @@ static std::string getValueOfValueInit(const QualType& t)
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
         const auto&       elementType{tt->getElementType()};
         const std::string elementTypeInitValue{getValueOfValueInit(elementType)};
-        const auto        size{tt->getSize().getZExtValue()};
+        const auto        size{std::clamp(tt->getSize().getZExtValue(), uint64_t(0), uint64_t(100))};
         std::string       ret{};
 
         OnceFalse needsComma{};
@@ -1651,7 +1647,7 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
 
     mOutputFormatHelper.Append(initOutputFormatHelper.GetString());
 
-    if(const auto* con = dyn_cast_or_null<CXXConversionDecl>(stmt)) {
+    if(isa<CXXConversionDecl>(stmt)) {
         if(stmt->getParent()->isLambda() && not stmt->doesThisDeclarationHaveABody()) {
             mOutputFormatHelper.AppendNewLine();
             WrapInCurlys([&]() {
