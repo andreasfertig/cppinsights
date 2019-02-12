@@ -359,7 +359,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
     // Sometimes we get char const[2]. If we directly insert the typename we end up with char const__var[2] which is not
     // a valid type name. Hence check for this condition and, if necessary, insert a space before __var.
     auto getSpaceOrEmpty = [&](const std::string& needle) -> std::string {
-        if(std::string::npos == typeName.find(needle, 0)) {
+        if(not Contains(typeName, needle)) {
             return " ";
         }
 
@@ -371,22 +371,22 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         InsertBefore(typeName, "[", StrCat(space, varName));
 
     } else if(isArrayRef) {
-        if(std::string::npos != typeName.find("(&", 0)) {
+        if(Contains(typeName, "(&")) {
             InsertAfter(typeName, "(&", varName);
         } else {
             InsertBefore(typeName, "&[", "(");
             InsertAfter(typeName, "(&", StrCat(varName, ")"));
         }
     } else if(isFunctionPointer) {
-        if(std::string::npos != typeName.find("(&", 0)) {
+        if(Contains(typeName, "(&")) {
             InsertAfter(typeName, "(&", varName);
         } else {
             typeName += StrCat(" ", varName);
         }
     } else if(isPointerToArray) {
-        if(std::string::npos != typeName.find("(*", 0)) {
+        if(Contains(typeName, "(*")) {
             InsertAfter(typeName, "(*", varName);
-        } else if(std::string::npos != typeName.find("*", 0)) {
+        } else if(Contains(typeName, "*")) {
             InsertBefore(typeName, "*", "(");
             InsertAfter(typeName, "*", StrCat(varName, ")"));
         } else {

@@ -83,6 +83,12 @@ static inline bool IsInvalidLocation(const T& t, Args... args)
     }
 //-----------------------------------------------------------------------------
 
+static inline bool Contains(const std::string& source, const std::string search)
+{
+    return std::string::npos != source.find(search, 0);
+}
+//-----------------------------------------------------------------------------
+
 void InsertBefore(std::string& source, const std::string& find, const std::string& replace);
 //-----------------------------------------------------------------------------
 

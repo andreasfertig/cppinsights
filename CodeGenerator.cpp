@@ -526,7 +526,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
             std::string name = GetPlainName(*declName);
 
             const std::string operatorName{"operator"};
-            if(name.find(operatorName) != std::string::npos) {
+            if(Contains(name, operatorName)) {
                 return operatorName;
             }
 
@@ -946,7 +946,7 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
                     const TemplateArgument& Pack = Args->get(0);
 
                     ForEachArg(Pack.pack_elements(), [&](const auto& arg) {
-                        char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
+                        const char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
                         mOutputFormatHelper.Append("'", std::string{C}, "'");
                     });
 
@@ -1187,7 +1187,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
 
             // In case of multi dimension the first dimension is the getArraySize() while the others are part of the
             // type included in GetName(...).
-            if(std::string::npos != name.find("[", 0)) {
+            if(Contains(name, "[")) {
                 InsertBefore(name, "[", ofm.GetString());
             } else {
                 // here we have the single dimension case, the dimension is not part of GetName, so add it.
