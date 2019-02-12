@@ -195,7 +195,7 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
     }
 
     if(!isBodyBraced && !isa<NullStmt>(body)) {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
     }
 
     // close range-for scope in for
@@ -238,7 +238,7 @@ void CodeGenerator::InsertArg(const DoStmt* stmt)
     mOutputFormatHelper.Append("while");
     WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::No);
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -334,7 +334,7 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
     } else {
         const bool isBodyBraced = isa<CompoundStmt>(body);
         if(!isBodyBraced) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 
@@ -400,9 +400,7 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
                 for(const auto& arg : tmplArgs->asArray()) {
 
                     if(arg.getKind() == TemplateArgument::Integral) {
-                        if(needsComma) {
-                            ofm.Append(", ");
-                        }
+                        ofm.AppendComma(needsComma);
 
                         ofm.Append(arg.getAsIntegral());
                         haveArg = true;
@@ -544,7 +542,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
     InsertArg(decompositionDeclStmt->getInit());
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
 
     for(const auto* bindingDecl : decompositionDeclStmt->bindings()) {
         if(const auto* binding = bindingDecl->getBinding()) {
@@ -589,7 +587,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
                 TODO(bindingDecl, mOutputFormatHelper);
             }
 
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }
@@ -705,7 +703,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         }
 
         if(UseCommaInsteadOfSemi::No == mUseCommaInsteadOfSemi) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         } else {
             mOutputFormatHelper.Append(',');
         }
@@ -743,7 +741,7 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
             InsertArg(stmt->getBody());
             mOutputFormatHelper.AppendNewLine();
         } else {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }
@@ -754,9 +752,7 @@ void CodeGenerator::InsertArg(const ParenListExpr* stmt)
     OnceFalse needsComma{};
 
     for(const auto& expr : stmt->children()) {
-        if(needsComma) {
-            mOutputFormatHelper.Append(", ");
-        }
+        mOutputFormatHelper.AppendComma(needsComma);
 
         InsertArg(expr);
     }
@@ -786,9 +782,7 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
             // now fill the remaining array slots.
             OnceFalse needsComma{0 != stmt->getNumInits()};
             for_each(static_cast<uint64_t>(stmt->getNumInits()), fullWidth, [&](auto) {
-                if(needsComma) {
-                    mOutputFormatHelper.Append(", ");
-                }
+                mOutputFormatHelper.AppendComma(needsComma);
 
                 InsertArg(filler);
             });
@@ -1027,7 +1021,7 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
         InsertArg(item);
 
         if(IsStmtRequieringSemi<IfStmt, ForStmt, DeclStmt, WhileStmt, DoStmt, CXXForRangeStmt, SwitchStmt>(item)) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }
@@ -1061,7 +1055,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
     const bool isBodyBraced = isa<CompoundStmt>(body);
 
     if(!isBodyBraced && !isa<NullStmt>(body)) {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
     }
 
     // else
@@ -1083,7 +1077,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
         // an else with just a single statement seems not to carry a semi-colon at the end
         if(!needScope && !isa<CompoundStmt>(elsePart)) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
 
         if(needScope) {
@@ -1140,7 +1134,7 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
         mOutputFormatHelper.AppendNewLine();
     } else {
         if(!isa<CompoundStmt>(body) && !isa<NullStmt>(body)) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 
@@ -1580,7 +1574,7 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         mOutputFormatHelper.Append(GetName(stmt->getUnderlyingType()));
     }
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
 }
 //-----------------------------------------------------------------------------
 
@@ -1681,7 +1675,7 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         mOutputFormatHelper.AppendNewLine();
 
     } else {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
     }
 
     mOutputFormatHelper.AppendNewLine();
@@ -1722,7 +1716,7 @@ void CodeGenerator::InsertArg(const EnumDecl* stmt)
         },
         AddSpaceAtTheEnd::No);
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -2020,7 +2014,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     // skip classes/struct's without a definition
     if(!stmt->hasDefinition()) {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
         return;
     }
 
@@ -2161,7 +2155,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
     }
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -2201,7 +2195,7 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 
 void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
 {
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
 }
 //-----------------------------------------------------------------------------
 

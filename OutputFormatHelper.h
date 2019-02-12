@@ -134,6 +134,17 @@ public:
         Append(";");
     }
 
+    /// \brief Append a comma if needed.
+    void AppendComma(OnceFalse& needsComma)
+    {
+        if(needsComma) {
+            Append(", ");
+        }
+    }
+
+    /// \brief Append a semicolon and a newline.
+    void AppendSemiNewLine() { AppendNewLine(';'); }
+
     /// \brief Append a argument list to the buffer.
     ///
     /// This function takes care of the delimiting ',' between the parameters. The lambda \c lambda is called to each
