@@ -300,7 +300,6 @@ add_clang_tool(insights
     OutputFormatHelper.cpp
     StaticAssertHandler.cpp
     TemplateHandler.cpp
-    UserDefinedLiteralHandler.cpp
 )
 
 # general include also provided by clang-build
