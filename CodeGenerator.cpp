@@ -2274,7 +2274,7 @@ void CodeGenerator::FormatCast(const std::string castName,
     const std::string castDestTypeText{
         StrCat(GetName(castDestType), ((isCastToBase && !castDestType->isAnyPointerType()) ? "&" : ""))};
 
-    mOutputFormatHelper.Append(StrCat(castName, "<", castDestTypeText, ">("));
+    mOutputFormatHelper.Append(castName, "<", castDestTypeText, ">(");
     InsertArg(subExpr);
     mOutputFormatHelper.Append(')');
 }
