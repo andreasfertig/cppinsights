@@ -6,8 +6,7 @@ struct template_tuple {};
 template<>
 struct template_tuple<identity>
 {
-  inline ~template_tuple() noexcept = default;
-  
+  // inline ~template_tuple() noexcept = default;
 };
 
 #endif
@@ -41,11 +40,10 @@ void foo2()
   template<>
   class B<Test, Test>
   {
-    inline constexpr B() noexcept = default;
-    inline ~B() = default;
-    inline constexpr B(const B<Test, Test> &) = default;
-    inline constexpr B(B<Test, Test> &&) = default;
-    
+    // inline constexpr B() noexcept = default;
+    // inline ~B() = default;
+    // inline constexpr B(const B<Test, Test> &) = default;
+    // inline constexpr B(B<Test, Test> &&) = default;
   };
   
   #endif
@@ -60,10 +58,9 @@ void foo2()
   template<>
   class testType<int>
   {
-    inline constexpr testType() noexcept = default;
-    inline constexpr testType(const testType<int> &) = default;
-    inline constexpr testType(testType<int> &&) = default;
-    
+    // inline constexpr testType() noexcept = default;
+    // inline constexpr testType(const testType<int> &) = default;
+    // inline constexpr testType(testType<int> &&) = default;
   };
   
   #endif
@@ -76,7 +73,6 @@ void foo2()
   template<>
   class testDecl<&foo>
   {
-    
   };
   
   #endif
@@ -87,7 +83,6 @@ void foo2()
   template<>
   class testDecl<int (*)()>
   {
-    
   };
   
   #endif
@@ -100,10 +95,9 @@ void foo2()
   template<>
   class testIntegral<2>
   {
-    inline constexpr testIntegral() noexcept = default;
-    inline constexpr testIntegral(const testIntegral<2> &) = default;
-    inline constexpr testIntegral(testIntegral<2> &&) = default;
-    
+    // inline constexpr testIntegral() noexcept = default;
+    // inline constexpr testIntegral(const testIntegral<2> &) = default;
+    // inline constexpr testIntegral(testIntegral<2> &&) = default;
   };
   
   #endif
@@ -122,10 +116,9 @@ void foo2()
   class C<Test, Test>
   {
     B<Test, Test> testTemplateExpansion;
-    inline constexpr C() noexcept = default;
-    inline constexpr C(const C<Test, Test> &) = default;
-    inline constexpr C(C<Test, Test> &&) = default;
-    
+    // inline constexpr C() noexcept = default;
+    // inline constexpr C(const C<Test, Test> &) = default;
+    // inline constexpr C(C<Test, Test> &&) = default;
   };
   
   #endif
@@ -138,10 +131,9 @@ void foo2()
   template<>
   class testExpr<4, 1>
   {
-    inline constexpr testExpr() noexcept = default;
-    inline constexpr testExpr(const testExpr<4, 1> &) = default;
-    inline constexpr testExpr(testExpr<4, 1> &&) = default;
-    
+    // inline constexpr testExpr() noexcept = default;
+    // inline constexpr testExpr(const testExpr<4, 1> &) = default;
+    // inline constexpr testExpr(testExpr<4, 1> &&) = default;
   };
   
   #endif
@@ -154,10 +146,9 @@ void foo2()
   template<>
   class testPack<0, 1, 2, 4>
   {
-    inline constexpr testPack() noexcept = default;
-    inline constexpr testPack(const testPack<0, 1, 2, 4> &) = default;
-    inline constexpr testPack(testPack<0, 1, 2, 4> &&) = default;
-    
+    // inline constexpr testPack() noexcept = default;
+    // inline constexpr testPack(const testPack<0, 1, 2, 4> &) = default;
+    // inline constexpr testPack(testPack<0, 1, 2, 4> &&) = default;
   };
   
   #endif

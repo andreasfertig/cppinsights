@@ -8,7 +8,7 @@ option(DEBUG             "Enable debug"              Off)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
-set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 6)
+set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 7)
 set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
 
 if(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder
@@ -162,7 +162,6 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         add_definitions(-Wsuggest-override)
         #        add_definitions(-Wsuggest-final-types)
         add_definitions(-Wuseless-cast)
-        add_definitions(-Wno-overloaded-virtual)
     elseif(IS_CLANG)
         # -Wno-maybe-uninitialized is a g++ option which is (currently) unknown to clang
         add_definitions(-Wno-unknown-warning-option)
@@ -301,7 +300,6 @@ add_clang_tool(insights
     OutputFormatHelper.cpp
     StaticAssertHandler.cpp
     TemplateHandler.cpp
-    UserDefinedLiteralHandler.cpp
 )
 
 # general include also provided by clang-build

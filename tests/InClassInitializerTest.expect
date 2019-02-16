@@ -4,7 +4,6 @@ int main()
   {
     int v{676};
     int v2 = 828;
-    
   };
   
 }

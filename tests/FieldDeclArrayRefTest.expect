@@ -33,9 +33,8 @@ class array<int, 2>
   {
   }
   
-  inline constexpr array(const array<int, 2> &) = default;
-  inline constexpr array(array<int, 2> &&) = default;
-  
+  // inline constexpr array(const array<int, 2> &) = default;
+  // inline constexpr array(array<int, 2> &&) = default;
 };
 
 #endif

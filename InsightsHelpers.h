@@ -83,6 +83,12 @@ static inline bool IsInvalidLocation(const T& t, Args... args)
     }
 //-----------------------------------------------------------------------------
 
+static inline bool Contains(const std::string& source, const std::string search)
+{
+    return std::string::npos != source.find(search, 0);
+}
+//-----------------------------------------------------------------------------
+
 void InsertBefore(std::string& source, const std::string& find, const std::string& replace);
 //-----------------------------------------------------------------------------
 
@@ -142,6 +148,26 @@ static inline std::string GetLambdaName(const LambdaExpr& lambda)
 }
 //-----------------------------------------------------------------------------
 
+static inline std::string GetName(const CXXRecordDecl& RD)
+{
+    if(RD.isLambda()) {
+        return GetLambdaName(RD);
+    }
+
+    return RD.getNameAsString();
+}
+//-----------------------------------------------------------------------------
+
+static inline std::string GetName(const CXXMethodDecl& RD)
+{
+    if(RD.getParent()->isLambda()) {
+        return GetLambdaName(*RD.getParent());
+    }
+
+    return RD.getNameAsString();
+}
+//-----------------------------------------------------------------------------
+
 /// \brief Remove decltype from a QualType, if possible.
 const QualType GetDesugarType(const QualType& QT);
 // -----------------------------------------------------------------------------
@@ -164,6 +190,16 @@ GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqu
 const std::string EvaluateAsFloat(const FloatingLiteral& expr);
 const std::string GetNoExcept(const FunctionDecl& decl);
 const char*       GetConst(const FunctionDecl& decl);
+//-----------------------------------------------------------------------------
+
+template<typename T, typename TFunc>
+void for_each(T start, T end, TFunc&& func)
+{
+    for(; start < end; ++start) {
+        func(start);
+    }
+}
+//-----------------------------------------------------------------------------
 
 }  // namespace clang::insights
 

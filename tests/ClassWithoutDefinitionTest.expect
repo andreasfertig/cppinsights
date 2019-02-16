@@ -12,10 +12,9 @@ class Foo<int>
 {
   class Bar;
   struct Far;
-  inline constexpr Foo() noexcept = default;
-  inline constexpr Foo(const Foo<int> &) = default;
-  inline constexpr Foo(Foo<int> &&) = default;
-  
+  // inline constexpr Foo() noexcept = default;
+  // inline constexpr Foo(const Foo<int> &) = default;
+  // inline constexpr Foo(Foo<int> &&) = default;
 };
 
 #endif

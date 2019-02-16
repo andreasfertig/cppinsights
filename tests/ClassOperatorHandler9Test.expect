@@ -62,11 +62,10 @@ class MyVector<int>
     return this->v.operator[](i);
   }
   
-  inline MyVector(const MyVector<int> &) = default;
-  inline MyVector(MyVector<int> &&) noexcept = default;
-  inline MyVector<int> & operator=(MyVector<int> &&) = default;
-  inline ~MyVector() noexcept = default;
-  
+  // inline MyVector(const MyVector<int> &) = default;
+  // inline MyVector(MyVector<int> &&) noexcept = default;
+  // inline MyVector<int> & operator=(MyVector<int> &&) = default;
+  // inline ~MyVector() noexcept = default;
 };
 
 #endif

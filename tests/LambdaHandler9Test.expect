@@ -21,6 +21,7 @@ int main()
       }
     }
     
+    
   };
   
   __lambda_5_14 l = __lambda_5_14{};
@@ -38,6 +39,7 @@ int main()
       
     }
     
+    
   };
   
   __lambda_14_14 w = __lambda_14_14{};
@@ -53,6 +55,7 @@ int main()
         default: return;
       }
     }
+    
     
   };
   
@@ -71,6 +74,7 @@ int main()
       
     }
     
+    
   };
   
   __lambda_36_14 f = __lambda_36_14{};
@@ -88,6 +92,7 @@ int main()
       }
       
     }
+    
     
   };
   

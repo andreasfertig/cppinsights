@@ -6,11 +6,13 @@ int g(Args ...)
     return 1;
 }
 
+#if 0
 template<class... Args>
 void f(Args... args) {
     auto lm = [&] { return g(args...); };
     lm();
 }
+#endif
 
 template<class... Args>
 void f2(Args... args) {
@@ -20,6 +22,6 @@ void f2(Args... args) {
 
 int main()
 {
-    f(1, 2, 3 , 4, 5);
+    //f(1, 2, 3 , 4, 5);
     f2(1, 2, 3 , 4, 5);
 }

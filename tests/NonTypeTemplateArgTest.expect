@@ -20,10 +20,9 @@ struct SC<&c>
     printf("%s\n", c);
   }
   
-  inline constexpr SC() noexcept = default;
-  inline constexpr SC(const SC<&c> &) = default;
-  inline constexpr SC(SC<&c> &&) = default;
-  
+  // inline constexpr SC() noexcept = default;
+  // inline constexpr SC(const SC<&c> &) = default;
+  // inline constexpr SC(SC<&c> &&) = default;
 };
 
 #endif

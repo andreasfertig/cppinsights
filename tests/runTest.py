@@ -33,7 +33,7 @@ def testCompare(tmpFileName, stdout, expectFile, f, args):
 #------------------------------------------------------------------------------
 
 def testCompile(tmpFileName, f, args, fileName):
-    cmd = [args['cxx'], '-std=c++1z', '-c', tmpFileName]
+    cmd = [args['cxx'], '-std=c++1z', '-m64', '-c', tmpFileName]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
@@ -134,7 +134,7 @@ def main():
                 p   = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate(input=data)
         else:
-                cmd = [insightsPath, f, '--', '-std=c++1z'] + defaultIncludeDirs
+                cmd = [insightsPath, f, '--', '-std=c++1z', '-m64'] + defaultIncludeDirs
                 p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
 

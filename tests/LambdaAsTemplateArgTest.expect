@@ -6,10 +6,9 @@ struct FunctionArgs  {};
 template<>
 struct FunctionArgs<int (__lambda_12_14::*)(int) const>
 {
-  inline constexpr FunctionArgs() noexcept = default;
-  inline constexpr FunctionArgs(const FunctionArgs<int (__lambda_12_14::*)(int) const> &) = default;
-  inline constexpr FunctionArgs(FunctionArgs<int (__lambda_12_14::*)(int) const> &&) = default;
-  
+  // inline constexpr FunctionArgs() noexcept = default;
+  // inline constexpr FunctionArgs(const FunctionArgs<int (__lambda_12_14::*)(int) const> &) = default;
+  // inline constexpr FunctionArgs(FunctionArgs<int (__lambda_12_14::*)(int) const> &&) = default;
 };
 
 #endif
@@ -26,15 +25,13 @@ int main()
     
   class __lambda_12_14
   {
+    int & y;
     public: inline /*constexpr */ int operator()(int x) const
     {
       return x + y;
     }
     
-    private:
-    int& y;
-    
-    public: __lambda_12_14(int& _y)
+    public: __lambda_12_14(int & _y)
     : y{_y}
     {}
     

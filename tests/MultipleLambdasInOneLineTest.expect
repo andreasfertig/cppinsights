@@ -10,6 +10,18 @@ int main()
       printf("Hello ");
     }
     
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("Hello ");
+    }
+    
+    
   } __lambda_5_3{};
   
     
@@ -19,6 +31,18 @@ int main()
     {
       printf("world");
     }
+    
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("world");
+    }
+    
     
   } __lambda_5_33{};
   

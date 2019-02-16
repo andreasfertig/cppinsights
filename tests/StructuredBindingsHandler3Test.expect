@@ -10,7 +10,6 @@ template<>
 struct tuple_element<0, constant::Q>
 {
   using type = int;
-  
 };
 
 #endif
@@ -22,7 +21,6 @@ template<>
 struct tuple_element<1, constant::Q>
 {
   using type = int;
-  
 };
 
 #endif
@@ -34,7 +32,6 @@ template<>
 struct tuple_element<2, constant::Q>
 {
   using type = int;
-  
 };
 
 #endif

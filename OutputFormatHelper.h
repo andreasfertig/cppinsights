@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "InsightsHelpers.h"
+#include "InsightsOnce.h"
 #include "InsightsStrCat.h"
 #include "InsightsStrongTypes.h"
 //-----------------------------------------------------------------------------
@@ -133,6 +134,17 @@ public:
         Append(";");
     }
 
+    /// \brief Append a comma if needed.
+    void AppendComma(OnceFalse& needsComma)
+    {
+        if(needsComma) {
+            Append(", ");
+        }
+    }
+
+    /// \brief Append a semicolon and a newline.
+    void AppendSemiNewLine() { AppendNewLine(';'); }
+
     /// \brief Append a argument list to the buffer.
     ///
     /// This function takes care of the delimiting ',' between the parameters. The lambda \c lambda is called to each
@@ -146,11 +158,9 @@ public:
     template<typename T, typename Lambda>
     static inline void ForEachArg(const T& arguments, OutputFormatHelper& outputFormatHelper, Lambda&& lambda)
     {
-        bool first{true};
+        OnceFalse needsComma{};
         for(const auto& arg : arguments) {
-            if(first) {
-                first = false;
-            } else {
+            if(needsComma) {
                 outputFormatHelper.Append(", ");
             }
 

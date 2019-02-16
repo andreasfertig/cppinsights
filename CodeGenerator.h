@@ -96,6 +96,7 @@ public:
     , mLambdaStack{mLambdaStackThis}
     , mSkipVarDecl{SkipVarDecl::No}
     , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
+    , mLambdaExpr{nullptr}
     {
     }
 
@@ -105,6 +106,7 @@ public:
     , mLambdaStack{lambdaStack}
     , mSkipVarDecl{SkipVarDecl::No}
     , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
+    , mLambdaExpr{nullptr}
     {
     }
 
@@ -151,11 +153,6 @@ protected:
     void HandleCompoundStmt(const CompoundStmt* stmt);
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
 
-    void InsertMethod(const FunctionDecl*  d,
-                      OutputFormatHelper&  outputFormatHelper,
-                      const CXXMethodDecl& md,
-                      bool /*skipConstexpr*/);
-
     STRONG_BOOL(AsComment);
     void FormatCast(const std::string castName,
                     const QualType&   CastDestType,
@@ -187,6 +184,16 @@ protected:
         Parens,
         Curlys
     };
+
+    template<typename T>
+    void WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+
+    template<typename T>
+    void
+    WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+
+    template<typename T>
+    void WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
     template<typename T>
     void WrapInParensOrCurlys(const BraceKind        curlys,
@@ -222,6 +229,8 @@ protected:
 
     SkipVarDecl           mSkipVarDecl;
     UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
+
+    const LambdaExpr* mLambdaExpr;
 };
 //-----------------------------------------------------------------------------
 
@@ -236,6 +245,7 @@ public:
     {
     }
 
+    using CodeGenerator::InsertArg;
     void InsertArg(const DeclRefExpr* stmt) override;
 };
 //-----------------------------------------------------------------------------
@@ -245,6 +255,7 @@ class LambdaCodeGenerator final : public CodeGenerator
 public:
     using CodeGenerator::CodeGenerator;
 
+    using CodeGenerator::InsertArg;
     void InsertArg(const CXXThisExpr* stmt) override;
 
     bool mCapturedThisAsCopy;

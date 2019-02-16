@@ -41,8 +41,7 @@ struct X<int>
 {
   int x;
   int y;
-  inline ~X() noexcept = default;
-  
+  // inline ~X() noexcept = default;
 };
 
 #endif

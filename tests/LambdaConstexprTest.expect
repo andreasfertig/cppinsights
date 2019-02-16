@@ -4,13 +4,11 @@ void Test()
     
   class __lambda_4_18
   {
+    const int Size;
     public: inline void operator()() const
     {
       int Dim[3];
     }
-    
-    private:
-    const int Size;
     
     public: __lambda_4_18(const int _Size)
     : Size{_Size}

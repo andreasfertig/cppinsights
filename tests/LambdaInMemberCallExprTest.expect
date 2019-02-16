@@ -28,6 +28,7 @@ int main()
     {
     }
     
+    
   } __lambda_13_12{};
   
   t.foo(__lambda_13_12);

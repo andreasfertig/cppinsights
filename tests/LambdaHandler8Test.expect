@@ -19,13 +19,11 @@ int get(int & v)
       
   class __lambda_9_18
   {
+    int & v;
     public: inline /*constexpr */ int operator()() const
     {
       return v;
     }
-    
-    private:
-    int & v;
     
     public: __lambda_9_18(int & _v)
     : v{_v}

@@ -10,7 +10,6 @@ namespace details {
   struct remove_reference<int [16]>
   {
     using type = int [16];
-    
   };
   
   #endif
@@ -34,7 +33,6 @@ namespace details {
   {
     inline static constexpr const size_t value = 16ul;
     /* PASSED: static_assert(16ul != 0, "Arrays only"); */
-    
   };
   
   #endif
@@ -78,10 +76,9 @@ class S : public B
 template<>
 class S<int> : public B
 {
-  inline constexpr S() noexcept = default;
-  inline constexpr S(const S<int> &) = default;
-  inline constexpr S(S<int> &&) = default;
-  
+  // inline constexpr S() noexcept = default;
+  // inline constexpr S(const S<int> &) = default;
+  // inline constexpr S(S<int> &&) = default;
 };
 
 #endif
@@ -92,11 +89,10 @@ class S<int> : public B
 template<>
 class S<double> : public B
 {
-  inline constexpr S() noexcept = default;
-  inline ~S() = default;
-  inline constexpr S(const S<double> &) = default;
-  inline constexpr S(S<double> &&) = default;
-  
+  // inline constexpr S() noexcept = default;
+  // inline ~S() = default;
+  // inline constexpr S(const S<double> &) = default;
+  // inline constexpr S(S<double> &&) = default;
 };
 
 #endif
@@ -112,10 +108,9 @@ class Y : public S<T>, public E
 template<>
 class Y<double> : public S<double>, public E
 {
-  inline constexpr Y() noexcept = default;
-  inline constexpr Y(const Y<double> &) = default;
-  inline constexpr Y(Y<double> &&) = default;
-  
+  // inline constexpr Y() noexcept = default;
+  // inline constexpr Y(const Y<double> &) = default;
+  // inline constexpr Y(Y<double> &&) = default;
 };
 
 #endif

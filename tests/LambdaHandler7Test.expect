@@ -12,6 +12,18 @@ int main()
       return fir * sec;
     }
     
+    public: using retType = int (*)(int, int);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline int __invoke(int fir, int sec)
+    {
+      return fir * sec;
+    }
+    
+    
   };
   
   int fak = std::accumulate(myVec.begin(), myVec.end(), 1, __lambda_8_57{});

@@ -26,50 +26,34 @@ struct IsClangNewerThan
 };
 //-----------------------------------------------------------------------------
 
-inline constexpr bool IsClangNewerThan7 = IsClangNewerThan<7>::value;
+// inline constexpr bool IsClangNewerThan8 = IsClangNewerThan<8>::value;
 //-----------------------------------------------------------------------------
 
 template<typename T>
 auto inline GetBeginLoc(const T& decl)
 {
-    if constexpr(IsClangNewerThan7) {
-        return decl.getBeginLoc();
-    } else {
-        return decl.getLocStart();
-    }
+    return decl.getBeginLoc();
 }
 //-----------------------------------------------------------------------------
 
 template<typename T>
 auto inline GetBeginLoc(const T* decl)
 {
-    if constexpr(IsClangNewerThan7) {
-        return decl->getBeginLoc();
-    } else {
-        return decl->getLocStart();
-    }
+    return decl->getBeginLoc();
 }
 //-----------------------------------------------------------------------------
 
 template<typename T>
 auto inline GetEndLoc(const T& decl)
 {
-    if constexpr(IsClangNewerThan7) {
-        return decl.getEndLoc();
-    } else {
-        return decl.getLocEnd();
-    }
+    return decl.getEndLoc();
 }
 //-----------------------------------------------------------------------------
 
 template<typename T>
 auto inline GetEndLoc(const T* decl)
 {
-    if constexpr(IsClangNewerThan7) {
-        return decl->getEndLoc();
-    } else {
-        return decl->getLocEnd();
-    }
+    return decl->getEndLoc();
 }
 //-----------------------------------------------------------------------------
 

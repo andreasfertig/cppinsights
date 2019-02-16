@@ -30,7 +30,6 @@
 #include "ImplicitCastHandler.h"
 #include "StaticAssertHandler.h"
 #include "TemplateHandler.h"
-#include "UserDefinedLiteralHandler.h"
 #include "version.h"
 //-----------------------------------------------------------------------------
 
@@ -66,7 +65,6 @@ public:
     , mGlobalVariableHandler{rewriter, mMatcher}
     , mImplicitCastHandler{rewriter, mMatcher}
     , mAutoStmtHandler{rewriter, mMatcher}
-    , mUserDefinedLiteralHandler{rewriter, mMatcher}
     , mFunctionDeclHandler{rewriter, mMatcher}
     {
     }
@@ -74,15 +72,14 @@ public:
     void HandleTranslationUnit(ASTContext& context) override { mMatcher.matchAST(context); }
 
 private:
-    MatchFinder               mMatcher;
-    CompilerGeneratedHandler  mCompilerGeneratedHandler;
-    StaticAssertHandler       mStaticAssertHandler;
-    TemplateHandler           mTemplateHandler;
-    GlobalVariableHandler     mGlobalVariableHandler;
-    ImplicitCastHandler       mImplicitCastHandler;
-    AutoStmtHandler           mAutoStmtHandler;
-    UserDefinedLiteralHandler mUserDefinedLiteralHandler;
-    FunctionDeclHandler       mFunctionDeclHandler;
+    MatchFinder              mMatcher;
+    CompilerGeneratedHandler mCompilerGeneratedHandler;
+    StaticAssertHandler      mStaticAssertHandler;
+    TemplateHandler          mTemplateHandler;
+    GlobalVariableHandler    mGlobalVariableHandler;
+    ImplicitCastHandler      mImplicitCastHandler;
+    AutoStmtHandler          mAutoStmtHandler;
+    FunctionDeclHandler      mFunctionDeclHandler;
 };
 //-----------------------------------------------------------------------------
 

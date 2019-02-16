@@ -89,8 +89,7 @@ struct str_view<char>
     return {};
   }
   
-  inline ~str_view() noexcept = default;
-  
+  // inline ~str_view() noexcept = default;
 };
 
 #endif

@@ -16,10 +16,9 @@ struct A<int>
 {
   void foo(int);
   
-  inline constexpr A() noexcept = default;
-  inline constexpr A(const A<int> &) = default;
-  inline constexpr A(A<int> &&) = default;
-  
+  // inline constexpr A() noexcept = default;
+  // inline constexpr A(const A<int> &) = default;
+  // inline constexpr A(A<int> &&) = default;
 };
 
 #endif
@@ -34,18 +33,16 @@ struct A<int *>
   {
     void operator()(int);
     
-    inline constexpr B() noexcept = default;
-    inline ~B() = default;
-    inline constexpr B(const A<int *>::B &) = default;
-    inline constexpr B(A<int *>::B &&) = default;
-    
+    // inline constexpr B() noexcept = default;
+    // inline ~B() = default;
+    // inline constexpr B(const A<int *>::B &) = default;
+    // inline constexpr B(A<int *>::B &&) = default;
   };
   
   A<int *>::B foo;
-  inline constexpr A() noexcept = default;
-  inline constexpr A(const A<int *> &) = default;
-  inline constexpr A(A<int *> &&) = default;
-  
+  // inline constexpr A() noexcept = default;
+  // inline constexpr A(const A<int *> &) = default;
+  // inline constexpr A(A<int *> &&) = default;
 };
 
 #endif

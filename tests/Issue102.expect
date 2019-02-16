@@ -20,7 +20,6 @@ struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
 template<>
 struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string<char>) const>
 {
-  
 };
 
 #endif
@@ -31,7 +30,6 @@ struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char>
 template<>
 struct FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string<char>) const> : public FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
 {
-  
 };
 
 #endif
@@ -42,7 +40,6 @@ struct FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string
 template<>
 struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
 {
-  
 };
 
 #endif
@@ -53,7 +50,6 @@ struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(
 template<>
 struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase<int, int>
 {
-  
 };
 
 #endif
@@ -64,7 +60,6 @@ struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase
 template<>
 struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string<char>) const>
 {
-  
 };
 
 #endif
@@ -75,7 +70,6 @@ struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char>
 template<>
 struct FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string<char>) const> : public FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
 {
-  
 };
 
 #endif
@@ -86,7 +80,6 @@ struct FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string
 template<>
 struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
 {
-  
 };
 
 #endif
@@ -97,7 +90,6 @@ struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(
 template<>
 struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase<int, int>
 {
-  
 };
 
 #endif
@@ -108,7 +100,6 @@ struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase
 template<>
 struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string<char>) const>
 {
-  
 };
 
 #endif
@@ -119,7 +110,6 @@ struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char>
 template<>
 struct FunctionArgs<std::basic_string<char> (__lambda_73_4::*)(std::basic_string<char>) const> : public FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
 {
-  
 };
 
 #endif
@@ -140,7 +130,6 @@ struct FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
   using args = tuple<std::basic_string<char>>;
   using arity = integral_constant<unsigned int, static_cast<unsigned int>(1)>;
   using result = std::basic_string<char>;
-  
 };
 
 #endif
@@ -154,7 +143,6 @@ struct FunctionArgsBase<int, int>
   using args = tuple<int>;
   using arity = integral_constant<unsigned int, static_cast<unsigned int>(1)>;
   using result = int;
-  
 };
 
 #endif
@@ -358,6 +346,19 @@ int test<int>(int && value)
       return operator+(value, " Hi!");
     }
     
+    public: using retType = std::basic_string<char> (*)(std::string);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline std::basic_string<char> __invoke(std::basic_string<char> value)
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    
   };
   
   
@@ -368,6 +369,19 @@ int test<int>(int && value)
       std::operator<<(std::cout, "This is int ");
       return i * 100;
     }
+    
+    public: using retType = int (*)(int);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline int __invoke(int i)
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
     
   };
   
@@ -396,6 +410,19 @@ int test<char const (&)[3]>(char const (&value)[3])
       return operator+(value, " Hi!");
     }
     
+    public: using retType = std::basic_string<char> (*)(std::string);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline std::basic_string<char> __invoke(std::basic_string<char> value)
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    
   };
   
   
@@ -406,6 +433,19 @@ int test<char const (&)[3]>(char const (&value)[3])
       std::operator<<(std::cout, "This is int ");
       return i * 100;
     }
+    
+    public: using retType = int (*)(int);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline int __invoke(int i)
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
     
   };
   
@@ -439,6 +479,19 @@ std::basic_string<char> test<std::basic_string<char> >(std::basic_string<char> &
       return operator+(value, " Hi!");
     }
     
+    public: using retType = std::basic_string<char> (*)(std::string);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline std::basic_string<char> __invoke(std::basic_string<char> value)
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    
   };
   
   
@@ -449,6 +502,19 @@ std::basic_string<char> test<std::basic_string<char> >(std::basic_string<char> &
       std::operator<<(std::cout, "This is int ");
       return i * 100;
     }
+    
+    public: using retType = int (*)(int);
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline int __invoke(int i)
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
     
   };
   

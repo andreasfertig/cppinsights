@@ -8,9 +8,8 @@ int main()
     }
     
     int x;
-    inline constexpr S(const S &) = default;
-    inline constexpr S(S &&) = default;
-    
+    // inline constexpr S(const S &) = default;
+    // inline constexpr S(S &&) = default;
   };
   
   S s = S();

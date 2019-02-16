@@ -6,10 +6,12 @@
  ****************************************************************************/
 
 #include "CodeGenerator.h"
+#include <algorithm>
 #include "ClangCompat.h"
 #include "DPrint.h"
 #include "InsightsBase.h"
 #include "InsightsMatchers.h"
+#include "InsightsOnce.h"
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -71,7 +73,7 @@ public:
     {
     }
 
-    void InsertArg(const Stmt* stmt) override { CodeGenerator::InsertArg(stmt); }
+    using CodeGenerator::InsertArg;
     void InsertArg(const ArrayInitIndexExpr*) override { mOutputFormatHelper.Append(mIndex); }
 };
 //-----------------------------------------------------------------------------
@@ -193,7 +195,7 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
     }
 
     if(!isBodyBraced && !isa<NullStmt>(body)) {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
     }
 
     // close range-for scope in for
@@ -234,9 +236,9 @@ void CodeGenerator::InsertArg(const DoStmt* stmt)
     }
 
     mOutputFormatHelper.Append("while");
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::No);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::No);
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -305,7 +307,7 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 
     mOutputFormatHelper.Append("switch");
 
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     InsertArg(stmt->getBody());
 
@@ -320,7 +322,7 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 void CodeGenerator::InsertArg(const WhileStmt* stmt)
 {
     mOutputFormatHelper.Append("while");
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     const auto* body = stmt->getBody();
     const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
@@ -332,7 +334,7 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
     } else {
         const bool isBodyBraced = isa<CompoundStmt>(body);
         if(!isBodyBraced) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 
@@ -393,16 +395,12 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
 
                 ofm.Append('<');
 
-                bool haveArg{false};
-                bool first{true};
+                bool      haveArg{false};
+                OnceFalse needsComma{};
                 for(const auto& arg : tmplArgs->asArray()) {
 
                     if(arg.getKind() == TemplateArgument::Integral) {
-                        if(first) {
-                            first = false;
-                        } else {
-                            ofm.Append(", ");
-                        }
+                        ofm.AppendComma(needsComma);
 
                         ofm.Append(arg.getAsIntegral());
                         haveArg = true;
@@ -429,17 +427,10 @@ void CodeGenerator::InsertArg(const UnaryExprOrTypeTraitExpr* stmt)
         const auto* argExpr = stmt->getArgumentExpr();
         const bool  needsParens{!isa<ParenExpr>(argExpr)};
 
-        if(needsParens) {
-            mOutputFormatHelper.Append('(');
-        }
+        WrapInParensIfNeeded(needsParens, [&] { InsertArg(argExpr); });
 
-        InsertArg(argExpr);
-
-        if(needsParens) {
-            mOutputFormatHelper.Append(')');
-        }
     } else {
-        mOutputFormatHelper.Append("(", GetName(stmt->getTypeOfArgument()), ")");
+        WrapInParens([&] { mOutputFormatHelper.Append(GetName(stmt->getTypeOfArgument())); });
     }
 }
 //-----------------------------------------------------------------------------
@@ -465,7 +456,7 @@ void CodeGenerator::InsertArg(const FloatingLiteral* stmt)
 void CodeGenerator::InsertArg(const CXXTypeidExpr* stmt)
 {
     mOutputFormatHelper.Append("typeid");
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+    WrapInParens([&]() {
         if(stmt->isTypeOperand()) {
             mOutputFormatHelper.Append(GetName(stmt->getType()));
         } else {
@@ -533,7 +524,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
             std::string name = GetPlainName(*declName);
 
             const std::string operatorName{"operator"};
-            if(name.find(operatorName) != std::string::npos) {
+            if(Contains(name, operatorName)) {
                 return operatorName;
             }
 
@@ -551,7 +542,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
 
     InsertArg(decompositionDeclStmt->getInit());
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
 
     for(const auto* bindingDecl : decompositionDeclStmt->bindings()) {
         if(const auto* binding = bindingDecl->getBinding()) {
@@ -583,8 +574,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
             if(holdingVarOrMemberExpr) {
                 DPrint("4444\n");
 
-                StructuredBindingsCodeGenerator structuredBindingsCodeGenerator{mOutputFormatHelper, tmpVarName};
-                CodeGenerator&                  codeGenerator = structuredBindingsCodeGenerator;
+                StructuredBindingsCodeGenerator codeGenerator{mOutputFormatHelper, tmpVarName};
                 codeGenerator.InsertArg(holdingVarOrMemberExpr);
 
                 // array decomposition
@@ -597,7 +587,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
                 TODO(bindingDecl, mOutputFormatHelper);
             }
 
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }
@@ -713,7 +703,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         }
 
         if(UseCommaInsteadOfSemi::No == mUseCommaInsteadOfSemi) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         } else {
             mOutputFormatHelper.Append(',');
         }
@@ -730,20 +720,48 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
     } else {
         InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
 
-        if(stmt->doesThisDeclarationHaveABody()) {
+        if(const auto* md = dyn_cast_or_null<CXXMethodDecl>(stmt); (md && md->isLambdaStaticInvoker())) {
+            mOutputFormatHelper.AppendNewLine();
+            const auto* Lambda = md->getParent();
+            const auto* CallOp = Lambda->getLambdaCallOperator();
+            if(Lambda->isGenericLambda() && md->isFunctionTemplateSpecialization()) {
+
+                const TemplateArgumentList* TAL            = md->getTemplateSpecializationArgs();
+                FunctionTemplateDecl*       CallOpTemplate = CallOp->getDescribedFunctionTemplate();
+                void*                       InsertPos      = nullptr;
+                FunctionDecl*               CorrespondingCallOpSpecialization =
+                    CallOpTemplate->findSpecialization(TAL->asArray(), InsertPos);
+                CallOp = cast<CXXMethodDecl>(CorrespondingCallOpSpecialization);
+            }
+
+            InsertArg(CallOp->getBody());
+            mOutputFormatHelper.AppendNewLine();
+        } else if(stmt->doesThisDeclarationHaveABody()) {
             mOutputFormatHelper.AppendNewLine();
             InsertArg(stmt->getBody());
             mOutputFormatHelper.AppendNewLine();
         } else {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const ParenListExpr* stmt)
+{
+    OnceFalse needsComma{};
+
+    for(const auto& expr : stmt->children()) {
+        mOutputFormatHelper.AppendComma(needsComma);
+
+        InsertArg(expr);
     }
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, [&]() {
+    WrapInCurlys([&]() {
         mOutputFormatHelper.IncreaseIndent();
 
         ForEachArg(stmt->inits(), [&](const auto& init) { InsertArg(init); });
@@ -755,27 +773,19 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
                     const auto v = ct->getSize().getZExtValue();
 
                     // clamp here to survive large arrays.
-                    if(100 < v) {
-                        return 100;
-                    }
-
-                    return v;
+                    return std::clamp(v, uint64_t(0), uint64_t(100));
                 }
 
                 return 0;
             }();
 
             // now fill the remaining array slots.
-            bool bFirst{0 == stmt->getNumInits()};
-            for(uint64_t i = stmt->getNumInits(); i < fullWidth; ++i) {
-                if(bFirst) {
-                    bFirst = false;
-                } else {
-                    mOutputFormatHelper.Append(", ");
-                }
+            OnceFalse needsComma{0 != stmt->getNumInits()};
+            for_each(static_cast<uint64_t>(stmt->getNumInits()), fullWidth, [&](auto) {
+                mOutputFormatHelper.AppendComma(needsComma);
 
                 InsertArg(filler);
-            }
+            });
         }
     });
 
@@ -786,17 +796,8 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
 void CodeGenerator::InsertArg(const CXXDefaultInitExpr* stmt)
 {
     const auto* subExpr = stmt->getExpr();
-    const bool  needsBraces{isa<InitListExpr>(subExpr) ? false : true};
 
-    if(needsBraces) {
-        mOutputFormatHelper.Append('{');
-    }
-
-    InsertArg(subExpr);
-
-    if(needsBraces) {
-        mOutputFormatHelper.Append('}');
-    }
+    InsertCurlysIfRequired(subExpr);
 }
 //-----------------------------------------------------------------------------
 
@@ -838,7 +839,7 @@ void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
     const auto& constructorDecl = *stmt->getConstructor();
 
     mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+    WrapInParens([&]() {
         mOutputFormatHelper.AppendParameterList(constructorDecl.parameters(), OutputFormatHelper::NameOnly::Yes);
     });
 }
@@ -850,14 +851,13 @@ void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 
     InsertArg(stmt->getCallee());
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
+    WrapInParens([&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const ParenExpr* stmt)
 {
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getSubExpr()); });
+    WrapInParens([&]() { InsertArg(stmt->getSubExpr()); });
 }
 //-----------------------------------------------------------------------------
 
@@ -906,7 +906,7 @@ void CodeGenerator::InsertArg(const ArraySubscriptExpr* stmt)
 
 void CodeGenerator::InsertArg(const ArrayInitLoopExpr* stmt)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, [&]() {
+    WrapInCurlys([&]() {
         const uint64_t size = stmt->getArraySize().getZExtValue();
 
         ForEachArg(NumberIterator(size), [&](const auto& i) {
@@ -940,7 +940,7 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
                     const TemplateArgument& Pack = Args->get(0);
 
                     ForEachArg(Pack.pack_elements(), [&](const auto& arg) {
-                        char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
+                        const char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
                         mOutputFormatHelper.Append("'", std::string{C}, "'");
                     });
 
@@ -950,8 +950,7 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
         }
     }
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
+    WrapInParens([&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
 }
 //-----------------------------------------------------------------------------
 
@@ -1022,7 +1021,7 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
         InsertArg(item);
 
         if(IsStmtRequieringSemi<IfStmt, ForStmt, DeclStmt, WhileStmt, DoStmt, CXXForRangeStmt, SwitchStmt>(item)) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }
@@ -1047,7 +1046,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
     mOutputFormatHelper.Append("if", cexpr);
 
-    WrapInParensOrCurlys(BraceKind::Parens, [&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
     const auto* body = stmt->getThen();
 
@@ -1056,7 +1055,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
     const bool isBodyBraced = isa<CompoundStmt>(body);
 
     if(!isBodyBraced && !isa<NullStmt>(body)) {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
     }
 
     // else
@@ -1078,7 +1077,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
         // an else with just a single statement seems not to carry a semi-colon at the end
         if(!needScope && !isa<CompoundStmt>(elsePart)) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
 
         if(needScope) {
@@ -1102,24 +1101,24 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
 {
     mOutputFormatHelper.Append("for");
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() {
-                             if(const auto* init = stmt->getInit()) {
-                                 InsertArg(init);
+    WrapInParens(
+        [&]() {
+            if(const auto* init = stmt->getInit()) {
+                InsertArg(init);
 
-                                 // the init-stmt carries a ; at the end plus a newline. Remove and replace it with
-                                 // a space
-                                 mOutputFormatHelper.RemoveIndentIncludingLastNewLine();
-                             } else {
-                                 mOutputFormatHelper.Append("; ");
-                             }
+                // the init-stmt carries a ; at the end plus a newline. Remove and replace it with
+                // a space
+                mOutputFormatHelper.RemoveIndentIncludingLastNewLine();
+            } else {
+                mOutputFormatHelper.Append("; ");
+            }
 
-                             InsertArg(stmt->getCond());
-                             mOutputFormatHelper.Append("; ");
+            InsertArg(stmt->getCond());
+            mOutputFormatHelper.Append("; ");
 
-                             InsertArg(stmt->getInc());
-                         },
-                         AddSpaceAtTheEnd::Yes);
+            InsertArg(stmt->getInc());
+        },
+        AddSpaceAtTheEnd::Yes);
 
     const auto* body = stmt->getBody();
     const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
@@ -1135,7 +1134,7 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
         mOutputFormatHelper.AppendNewLine();
     } else {
         if(!isa<CompoundStmt>(body) && !isa<NullStmt>(body)) {
-            mOutputFormatHelper.AppendNewLine(';');
+            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 
@@ -1160,7 +1159,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
     if(stmt->getNumPlacementArgs()) {
         /* we have a placement new */
 
-        WrapInParensOrCurlys(BraceKind::Parens, [&]() {
+        WrapInParens([&]() {
             ForEachArg(stmt->placement_arguments(), [&](const auto& placementArg) { InsertArg(placementArg); });
         });
     }
@@ -1182,7 +1181,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
 
             // In case of multi dimension the first dimension is the getArraySize() while the others are part of the
             // type included in GetName(...).
-            if(std::string::npos != name.find("[", 0)) {
+            if(Contains(name, "[")) {
                 InsertBefore(name, "[", ofm.GetString());
             } else {
                 // here we have the single dimension case, the dimension is not part of GetName, so add it.
@@ -1222,7 +1221,7 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
                 if(isa<CXXMethodDecl>(callee->getDecl())) {
                     const std::string tmpl = [&] {
                         if(const auto* tvd = dyn_cast_or_null<VarTemplateSpecializationDecl>(param1->getDecl())) {
-                            OutputFormatHelper outputFormatHelper;
+                            OutputFormatHelper outputFormatHelper{};
                             CodeGenerator      codeGenerator{outputFormatHelper};
 
                             codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
@@ -1258,11 +1257,12 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
     // operators in a namespace but outside a class so operator goes first
     if(!isCXXMethod) {
         if(callee) {
-            mOutputFormatHelper.Append(GetName(*callee), "(");
+            mOutputFormatHelper.Append(GetName(*callee));
         } else {
             InsertArg(stmt->getCallee()->IgnoreImpCasts());
-            mOutputFormatHelper.Append("(");
         }
+
+        mOutputFormatHelper.Append('(');
     }
 
     // insert the arguments
@@ -1339,15 +1339,7 @@ void CodeGenerator::InsertArg(const CXXFunctionalCastExpr* stmt)
         mOutputFormatHelper.Append(GetName(stmt->getTypeAsWritten()));
     }
 
-    if(needsParens) {
-        mOutputFormatHelper.Append('(');
-    }
-
-    InsertArg(stmt->getSubExpr());
-
-    if(needsParens) {
-        mOutputFormatHelper.Append(')');
-    }
+    WrapInParensIfNeeded(needsParens, [&] { InsertArg(stmt->getSubExpr()); });
 }
 //-----------------------------------------------------------------------------
 
@@ -1476,23 +1468,19 @@ static std::string getValueOfValueInit(const QualType& t)
         }
 
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
-        tt->dump();
-        DPrint("scalar: %d\n", type->isScalarType());
         const auto&       elementType{tt->getElementType()};
         const std::string elementTypeInitValue{getValueOfValueInit(elementType)};
-        const auto        size{tt->getSize().getZExtValue()};
+        const auto        size{std::clamp(tt->getSize().getZExtValue(), uint64_t(0), uint64_t(100))};
         std::string       ret{};
 
-        bool first{true};
-        for(uint64_t i = 0; i < size; ++i) {
-            if(first) {
-                first = false;
-            } else {
+        OnceFalse needsComma{};
+        for_each(static_cast<uint64_t>(0), size, [&](auto) {
+            if(needsComma) {
                 ret.append(", ");
             }
 
             ret.append(elementTypeInitValue);
-        }
+        });
 
         return ret;
     }
@@ -1531,16 +1519,16 @@ void CodeGenerator::InsertArg(const CXXCatchStmt* stmt)
 {
     mOutputFormatHelper.Append(" catch");
 
-    WrapInParensOrCurlys(BraceKind::Parens,
-                         [&]() {
-                             if(!stmt->getCaughtType().isNull()) {
-                                 mOutputFormatHelper.Append(GetTypeNameAsParameter(
-                                     stmt->getCaughtType(), stmt->getExceptionDecl()->getNameAsString()));
-                             } else {
-                                 mOutputFormatHelper.Append("...");
-                             }
-                         },
-                         AddSpaceAtTheEnd::Yes);
+    WrapInParens(
+        [&]() {
+            if(!stmt->getCaughtType().isNull()) {
+                mOutputFormatHelper.Append(
+                    GetTypeNameAsParameter(stmt->getCaughtType(), stmt->getExceptionDecl()->getNameAsString()));
+            } else {
+                mOutputFormatHelper.Append("...");
+            }
+        },
+        AddSpaceAtTheEnd::Yes);
 
     InsertArg(stmt->getHandlerBlock());
 }
@@ -1586,7 +1574,7 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         mOutputFormatHelper.Append(GetName(stmt->getUnderlyingType()));
     }
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
 }
 //-----------------------------------------------------------------------------
 
@@ -1605,16 +1593,19 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
     initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
     CXXConstructorDecl* cxxInheritedCtorDecl{nullptr};
 
+    if(not stmt->isUserProvided()) {
+        mOutputFormatHelper.Append("// ");
+    }
+
     // travers the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the name
     // and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         CodeGenerator codeGenerator{initOutputFormatHelper};
-        bool          first = true;
+        OnceTrue      first{};
 
         for(const auto* init : ctor->inits()) {
             initOutputFormatHelper.AppendNewLine();
             if(first) {
-                first = false;
                 initOutputFormatHelper.Append(": ");
             } else {
                 initOutputFormatHelper.Append(", ");
@@ -1650,12 +1641,41 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
 
     mOutputFormatHelper.Append(initOutputFormatHelper.GetString());
 
-    if(stmt->doesThisDeclarationHaveABody()) {
+    if(isa<CXXConversionDecl>(stmt)) {
+        if(stmt->getParent()->isLambda() && not stmt->doesThisDeclarationHaveABody()) {
+            mOutputFormatHelper.AppendNewLine();
+            WrapInCurlys([&]() {
+                mOutputFormatHelper.AppendNewLine();
+
+                mOutputFormatHelper.AppendNewLine(
+                    "  return ", stmt->getParent()->getLambdaStaticInvoker()->getNameAsString(), ";");
+            });
+        }
+    }
+
+    if(stmt->doesThisDeclarationHaveABody() && not stmt->isLambdaStaticInvoker()) {
         mOutputFormatHelper.AppendNewLine();
         InsertArg(stmt->getBody());
         mOutputFormatHelper.AppendNewLine();
+
+    } else if(stmt->isLambdaStaticInvoker()) {
+        mOutputFormatHelper.AppendNewLine();
+        const auto* lambda = stmt->getParent();
+        const auto* callOp = lambda->getLambdaCallOperator();
+        if(lambda->isGenericLambda() && stmt->isFunctionTemplateSpecialization()) {
+            const TemplateArgumentList* tal            = stmt->getTemplateSpecializationArgs();
+            FunctionTemplateDecl*       callOpTemplate = callOp->getDescribedFunctionTemplate();
+            void*                       InsertPos      = nullptr;
+            FunctionDecl*               CorrespondingCallOpSpecialization =
+                callOpTemplate->findSpecialization(tal->asArray(), InsertPos);
+            callOp = cast<CXXMethodDecl>(CorrespondingCallOpSpecialization);
+        }
+
+        InsertArg(callOp->getBody());
+        mOutputFormatHelper.AppendNewLine();
+
     } else {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
     }
 
     mOutputFormatHelper.AppendNewLine();
@@ -1682,21 +1702,21 @@ void CodeGenerator::InsertArg(const EnumDecl* stmt)
 
     mOutputFormatHelper.AppendNewLine();
 
-    WrapInParensOrCurlys(BraceKind::Curlys,
-                         [&]() {
-                             mOutputFormatHelper.IncreaseIndent();
-                             mOutputFormatHelper.AppendNewLine();
+    WrapInCurlys(
+        [&]() {
+            mOutputFormatHelper.IncreaseIndent();
+            mOutputFormatHelper.AppendNewLine();
 
-                             ForEachArg(stmt->enumerators(), [&](const auto* value) { InsertArg(value); });
+            ForEachArg(stmt->enumerators(), [&](const auto* value) { InsertArg(value); });
 
-                             InsertArg(stmt->getBody());
+            InsertArg(stmt->getBody());
 
-                             mOutputFormatHelper.DecreaseIndent();
-                             mOutputFormatHelper.AppendNewLine();
-                         },
-                         AddSpaceAtTheEnd::No);
+            mOutputFormatHelper.DecreaseIndent();
+            mOutputFormatHelper.AppendNewLine();
+        },
+        AddSpaceAtTheEnd::No);
 
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -1716,9 +1736,32 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 
 void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
-    mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
+    if(stmt->isMutable()) {
+        mOutputFormatHelper.Append("mutable ");
+    }
 
     if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(stmt->getParent())) {
+        std::string name{GetName(*stmt)};
+        if(cxxRecordDecl->isLambda()) {
+            llvm::DenseMap<const VarDecl*, FieldDecl*> Captures{};
+            FieldDecl*                                 ThisCapture{};
+
+            cxxRecordDecl->getCaptureFields(Captures, ThisCapture);
+
+            if(stmt == ThisCapture) {
+                name = "__this";
+            } else {
+                for(const auto& [key, value] : Captures) {
+                    if(value == stmt) {
+                        name = GetName(*key);
+                        break;
+                    }
+                }
+            }
+        }
+
+        mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), name));
+
         // Keep the inline init for aggregates, as we do not see it somewhere else.
         if(cxxRecordDecl->isAggregate()) {
             const auto* initializer = stmt->getInClassInitializer();
@@ -1730,6 +1773,8 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
                 InsertArg(initializer);
             }
         }
+    } else {
+        mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
     }
 
     mOutputFormatHelper.AppendNewLine(";");
@@ -1969,7 +2014,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     // skip classes/struct's without a definition
     if(!stmt->hasDefinition()) {
-        mOutputFormatHelper.AppendNewLine(';');
+        mOutputFormatHelper.AppendSemiNewLine();
         return;
     }
 
@@ -1988,18 +2033,129 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.OpenScope();
 
-    bool firstRecordDecl{true};
+    OnceTrue   firstRecordDecl{};
+    OnceTrue   firstDecl{};
+    Decl::Kind formerKind{};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) && firstRecordDecl) {
-            firstRecordDecl = false;
+            continue;
+        }
+
+        // Insert a newline when the decl kind changes. This for example, inserts a newline when after a FieldDecl we
+        // see a CXXMethodDecl.
+        if(not firstDecl && (d->getKind() != formerKind)) {
+            // mOutputFormatHelper.AppendNewLine();
+        }
+
+        if((stmt->isLambda() && isa<CXXDestructorDecl>(d))) {
             continue;
         }
 
         InsertArg(d);
+        formerKind = d->getKind();
     }
 
-    mOutputFormatHelper.CloseScopeWithSemi();
-    mOutputFormatHelper.AppendNewLine();
+    if(stmt->isLambda()) {
+        const LambdaCallerType lambdaCallerType = mLambdaStack.back().callerType();
+        const bool             ctorRequired{stmt->captures_begin() != stmt->captures_end()};
+
+        if(ctorRequired) {
+            mOutputFormatHelper.Append("public: ", GetName(*stmt), "(");
+        }
+
+        std::string ctorInitializerList{};
+        std::string ctorInitializers{"{"};
+
+        OnceTrue bFirst{};
+
+        auto addToInits = [&](std::string name, const FieldDecl* fd, bool isThis, const Expr* expr) {
+            if(bFirst) {
+                ctorInitializerList.append(": ");
+            } else {
+                mOutputFormatHelper.Append(", ");
+                ctorInitializerList.append("\n, ");
+                ctorInitializers.append(", ");
+            }
+
+            if(isThis) {
+                ctorInitializerList.append(StrCat("__", name, "{", "_", name, "}\n"));
+
+            } else {
+                ctorInitializerList.append(StrCat(name, "{", "_", name, "}"));
+            }
+
+            if(not isThis && expr) {
+                OutputFormatHelper ofm{};
+                CodeGenerator      codeGenerator{ofm, mLambdaStack};
+                codeGenerator.InsertArg(expr);
+                ctorInitializers.append(ofm.GetString());
+            } else {
+                if(isThis && not fd->getType()->isPointerType()) {
+                    ctorInitializers.append("*");
+                }
+
+                ctorInitializers.append(name);
+            }
+
+            mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat("_", name)));
+        };
+
+        llvm::DenseMap<const VarDecl*, FieldDecl*> Captures{};
+        FieldDecl*                                 ThisCapture{};
+
+        stmt->getCaptureFields(Captures, ThisCapture);
+
+        const auto* captureInits = mLambdaExpr->capture_init_begin();
+        const auto* captureInit  = *captureInits;
+
+        // Check if it captures this
+        if(ThisCapture) {
+            addToInits("this", ThisCapture, true, captureInit);
+        } else {
+            // Find the corresponding capture in the DenseMap. The DenseMap seems to be change its order each time.
+            // Hence we use \c captures() to keep the order stable. While using \c Captures to generate the code as
+            // it carries the better type infos.
+            for(const auto& c : mLambdaExpr->captures()) {
+                captureInit = *captureInits;
+                ++captureInits;
+
+                if(not c.capturesVariable()) {
+                    continue;
+                }
+
+                for(const auto& [key, value] : Captures) {
+                    if(key == c.getCapturedVar()) {
+                        addToInits(GetName(*key), value, false, captureInit);
+                        break;
+                    }
+                }
+            }
+        }
+
+        ctorInitializers.append("}");
+
+        // generate the ctor only if it is required, i.e. we have captures. This is in fact a trick to get compiliing
+        // code out of it. The compiler itself does not generate a constructor in many many cases.
+        if(ctorRequired) {
+            mOutputFormatHelper.AppendNewLine(")");
+            mOutputFormatHelper.AppendNewLine(ctorInitializerList);
+            mOutputFormatHelper.AppendNewLine("{}");
+        }
+
+        // close the class scope
+        mOutputFormatHelper.CloseScope();
+
+        if((LambdaCallerType::VarDecl != lambdaCallerType) && (LambdaCallerType::CallExpr != lambdaCallerType)) {
+            mOutputFormatHelper.Append(" ", GetLambdaName(*stmt), ctorInitializers);
+        } else {
+            mLambdaStack.back().inits().append(ctorInitializers);
+        }
+
+    } else {
+        mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
+    }
+
+    mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -2039,7 +2195,7 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 
 void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
 {
-    mOutputFormatHelper.AppendNewLine(';');
+    mOutputFormatHelper.AppendSemiNewLine();
 }
 //-----------------------------------------------------------------------------
 
@@ -2118,7 +2274,7 @@ void CodeGenerator::FormatCast(const std::string castName,
     const std::string castDestTypeText{
         StrCat(GetName(castDestType), ((isCastToBase && !castDestType->isAnyPointerType()) ? "&" : ""))};
 
-    mOutputFormatHelper.Append(StrCat(castName, "<", castDestTypeText, ">("));
+    mOutputFormatHelper.Append(castName, "<", castDestTypeText, ">(");
     InsertArg(subExpr);
     mOutputFormatHelper.Append(')');
 }
@@ -2126,7 +2282,7 @@ void CodeGenerator::FormatCast(const std::string castName,
 
 void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
 {
-    const bool needParens = [&]() {
+    const bool needsParens = [&]() {
         if(const auto* expr = dyn_cast_or_null<Expr>(stmt))
             if(const auto* dest = dyn_cast_or_null<UnaryOperator>(expr->IgnoreImplicit())) {
                 if(dest->getOpcode() == clang::UO_Deref) {
@@ -2137,15 +2293,7 @@ void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
         return false;
     }();
 
-    if(needParens) {
-        mOutputFormatHelper.Append('(');
-    }
-
-    InsertArg(stmt);
-
-    if(needParens) {
-        mOutputFormatHelper.Append(')');
-    }
+    WrapInParensIfNeeded(needsParens, [&] { InsertArg(stmt); });
 }
 //-----------------------------------------------------------------------------
 
@@ -2290,54 +2438,13 @@ const char* CodeGenerator::GetBuiltinTypeSuffix(const BuiltinType::Kind& kind)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertMethod(const FunctionDecl*  d,
-                                 OutputFormatHelper&  outputFormatHelper,
-                                 const CXXMethodDecl& md,
-                                 bool                 capturesThisByCopy)
-{
-    LambdaCodeGenerator lambdaCodeGenerator{outputFormatHelper, mLambdaStack};
-    lambdaCodeGenerator.mCapturedThisAsCopy = capturesThisByCopy;
-    CodeGenerator& codeGenerator{lambdaCodeGenerator};
-
-    codeGenerator.InsertAccessModifierAndNameWithReturnType(*d);
-    outputFormatHelper.AppendNewLine();
-
-    codeGenerator.InsertArg(md.getBody());
-    outputFormatHelper.AppendNewLine();
-}
-//-----------------------------------------------------------------------------
-
-/// \brief Get a correct type for an array.
-///
-/// This is a special case for lambdas. The QualType of the VarDecl we are looking at could be a plain type. But if
-/// we capture via reference, obviously we need to a a reference. This is why the more general version does not work
-/// here. Probably needs improvement.
-static std::string GetCaptureTypeNameAsParameter(const QualType& t, const std::string& varName)
-{
-    std::string typeName = GetName(t);
-
-    if(t->isArrayType()) {
-        InsertBefore(typeName, "[", StrCat("(&", varName, ")"));
-    }
-
-    return typeName;
-}
-//-----------------------------------------------------------------------------
-
 void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lambdaHelper)
 {
-    const LambdaCallerType lambdaCallerType   = lambdaHelper.callerType();
-    OutputFormatHelper&    outputFormatHelper = lambdaHelper.buffer();
+    OutputFormatHelper& outputFormatHelper = lambdaHelper.buffer();
 
     outputFormatHelper.AppendNewLine();
-
-    const std::string lambdaTypeName{GetLambdaName(*lambda->getLambdaClass())};
-    outputFormatHelper.AppendNewLine(kwClassSpace, lambdaTypeName);
-    outputFormatHelper.OpenScope();
-
-    const auto& callOp                = *lambda->getCallOperator();
-    const auto& lambdaClass           = *lambda->getLambdaClass();
-    const bool  isCapturingThisByCopy = [&] {
+    LambdaCodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
+    codeGenerator.mCapturedThisAsCopy = [&] {
         for(const auto& c : lambda->captures()) {
             const auto captureKind = c.getCaptureKind();
 
@@ -2349,205 +2456,8 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
         return false;
     }();
 
-    if(lambda->isGenericLambda()) {
-        const auto conversions = llvm::make_range(lambdaClass.conversion_begin(), lambdaClass.conversion_end());
-        for(auto&& conversion : conversions) {
-            CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
-            codeGenerator.InsertArg(conversion->getAsFunction()->getDescribedFunctionTemplate());
-
-            DPrint("-----\n");
-        }
-
-        CodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
-        codeGenerator.InsertArg(lambdaClass.getLambdaCallOperator()->getDescribedFunctionTemplate());
-
-        if(lambdaClass.getLambdaStaticInvoker()) {
-            for(const auto* iv :
-                lambdaClass.getLambdaStaticInvoker()->getDescribedFunctionTemplate()->specializations()) {
-                DPrint("invoker:\n");
-
-                InsertMethod(iv, outputFormatHelper, *lambdaClass.getLambdaCallOperator(), isCapturingThisByCopy);
-            }
-        }
-
-    } else {
-        bool       haveConversionOperator{false};
-        const auto conversions = llvm::make_range(lambdaClass.conversion_begin(), lambdaClass.conversion_end());
-        for(auto&& conversion : conversions) {
-            const auto* func = conversion->getAsFunction();
-
-            if(const auto* cxxmd = dyn_cast_or_null<CXXMethodDecl>(func)) {
-                /* looks like a conversion operator is (often) there but sometimes undeduced. e.g. still has return
-                 * type auto and no body. We do not want these functions. */
-                if(cxxmd->hasBody()) {
-                    haveConversionOperator = true;
-                    InsertMethod(func, outputFormatHelper, *cxxmd, isCapturingThisByCopy);
-                }
-            }
-
-            DPrint("-----\n");
-        }
-
-        InsertMethod(&callOp, outputFormatHelper, callOp, isCapturingThisByCopy);
-
-        if(haveConversionOperator && lambdaClass.getLambdaStaticInvoker()) {
-            InsertMethod(lambdaClass.getLambdaStaticInvoker(),
-                         outputFormatHelper,
-                         *lambdaClass.getLambdaCallOperator(),
-                         isCapturingThisByCopy);
-        }
-    }
-
-    /*
-     *   class xx
-     *   {
-     *      x _var1{var1}
-     *      ...
-     *
-     *      RET operator()() MUTABLE
-     *      {
-     *        BODY
-     *      }
-     *
-     *   };
-     *
-     */
-
-    std::string ctor{StrCat("public: ", lambdaTypeName, "(")};
-    std::string ctorInits{": "};
-    std::string inits("{");
-
-    if(0 != lambda->capture_size()) {
-        outputFormatHelper.AppendNewLine();
-        outputFormatHelper.Append("private:");
-    }
-
-    DPrint("captures\n");
-    bool        first{true};
-    bool        ctorRequired{false};
-    const auto* captureInits = lambda->capture_init_begin();
-    for(const auto& c : lambda->captures()) {
-        const auto* captureInit = *captureInits;
-        ++captureInits;
-        ctorRequired = true;
-
-        if(!c.capturesVariable() && !c.capturesThis()) {
-            // This also catches VLA captures
-            if(!c.capturesVLAType()) {
-                Error(captureInit, "no capture var\n");
-            }
-            continue;
-        }
-
-        if(first) {
-            first = false;
-            outputFormatHelper.AppendNewLine();
-        } else {
-            ctor.append(", ");
-            inits.append(", ");
-            ctorInits.append("\n, ");
-        }
-
-        const auto* capturedVar = c.getCapturedVar();
-        const auto& varType     = (c.capturesThis()) ? captureInit->getType() : capturedVar->getType();
-
-        const auto& clsVarType = [&]() {
-            // http://eel.is/c++draft/expr.prim.lambda#capture-10 states, that implicitly captured variables are
-            // captured by copied. This also applies for named captures which are not prefixed with an ampersand.
-            // The clang internal type carries the ampersand, which is stripped in the following statement.
-            if((LCK_ByCopy == c.getCaptureKind()) && varType->isLValueReferenceType()) {
-                return varType->getPointeeType();
-            }
-
-            return varType;
-        }();
-
-        const std::string varNamePlain = [&]() {
-            if(c.capturesThis()) {
-                return std::string{"this"};
-            }
-
-            return GetName(*capturedVar);
-        }();
-
-        DPrint("plain name: %s\n", varNamePlain);
-
-        const std::string varName = [&]() {
-            if(c.capturesThis()) {
-                return StrCat("__", varNamePlain);
-            }
-
-            return varNamePlain;
-        }();
-
-        const auto captureKind = c.getCaptureKind();
-
-        // If we initialize by copy we can assign a variable: [a=b[1]], get this assigned variable (b[1]) and not a in
-        // this case.
-        if(!c.capturesThis() && capturedVar->hasInit() && (captureKind == LCK_ByCopy)) {
-            OutputFormatHelper ofm{};
-            CodeGenerator      codeGenerator{ofm, mLambdaStack};
-            codeGenerator.InsertArg(captureInit);
-            inits.append(ofm.GetString());
-        } else {
-            inits.append(StrCat(((c.getCaptureKind() == LCK_StarThis) ? "*" : ""), varNamePlain));
-        }
-
-        const std::string varTypeName     = GetCaptureTypeNameAsParameter(clsVarType, varNamePlain);
-        const std::string ctorVarTypeName = GetCaptureTypeNameAsParameter(varType, StrCat("_", varNamePlain));
-
-        DPrint("%s\n", varTypeName);
-
-        ctor.append(ctorVarTypeName);
-
-        outputFormatHelper.Append(varTypeName);
-
-        switch(captureKind) {
-            case LCK_This: break;
-            case LCK_StarThis: break;
-            case LCK_ByCopy: break;
-            case LCK_VLAType: break;  //  unreachable
-            case LCK_ByRef:
-                /* varTypeName already carries the & in case we capture a reference by reference, we need to skip it
-                 * in case of an array */
-                if(!varType->isReferenceType() && !varType->isArrayType()) {
-                    ctor.append("&");
-                    outputFormatHelper.Append("&");
-                }
-                break;
-        }
-
-        if(!varType->isArrayType()) {
-            ctor.append(StrCat(" _", varName));
-            outputFormatHelper.AppendNewLine(" ", varName, ";");
-        } else {
-            outputFormatHelper.AppendNewLine(';');
-        }
-
-        ctorInits.append(StrCat(varName, "{_", varName, "}"));
-    }
-
-    ctor.append(")");
-    inits.append("}");
-
-    if(ctorRequired) {
-        outputFormatHelper.AppendNewLine("");
-        outputFormatHelper.AppendNewLine(ctor);
-        outputFormatHelper.AppendNewLine(ctorInits);
-        outputFormatHelper.AppendNewLine("{}");
-    }
-
-    // close the class scope
-    outputFormatHelper.CloseScope();
-
-    if((LambdaCallerType::VarDecl != lambdaCallerType) && (LambdaCallerType::CallExpr != lambdaCallerType)) {
-        outputFormatHelper.Append(" ", GetLambdaName(*lambda), inits);
-    } else {
-        mLambdaStack.back().inits().append(inits);
-    }
-
-    outputFormatHelper.AppendNewLine(';');
-    outputFormatHelper.AppendNewLine();
+    codeGenerator.mLambdaExpr = lambda;
+    codeGenerator.InsertArg(lambda->getLambdaClass());
 }
 //-----------------------------------------------------------------------------
 
@@ -2557,13 +2467,19 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 {
     bool        isLambda{false};
     bool        isFirstCxxMethodDecl{true};
-    bool        isCXXMethodDecl{isa<CXXMethodDecl>(&decl)};
     const auto* methodDecl{dyn_cast_or_null<CXXMethodDecl>(&decl)};
+    bool        isCXXMethodDecl{nullptr != methodDecl};
     const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
 
     if(methodDecl) {
         isLambda             = methodDecl->getParent()->isLambda();
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
+
+#if 0
+        if(not methodDecl->isUserProvided()) {
+            mOutputFormatHelper.Append("// ");
+        }
+#endif
     }
 
     if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda || cxxInheritedCtorDecl) {
@@ -2665,7 +2581,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
                     outputFormatHelper.Append('~');
                 }
 
-                outputFormatHelper.Append(methodDecl->getParent()->getNameAsString());
+                outputFormatHelper.Append(GetName(*methodDecl->getParent()));
             }
 
         } else {
@@ -2748,6 +2664,31 @@ void CodeGenerator::WrapInParensOrCurlys(const BraceKind braceKind, T&& lambda, 
     if(AddSpaceAtTheEnd::Yes == addSpaceAtTheEnd) {
         mOutputFormatHelper.Append(' ');
     }
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    if(needsParens) {
+        WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+    } else {
+        lambda();
+    }
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    WrapInParensOrCurlys(BraceKind::Curlys, std::move(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 

@@ -7,6 +7,17 @@ void foo()
     {
     }
     
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+    }
+    
+    
   } __lambda_2_1{};
   
   __lambda_2_1.operator()();

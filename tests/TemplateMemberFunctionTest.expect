@@ -70,6 +70,18 @@ int main()
       printf("hello\n");
     }
     
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("hello\n");
+    }
+    
+    
   } __lambda_33_10{};
   
   f.Do(__lambda_33_10);
@@ -81,6 +93,18 @@ int main()
       printf("hello\n");
     }
     
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("hello\n");
+    }
+    
+    
   } __lambda_35_18{};
   
   f.DoOther<1>(__lambda_35_18);
@@ -91,6 +115,18 @@ int main()
     {
       printf("hello\n");
     }
+    
+    public: using retType = void (*)();
+    inline /*constexpr */ operator retType () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("hello\n");
+    }
+    
     
   } __lambda_37_21{};
   

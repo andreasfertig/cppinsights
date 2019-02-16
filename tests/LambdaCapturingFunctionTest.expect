@@ -1,0 +1,33 @@
+#include <cstdio>
+
+void Dummy(int x)
+{
+  printf("%d\n", x);
+}
+
+
+int main()
+{
+  using D = void (*)(int);
+  using FuncPtr_11 = D;
+  FuncPtr_11 d = Dummy;
+  d(2);
+    
+  class __lambda_15_14
+  {
+    D & d;
+    public: inline /*constexpr */ void operator()() const
+    {
+      d(3);
+    }
+    
+    public: __lambda_15_14(D & _d)
+    : d{_d}
+    {}
+    
+  };
+  
+  __lambda_15_14 l = __lambda_15_14{d};
+  l.operator()();
+}
+
