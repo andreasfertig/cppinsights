@@ -314,7 +314,7 @@ if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
   set_target_properties(insights PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 endif()
 
-
+install( TARGETS insights RUNTIME DESTINATION bin )
 
 # additional includes we need when building outside the llvm-folder
 if (BUILD_INSIGHTS_OUTSIDE_LLVM)
