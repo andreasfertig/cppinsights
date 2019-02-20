@@ -92,8 +92,16 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
             .bind("func"),
         this);
 
+    // match typical use where a class template is defined and it is used later.
     matcher.addMatcher(classTemplateSpecializationDecl(unless(isExpansionInSystemHeader()),
                                                        hasParent(classTemplateDecl().bind("decl")))
+                           .bind("class"),
+                       this);
+
+    // special case, where a class template is defined and somewhere else we request an explicit instantiation
+    matcher.addMatcher(classTemplateSpecializationDecl(unless(anyOf(isExpansionInSystemHeader(),
+                                                                    hasParent(classTemplateDecl()),
+                                                                    isExplicitTemplateSpecialization())))
                            .bind("class"),
                        this);
 
@@ -122,7 +130,8 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl, result);
         const auto*        clsTmplDecl        = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
-        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(clsTmplDecl), result);
+        const auto         endOfCond =
+            FindLocationAfterSemi(clsTmplDecl ? GetEndLoc(clsTmplDecl) : GetEndLoc(clsTmplSpecDecl), result);
 
         InsertIndentedText(endOfCond, outputFormatHelper);
 
