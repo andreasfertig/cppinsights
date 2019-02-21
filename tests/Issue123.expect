@@ -1,0 +1,51 @@
+#define INSIGHTS_USE_TEMPLATE
+
+template<typename T>
+struct Person
+{
+	int age, heightInInches;
+	T distanceTraveled = T(); //default value
+	float hairLength, GPA;
+	unsigned int SATScore;
+
+	T run(T speed, bool startWithLeftFoot);
+};
+
+template<typename T>
+T Person<T>::run(T speed, bool left )
+{
+	return speed + (left ? 1 : 0);
+}
+
+
+
+/* First instantiated from: Issue123.cpp:20 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Person<int>
+{
+  int age;
+  int heightInInches;
+  int distanceTraveled = int();
+  float hairLength;
+  float GPA;
+  unsigned int SATScore;
+  int run(int speed, bool left)
+  {
+    return speed + (left ? 1 : 0);
+  }
+  
+  // inline Person() noexcept = default;
+  // inline constexpr Person(const Person<int> &) = default;
+  // inline constexpr Person(Person<int> &&) = default;
+};
+
+#endif
+;
+
+int main()
+{
+  Person<int> f = Person<int>();
+  int x = f.run(2, true);
+}
+

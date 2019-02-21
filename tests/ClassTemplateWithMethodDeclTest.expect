@@ -1,0 +1,37 @@
+#define INSIGHTS_USE_TEMPLATE
+
+template<typename T>
+struct Foo
+{
+	void bar();
+};
+
+/* First instantiated from: ClassTemplateWithMethodDeclTest.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Foo<int>
+{
+  void bar()
+  {
+  }
+  
+  // inline constexpr Foo() noexcept = default;
+  // inline constexpr Foo(const Foo<int> &) = default;
+  // inline constexpr Foo(Foo<int> &&) = default;
+};
+
+#endif
+
+
+template<typename T>
+void Foo<T>::bar()
+{
+}
+
+int main()
+{
+  Foo<int> f = Foo<int>();
+  f.bar();
+}
+
+
