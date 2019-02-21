@@ -1,0 +1,41 @@
+#define INSIGHTS_USE_TEMPLATE
+
+void g()
+{
+}
+
+
+template<typename T>
+void (&&f(T))()
+{
+  return g;
+}
+
+/* First instantiated from: Issue124_2Tmpl.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void (&&f<long>(long))()
+{
+  return g;
+}
+#endif
+
+
+/* First instantiated from: Issue124_2Tmpl.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void (&&f<int>(int))()
+{
+  return g;
+}
+#endif
+
+
+int main()
+{
+  long l;
+  f(l);
+  int i;
+  f(i);
+}
+
