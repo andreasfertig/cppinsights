@@ -11,14 +11,13 @@ struct Person
 	T run(T speed, bool startWithLeftFoot);
 };
 
-template<T>
-T Person<T>::run(T speed, bool left)
+template<typename T>
+T Person<T>::run(T speed, bool left )
 {
-  return speed + (left ? 1 : 0);
+	return speed + (left ? 1 : 0);
 }
 
 
-template class Person<int>;
 
 /* First instantiated from: Issue123.cpp:20 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -42,7 +41,7 @@ struct Person<int>
 };
 
 #endif
-
+;
 
 int main()
 {

@@ -129,11 +129,14 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         }
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl, result);
-        const auto*        clsTmplDecl        = result.Nodes.getNodeAs<ClassTemplateDecl>("decl");
-        const auto         endOfCond =
-            FindLocationAfterSemi(clsTmplDecl ? GetEndLoc(clsTmplDecl) : GetEndLoc(clsTmplSpecDecl), result);
 
-        InsertIndentedText(endOfCond, outputFormatHelper);
+        if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl")) {
+            const auto endOfCond = FindLocationAfterSemi(GetEndLoc(clsTmplDecl), result);
+            InsertIndentedText(endOfCond, outputFormatHelper);
+
+        } else {  // explicit specialization, we have to remove the specialization
+            mRewrite.ReplaceText(clsTmplSpecDecl->getSourceRange(), outputFormatHelper.GetString());
+        }
 
     } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*vd, result);

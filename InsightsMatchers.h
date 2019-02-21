@@ -76,6 +76,14 @@ static inline bool IsMatchingCast(const CastKind kind)
 }
 //-----------------------------------------------------------------------------
 
+/// \brief Matches AST nodes which are a templated CXXMethodDecl
+AST_MATCHER(CXXMethodDecl, isTemplated)
+{
+    SILENCE;
+
+    return Node.isTemplated();
+}
+
 /// \brief Matches AST nodes with a matching cast kind for our ImplicitCastExpr
 AST_MATCHER(ImplicitCastExpr, hasMatchingCast)
 {

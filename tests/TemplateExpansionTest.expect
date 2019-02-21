@@ -104,7 +104,17 @@ void foo2()
   
 
   template<template<typename> class> class testTemplate { };
-  template class testTemplate<A>;
+  
+
+/* First instantiated from: TemplateExpansionTest.cpp:24 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class testTemplate<A>
+{
+};
+
+#endif
+;
 
   template<template<typename> class ...T> class C {
     B<T...> testTemplateExpansion;
