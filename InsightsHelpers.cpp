@@ -347,8 +347,8 @@ static bool TestPlainSubType(const QualType& t)
 
 std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified)
 {
-    const bool isFunctionPointer = TestPlainSubType<LValueReferenceType, FunctionProtoType>(t);
-    const bool isArrayRef        = TestPlainSubType<LValueReferenceType, ArrayType>(t);
+    const bool isFunctionPointer = TestPlainSubType<ReferenceType, FunctionProtoType>(t);
+    const bool isArrayRef        = TestPlainSubType<ReferenceType, ArrayType>(t);
     // Special case for Issue81, auto returns an array-ref and to catch auto deducing an array (Issue106)
     const bool isAutoType             = dyn_cast_or_null<AutoType>(t.getTypePtrOrNull());
     const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
@@ -371,18 +371,28 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         InsertBefore(typeName, "[", StrCat(space, varName));
 
     } else if(isArrayRef) {
-        if(Contains(typeName, "(&")) {
-            InsertAfter(typeName, "(&", varName);
+        const bool        isRValueRef{TestPlainSubType<RValueReferenceType, ArrayType>(t)};
+        const std::string contains{isRValueRef ? "(&&" : "(&"};
+
+        if(Contains(typeName, contains)) {
+            InsertAfter(typeName, contains, varName);
         } else {
-            InsertBefore(typeName, "&[", "(");
-            InsertAfter(typeName, "(&", StrCat(varName, ")"));
+            const std::string insertBefore{isRValueRef ? "&&[" : "&["};
+
+            InsertBefore(typeName, insertBefore, "(");
+            InsertAfter(typeName, contains, StrCat(varName, ")"));
         }
+
     } else if(isFunctionPointer) {
-        if(Contains(typeName, "(&")) {
-            InsertAfter(typeName, "(&", varName);
+        const bool        isRValueRef{TestPlainSubType<RValueReferenceType, FunctionProtoType>(t)};
+        const std::string contains{isRValueRef ? "(&&" : "(&"};
+
+        if(Contains(typeName, contains)) {
+            InsertAfter(typeName, contains, varName);
         } else {
             typeName += StrCat(" ", varName);
         }
+
     } else if(isPointerToArray) {
         if(Contains(typeName, "(*")) {
             InsertAfter(typeName, "(*", varName);
