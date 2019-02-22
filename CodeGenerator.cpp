@@ -2602,6 +2602,11 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     } else {
         outputFormatHelper.AppendParameterList(decl.parameters());
     }
+
+    if(decl.isVariadic()) {
+        outputFormatHelper.Append(", ...");
+    }
+
     outputFormatHelper.Append(")");
 
     if(!isa<CXXConstructorDecl>(decl) && !isa<CXXDestructorDecl>(decl)) {

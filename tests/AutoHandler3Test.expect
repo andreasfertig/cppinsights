@@ -26,7 +26,7 @@ void f(T, ...) {
 /* First instantiated from: AutoHandler3Test.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void f<T>(T)
+void f<T>(T, ...)
 {
 }
 #endif
