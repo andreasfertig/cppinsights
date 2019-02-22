@@ -1,0 +1,17 @@
+template<typename T>
+void foo(T, ...) {}
+
+/* First instantiated from: Issue128.cpp:5 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void foo<int>(int, ...)
+{
+}
+#endif
+
+
+int main()
+{
+  foo(1, 2.0);
+}
+
