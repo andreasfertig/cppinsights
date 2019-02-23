@@ -23,7 +23,6 @@ CompilerGeneratedHandler::CompilerGeneratedHandler(Rewriter& rewrite, MatchFinde
 : InsightsBase(rewrite)
 {
     static const auto compilerProvided = allOf(unless(anyOf(isUserProvided(),
-                                                            isDeleted(),
                                                             isExpansionInSystemHeader(),
                                                             isTemplate,
                                                             hasAncestor(functionDecl()),
@@ -38,12 +37,11 @@ void CompilerGeneratedHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* methodDecl = result.Nodes.getNodeAs<CXXMethodDecl>("method")) {
         OutputFormatHelper outputFormatHelper{};
-        outputFormatHelper.Append("/* ");
 
         CodeGenerator codeGenerator{outputFormatHelper};
         codeGenerator.InsertAccessModifierAndNameWithReturnType(*methodDecl);
 
-        outputFormatHelper.AppendNewLine("; */");
+        outputFormatHelper.AppendNewLine(";");
 
         // add all compiler generated methods at the end of the class
         const auto* recrodDecl = result.Nodes.getNodeAs<CXXRecordDecl>("record");

@@ -2472,6 +2472,10 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
 
     if(methodDecl) {
+        if(not methodDecl->isUserProvided()) {
+            mOutputFormatHelper.Append("// ");
+        }
+
         isLambda             = methodDecl->getParent()->isLambda();
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
 
