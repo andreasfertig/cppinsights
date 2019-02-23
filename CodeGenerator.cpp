@@ -2630,6 +2630,10 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     }
 
     mOutputFormatHelper.Append(GetNoExcept(decl));
+
+    if(decl.isPure()) {
+        mOutputFormatHelper.Append(" = 0");
+    }
 }
 //-----------------------------------------------------------------------------
 

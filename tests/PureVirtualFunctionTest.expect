@@ -1,0 +1,34 @@
+class Test
+{
+public:
+    virtual void Pure() = 0;
+    
+// public: inline constexpr Test & operator=(const Test &);
+// public: inline constexpr Test & operator=(Test &&);
+// public: inline ~Test();
+// public: inline constexpr Test() noexcept;
+// public: inline constexpr Test(const Test &);
+// public: inline constexpr Test(Test &&);
+};
+
+class West : public Test
+{
+public:
+    inline virtual void Pure()
+    {
+    }
+    
+// public: inline constexpr West & operator=(const West &);
+// public: inline constexpr West & operator=(West &&);
+// public: inline ~West();
+// public: inline constexpr West() noexcept;
+// public: inline constexpr West(const West &);
+// public: inline constexpr West(West &&);
+};
+
+int main()
+{
+  West w = West();
+  w.Pure();
+}
+
