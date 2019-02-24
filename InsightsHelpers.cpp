@@ -108,6 +108,18 @@ std::string GetLambdaName(const CXXRecordDecl& lambda)
 }
 //-----------------------------------------------------------------------------
 
+std::string BuildRetTypeName(const Decl& decl)
+{
+    static const std::string retTypePrefix{"retType_"};
+    const auto&              sm       = GetSM(decl);
+    const auto               locBegin = GetBeginLoc(decl);
+    const auto               lineNo   = sm.getSpellingLineNumber(locBegin);
+    const auto               columnNo = sm.getSpellingColumnNumber(locBegin);
+
+    return StrCat(retTypePrefix, lineNo, "_", columnNo);
+}
+//-----------------------------------------------------------------------------
+
 const QualType GetDesugarType(const QualType& QT)
 {
     if(QT.getTypePtrOrNull()) {

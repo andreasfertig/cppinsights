@@ -73,6 +73,9 @@ static inline bool IsInvalidLocation(const T& t, Args... args)
 }
 //-----------------------------------------------------------------------------
 
+std::string BuildRetTypeName(const Decl& decl);
+//-----------------------------------------------------------------------------
+
 #define SKIP_MACRO_LOCATION(...)                                                                                       \
     {                                                                                                                  \
         const bool isMacro{IsMacroLocation(__VA_ARGS__) || IsInvalidLocation(__VA_ARGS__)};                            \

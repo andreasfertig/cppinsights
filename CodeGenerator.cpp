@@ -373,7 +373,7 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
             if(const auto* rd = m->getParent(); rd && rd->isLambda()) {
                 skipTemplateArgs = true;
 
-                return StrCat("operator ", GetLambdaName(*rd), "::retType");
+                return StrCat("operator ", GetLambdaName(*rd), "::", BuildRetTypeName(*rd));
             }
         }
 
@@ -2497,7 +2497,8 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
     // types of conversion decls can be invalid to type at this place. So introduce a using
     if(isa<CXXConversionDecl>(decl)) {
-        mOutputFormatHelper.AppendNewLine("using retType = ", GetName(GetDesugarReturnType(decl)), ";");
+        mOutputFormatHelper.AppendNewLine(
+            "using ", BuildRetTypeName(decl), " = ", GetName(GetDesugarReturnType(decl)), ";");
     }
 
     if(!decl.isFunctionTemplateSpecialization() || (isCXXMethodDecl && isFirstCxxMethodDecl)) {
@@ -2621,7 +2622,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
     if(!isa<CXXConstructorDecl>(decl) && !isa<CXXDestructorDecl>(decl)) {
         if(isa<CXXConversionDecl>(decl)) {
-            mOutputFormatHelper.Append("operator retType (");
+            mOutputFormatHelper.Append("operator ", BuildRetTypeName(decl), " (");
             mOutputFormatHelper.Append(outputFormatHelper.GetString());
         } else {
             const auto t = GetDesugarReturnType(decl);
