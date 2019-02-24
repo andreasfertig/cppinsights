@@ -7,33 +7,34 @@ import subprocess
 import re
 import argparse
 import tempfile
+import datetime
 #------------------------------------------------------------------------------
 
 mypath = '.'
 
 
-def testCompare(tmpFileName, stdout, expectFile, f, args):
+def testCompare(tmpFileName, stdout, expectFile, f, args, time):
     expect = open(expectFile, 'r').read()
 
     if args['docker']:
         expect = re.sub( r'instantiated from: .*?.cpp:', r'instantiated from: x.cpp:', expect)
 
     if stdout != expect:
-        print '[FAILED] %s' %(f)
+        print '[FAILED] %s - %s' %(f, time)
         cmd = ['/usr/bin/diff', expectFile, tmpFileName]
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
 
         print stdout
     else:
-        print '[PASSED] %s' %(f)
+        print '[PASSED] %s - %s' %(f, time)
         return True
 
     return False
 #------------------------------------------------------------------------------
 
-def testCompile(tmpFileName, f, args, fileName):
-    cmd = [args['cxx'], '-std=c++1z', '-m64', '-c', tmpFileName]
+def testCompile(tmpFileName, f, args, fileName, cppStd):
+    cmd = [args['cxx'], cppStd, '-m64', '-c', tmpFileName]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
@@ -98,12 +99,14 @@ def main():
     parser.add_argument('--docker',         help='Run tests in docker container', action='store_true')
     parser.add_argument('--docker-image',   help='Docker image name', default='cppinsights-runtime')
     parser.add_argument('--failure-is-ok',  help='Failing tests are ok', default=False, action='store_true')
+    parser.add_argument('--std',            help='C++ Standard to used', default='c++1z')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = vars(parser.parse_args())
 
     insightsPath  = args['insights']
     remainingArgs = args['args']
     bFailureIsOk  = args['failure_is_ok']
+    defaultCppStd = '-std=%s'% (args['std'])
 
     if 0 == len(remainingArgs):
         cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp'))]
@@ -119,9 +122,16 @@ def main():
 
     defaultIncludeDirs = getDefaultIncludeDirs(args['cxx'])
 
+    regEx = re.compile('.*cmdline:(.*)')
     for f in sorted(cppFiles):
         fileName   = os.path.splitext(f)[0]
         expectFile = os.path.join(mypath, fileName + '.expect')
+        cppStd     = defaultCppStd
+
+        fileHeader = open(f, 'r').readline().strip()
+        m = regEx.match(fileHeader)
+        if None != m:
+            cppStd = m.group(1)
 
         if not os.path.isfile(expectFile):
             print 'Missing expect for: %s' %(f)
@@ -134,8 +144,10 @@ def main():
                 p   = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate(input=data)
         else:
-                cmd = [insightsPath, f, '--', '-std=c++1z', '-m64'] + defaultIncludeDirs
-                p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                cmd   = [insightsPath, f, '--', cppStd, '-m64'] + defaultIncludeDirs
+                begin = datetime.datetime.now()
+                p     = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                end   = datetime.datetime.now()
                 stdout, stderr = p.communicate()
 
         if 0 != p.returncode:
@@ -181,9 +193,9 @@ def main():
                 # write the data to the temp file
                 tmp.write(stdout)
 
-            equal = testCompare(tmpFileName, stdout, expectFile, f, args)
+            equal = testCompare(tmpFileName, stdout, expectFile, f, args, end-begin)
 
-            if testCompile(tmpFileName, f, args, fileName) and equal:
+            if testCompile(tmpFileName, f, args, fileName, cppStd) and equal:
                 filesPassed += 1
 
         finally:
