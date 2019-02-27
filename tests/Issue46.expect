@@ -6,8 +6,8 @@ class __lambda_1_10
     return 5;
   }
   
-  public: using retType = int (*)();
-  inline /*constexpr */ operator retType () const
+  public: using retType_1_10 = int (*)();
+  inline /*constexpr */ operator retType_1_10 () const
   {
     return __invoke;
   };

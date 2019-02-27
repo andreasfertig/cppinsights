@@ -13,8 +13,8 @@ struct Foo
     }
     
     
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
 };
  
 int main()

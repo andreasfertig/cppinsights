@@ -20,7 +20,9 @@ struct Movable
   
   Movable(const Movable&) = delete;
   Movable& operator=(const Movable&) = delete;
-/* public: inline ~Movable() noexcept; */
+// public: inline Movable(const Movable &);
+// public: inline Movable & operator=(const Movable &);
+// public: inline ~Movable() noexcept;
 };
 
 int main()

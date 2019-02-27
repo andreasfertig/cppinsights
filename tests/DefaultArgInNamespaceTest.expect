@@ -21,8 +21,8 @@ class West
       return 2;
     }
     
-/* public: inline constexpr West(const Test::West &); */
-/* public: inline constexpr West(Test::West &&); */
+// public: inline constexpr West(const Test::West &);
+// public: inline constexpr West(Test::West &&);
 };
 }
 

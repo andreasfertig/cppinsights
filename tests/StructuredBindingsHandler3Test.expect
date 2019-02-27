@@ -39,9 +39,9 @@ struct tuple_element<2, constant::Q>
 
 
 namespace constant {
-  struct Q {/* public: inline constexpr Q() noexcept; */
-  /* public: inline constexpr Q(const constant::Q &) noexcept; */
-  /* public: inline constexpr Q(constant::Q &&); */
+  struct Q {// public: inline constexpr Q() noexcept;
+  // public: inline constexpr Q(const constant::Q &) noexcept;
+  // public: inline constexpr Q(constant::Q &&);
   };
   template<int N> constexpr int get(Q &&) { return N * N; }
   

@@ -28,8 +28,8 @@ private:
 
     int mX;
 
-/* private: inline Singleton() noexcept; */
-/* public: inline constexpr Singleton(const Singleton &); */
+// private: inline Singleton() noexcept;
+// public: inline constexpr Singleton(const Singleton &);
 };
 
 
@@ -76,8 +76,8 @@ public:
 private:
     int mX;
 
-/* public: inline Bingleton() noexcept; */
-/* public: inline constexpr Bingleton(const Bingleton &); */
+// public: inline Bingleton() noexcept;
+// public: inline constexpr Bingleton(const Bingleton &);
 };
 
 

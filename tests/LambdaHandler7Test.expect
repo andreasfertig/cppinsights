@@ -12,8 +12,8 @@ int main()
       return fir * sec;
     }
     
-    public: using retType = int (*)(int, int);
-    inline /*constexpr */ operator retType () const
+    public: using retType_8_57 = int (*)(int, int);
+    inline /*constexpr */ operator retType_8_57 () const
     {
       return __invoke;
     };

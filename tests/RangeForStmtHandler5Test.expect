@@ -14,9 +14,9 @@ public:
      return this->size > 0 ? &this->data[this->size - 1] : nullptr;
    }
    
-/* public: inline MyArrayWrapper() noexcept; */
-/* public: inline constexpr MyArrayWrapper(const MyArrayWrapper &); */
-/* public: inline constexpr MyArrayWrapper(MyArrayWrapper &&); */
+// public: inline MyArrayWrapper() noexcept;
+// public: inline constexpr MyArrayWrapper(const MyArrayWrapper &);
+// public: inline constexpr MyArrayWrapper(MyArrayWrapper &&);
 };
 
 

@@ -1,4 +1,4 @@
-.tmp.cpp:42:7: error: call to deleted constructor of 'Movable'
+.tmp.cpp:44:7: error: call to deleted constructor of 'Movable'
     : x{_x}
       ^~~~~
 .tmp.cpp:21:3: note: 'Movable' has been explicitly marked deleted here

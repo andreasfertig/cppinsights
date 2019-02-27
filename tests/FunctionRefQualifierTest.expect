@@ -12,10 +12,10 @@ struct Foo {
       printf("rvalue\n");
     }
     
-/* public: inline constexpr Foo() noexcept; */
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
-/* public: inline ~Foo() noexcept; */
+// public: inline constexpr Foo() noexcept;
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
+// public: inline ~Foo() noexcept;
 };
 
 int main()

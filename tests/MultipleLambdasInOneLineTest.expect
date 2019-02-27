@@ -10,8 +10,8 @@ int main()
       printf("Hello ");
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_5_3 = void (*)();
+    inline /*constexpr */ operator retType_5_3 () const
     {
       return __invoke;
     };
@@ -32,8 +32,8 @@ int main()
       printf("world");
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_5_33 = void (*)();
+    inline /*constexpr */ operator retType_5_33 () const
     {
       return __invoke;
     };

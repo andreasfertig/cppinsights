@@ -38,7 +38,7 @@ public:
     return *this;
   }
   
-/* public: inline constexpr X(const X &); */
+// public: inline constexpr X(const X &);
 };
 
 struct V {
@@ -53,11 +53,11 @@ struct V {
   
   
 
-/* public: inline constexpr V(const V &); */
-/* public: inline constexpr V(V &&); */
+// public: inline constexpr V(const V &);
+// public: inline constexpr V(V &&);
 };
 
-struct Y { int x, y; /* public: inline ~Y() noexcept; */
+struct Y { int x, y; // public: inline ~Y() noexcept;
 };
 
 void takes_y(Y y);

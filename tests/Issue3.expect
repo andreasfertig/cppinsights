@@ -12,8 +12,8 @@ void x()
         {
         }
         
-        public: using retType = void (*)();
-        inline /*constexpr */ operator retType () const
+        public: using retType_4_5 = void (*)();
+        inline /*constexpr */ operator retType_4_5 () const
         {
           return __invoke;
         };
@@ -28,8 +28,8 @@ void x()
       __lambda_4_5{};
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_3_12 = void (*)();
+    inline /*constexpr */ operator retType_3_12 () const
     {
       return __invoke;
     };
@@ -43,8 +43,8 @@ void x()
         {
         }
         
-        public: using retType = void (*)();
-        inline /*constexpr */ operator retType () const
+        public: using retType_4_5 = void (*)();
+        inline /*constexpr */ operator retType_4_5 () const
         {
           return __invoke;
         };

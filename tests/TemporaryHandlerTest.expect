@@ -3,34 +3,34 @@ using namespace std;
 
 class A
     {
-    /* public: inline constexpr A() noexcept; */
-    /* public: inline constexpr A(const A &); */
-    /* public: inline constexpr A(A &&); */
-    /* public: inline ~A() noexcept; */
+    // public: inline constexpr A() noexcept;
+    // public: inline constexpr A(const A &);
+    // public: inline constexpr A(A &&);
+    // public: inline ~A() noexcept;
     };
 
 class B
     {
     public:
-        using retType = A;
-        inline operator retType () const
+        using retType_11_9 = A;
+        inline operator retType_11_9 () const
         {
           return A();
         }
         
-    /* public: inline constexpr B() noexcept; */
-    /* public: inline ~B() noexcept; */
-    /* public: inline constexpr B(const B &); */
-    /* public: inline constexpr B(B &&); */
+    // public: inline constexpr B() noexcept;
+    // public: inline ~B() noexcept;
+    // public: inline constexpr B(const B &);
+    // public: inline constexpr B(B &&);
     };
 
 class C
     : public B
     {
-    /* public: inline constexpr C() noexcept; */
-    /* public: inline constexpr C(const C &); */
-    /* public: inline constexpr C(C &&); */
-    /* public: inline ~C() noexcept; */
+    // public: inline constexpr C() noexcept;
+    // public: inline constexpr C(const C &);
+    // public: inline constexpr C(C &&);
+    // public: inline ~C() noexcept;
     };
 
 void foo(const A &)

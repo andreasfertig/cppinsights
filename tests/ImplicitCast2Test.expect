@@ -8,15 +8,15 @@ void IntegralToBoolean(bool b)
 
 
 // CK_UserDefinedConversion
-struct A { using retType = int;
-           inline operator retType ()
+struct A { using retType_5_12 = int;
+           inline operator retType_5_12 ()
            {
              return 2;
            }
-            /* public: inline constexpr A() noexcept; */
-/* public: inline constexpr A(const A &); */
-/* public: inline constexpr A(A &&); */
-/* public: inline ~A() noexcept; */
+            // public: inline constexpr A() noexcept;
+// public: inline constexpr A(const A &);
+// public: inline constexpr A(A &&);
+// public: inline ~A() noexcept;
 }; 
 
 int main()

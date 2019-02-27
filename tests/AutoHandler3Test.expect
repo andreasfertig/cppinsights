@@ -1,7 +1,7 @@
 struct S { void f();
-            /* public: inline ~S() noexcept; */
+            // public: inline ~S() noexcept;
 };
-struct T {/* public: inline ~T() noexcept; */
+struct T {// public: inline ~T() noexcept;
 };
 
 template <typename T>

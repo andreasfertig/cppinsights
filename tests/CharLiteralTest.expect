@@ -30,8 +30,8 @@ struct Foo<int>
   // inline constexpr Foo(const Foo<int> & v) noexcept = default;
   inline constexpr Foo(int v);
   
-  using retType = int;
-  inline constexpr operator retType () const
+  using retType_12_5 = int;
+  inline constexpr operator retType_12_5 () const
   {
     return this->raw;
   }
@@ -57,8 +57,8 @@ struct Foo<char>
   // inline constexpr Foo(const Foo<char> & v) = default;
   inline constexpr Foo(char v);
   
-  using retType = char;
-  inline constexpr operator retType () const;
+  using retType_12_5 = char;
+  inline constexpr operator retType_12_5 () const;
   
   // inline constexpr Foo<char> & operator=(const Foo<char> & rhs) = default;
   inline Foo<char> & operator=(char v)
@@ -115,10 +115,10 @@ public:
 private:
     Char mData[1024];
     Int  mLength;
-/* public: inline constexpr Test(const Test &); */
-/* public: inline constexpr Test(Test &&); */
-/* public: inline constexpr Test & operator=(Test &&); */
-/* public: inline Test() noexcept; */
+// public: inline constexpr Test(const Test &);
+// public: inline constexpr Test(Test &&);
+// public: inline constexpr Test & operator=(Test &&);
+// public: inline Test() noexcept;
 };
 
 int main()

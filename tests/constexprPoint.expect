@@ -31,8 +31,8 @@
    
  private:
    double mX, mY;
- /* public: inline constexpr Point(const Point &); */
- /* public: inline constexpr Point(Point &&); */
+ // public: inline constexpr Point(const Point &);
+ // public: inline constexpr Point(Point &&);
  };
 
 

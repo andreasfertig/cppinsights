@@ -16,8 +16,8 @@ int main()
       int x = mine::x;
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_11_5 = void (*)();
+    inline /*constexpr */ operator retType_11_5 () const
     {
       return __invoke;
     };

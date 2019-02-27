@@ -1593,10 +1593,6 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
     initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
     CXXConstructorDecl* cxxInheritedCtorDecl{nullptr};
 
-    if(not stmt->isUserProvided()) {
-        mOutputFormatHelper.Append("// ");
-    }
-
     // travers the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the name
     // and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
@@ -2478,12 +2474,6 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
         isLambda             = methodDecl->getParent()->isLambda();
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
-
-#if 0
-        if(not methodDecl->isUserProvided()) {
-            mOutputFormatHelper.Append("// ");
-        }
-#endif
     }
 
     if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda || cxxInheritedCtorDecl) {

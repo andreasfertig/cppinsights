@@ -28,8 +28,8 @@ struct A
     
 
     int v[10];
-/* public: inline constexpr A(const A &); */
-/* public: inline constexpr A(A &&); */
+// public: inline constexpr A(const A &);
+// public: inline constexpr A(A &&);
 };
 
 
@@ -80,8 +80,8 @@ struct B
 
 
     int v[10];
-/* public: inline constexpr B(const B &); */
-/* public: inline constexpr B(B &&); */
+// public: inline constexpr B(const B &);
+// public: inline constexpr B(B &&);
 };
 
 int * begin(A & v)

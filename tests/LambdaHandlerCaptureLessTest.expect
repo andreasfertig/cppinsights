@@ -9,8 +9,8 @@ int main()
     {
       return a + static_cast<int>(b);
     }
-    public: using retType = int (*)(int, char);
-    inline /*constexpr */ operator retType () const
+    public: using retType_4_28 = int (*)(int, char);
+    inline /*constexpr */ operator retType_4_28 () const
     {
       return __invoke;
     }
@@ -22,7 +22,7 @@ int main()
   } __lambda_4_28{};
   
   using FuncPtr_4 = int (*)(int, char);
-  FuncPtr_4 fp = static_cast<int (*)(int, char)>(__lambda_4_28.operator __lambda_4_28::retType());
+  FuncPtr_4 fp = static_cast<int (*)(int, char)>(__lambda_4_28.operator __lambda_4_28::retType_4_28());
 }
 
 

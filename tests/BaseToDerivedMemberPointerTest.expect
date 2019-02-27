@@ -1,17 +1,17 @@
 class Base
 {
 
-/* public: inline constexpr Base() noexcept; */
-/* public: inline ~Base(); */
-/* public: inline constexpr Base(const Base &); */
-/* public: inline constexpr Base(Base &&); */
+// public: inline constexpr Base() noexcept;
+// public: inline ~Base();
+// public: inline constexpr Base(const Base &);
+// public: inline constexpr Base(Base &&);
 };
 
 class Derived : public Base
 {
-/* public: inline constexpr Derived() noexcept; */
-/* public: inline constexpr Derived(const Derived &); */
-/* public: inline constexpr Derived(Derived &&); */
+// public: inline constexpr Derived() noexcept;
+// public: inline constexpr Derived(const Derived &);
+// public: inline constexpr Derived(Derived &&);
 };
 
 

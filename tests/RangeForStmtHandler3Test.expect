@@ -60,10 +60,10 @@
         return false;
       }
       
-    /* public: inline ~null_sentinal_t() noexcept; */
-    /* public: inline constexpr null_sentinal_t(); */
-    /* public: inline constexpr null_sentinal_t(const null_sentinal_t &) noexcept; */
-    /* public: inline constexpr null_sentinal_t(null_sentinal_t &&); */
+    // public: inline ~null_sentinal_t() noexcept;
+    // public: inline constexpr null_sentinal_t();
+    // public: inline constexpr null_sentinal_t(const null_sentinal_t &) noexcept;
+    // public: inline constexpr null_sentinal_t(null_sentinal_t &&);
     };
 
 template<class Char>

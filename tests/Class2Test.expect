@@ -52,8 +52,8 @@ public:
     }
     
  
-  using retType = int;
-  inline operator retType ()
+  using retType_40_3 = int;
+  inline operator retType_40_3 ()
   {
     return this->mV;
   }
@@ -61,7 +61,7 @@ public:
 
 private:
     int mV;
-/* public: inline ~Test() noexcept; */
+// public: inline ~Test() noexcept;
 };
 
 
@@ -69,9 +69,10 @@ struct S
 {
     Test count;
     
-/* public: inline S(S &); */
-/* public: inline S & operator=(S &&); */
-/* public: inline S() noexcept(false); */
+// public: inline S(S &);
+// public: inline constexpr S(S &&);
+// public: inline S & operator=(S &&);
+// public: inline S() noexcept(false);
 };
 
 int main()
