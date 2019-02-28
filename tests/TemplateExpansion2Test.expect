@@ -54,16 +54,16 @@ namespace details {
 
 class B
 {
-/* public: inline constexpr B() noexcept; */
-/* public: inline ~B(); */
-/* public: inline constexpr B(const B &); */
-/* public: inline constexpr B(B &&); */
+// public: inline constexpr B() noexcept;
+// public: inline ~B();
+// public: inline constexpr B(const B &);
+// public: inline constexpr B(B &&);
 };
 
-class E{/* public: inline constexpr E() noexcept; */
-/* public: inline ~E(); */
-/* public: inline constexpr E(const E &); */
-/* public: inline constexpr E(E &&); */
+class E{// public: inline constexpr E() noexcept;
+// public: inline ~E();
+// public: inline constexpr E(const E &);
+// public: inline constexpr E(E &&);
 };
 
 template<typename T>

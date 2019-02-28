@@ -24,8 +24,8 @@ private:
 
     friend void ChangePrivate(Foo &);
     ;
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
 };
 
 void ChangePrivate(Foo & i)

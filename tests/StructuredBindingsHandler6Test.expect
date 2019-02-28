@@ -99,9 +99,9 @@ public:
     }
     #endif
     
-/* public: inline constexpr Point(const Point &) noexcept; */
-/* public: inline constexpr Point(Point &&); */
-/* public: inline ~Point() noexcept; */
+// public: inline constexpr Point(const Point &) noexcept;
+// public: inline constexpr Point(Point &&);
+// public: inline ~Point() noexcept;
 };
 
 int main()

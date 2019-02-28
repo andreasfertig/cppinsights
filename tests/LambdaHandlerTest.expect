@@ -59,8 +59,8 @@ int main()
       printf("%d\n", 1);
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_24_20 = void (*)();
+    inline /*constexpr */ operator retType_24_20 () const
     {
       return __invoke;
     };

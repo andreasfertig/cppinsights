@@ -346,8 +346,8 @@ int test<int>(int && value)
       return operator+(value, " Hi!");
     }
     
-    public: using retType = std::basic_string<char> (*)(std::string);
-    inline /*constexpr */ operator retType () const
+    public: using retType_73_4 = std::basic_string<char> (*)(std::string);
+    inline /*constexpr */ operator retType_73_4 () const
     {
       return __invoke;
     };
@@ -370,8 +370,8 @@ int test<int>(int && value)
       return i * 100;
     }
     
-    public: using retType = int (*)(int);
-    inline /*constexpr */ operator retType () const
+    public: using retType_74_4 = int (*)(int);
+    inline /*constexpr */ operator retType_74_4 () const
     {
       return __invoke;
     };
@@ -410,8 +410,8 @@ int test<char const (&)[3]>(char const (&value)[3])
       return operator+(value, " Hi!");
     }
     
-    public: using retType = std::basic_string<char> (*)(std::string);
-    inline /*constexpr */ operator retType () const
+    public: using retType_73_4 = std::basic_string<char> (*)(std::string);
+    inline /*constexpr */ operator retType_73_4 () const
     {
       return __invoke;
     };
@@ -434,8 +434,8 @@ int test<char const (&)[3]>(char const (&value)[3])
       return i * 100;
     }
     
-    public: using retType = int (*)(int);
-    inline /*constexpr */ operator retType () const
+    public: using retType_74_4 = int (*)(int);
+    inline /*constexpr */ operator retType_74_4 () const
     {
       return __invoke;
     };
@@ -479,8 +479,8 @@ std::basic_string<char> test<std::basic_string<char> >(std::basic_string<char> &
       return operator+(value, " Hi!");
     }
     
-    public: using retType = std::basic_string<char> (*)(std::string);
-    inline /*constexpr */ operator retType () const
+    public: using retType_73_4 = std::basic_string<char> (*)(std::string);
+    inline /*constexpr */ operator retType_73_4 () const
     {
       return __invoke;
     };
@@ -503,8 +503,8 @@ std::basic_string<char> test<std::basic_string<char> >(std::basic_string<char> &
       return i * 100;
     }
     
-    public: using retType = int (*)(int);
-    inline /*constexpr */ operator retType () const
+    public: using retType_74_4 = int (*)(int);
+    inline /*constexpr */ operator retType_74_4 () const
     {
       return __invoke;
     };

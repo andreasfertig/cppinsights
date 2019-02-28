@@ -28,8 +28,8 @@ private:
 
     int mX;
 
-/* private: inline Singleton() noexcept; */
-/* public: inline constexpr Singleton(const Singleton &); */
+// private: inline Singleton() noexcept;
+// public: inline constexpr Singleton(const Singleton &);
 };
 
 
@@ -76,8 +76,8 @@ public:
 private:
     int mX;
 
-/* public: inline Bingleton() noexcept; */
-/* public: inline constexpr Bingleton(const Bingleton &) noexcept; */
+// public: inline Bingleton() noexcept;
+// public: inline constexpr Bingleton(const Bingleton &) noexcept;
 };
 
 
@@ -103,8 +103,8 @@ int main()
       return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
     }
     
-    public: using retType = Bingleton (*)(bool);
-    inline /*constexpr */ operator retType () const
+    public: using retType_52_14 = Bingleton (*)(bool);
+    inline /*constexpr */ operator retType_52_14 () const
     {
       return __invoke;
     };
@@ -150,8 +150,8 @@ int main()
       return &*reinterpret_cast<Bingleton*>(__bb);
     }
     
-    public: using retType = Bingleton *(*)(bool);
-    inline /*constexpr */ operator retType () const
+    public: using retType_62_14 = Bingleton *(*)(bool);
+    inline /*constexpr */ operator retType_62_14 () const
     {
       return __invoke;
     };

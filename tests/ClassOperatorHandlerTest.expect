@@ -73,9 +73,9 @@ public:
 
 private:
     int mX;
-/* public: inline constexpr Test(const Test &) noexcept; */
-/* public: inline constexpr Test(Test &&) noexcept; */
-/* public: inline ~Test() noexcept; */
+// public: inline constexpr Test(const Test &) noexcept;
+// public: inline constexpr Test(Test &&) noexcept;
+// public: inline ~Test() noexcept;
 };
 
 class Fest
@@ -101,8 +101,8 @@ public:
 
 private:
     int mX;
-/* public: inline constexpr Fest(const Fest &); */
-/* public: inline constexpr Fest(Fest &&); */
+// public: inline constexpr Fest(const Fest &);
+// public: inline constexpr Fest(Fest &&);
 };
 
 
@@ -139,8 +139,8 @@ public:
 
 private:
     int mX;
-/* public: inline constexpr Fest(const Hello::Bello::Fest &); */
-/* public: inline constexpr Fest(Hello::Bello::Fest &&); */
+// public: inline constexpr Fest(const Hello::Bello::Fest &);
+// public: inline constexpr Fest(Hello::Bello::Fest &&);
 };
 
 inline bool operator<(const Hello::Bello::Fest & LHS, const Hello::Bello::Fest & RHS)

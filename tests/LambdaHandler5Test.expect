@@ -7,8 +7,8 @@ int main()
     {
     }
     
-    public: using retType = auto (*)() -> void;
-    inline /*constexpr */ operator retType () const
+    public: using retType_4_5 = auto (*)() -> void;
+    inline /*constexpr */ operator retType_4_5 () const
     {
       return __invoke;
     };
@@ -29,8 +29,8 @@ int main()
       1 * 2;
     }
     
-    public: using retType = auto (*)() -> void;
-    inline /*constexpr */ operator retType () const
+    public: using retType_7_5 = auto (*)() -> void;
+    inline /*constexpr */ operator retType_7_5 () const
     {
       return __invoke;
     };
@@ -54,8 +54,8 @@ int main()
       x = x + y;
     }
     
-    public: using retType = void (*)(int &, int &);
-    inline /*constexpr */ operator retType () const
+    public: using retType_13_5 = void (*)(int &, int &);
+    inline /*constexpr */ operator retType_13_5 () const
     {
       return __invoke;
     };

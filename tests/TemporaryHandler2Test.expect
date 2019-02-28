@@ -11,11 +11,11 @@ public:
     
     void modify();
     
-/* public: inline constexpr X(const X &); */
-/* public: inline constexpr X(X &&); */
-/* public: inline ~X() noexcept; */
-/* public: inline X & operator=(const X &); */
-/* public: inline X & operator=(X &&) noexcept; */
+// public: inline constexpr X(const X &);
+// public: inline constexpr X(X &&);
+// public: inline ~X() noexcept;
+// public: inline X & operator=(const X &);
+// public: inline X & operator=(X &&) noexcept;
 };
 
 X::X(int ii)
@@ -79,7 +79,7 @@ public:
       std::operator<<(std::cout, "Base dtor").operator<<(std::endl);
     }
     
-/* public: inline constexpr Base(const Base &); */
+// public: inline constexpr Base(const Base &);
 };
 
 class Foo : public Base
@@ -91,7 +91,7 @@ public:
       std::operator<<(std::cout, "Foo dtor").operator<<(std::endl);
     }
     
-/* public: inline constexpr Foo(const Foo &); */
+// public: inline constexpr Foo(const Foo &);
 };
 
 Base return_base()
@@ -122,7 +122,7 @@ struct S {
   {
   }
    // User defined destructor makes it non-trivial.
-/* public: inline constexpr S(const S &); */
+// public: inline constexpr S(const S &);
 };
 void test()
 {

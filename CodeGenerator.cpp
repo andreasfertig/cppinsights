@@ -373,7 +373,7 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
             if(const auto* rd = m->getParent(); rd && rd->isLambda()) {
                 skipTemplateArgs = true;
 
-                return StrCat("operator ", GetLambdaName(*rd), "::retType");
+                return StrCat("operator ", GetLambdaName(*rd), "::", BuildRetTypeName(*rd));
             }
         }
 
@@ -1593,10 +1593,6 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
     initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
     CXXConstructorDecl* cxxInheritedCtorDecl{nullptr};
 
-    if(not stmt->isUserProvided()) {
-        mOutputFormatHelper.Append("// ");
-    }
-
     // travers the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the name
     // and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
@@ -2472,14 +2468,12 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
 
     if(methodDecl) {
-        isLambda             = methodDecl->getParent()->isLambda();
-        isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
-
-#if 0
         if(not methodDecl->isUserProvided()) {
             mOutputFormatHelper.Append("// ");
         }
-#endif
+
+        isLambda             = methodDecl->getParent()->isLambda();
+        isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
     }
 
     if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || isLambda || cxxInheritedCtorDecl) {
@@ -2493,7 +2487,8 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
     // types of conversion decls can be invalid to type at this place. So introduce a using
     if(isa<CXXConversionDecl>(decl)) {
-        mOutputFormatHelper.AppendNewLine("using retType = ", GetName(GetDesugarReturnType(decl)), ";");
+        mOutputFormatHelper.AppendNewLine(
+            "using ", BuildRetTypeName(decl), " = ", GetName(GetDesugarReturnType(decl)), ";");
     }
 
     if(!decl.isFunctionTemplateSpecialization() || (isCXXMethodDecl && isFirstCxxMethodDecl)) {
@@ -2530,6 +2525,12 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
         if(methodDecl->isVolatile()) {
             mOutputFormatHelper.Append(kwVolatileSpace);
+        }
+
+        if(const auto* ctorDecl = dyn_cast_or_null<CXXConstructorDecl>(methodDecl)) {
+            if(isFirstCxxMethodDecl && ctorDecl->isExplicit()) {
+                mOutputFormatHelper.Append("explicit ");
+            }
         }
     }
 
@@ -2611,7 +2612,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
     if(!isa<CXXConstructorDecl>(decl) && !isa<CXXDestructorDecl>(decl)) {
         if(isa<CXXConversionDecl>(decl)) {
-            mOutputFormatHelper.Append("operator retType (");
+            mOutputFormatHelper.Append("operator ", BuildRetTypeName(decl), " (");
             mOutputFormatHelper.Append(outputFormatHelper.GetString());
         } else {
             const auto t = GetDesugarReturnType(decl);
@@ -2630,6 +2631,10 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     }
 
     mOutputFormatHelper.Append(GetNoExcept(decl));
+
+    if(decl.isPure()) {
+        mOutputFormatHelper.Append(" = 0");
+    }
 }
 //-----------------------------------------------------------------------------
 

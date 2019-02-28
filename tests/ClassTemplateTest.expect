@@ -40,9 +40,9 @@ public:
       return /* static_cast<Foo<int> *>(this)-> */ Mo();
     }
     
-/* public: inline constexpr Bar() noexcept; */
-/* public: inline constexpr Bar(const Bar &); */
-/* public: inline constexpr Bar(Bar &&); */
+// public: inline constexpr Bar() noexcept;
+// public: inline constexpr Bar(const Bar &);
+// public: inline constexpr Bar(Bar &&);
 };
 
 

@@ -9,8 +9,8 @@ struct C
     }
     
     
-/* public: inline constexpr C() noexcept; */
-/* public: inline ~C() noexcept; */
+// public: inline constexpr C() noexcept;
+// public: inline ~C() noexcept;
 };
 
 C f()

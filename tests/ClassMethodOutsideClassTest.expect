@@ -8,8 +8,8 @@ public:
     
     void modify();
     
-/* public: inline constexpr X(const X &); */
-/* public: inline constexpr X(X &&); */
+// public: inline constexpr X(const X &);
+// public: inline constexpr X(X &&);
 };
 
 X::X(int ii)

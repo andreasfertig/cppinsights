@@ -61,8 +61,8 @@ public:
     }
     
  
-  using retType = int;
-  inline operator retType ()
+  using retType_54_3 = int;
+  inline operator retType_54_3 ()
   {
     return this->mV;
   }
@@ -70,7 +70,7 @@ public:
 
 private:
     int mV;
-/* public: inline ~Test() noexcept; */
+// public: inline ~Test() noexcept;
 };
 
 int main()

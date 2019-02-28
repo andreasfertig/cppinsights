@@ -3,19 +3,19 @@
 struct S
 {
     int i;
-/* public: inline S(); */
-/* public: inline constexpr S(const S &) noexcept; */
-/* public: inline constexpr S(S &&) noexcept; */
+// public: inline S();
+// public: inline constexpr S(const S &) noexcept;
+// public: inline constexpr S(S &&) noexcept;
 };
 
 struct SS
 {
     int i;
-/* public: inline SS() noexcept; */
-/* public: inline constexpr SS(const SS &) noexcept; */
-/* public: inline constexpr SS(SS &&) noexcept; */
-/* public: inline constexpr SS & operator=(const SS &) noexcept; */
-/* public: inline constexpr SS & operator=(SS &&); */
+// public: inline SS() noexcept;
+// public: inline constexpr SS(const SS &) noexcept;
+// public: inline constexpr SS(SS &&) noexcept;
+// public: inline constexpr SS & operator=(const SS &) noexcept;
+// public: inline constexpr SS & operator=(SS &&);
 };
 
 
@@ -23,21 +23,21 @@ class C
 {
 public:
     int i;
-/* public: inline C(); */
-/* public: inline constexpr C(const C &) noexcept; */
-/* public: inline constexpr C(C &&) noexcept; */
+// public: inline C();
+// public: inline constexpr C(const C &) noexcept;
+// public: inline constexpr C(C &&) noexcept;
 };
 
 class D
 {
 public:
     int i;
-/* public: inline D() noexcept; */
-/* public: inline constexpr D(const D &) noexcept; */
-/* public: inline constexpr D(D &&) noexcept; */
-/* public: inline constexpr D & operator=(const D &) noexcept; */
-/* public: inline constexpr D & operator=(D &&); */
-/* public: inline ~D(); */
+// public: inline D() noexcept;
+// public: inline constexpr D(const D &) noexcept;
+// public: inline constexpr D(D &&) noexcept;
+// public: inline constexpr D & operator=(const D &) noexcept;
+// public: inline constexpr D & operator=(D &&);
+// public: inline ~D();
 };
 
 class E
@@ -52,8 +52,8 @@ public:
     
 private:
     int i;
-/* public: inline constexpr E(const E &); */
-/* public: inline constexpr E(E &&); */
+// public: inline constexpr E(const E &);
+// public: inline constexpr E(E &&);
 };
 
 int main()

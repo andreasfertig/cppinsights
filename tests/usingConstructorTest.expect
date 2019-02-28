@@ -10,9 +10,9 @@ public:
     }
     
     
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
-/* public: inline ~Foo(); */
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
+// public: inline ~Foo();
 };
 
 class Bar: public Foo{ 
@@ -30,8 +30,9 @@ public:
                        
 
 int mX;
-/* public: inline constexpr Bar(const Bar &); */
-/* public: inline constexpr Bar(Bar &&); */
+// public: inline Bar();
+// public: inline constexpr Bar(const Bar &);
+// public: inline constexpr Bar(Bar &&);
 };
 
 class Bla: public Foo{ 
@@ -44,8 +45,9 @@ private:
                        
 
 int mX;
-/* public: inline constexpr Bla(const Bla &); */
-/* public: inline constexpr Bla(Bla &&); */
+// public: inline Bla();
+// public: inline constexpr Bla(const Bla &);
+// public: inline constexpr Bla(Bla &&);
 };
 
 

@@ -3,9 +3,9 @@
 
 struct Test
 {
-/* public: inline constexpr Test() noexcept; */
-/* public: inline constexpr Test(const Test &); */
-/* public: inline constexpr Test(Test &&); */
+// public: inline constexpr Test() noexcept;
+// public: inline constexpr Test(const Test &);
+// public: inline constexpr Test(Test &&);
 };
 
 template<class T>

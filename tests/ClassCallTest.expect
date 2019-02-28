@@ -24,9 +24,9 @@ protected:
 
 private:
   int mFoo;
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
-/* public: inline ~Foo(); */
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
+// public: inline ~Foo();
 };
 
 class Bar : public Foo {
@@ -47,8 +47,8 @@ public:
 
 private:
   int mBar;
-/* public: inline constexpr Bar(const Bar &); */
-/* public: inline constexpr Bar(Bar &&); */
+// public: inline constexpr Bar(const Bar &);
+// public: inline constexpr Bar(Bar &&);
 };
 
 int main()

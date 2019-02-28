@@ -24,9 +24,9 @@ private:
 
     int mX;
 
-/* private: inline Singleton() noexcept; */
-/* private: inline ~Singleton() noexcept; */
-/* public: inline constexpr Singleton(const Singleton &); */
+// private: inline Singleton() noexcept;
+// private: inline ~Singleton() noexcept;
+// public: inline constexpr Singleton(const Singleton &);
 };
 
 

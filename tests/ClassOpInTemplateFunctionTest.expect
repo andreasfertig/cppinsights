@@ -50,11 +50,11 @@ public:
 
 
     int mX;
-/* public: inline Foo & operator=(const Foo &); */
-/* public: inline Foo & operator=(Foo &&) noexcept; */
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
-/* public: inline ~Foo() noexcept; */
+// public: inline Foo & operator=(const Foo &);
+// public: inline Foo & operator=(Foo &&) noexcept;
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
+// public: inline ~Foo() noexcept;
 };
 
 

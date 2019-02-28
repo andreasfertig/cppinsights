@@ -5,12 +5,12 @@
 
 #include <new>
 
-class Bar {/* public: inline constexpr Bar() noexcept; */
-/* public: inline constexpr Bar(const Bar &); */
-/* public: inline constexpr Bar(Bar &&); */
-/* public: inline constexpr Bar & operator=(const Bar &); */
-/* public: inline constexpr Bar & operator=(Bar &&); */
-/* public: inline ~Bar(); */
+class Bar {// public: inline constexpr Bar() noexcept;
+// public: inline constexpr Bar(const Bar &);
+// public: inline constexpr Bar(Bar &&);
+// public: inline constexpr Bar & operator=(const Bar &);
+// public: inline constexpr Bar & operator=(Bar &&);
+// public: inline ~Bar();
 };
 
 class Woo
@@ -24,9 +24,9 @@ public:
     
 
     int mX;
-/* public: inline constexpr Woo(const Woo &); */
-/* public: inline constexpr Woo(Woo &&); */
-/* public: inline ~Woo() noexcept; */
+// public: inline constexpr Woo(const Woo &);
+// public: inline constexpr Woo(Woo &&);
+// public: inline ~Woo() noexcept;
 };
 
 
@@ -107,10 +107,10 @@ public:
     
     
     int mX;
-/* public: inline Foo & operator=(const Foo &); */
-/* public: inline Foo & operator=(Foo &&); */
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
+// public: inline Foo & operator=(const Foo &);
+// public: inline Foo & operator=(Foo &&);
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
 };
 
 

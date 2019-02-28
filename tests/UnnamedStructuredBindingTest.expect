@@ -4,7 +4,7 @@ struct RET
 {
     X x;
     int r;
-/* public: inline ~RET() noexcept; */
+// public: inline ~RET() noexcept;
 };
 
 int main()

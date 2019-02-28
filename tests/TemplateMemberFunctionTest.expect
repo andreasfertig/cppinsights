@@ -54,9 +54,9 @@ public:
     #endif
     
     
-/* public: inline constexpr Foo() noexcept; */
-/* public: inline constexpr Foo(const Foo &); */
-/* public: inline constexpr Foo(Foo &&); */
+// public: inline constexpr Foo() noexcept;
+// public: inline constexpr Foo(const Foo &);
+// public: inline constexpr Foo(Foo &&);
 };
 
 int main()
@@ -70,8 +70,8 @@ int main()
       printf("hello\n");
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_33_10 = void (*)();
+    inline /*constexpr */ operator retType_33_10 () const
     {
       return __invoke;
     };
@@ -93,8 +93,8 @@ int main()
       printf("hello\n");
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_35_18 = void (*)();
+    inline /*constexpr */ operator retType_35_18 () const
     {
       return __invoke;
     };
@@ -116,8 +116,8 @@ int main()
       printf("hello\n");
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_37_21 = void (*)();
+    inline /*constexpr */ operator retType_37_21 () const
     {
       return __invoke;
     };

@@ -7,8 +7,8 @@ void foo()
     {
     }
     
-    public: using retType = void (*)();
-    inline /*constexpr */ operator retType () const
+    public: using retType_2_1 = void (*)();
+    inline /*constexpr */ operator retType_2_1 () const
     {
       return __invoke;
     };
