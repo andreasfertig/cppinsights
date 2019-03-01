@@ -1,0 +1,38 @@
+#include <tuple>
+
+std::tuple<int, float> foo = std::tuple<int, float>();
+
+ 
+std::tuple<int, float> __foo5 = std::tuple<int, float>(foo);
+std::tuple_element<0, std::tuple<int, float> >::type& a = std::get<0ul>(__foo5);
+std::tuple_element<1, std::tuple<int, float> >::type& b = std::get<1ul>(__foo5);
+
+std::tuple<int, float> & __foo6 = foo;
+std::tuple_element<0, std::tuple<int, float> >::type& ra = std::get<0ul>(__foo6);
+std::tuple_element<1, std::tuple<int, float> >::type& rb = std::get<1ul>(__foo6);
+
+
+
+char c[3] = {'\0', '\0', '\0'};
+
+
+char __c11[3] = {c[0], c[1], c[2]};
+char x = __c11[0];
+char y = __c11[1];
+char z = __c11[2];
+
+
+char (&__c13)[3] = c;
+char& cx = __c13[0];
+char& cy = __c13[1];
+char& cz = __c13[2];
+
+
+
+std::tuple<int, float> Func();
+
+ 
+const std::tuple<int, float> & __Func18 = Func();
+std::tuple_element<0, const std::tuple<int, float> >::type& fa = std::get<0ul>(__Func18);
+std::tuple_element<1, const std::tuple<int, float> >::type& fb = std::get<1ul>(__Func18);
+

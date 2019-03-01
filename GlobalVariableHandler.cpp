@@ -18,21 +18,28 @@ using namespace clang::ast_matchers;
 
 namespace clang::ast_matchers {
 const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl> varTemplateSpecDecl;
-}
+const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl>             decompositionDecl;
+}  // namespace clang::ast_matchers
 
 namespace clang::insights {
 
 GlobalVariableHandler::GlobalVariableHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    matcher.addMatcher(varDecl(hasParent(translationUnitDecl()),
-                               unless(anyOf(isExpansionInSystemHeader(),
-                                            isMacroOrInvalidLocation(),
-                                            hasDescendant(cxxRecordDecl(isLambda())),
-                                            varTemplateSpecDecl(),
-                                            isTemplate)))
-                           .bind("varDecl"),
-                       this);
+    matcher.addMatcher(
+        varDecl(hasParent(translationUnitDecl()),
+                unless(anyOf(
+                    isExpansionInSystemHeader(),
+                    isMacroOrInvalidLocation(),
+                    hasDescendant(cxxRecordDecl(isLambda())),
+                    varTemplateSpecDecl(),
+                    // A DecompositionDecl in global scope is different in the AST than one in a function for example.
+                    // Try to find out whether this VarDecl is the result of a DecompositionDecl, if so bail out.
+                    hasInitializer(ignoringImpCasts(
+                        callExpr(hasAnyArgument(ignoringParenImpCasts(declRefExpr(to(decompositionDecl()))))))),
+                    isTemplate)))
+            .bind("varDecl"),
+        this);
 }
 //-----------------------------------------------------------------------------
 
