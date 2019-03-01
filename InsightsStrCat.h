@@ -27,6 +27,16 @@ static inline bool EndsWith(const std::string& src, const std::string& ending)
 }
 //-----------------------------------------------------------------------------
 
+static inline bool BeginsWith(const std::string& src, const std::string& begining)
+{
+    if(begining.size() > src.size()) {
+        return false;
+    }
+
+    return std::equal(begining.begin(), begining.end(), src.begin());
+}
+//-----------------------------------------------------------------------------
+
 static inline std::string ToString(const llvm::APSInt& val)
 {
     return val.toString(10);

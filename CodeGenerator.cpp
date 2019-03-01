@@ -2705,6 +2705,13 @@ void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTh
 void StructuredBindingsCodeGenerator::InsertArg(const DeclRefExpr* stmt)
 {
     const auto name = GetName(*stmt);
+
+    // Special case for structured bindings, probably only with std::tuple. The get which is used to retrieve the value
+    // seems to carry no std:: in front. Insert it to make the code compile.
+    if(not name.empty() && BeginsWith(name, "get")) {
+        mOutputFormatHelper.Append("std::");
+    }
+
     mOutputFormatHelper.Append(name);
 
     if(name.empty() || EndsWith(name, "::")) {

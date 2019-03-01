@@ -132,12 +132,12 @@ int main()
   const char& a19 = __aa75[1];
   std::tuple<int, char, double> muple = std::make_tuple(1, 'a', 2.2999999999999998);
   std::tuple<int, char, double> & __muple80 = muple;
-  std::tuple_element<0, std::tuple<int, char, double> >::type& i = get<0ul>(__muple80);
-  std::tuple_element<1, std::tuple<int, char, double> >::type& c = get<1ul>(__muple80);
-  std::tuple_element<2, std::tuple<int, char, double> >::type& d = get<2ul>(__muple80);
+  std::tuple_element<0, std::tuple<int, char, double> >::type& i = std::get<0ul>(__muple80);
+  std::tuple_element<1, std::tuple<int, char, double> >::type& c = std::get<1ul>(__muple80);
+  std::tuple_element<2, std::tuple<int, char, double> >::type& d = std::get<2ul>(__muple80);
   std::tuple<int, char, double> __muple82 = std::tuple<int, char, double>(muple);
-  std::tuple_element<0, std::tuple<int, char, double> >::type& ii = get<0ul>(__muple82);
-  std::tuple_element<1, std::tuple<int, char, double> >::type& cc = get<1ul>(__muple82);
-  std::tuple_element<2, std::tuple<int, char, double> >::type& dd = get<2ul>(__muple82);
+  std::tuple_element<0, std::tuple<int, char, double> >::type& ii = std::get<0ul>(__muple82);
+  std::tuple_element<1, std::tuple<int, char, double> >::type& cc = std::get<1ul>(__muple82);
+  std::tuple_element<2, std::tuple<int, char, double> >::type& dd = std::get<2ul>(__muple82);
 }
 
