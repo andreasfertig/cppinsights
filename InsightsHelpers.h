@@ -137,9 +137,6 @@ static inline std::string GetName(const NamedDecl& ND)
 }
 //-----------------------------------------------------------------------------
 
-std::string GetName(const NamedDecl& namedDecl);
-//-----------------------------------------------------------------------------
-
 std::string GetNameAsFunctionPointer(const QualType& t);
 //-----------------------------------------------------------------------------
 
