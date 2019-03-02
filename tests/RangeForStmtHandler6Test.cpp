@@ -1,3 +1,4 @@
+// cmdline:-std=c++2a
 int main()
 {
     int ar[]{1,2,3,4,5};
