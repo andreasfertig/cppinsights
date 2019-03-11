@@ -538,7 +538,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
         }
 
         // We approached an unnamed decl. This happens for example like this: auto& [x, y] = Point{};
-        return std::string{""};
+        return std::string{};
     }()};
 
     const std::string tmpVarName{
@@ -571,7 +571,7 @@ void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
                     return "&";
                 }
 
-                return "";
+                return {};
             }();
 
             mOutputFormatHelper.Append(GetName(bindingDecl->getType()), refOrRefRef, " ", GetName(*bindingDecl), " = ");
@@ -1684,7 +1684,7 @@ void CodeGenerator::InsertArg(const EnumDecl* stmt)
 
     if(stmt->isScoped()) {
         if(stmt->isScopedUsingClassTag()) {
-            mOutputFormatHelper.Append("class ");
+            mOutputFormatHelper.Append(kwClassSpace);
         } else {
             mOutputFormatHelper.Append("struct ");
         }
@@ -1866,17 +1866,16 @@ void CodeGenerator::print(const NestedNameSpecifier* stmt)
 
 void CodeGenerator::ParseDeclContext(const DeclContext* Ctx)
 {
-    using ContextsTy = SmallVector<const DeclContext*, 8>;
-    ContextsTy Contexts;
+    SmallVector<const DeclContext*, 8> contexts{};
 
     while(Ctx) {
         if(isa<NamedDecl>(Ctx)) {
-            Contexts.push_back(Ctx);
+            contexts.push_back(Ctx);
         }
         Ctx = Ctx->getParent();
     }
 
-    for(const auto* DC : llvm::reverse(Contexts)) {
+    for(const auto* DC : llvm::reverse(contexts)) {
         if(const auto* Spec = dyn_cast<ClassTemplateSpecializationDecl>(DC)) {
             mOutputFormatHelper.Append(Spec->getName());
             InsertTemplateArgs(*Spec);
