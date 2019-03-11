@@ -163,12 +163,8 @@ protected:
     /// - www.opensource.apple.com/source/libcppabi/libcppabi-14/src/cxa_guard.cxx
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
 
-    STRONG_BOOL(AsComment);
-    void FormatCast(const std::string castName,
-                    const QualType&   CastDestType,
-                    const Expr*       SubExpr,
-                    const CastKind&   castKind,
-                    const AsComment   comment = AsComment::No);
+    void
+    FormatCast(const std::string castName, const QualType& CastDestType, const Expr* SubExpr, const CastKind& castKind);
 
     template<typename T, typename Lambda>
     void ForEachArg(const T& arguments, Lambda&& lambda)
