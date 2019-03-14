@@ -2380,16 +2380,25 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
 
 void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
 {
-    const auto*       cxxRecordDecl = stmt->getType()->getAsCXXRecordDecl();
+    mHaveLocalStatic = true;
+
+    const auto* cxxRecordDecl = stmt->getType()->getAsCXXRecordDecl();
+    auto&       langOpts{GetLangOpts(*stmt)};
+    const bool  threadSafe{langOpts.ThreadsafeStatics && langOpts.CPlusPlus11 &&
+                          (stmt->isLocalVarDecl() /*|| NonTemplateInline*/) && !stmt->getTLSKind()};
+
     const std::string internalVarName{BuildInternalVarName(GetName(*stmt))};
-    const std::string compilerBoolVarName{StrCat(internalVarName, "B")};
+    const std::string compilerBoolVarName{StrCat(internalVarName, "Guard")};
     const std::string typeName{GetName(*cxxRecordDecl)};
 
     // insert compiler bool to track init state
-    mOutputFormatHelper.AppendNewLine("static bool ", compilerBoolVarName, ";");
+    const std::string stateTrackingVarName{threadSafe ? "uint64_t" : "bool"};
+
+    mOutputFormatHelper.AppendNewLine("static ", stateTrackingVarName, " ", compilerBoolVarName, ";");
 
     // insert compiler memory place holder
-    mOutputFormatHelper.AppendNewLine("static char ", internalVarName, "[sizeof(", typeName, ")];");
+    mOutputFormatHelper.AppendNewLine(
+        "alignas(", typeName, ") static char ", internalVarName, "[sizeof(", typeName, ")];");
 
     // insert compiler init if
     mOutputFormatHelper.AppendNewLine();
@@ -2397,9 +2406,58 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
     mOutputFormatHelper.AppendNewLine("if( ! ", compilerBoolVarName, " )");
     mOutputFormatHelper.OpenScope();
 
-    mOutputFormatHelper.AppendNewLine("new (&", internalVarName, ") ", typeName, ";");
+    if(threadSafe) {
+        mOutputFormatHelper.AppendNewLine("if( __cxa_guard_acquire(&", compilerBoolVarName, ") )");
+        mOutputFormatHelper.OpenScope();
+    }
 
+    // try to find out whether this ctor can throw. If, then additional code needs to be generated for exception
+    // handling.
+    const bool canThrow{[&] {
+        if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(stmt->getInit())) {
+            const auto* ctor = ctorExpr->getConstructor();
+            if(const auto* func = ctor->getType()->castAs<FunctionProtoType>()) {
+                return CT_Cannot != func->canThrow();
+            }
+        }
+
+        return false;
+    }()};
+
+    if(canThrow) {
+        mOutputFormatHelper.AppendNewLine("try");
+        mOutputFormatHelper.OpenScope();
+    }
+
+    mOutputFormatHelper.Append("new (&", internalVarName, ") ");
+    if(stmt->hasInit()) {
+        InsertArg(stmt->getInit());
+    } else {
+        mOutputFormatHelper.Append(typeName);
+    }
+
+    mOutputFormatHelper.AppendNewLine(';');
     mOutputFormatHelper.AppendNewLine(compilerBoolVarName, " = true;");
+
+    if(canThrow) {
+        mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
+        mOutputFormatHelper.AppendNewLine();
+        mOutputFormatHelper.AppendNewLine("catch(...)");
+        mOutputFormatHelper.OpenScope();
+
+        mOutputFormatHelper.AppendNewLine("__cxa_guard_abort(&", compilerBoolVarName, ");");
+        mOutputFormatHelper.AppendNewLine("throw;");
+        mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
+        mOutputFormatHelper.AppendNewLine();
+        mOutputFormatHelper.AppendNewLine();
+    }
+
+    if(threadSafe) {
+        mOutputFormatHelper.AppendNewLine("__cxa_guard_release(&", compilerBoolVarName, ");");
+        mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
+        mOutputFormatHelper.AppendNewLine();
+    }
+
     mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
     mOutputFormatHelper.AppendNewLine();
 }
