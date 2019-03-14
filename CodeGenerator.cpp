@@ -1262,13 +1262,7 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 
     // operators in a namespace but outside a class so operator goes first
     if(!isCXXMethod) {
-        if(callee) {
-            mOutputFormatHelper.Append(GetName(*callee));
-        } else {
-            InsertArg(stmt->getCallee()->IgnoreImpCasts());
-        }
-
-        mOutputFormatHelper.Append('(');
+        mOutputFormatHelper.Append(GetName(*callee), "(");
     }
 
     // insert the arguments
@@ -1745,15 +1739,15 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
     if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(stmt->getParent())) {
         std::string name{GetName(*stmt)};
         if(cxxRecordDecl->isLambda()) {
-            llvm::DenseMap<const VarDecl*, FieldDecl*> Captures{};
-            FieldDecl*                                 ThisCapture{};
+            llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
+            FieldDecl*                                 thisCapture{};
 
-            cxxRecordDecl->getCaptureFields(Captures, ThisCapture);
+            cxxRecordDecl->getCaptureFields(captures, thisCapture);
 
-            if(stmt == ThisCapture) {
+            if(stmt == thisCapture) {
                 name = "__this";
             } else {
-                for(const auto& [key, value] : Captures) {
+                for(const auto& [key, value] : captures) {
                     if(value == stmt) {
                         name = GetName(*key);
                         break;
@@ -1775,8 +1769,6 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
                 InsertArg(initializer);
             }
         }
-    } else {
-        mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), GetName(*stmt)));
     }
 
     mOutputFormatHelper.AppendNewLine(";");
