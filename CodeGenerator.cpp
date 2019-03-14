@@ -472,7 +472,13 @@ void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 
     InsertArg(stmt->getLHS());
     mOutputFormatHelper.Append(" ", stmt->getOpcodeStr(), " ");
-    InsertArg(stmt->getRHS());
+
+    // For + and - add the parentheses, if not already supplied. It looks like fold-expression to not carry them.
+    const bool needParens{
+        isa<BinaryOperator>(stmt->getRHS()->IgnoreImpCasts()) &&
+        ((BinaryOperatorKind::BO_Add == stmt->getOpcode()) || (BinaryOperatorKind::BO_Sub == stmt->getOpcode()))};
+
+    WrapInParensIfNeeded(needParens, [&] { InsertArg(stmt->getRHS()); });
 }
 //-----------------------------------------------------------------------------
 

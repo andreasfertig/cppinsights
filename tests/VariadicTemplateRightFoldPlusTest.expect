@@ -1,0 +1,61 @@
+#define INSIGHTS_USE_TEMPLATE
+
+template<int... Ints>
+constexpr int fold_minus_impl_rf() {
+    return ( 5 - ... - Ints);
+}
+
+/* First instantiated from: VariadicTemplateRightFoldPlusTest.cpp:8 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int fold_minus_impl_rf<0>()
+{
+  return 5 - 0;
+}
+#endif
+
+
+/* First instantiated from: VariadicTemplateRightFoldPlusTest.cpp:9 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int fold_minus_impl_rf<0, 1>()
+{
+  return 5 - 0 - 1;
+}
+#endif
+
+
+/* PASSED: static_assert(fold_minus_impl_rf<0>() == 5); */
+
+/* PASSED: static_assert(fold_minus_impl_rf<0, 1>() == 4); */
+
+
+template<int... Ints>
+constexpr int fold_negative_minus_impl_rf() {
+    return ( -5 - ... - Ints);
+}
+
+/* First instantiated from: VariadicTemplateRightFoldPlusTest.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int fold_negative_minus_impl_rf<0>()
+{
+  return -5 - 0;
+}
+#endif
+
+
+/* First instantiated from: VariadicTemplateRightFoldPlusTest.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int fold_negative_minus_impl_rf<0, 1>()
+{
+  return -5 - 0 - 1;
+}
+#endif
+
+
+/* PASSED: static_assert(fold_negative_minus_impl_rf<0>() == -5); */
+
+/* PASSED: static_assert(fold_negative_minus_impl_rf<0, 1>() == -6); */
+
