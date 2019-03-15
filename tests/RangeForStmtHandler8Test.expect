@@ -1,0 +1,61 @@
+#include <iostream>
+
+struct A
+{
+    A() = default;
+
+    inline A & begin()
+    {
+      return *this;
+    }
+    
+
+    inline const int end()
+    {
+      return this->v[9];
+    }
+    
+
+    inline A & operator++()
+    {
+      return *this;
+    }
+    
+
+    inline int operator*()
+    {
+      return 1;
+    }
+    
+
+    int v[10]{};
+// public: inline constexpr A() noexcept;
+// public: inline constexpr A(const A &) noexcept;
+// public: inline constexpr A(A &&);
+};
+
+bool operator!=(const A &, const int &)
+{
+  return true;
+}
+
+
+
+
+int main()
+{
+  A a = A();
+  {
+    A & __range1 = a;
+    A __begin1 = A(__range1.begin());
+    int __end1 = __range1.end();
+    
+    for( ; operator!=(__begin1, __end1); __begin1.operator++() )
+    {
+      const int & it = __begin1.operator*();
+      std::cout.operator<<(it).operator<<(std::endl);
+    }
+  }
+}
+
+

@@ -342,15 +342,15 @@ std::string GetName(const QualType& t, const Unqualified unqualified)
 }
 //-----------------------------------------------------------------------------
 
-template<typename QT, typename T>
-static bool TestPlainSubType(const QualType& t)
+template<typename QT, typename SUB_T>
+static bool HasTypeWithSubType(const QualType& t)
 {
     if(const auto* lref = dyn_cast_or_null<QT>(t.getTypePtrOrNull())) {
         const auto  subType      = GetDesugarType(lref->getPointeeType());
         const auto& ct           = subType.getCanonicalType();
         const auto* plainSubType = ct.getTypePtrOrNull();
 
-        return isa<T>(plainSubType);
+        return isa<SUB_T>(plainSubType);
     }
 
     return false;
@@ -359,12 +359,12 @@ static bool TestPlainSubType(const QualType& t)
 
 std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified)
 {
-    const bool isFunctionPointer = TestPlainSubType<ReferenceType, FunctionProtoType>(t);
-    const bool isArrayRef        = TestPlainSubType<ReferenceType, ArrayType>(t);
+    const bool isFunctionPointer = HasTypeWithSubType<ReferenceType, FunctionProtoType>(t);
+    const bool isArrayRef        = HasTypeWithSubType<ReferenceType, ArrayType>(t);
     // Special case for Issue81, auto returns an array-ref and to catch auto deducing an array (Issue106)
     const bool isAutoType             = dyn_cast_or_null<AutoType>(t.getTypePtrOrNull());
     const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
-    const bool isPointerToArray       = TestPlainSubType<PointerType, ArrayType>(pointerToArrayBaseType);
+    const bool isPointerToArray       = HasTypeWithSubType<PointerType, ArrayType>(pointerToArrayBaseType);
 
     std::string typeName = details::GetName(t, unqualified);
 
@@ -383,7 +383,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         InsertBefore(typeName, "[", StrCat(space, varName));
 
     } else if(isArrayRef) {
-        const bool        isRValueRef{TestPlainSubType<RValueReferenceType, ArrayType>(t)};
+        const bool        isRValueRef{HasTypeWithSubType<RValueReferenceType, ArrayType>(t)};
         const std::string contains{isRValueRef ? "(&&" : "(&"};
 
         if(Contains(typeName, contains)) {
@@ -396,7 +396,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         }
 
     } else if(isFunctionPointer) {
-        const bool        isRValueRef{TestPlainSubType<RValueReferenceType, FunctionProtoType>(t)};
+        const bool        isRValueRef{HasTypeWithSubType<RValueReferenceType, FunctionProtoType>(t)};
         const std::string contains{isRValueRef ? "(&&" : "(&"};
 
         if(Contains(typeName, contains)) {

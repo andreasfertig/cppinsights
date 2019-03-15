@@ -27,13 +27,13 @@ static inline bool EndsWith(const std::string& src, const std::string& ending)
 }
 //-----------------------------------------------------------------------------
 
-static inline bool BeginsWith(const std::string& src, const std::string& begining)
+static inline bool BeginsWith(const std::string& src, const std::string& beginning)
 {
-    if(begining.size() > src.size()) {
+    if(beginning.size() > src.size()) {
         return false;
     }
 
-    return std::equal(begining.begin(), begining.end(), src.begin());
+    return std::equal(beginning.begin(), beginning.end(), src.begin());
 }
 //-----------------------------------------------------------------------------
 
