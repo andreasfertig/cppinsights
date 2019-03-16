@@ -268,6 +268,7 @@ find_program(
   )
 if(NOT CLANG_TIDY_EXE)
   message(STATUS "clang-tidy not found.")
+
 else()
   message(STATUS "Found clang-tidy: ${CLANG_TIDY_EXE}")
   set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" )
@@ -310,7 +311,10 @@ target_link_libraries(insights
 )
 
 if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
+  set(RUN_CLANG_TIDY On)
   set_target_properties(insights PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+else()
+  set(RUN_CLANG_TIDY Off)
 endif()
 
 install( TARGETS insights RUNTIME DESTINATION bin )
@@ -416,6 +420,16 @@ if(INSIGHTS_COVERAGE)
     endif()
 endif()
 
+if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
+    add_custom_command(TARGET insights
+        POST_BUILD
+        COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clang-tidy-check.sh ${CMAKE_CURRENT_BINARY_DIR}/output.txt ${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy-ignore
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Analyzing clang-tidy output..."
+    )
+endif()
+
+
 message(STATUS "")
 message(STATUS "[ Build summary ]")
 message(STATUS "CMAKE_GENERATOR       : ${CMAKE_GENERATOR}")
@@ -433,6 +447,7 @@ message(STATUS "Debug                 : ${DEBUG}")
 message(STATUS "Code Coverage         : ${INSIGHTS_COVERAGE}")
 message(STATUS "Static linking        : ${INSIGHTS_STATIC}")
 message(STATUS "Strip executable      : ${INSIGHTS_STRIP}")
+message(STATUS "clang-tidy            : ${RUN_CLANG_TIDY}")
 message(STATUS "")
 
 

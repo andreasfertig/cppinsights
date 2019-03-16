@@ -1,0 +1,4 @@
+error: 'new' file not found
+error: 'utility' file not found
+warning: invalid case style for global constant 'InsightsPrintingPolicy'
+warning: invalid case style for constexpr variable 'is_same_v'

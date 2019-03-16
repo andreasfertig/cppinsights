@@ -27,7 +27,7 @@ matrix:
   include:
 
     # 1/ OSX Builds
-  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='No' SKIP_TESTS='No'
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='No' SKIP_TESTS='No' TIDY='No'
     os: osx
     osx_image: xcode9.3
     compiler: clang
@@ -42,7 +42,7 @@ matrix:
         - clang-9
         - *all_llvm_current_packages
         - libstdc++-7-dev
-    env: COMPILER='clang++-9' COMPILER_CC='clang-9' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No'
+    env: COMPILER='clang++-9' COMPILER_CC='clang-9' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang stable deployment
   - os: linux
@@ -53,7 +53,7 @@ matrix:
       ssh_known_hosts: cppinsights.io
     before_install:
     - cd docker_travis && docker build -t cppinsights-travis .
-    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG=/usr/bin/llvm-config-7  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes'
+    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG=/usr/bin/llvm-config-7  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No'
     
   # Linux g++ Build
   - os: linux
@@ -64,9 +64,9 @@ matrix:
         packages:
         - g++-8
         - *all_llvm_current_packages
-    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
-  # Debug build
+  # Debug build with coverage
   - os: linux
     compiler: gcc
     addons:
@@ -75,7 +75,19 @@ matrix:
         packages:
         - g++-8
         - *all_llvm_current_packages
-    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='Yes'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
+
+  # Clang-tidy analysis
+  - os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources: *all_sources
+        packages:
+        - g++-8
+        - clang-tidy-9
+        - *all_llvm_current_packages
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
 
     # Linux Clang Coverage Build
   - os: linux
@@ -88,7 +100,7 @@ matrix:
         - libstdc++-6-dev
         - *all_llvm_current_packages
         - lcov
-    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No'
+    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
 
 install:
 - |   
@@ -123,7 +135,7 @@ before_script:
     if [[ "${DEPLOY}" == "Yes" ]]; then
       docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes .."
     else
-      cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG}  ..
+      cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG} -DINSIGHTS_TIDY=${TIDY} ..
     fi
 
 script:
@@ -133,6 +145,8 @@ script:
     mkdir ${TRAVIS_BUILD_DIR}/build/html
     docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cmake --build /home/builder/build --target doc"
     echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
+  elif [[ "${TIDY}" == "Yes" ]]; then
+    make -j4 2>&1 | tee output.txt
   else
     make -j 2
   fi
