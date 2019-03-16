@@ -20,3 +20,5 @@ if [[ -n $(echo ${CLEANED_OUTPUT} | grep "warning: ") ]] || [[ -n $(echo ${CLEAN
 else
     echo -e "\033[1;32m\xE2\x9C\x93 passed:\033[0m $1";
 fi
+
+exit 0

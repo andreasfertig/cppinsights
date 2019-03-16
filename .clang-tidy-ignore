@@ -2,3 +2,7 @@ error: 'new' file not found
 error: 'utility' file not found
 warning: invalid case style for global constant 'InsightsPrintingPolicy'
 warning: invalid case style for constexpr variable 'is_same_v'
+warning: invalid case style for global constant 'decompositionDecl'
+warning: invalid case style for global constant 'myDecltypeType'
+warning: invalid case style for global constant 'varTemplateDecl'
+TemplateHandler.cpp:*: warning: potentially unintended semicolon
