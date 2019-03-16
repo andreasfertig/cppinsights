@@ -74,6 +74,7 @@ matrix:
         sources: *all_sources
         packages:
         - g++-8
+        - lcov
         - *all_llvm_current_packages
     env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
 
