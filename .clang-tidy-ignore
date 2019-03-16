@@ -5,4 +5,4 @@ warning: invalid case style for constexpr variable 'is_same_v'
 warning: invalid case style for global constant 'decompositionDecl'
 warning: invalid case style for global constant 'myDecltypeType'
 warning: invalid case style for global constant 'varTemplateDecl'
-TemplateHandler.cpp:*: warning: potentially unintended semicolon
+warning: potentially unintended semicolon

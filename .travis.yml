@@ -146,9 +146,7 @@ script:
     docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cmake --build /home/builder/build --target doc"
     echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
   elif [[ "${TIDY}" == "Yes" ]]; then
-    set -o pipefail
-    make -j4 2>&1 | tee output.txt
-    set +o pipefail
+    $TRAVIS_BUILD_DIR/scripts/travis-run-make-tidy.sh
   else
     make -j 2
   fi
