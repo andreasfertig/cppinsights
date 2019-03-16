@@ -73,9 +73,11 @@ matrix:
       apt:
         sources: *all_sources
         packages:
-        - g++-8
+        - g++-7
+        - libstdc++-6-dev
         - *all_llvm_current_packages
-    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
+        - lcov
+    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
 
   # Clang-tidy analysis
   - os: linux
