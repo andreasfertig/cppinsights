@@ -176,6 +176,7 @@ protected:
     void InsertSuffix(const QualType& type);
     void InsertTemplateArgs(const ArrayRef<TemplateArgument>& array);
     void InsertTemplateArg(const TemplateArgument& arg);
+    bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
 
     void PrintNamespace(const NestedNameSpecifier* namespaceSpecifier);
     void ParseDeclContext(const DeclContext* Ctx);

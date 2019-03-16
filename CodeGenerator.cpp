@@ -717,6 +717,32 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+bool CodeGenerator::InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl)
+{
+    if(cxxMethodDecl && cxxMethodDecl->isLambdaStaticInvoker()) {
+        mOutputFormatHelper.AppendNewLine();
+
+        const auto* lambda = cxxMethodDecl->getParent();
+        const auto* callOp = lambda->getLambdaCallOperator();
+        if(lambda->isGenericLambda() && cxxMethodDecl->isFunctionTemplateSpecialization()) {
+            const TemplateArgumentList* tal            = cxxMethodDecl->getTemplateSpecializationArgs();
+            FunctionTemplateDecl*       callOpTemplate = callOp->getDescribedFunctionTemplate();
+            void*                       insertPos      = nullptr;
+            FunctionDecl*               correspondingCallOpSpecialization =
+                callOpTemplate->findSpecialization(tal->asArray(), insertPos);
+            callOp = cast<CXXMethodDecl>(correspondingCallOpSpecialization);
+        }
+
+        InsertArg(callOp->getBody());
+        mOutputFormatHelper.AppendNewLine();
+
+        return true;
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 {
     //    LAMBDA_SCOPE_HELPER(VarDecl);
@@ -726,28 +752,14 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
     } else {
         InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
 
-        if(const auto* md = dyn_cast_or_null<CXXMethodDecl>(stmt); (md && md->isLambdaStaticInvoker())) {
-            mOutputFormatHelper.AppendNewLine();
-            const auto* lambda = md->getParent();
-            const auto* callOp = lambda->getLambdaCallOperator();
-            if(lambda->isGenericLambda() && md->isFunctionTemplateSpecialization()) {
-
-                const TemplateArgumentList* tmplArgumentList = md->getTemplateSpecializationArgs();
-                FunctionTemplateDecl*       callOpTemplate   = callOp->getDescribedFunctionTemplate();
-                void*                       insertPos        = nullptr;
-                FunctionDecl*               correspondingCallOpSpecialization =
-                    callOpTemplate->findSpecialization(tmplArgumentList->asArray(), insertPos);
-                callOp = cast<CXXMethodDecl>(correspondingCallOpSpecialization);
+        if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
+            if(stmt->doesThisDeclarationHaveABody()) {
+                mOutputFormatHelper.AppendNewLine();
+                InsertArg(stmt->getBody());
+                mOutputFormatHelper.AppendNewLine();
+            } else {
+                mOutputFormatHelper.AppendSemiNewLine();
             }
-
-            InsertArg(callOp->getBody());
-            mOutputFormatHelper.AppendNewLine();
-        } else if(stmt->doesThisDeclarationHaveABody()) {
-            mOutputFormatHelper.AppendNewLine();
-            InsertArg(stmt->getBody());
-            mOutputFormatHelper.AppendNewLine();
-        } else {
-            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }
@@ -1654,23 +1666,7 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         InsertArg(stmt->getBody());
         mOutputFormatHelper.AppendNewLine();
 
-    } else if(stmt->isLambdaStaticInvoker()) {
-        mOutputFormatHelper.AppendNewLine();
-        const auto* lambda = stmt->getParent();
-        const auto* callOp = lambda->getLambdaCallOperator();
-        if(lambda->isGenericLambda() && stmt->isFunctionTemplateSpecialization()) {
-            const TemplateArgumentList* tal            = stmt->getTemplateSpecializationArgs();
-            FunctionTemplateDecl*       callOpTemplate = callOp->getDescribedFunctionTemplate();
-            void*                       insertPos      = nullptr;
-            FunctionDecl*               correspondingCallOpSpecialization =
-                callOpTemplate->findSpecialization(tal->asArray(), insertPos);
-            callOp = cast<CXXMethodDecl>(correspondingCallOpSpecialization);
-        }
-
-        InsertArg(callOp->getBody());
-        mOutputFormatHelper.AppendNewLine();
-
-    } else {
+    } else if(not InsertLambdaStaticInvoker(stmt)) {
         mOutputFormatHelper.AppendSemiNewLine();
     }
 
