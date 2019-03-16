@@ -1,0 +1,20 @@
+Checks: '-*,clang-diagnostic-*,misc-*,-misc-unused-parameters,readability-identifier-naming'
+#Checks: '-*,readability-identifier-naming,performance-*,modernize-use-*,misc-string-*,misc-use-after-move,misc-suspicious-*,misc-static-assert,misc-move-*,misc-macro-*,misc-dangling-handle,cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast'
+CheckOptions:
+  - { key: readability-identifier-naming.NamespaceCase,          value: lower_case }
+  - { key: readability-identifier-naming.ClassCase,              value: CamelCase  }
+  - { key: readability-identifier-naming.MemberCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.MemberPrefix,           value: m          }
+  - { key: readability-identifier-naming.StructCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.FunctionCase,           value: CamelCase  }
+  - { key: readability-identifier-naming.VariableCase,           value: camelBack  }
+  - { key: readability-identifier-naming.GlobalConstantCase,     value: UPPER_CASE }
+  - { key: readability-identifier-naming.ConstexprVariableCase,  value: UPPER_CASE }
+  - { key: readability-identifier-naming.EnumCase,               value: CamelCase  }
+  - { key: readability-identifier-naming.EnumPrefix,             value: 'E'        }
+  - { key: readability-identifier-naming.GlobalFunctionCase,     value: CamelCase  }
+  - { key: readability-identifier-naming.GlobalVariableCase,     value: CamelCase  }
+  - { key: readability-identifier-naming.GlobalVariablePrefix,   value: 'g'        }
+  - { key: readability-identifier-naming.ConstexprFunctionCase,  value: CamelCase  }
+  - { key: readability-identifier-naming.ConstexprMethodCase,    value: CamelCase  }
+  - { key: readability-identifier-naming.ConstexprVariableCase,  value: camelBack  }

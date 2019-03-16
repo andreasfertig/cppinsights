@@ -160,9 +160,9 @@ static const VarDecl* GetVarDeclFromDeclRefExpr(const DeclRefExpr& declRefExpr)
 
 std::string GetNameAsWritten(const QualType& t)
 {
-    SplitQualType T_split = t.split();
+    SplitQualType splitted = t.split();
 
-    return QualType::getAsString(T_split, InsightsPrintingPolicy);
+    return QualType::getAsString(splitted, InsightsPrintingPolicy);
 }
 //-----------------------------------------------------------------------------
 
@@ -426,8 +426,8 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
 
 static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 {
-    if(const VarDecl* VD = GetVarDeclFromDeclRefExpr(declRefExpr)) {
-        return IsTrivialStaticClassVarDecl(*VD);
+    if(const VarDecl* vd = GetVarDeclFromDeclRefExpr(declRefExpr)) {
+        return IsTrivialStaticClassVarDecl(*vd);
     }
 
     return false;
@@ -524,8 +524,8 @@ std::string GetName(const DeclRefExpr& declRefExpr)
         // this case, as we teared that variable apart, we need to adjust the variable named and add a reinterpret
         // cast
         if(IsTrivialStaticClassVarDecl(declRefExpr)) {
-            if(const VarDecl* VD = GetVarDeclFromDeclRefExpr(declRefExpr)) {
-                if(const auto* cxxRecordDecl = VD->getType()->getAsCXXRecordDecl()) {
+            if(const VarDecl* vd = GetVarDeclFromDeclRefExpr(declRefExpr)) {
+                if(const auto* cxxRecordDecl = vd->getType()->getAsCXXRecordDecl()) {
                     plainName = StrCat(
                         "*reinterpret_cast<", GetName(*cxxRecordDecl), "*>(", BuildInternalVarName(plainName), ")");
                 }

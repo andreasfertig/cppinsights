@@ -728,19 +728,19 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 
         if(const auto* md = dyn_cast_or_null<CXXMethodDecl>(stmt); (md && md->isLambdaStaticInvoker())) {
             mOutputFormatHelper.AppendNewLine();
-            const auto* Lambda = md->getParent();
-            const auto* CallOp = Lambda->getLambdaCallOperator();
-            if(Lambda->isGenericLambda() && md->isFunctionTemplateSpecialization()) {
+            const auto* lambda = md->getParent();
+            const auto* callOp = lambda->getLambdaCallOperator();
+            if(lambda->isGenericLambda() && md->isFunctionTemplateSpecialization()) {
 
-                const TemplateArgumentList* TAL            = md->getTemplateSpecializationArgs();
-                FunctionTemplateDecl*       CallOpTemplate = CallOp->getDescribedFunctionTemplate();
-                void*                       InsertPos      = nullptr;
-                FunctionDecl*               CorrespondingCallOpSpecialization =
-                    CallOpTemplate->findSpecialization(TAL->asArray(), InsertPos);
-                CallOp = cast<CXXMethodDecl>(CorrespondingCallOpSpecialization);
+                const TemplateArgumentList* tmplArgumentList = md->getTemplateSpecializationArgs();
+                FunctionTemplateDecl*       callOpTemplate   = callOp->getDescribedFunctionTemplate();
+                void*                       insertPos        = nullptr;
+                FunctionDecl*               correspondingCallOpSpecialization =
+                    callOpTemplate->findSpecialization(tmplArgumentList->asArray(), insertPos);
+                callOp = cast<CXXMethodDecl>(correspondingCallOpSpecialization);
             }
 
-            InsertArg(CallOp->getBody());
+            InsertArg(callOp->getBody());
             mOutputFormatHelper.AppendNewLine();
         } else if(stmt->doesThisDeclarationHaveABody()) {
             mOutputFormatHelper.AppendNewLine();
@@ -937,15 +937,15 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
 
     if(isa<UserDefinedLiteral>(stmt)) {
         if(const auto* DRE = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
-            if(const TemplateArgumentList* Args = cast<FunctionDecl>(DRE->getDecl())->getTemplateSpecializationArgs()) {
-                if(1 != Args->size()) {
-                    InsertTemplateArgs(Args->asArray());
+            if(const TemplateArgumentList* args = cast<FunctionDecl>(DRE->getDecl())->getTemplateSpecializationArgs()) {
+                if(1 != args->size()) {
+                    InsertTemplateArgs(args->asArray());
                 } else {
                     mOutputFormatHelper.Append('<');
 
-                    const TemplateArgument& Pack = Args->get(0);
+                    const TemplateArgument& pack = args->get(0);
 
-                    ForEachArg(Pack.pack_elements(), [&](const auto& arg) {
+                    ForEachArg(pack.pack_elements(), [&](const auto& arg) {
                         const char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
                         mOutputFormatHelper.Append("'", std::string{C}, "'");
                     });
@@ -990,9 +990,9 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 
 void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
 {
-    const auto* Ctx = stmt->getDecl()->getDeclContext();
-    if(!Ctx->isFunctionOrMethod()) {
-        ParseDeclContext(Ctx);
+    const auto* ctx = stmt->getDecl()->getDeclContext();
+    if(!ctx->isFunctionOrMethod()) {
+        ParseDeclContext(ctx);
 
         mOutputFormatHelper.Append(GetPlainName(*stmt));
 
@@ -1419,7 +1419,7 @@ void CodeGenerator::InsertArg(const ExprWithCleanups* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static std::string getValueOfValueInit(const QualType& t)
+static std::string GetValueOfValueInit(const QualType& t)
 {
     const QualType& type = t.getCanonicalType();
 
@@ -1457,7 +1457,7 @@ static std::string getValueOfValueInit(const QualType& t)
             case Type::STK_FloatingComplex:
             case Type::STK_IntegralComplex:
                 if(const auto* complexType = type->getAs<ComplexType>()) {
-                    return getValueOfValueInit(complexType->getElementType());
+                    return GetValueOfValueInit(complexType->getElementType());
                 }
 
                 break;
@@ -1469,7 +1469,7 @@ static std::string getValueOfValueInit(const QualType& t)
 
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
         const auto&       elementType{tt->getElementType()};
-        const std::string elementTypeInitValue{getValueOfValueInit(elementType)};
+        const std::string elementTypeInitValue{GetValueOfValueInit(elementType)};
         const auto        size{std::clamp(tt->getSize().getZExtValue(), uint64_t(0), uint64_t(100))};
         std::string       ret{};
 
@@ -1491,7 +1491,7 @@ static std::string getValueOfValueInit(const QualType& t)
 
 void CodeGenerator::InsertArg(const ImplicitValueInitExpr* stmt)
 {
-    mOutputFormatHelper.Append(getValueOfValueInit(stmt->getType()));
+    mOutputFormatHelper.Append(GetValueOfValueInit(stmt->getType()));
 }
 //-----------------------------------------------------------------------------
 
@@ -1661,10 +1661,10 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         if(lambda->isGenericLambda() && stmt->isFunctionTemplateSpecialization()) {
             const TemplateArgumentList* tal            = stmt->getTemplateSpecializationArgs();
             FunctionTemplateDecl*       callOpTemplate = callOp->getDescribedFunctionTemplate();
-            void*                       InsertPos      = nullptr;
-            FunctionDecl*               CorrespondingCallOpSpecialization =
-                callOpTemplate->findSpecialization(tal->asArray(), InsertPos);
-            callOp = cast<CXXMethodDecl>(CorrespondingCallOpSpecialization);
+            void*                       insertPos      = nullptr;
+            FunctionDecl*               correspondingCallOpSpecialization =
+                callOpTemplate->findSpecialization(tal->asArray(), insertPos);
+            callOp = cast<CXXMethodDecl>(correspondingCallOpSpecialization);
         }
 
         InsertArg(callOp->getBody());
@@ -1819,14 +1819,14 @@ void CodeGenerator::InsertArg(const UsingDirectiveDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::print(const NestedNameSpecifier* stmt)
+void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
 {
     if(!stmt) {
         return;
     }
 
     if(const auto* prefix = stmt->getPrefix()) {
-        print(prefix);
+        PrintNamespace(prefix);
     }
 
     switch(stmt->getKind()) {
@@ -1847,10 +1847,10 @@ void CodeGenerator::print(const NestedNameSpecifier* stmt)
         case NestedNameSpecifier::TypeSpecWithTemplate:
         case NestedNameSpecifier::TypeSpec: {
 
-            const Type* T = stmt->getAsType();
-            mOutputFormatHelper.Append(GetName(QualType(T, 0)));
+            const Type* type = stmt->getAsType();
+            mOutputFormatHelper.Append(GetName(QualType(type, 0)));
 
-            if(const auto* SpecType = dyn_cast<TemplateSpecializationType>(T)) {
+            if(const auto* SpecType = dyn_cast<TemplateSpecializationType>(type)) {
                 InsertTemplateArgs(SpecType->template_arguments());
                 //            } else if(const auto* subs = dyn_cast_or_null<SubstTemplateTypeParmType>(T)) {
                 //                mOutputFormatHelper.Append(GetName(subs->getReplacementType()));
@@ -1918,12 +1918,12 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
     mOutputFormatHelper.Append("using ");
 
     // own implementation due to lambdas
-    if(const DeclContext* Ctx = stmt->getDeclContext()) {
-        if(Ctx->isFunctionOrMethod()) {
-            print(stmt->getQualifier());
+    if(const DeclContext* ctx = stmt->getDeclContext()) {
+        if(ctx->isFunctionOrMethod()) {
+            PrintNamespace(stmt->getQualifier());
 
         } else {
-            ParseDeclContext(Ctx);
+            ParseDeclContext(ctx);
         }
     }
 
@@ -1935,7 +1935,7 @@ void CodeGenerator::InsertArg(const NamespaceAliasDecl* stmt)
 {
     mOutputFormatHelper.Append("namespace ", stmt->getDeclName().getAsString(), " = ");
 
-    print(stmt->getQualifier());
+    PrintNamespace(stmt->getQualifier());
 
     mOutputFormatHelper.AppendNewLine(GetName(*stmt->getAliasedNamespace()), ";");
 }
@@ -2093,17 +2093,17 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat("_", name)));
         };
 
-        llvm::DenseMap<const VarDecl*, FieldDecl*> Captures{};
-        FieldDecl*                                 ThisCapture{};
+        llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
+        FieldDecl*                                 thisCapture{};
 
-        stmt->getCaptureFields(Captures, ThisCapture);
+        stmt->getCaptureFields(captures, thisCapture);
 
         const auto* captureInits = mLambdaExpr->capture_init_begin();
         const auto* captureInit  = *captureInits;
 
         // Check if it captures this
-        if(ThisCapture) {
-            addToInits("this", ThisCapture, true, captureInit);
+        if(thisCapture) {
+            addToInits("this", thisCapture, true, captureInit);
         } else {
             // Find the corresponding capture in the DenseMap. The DenseMap seems to be change its order each time.
             // Hence we use \c captures() to keep the order stable. While using \c Captures to generate the code as
@@ -2116,7 +2116,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     continue;
                 }
 
-                for(const auto& [key, value] : Captures) {
+                for(const auto& [key, value] : captures) {
                     if(key == c.getCapturedVar()) {
                         addToInits(GetName(*key), value, false, captureInit);
                         break;
