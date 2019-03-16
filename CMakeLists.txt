@@ -158,7 +158,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     add_definitions(-Wold-style-cast)
     add_definitions(-Werror)
     
-    if(IS_GNU)
+    if(IS_GNU AND NOT INSIGHTS_TIDY)
         add_definitions(-Wsuggest-override)
         #        add_definitions(-Wsuggest-final-types)
         add_definitions(-Wuseless-cast)

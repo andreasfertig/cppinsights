@@ -26,7 +26,7 @@ static const struct CppInsightsPrintingPolicy : PrintingPolicy
         ConstantsAsWritten     = true;
         AnonymousTagLocations  = false;  // does remove filename and line for from lambdas in parameters
     }
-} InsightsPrintingPolicy{};
+} InsightsPrintingPolicy{};  // NOLINT
 //-----------------------------------------------------------------------------
 
 static const std::string GetAsCPPStyleString(const QualType& t)
