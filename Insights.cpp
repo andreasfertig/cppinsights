@@ -28,7 +28,6 @@
 #include "CompilerGeneratedHandler.h"
 #include "FunctionDeclHandler.h"
 #include "GlobalVariableHandler.h"
-#include "ImplicitCastHandler.h"
 #include "StaticAssertHandler.h"
 #include "TemplateHandler.h"
 #include "version.h"
@@ -64,7 +63,6 @@ public:
     , mStaticAssertHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
     , mGlobalVariableHandler{rewriter, mMatcher}
-    , mImplicitCastHandler{rewriter, mMatcher}
     , mAutoStmtHandler{rewriter, mMatcher}
     , mFunctionDeclHandler{rewriter, mMatcher}
     , mRewriter{rewriter}
@@ -92,7 +90,6 @@ private:
     StaticAssertHandler      mStaticAssertHandler;
     TemplateHandler          mTemplateHandler;
     GlobalVariableHandler    mGlobalVariableHandler;
-    ImplicitCastHandler      mImplicitCastHandler;
     AutoStmtHandler          mAutoStmtHandler;
     FunctionDeclHandler      mFunctionDeclHandler;
     Rewriter&                mRewriter;

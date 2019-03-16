@@ -17,8 +17,8 @@ using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
 
 namespace clang::ast_matchers {
-const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl> varTemplateSpecDecl;
-const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl>             decompositionDecl;
+const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl> varTemplateSpecDecl;  // NOLINT
+const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl>             decompositionDecl;    // NOLINT
 }  // namespace clang::ast_matchers
 
 namespace clang::insights {

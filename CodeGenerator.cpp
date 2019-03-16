@@ -717,6 +717,32 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+bool CodeGenerator::InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl)
+{
+    if(cxxMethodDecl && cxxMethodDecl->isLambdaStaticInvoker()) {
+        mOutputFormatHelper.AppendNewLine();
+
+        const auto* lambda = cxxMethodDecl->getParent();
+        const auto* callOp = lambda->getLambdaCallOperator();
+        if(lambda->isGenericLambda() && cxxMethodDecl->isFunctionTemplateSpecialization()) {
+            const TemplateArgumentList* tal            = cxxMethodDecl->getTemplateSpecializationArgs();
+            FunctionTemplateDecl*       callOpTemplate = callOp->getDescribedFunctionTemplate();
+            void*                       insertPos      = nullptr;
+            FunctionDecl*               correspondingCallOpSpecialization =
+                callOpTemplate->findSpecialization(tal->asArray(), insertPos);
+            callOp = cast<CXXMethodDecl>(correspondingCallOpSpecialization);
+        }
+
+        InsertArg(callOp->getBody());
+        mOutputFormatHelper.AppendNewLine();
+
+        return true;
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 {
     //    LAMBDA_SCOPE_HELPER(VarDecl);
@@ -726,28 +752,14 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
     } else {
         InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
 
-        if(const auto* md = dyn_cast_or_null<CXXMethodDecl>(stmt); (md && md->isLambdaStaticInvoker())) {
-            mOutputFormatHelper.AppendNewLine();
-            const auto* Lambda = md->getParent();
-            const auto* CallOp = Lambda->getLambdaCallOperator();
-            if(Lambda->isGenericLambda() && md->isFunctionTemplateSpecialization()) {
-
-                const TemplateArgumentList* TAL            = md->getTemplateSpecializationArgs();
-                FunctionTemplateDecl*       CallOpTemplate = CallOp->getDescribedFunctionTemplate();
-                void*                       InsertPos      = nullptr;
-                FunctionDecl*               CorrespondingCallOpSpecialization =
-                    CallOpTemplate->findSpecialization(TAL->asArray(), InsertPos);
-                CallOp = cast<CXXMethodDecl>(CorrespondingCallOpSpecialization);
+        if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
+            if(stmt->doesThisDeclarationHaveABody()) {
+                mOutputFormatHelper.AppendNewLine();
+                InsertArg(stmt->getBody());
+                mOutputFormatHelper.AppendNewLine();
+            } else {
+                mOutputFormatHelper.AppendSemiNewLine();
             }
-
-            InsertArg(CallOp->getBody());
-            mOutputFormatHelper.AppendNewLine();
-        } else if(stmt->doesThisDeclarationHaveABody()) {
-            mOutputFormatHelper.AppendNewLine();
-            InsertArg(stmt->getBody());
-            mOutputFormatHelper.AppendNewLine();
-        } else {
-            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }
@@ -936,18 +948,19 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
     InsertArg(stmt->getCallee());
 
     if(isa<UserDefinedLiteral>(stmt)) {
-        if(const auto* DRE = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
-            if(const TemplateArgumentList* Args = cast<FunctionDecl>(DRE->getDecl())->getTemplateSpecializationArgs()) {
-                if(1 != Args->size()) {
-                    InsertTemplateArgs(Args->asArray());
+        if(const auto* declRefExpr = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
+            if(const TemplateArgumentList* args =
+                   cast<FunctionDecl>(declRefExpr->getDecl())->getTemplateSpecializationArgs()) {
+                if(1 != args->size()) {
+                    InsertTemplateArgs(args->asArray());
                 } else {
                     mOutputFormatHelper.Append('<');
 
-                    const TemplateArgument& Pack = Args->get(0);
+                    const TemplateArgument& pack = args->get(0);
 
-                    ForEachArg(Pack.pack_elements(), [&](const auto& arg) {
-                        const char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
-                        mOutputFormatHelper.Append("'", std::string{C}, "'");
+                    ForEachArg(pack.pack_elements(), [&](const auto& arg) {
+                        const char c{static_cast<char>(arg.getAsIntegral().getZExtValue())};
+                        mOutputFormatHelper.Append("'", std::string{c}, "'");
                     });
 
                     mOutputFormatHelper.Append('>');
@@ -990,9 +1003,9 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 
 void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
 {
-    const auto* Ctx = stmt->getDecl()->getDeclContext();
-    if(!Ctx->isFunctionOrMethod()) {
-        ParseDeclContext(Ctx);
+    const auto* ctx = stmt->getDecl()->getDeclContext();
+    if(!ctx->isFunctionOrMethod()) {
+        ParseDeclContext(ctx);
 
         mOutputFormatHelper.Append(GetPlainName(*stmt));
 
@@ -1419,7 +1432,7 @@ void CodeGenerator::InsertArg(const ExprWithCleanups* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static std::string getValueOfValueInit(const QualType& t)
+static std::string GetValueOfValueInit(const QualType& t)
 {
     const QualType& type = t.getCanonicalType();
 
@@ -1457,7 +1470,7 @@ static std::string getValueOfValueInit(const QualType& t)
             case Type::STK_FloatingComplex:
             case Type::STK_IntegralComplex:
                 if(const auto* complexType = type->getAs<ComplexType>()) {
-                    return getValueOfValueInit(complexType->getElementType());
+                    return GetValueOfValueInit(complexType->getElementType());
                 }
 
                 break;
@@ -1469,7 +1482,7 @@ static std::string getValueOfValueInit(const QualType& t)
 
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
         const auto&       elementType{tt->getElementType()};
-        const std::string elementTypeInitValue{getValueOfValueInit(elementType)};
+        const std::string elementTypeInitValue{GetValueOfValueInit(elementType)};
         const auto        size{std::clamp(tt->getSize().getZExtValue(), uint64_t(0), uint64_t(100))};
         std::string       ret{};
 
@@ -1491,7 +1504,7 @@ static std::string getValueOfValueInit(const QualType& t)
 
 void CodeGenerator::InsertArg(const ImplicitValueInitExpr* stmt)
 {
-    mOutputFormatHelper.Append(getValueOfValueInit(stmt->getType()));
+    mOutputFormatHelper.Append(GetValueOfValueInit(stmt->getType()));
 }
 //-----------------------------------------------------------------------------
 
@@ -1654,23 +1667,7 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         InsertArg(stmt->getBody());
         mOutputFormatHelper.AppendNewLine();
 
-    } else if(stmt->isLambdaStaticInvoker()) {
-        mOutputFormatHelper.AppendNewLine();
-        const auto* lambda = stmt->getParent();
-        const auto* callOp = lambda->getLambdaCallOperator();
-        if(lambda->isGenericLambda() && stmt->isFunctionTemplateSpecialization()) {
-            const TemplateArgumentList* tal            = stmt->getTemplateSpecializationArgs();
-            FunctionTemplateDecl*       callOpTemplate = callOp->getDescribedFunctionTemplate();
-            void*                       InsertPos      = nullptr;
-            FunctionDecl*               CorrespondingCallOpSpecialization =
-                callOpTemplate->findSpecialization(tal->asArray(), InsertPos);
-            callOp = cast<CXXMethodDecl>(CorrespondingCallOpSpecialization);
-        }
-
-        InsertArg(callOp->getBody());
-        mOutputFormatHelper.AppendNewLine();
-
-    } else {
+    } else if(not InsertLambdaStaticInvoker(stmt)) {
         mOutputFormatHelper.AppendSemiNewLine();
     }
 
@@ -1819,14 +1816,14 @@ void CodeGenerator::InsertArg(const UsingDirectiveDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::print(const NestedNameSpecifier* stmt)
+void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
 {
     if(!stmt) {
         return;
     }
 
     if(const auto* prefix = stmt->getPrefix()) {
-        print(prefix);
+        PrintNamespace(prefix);
     }
 
     switch(stmt->getKind()) {
@@ -1847,11 +1844,11 @@ void CodeGenerator::print(const NestedNameSpecifier* stmt)
         case NestedNameSpecifier::TypeSpecWithTemplate:
         case NestedNameSpecifier::TypeSpec: {
 
-            const Type* T = stmt->getAsType();
-            mOutputFormatHelper.Append(GetName(QualType(T, 0)));
+            const Type* type = stmt->getAsType();
+            mOutputFormatHelper.Append(GetName(QualType(type, 0)));
 
-            if(const auto* SpecType = dyn_cast<TemplateSpecializationType>(T)) {
-                InsertTemplateArgs(SpecType->template_arguments());
+            if(const auto* tmplSpecType = dyn_cast<TemplateSpecializationType>(type)) {
+                InsertTemplateArgs(tmplSpecType->template_arguments());
                 //            } else if(const auto* subs = dyn_cast_or_null<SubstTemplateTypeParmType>(T)) {
                 //                mOutputFormatHelper.Append(GetName(subs->getReplacementType()));
             }
@@ -1864,48 +1861,48 @@ void CodeGenerator::print(const NestedNameSpecifier* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::ParseDeclContext(const DeclContext* Ctx)
+void CodeGenerator::ParseDeclContext(const DeclContext* ctx)
 {
     SmallVector<const DeclContext*, 8> contexts{};
 
-    while(Ctx) {
-        if(isa<NamedDecl>(Ctx)) {
-            contexts.push_back(Ctx);
+    while(ctx) {
+        if(isa<NamedDecl>(ctx)) {
+            contexts.push_back(ctx);
         }
-        Ctx = Ctx->getParent();
+        ctx = ctx->getParent();
     }
 
-    for(const auto* DC : llvm::reverse(contexts)) {
-        if(const auto* Spec = dyn_cast<ClassTemplateSpecializationDecl>(DC)) {
-            mOutputFormatHelper.Append(Spec->getName());
-            InsertTemplateArgs(*Spec);
+    for(const auto* declContext : llvm::reverse(contexts)) {
+        if(const auto* classTmplSpec = dyn_cast<ClassTemplateSpecializationDecl>(declContext)) {
+            mOutputFormatHelper.Append(classTmplSpec->getName());
+            InsertTemplateArgs(*classTmplSpec);
 
-        } else if(const auto* ND = dyn_cast<NamespaceDecl>(DC)) {
-            if(ND->isAnonymousNamespace() || ND->isInline()) {
+        } else if(const auto* nd = dyn_cast<NamespaceDecl>(declContext)) {
+            if(nd->isAnonymousNamespace() || nd->isInline()) {
                 continue;
             }
 
-            mOutputFormatHelper.Append(ND->getNameAsString());
+            mOutputFormatHelper.Append(nd->getNameAsString());
 
-        } else if(const auto* RD = dyn_cast<RecordDecl>(DC)) {
-            if(!RD->getIdentifier()) {
+        } else if(const auto* rd = dyn_cast<RecordDecl>(declContext)) {
+            if(!rd->getIdentifier()) {
                 continue;
             }
 
-            mOutputFormatHelper.Append(RD->getNameAsString());
+            mOutputFormatHelper.Append(rd->getNameAsString());
 
-        } else if(dyn_cast<FunctionDecl>(DC)) {
+        } else if(dyn_cast<FunctionDecl>(declContext)) {
             continue;
 
-        } else if(const auto* ED = dyn_cast<EnumDecl>(DC)) {
-            if(!ED->isScoped()) {
+        } else if(const auto* ed = dyn_cast<EnumDecl>(declContext)) {
+            if(!ed->isScoped()) {
                 continue;
             }
 
-            mOutputFormatHelper.Append(ED->getNameAsString());
+            mOutputFormatHelper.Append(ed->getNameAsString());
 
         } else {
-            mOutputFormatHelper.Append(cast<NamedDecl>(DC)->getNameAsString());
+            mOutputFormatHelper.Append(cast<NamedDecl>(declContext)->getNameAsString());
         }
 
         mOutputFormatHelper.Append("::");
@@ -1918,12 +1915,12 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
     mOutputFormatHelper.Append("using ");
 
     // own implementation due to lambdas
-    if(const DeclContext* Ctx = stmt->getDeclContext()) {
-        if(Ctx->isFunctionOrMethod()) {
-            print(stmt->getQualifier());
+    if(const DeclContext* ctx = stmt->getDeclContext()) {
+        if(ctx->isFunctionOrMethod()) {
+            PrintNamespace(stmt->getQualifier());
 
         } else {
-            ParseDeclContext(Ctx);
+            ParseDeclContext(ctx);
         }
     }
 
@@ -1935,7 +1932,7 @@ void CodeGenerator::InsertArg(const NamespaceAliasDecl* stmt)
 {
     mOutputFormatHelper.Append("namespace ", stmt->getDeclName().getAsString(), " = ");
 
-    print(stmt->getQualifier());
+    PrintNamespace(stmt->getQualifier());
 
     mOutputFormatHelper.AppendNewLine(GetName(*stmt->getAliasedNamespace()), ";");
 }
@@ -2093,17 +2090,17 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat("_", name)));
         };
 
-        llvm::DenseMap<const VarDecl*, FieldDecl*> Captures{};
-        FieldDecl*                                 ThisCapture{};
+        llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
+        FieldDecl*                                 thisCapture{};
 
-        stmt->getCaptureFields(Captures, ThisCapture);
+        stmt->getCaptureFields(captures, thisCapture);
 
         const auto* captureInits = mLambdaExpr->capture_init_begin();
         const auto* captureInit  = *captureInits;
 
         // Check if it captures this
-        if(ThisCapture) {
-            addToInits("this", ThisCapture, true, captureInit);
+        if(thisCapture) {
+            addToInits("this", thisCapture, true, captureInit);
         } else {
             // Find the corresponding capture in the DenseMap. The DenseMap seems to be change its order each time.
             // Hence we use \c captures() to keep the order stable. While using \c Captures to generate the code as
@@ -2116,7 +2113,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     continue;
                 }
 
-                for(const auto& [key, value] : Captures) {
+                for(const auto& [key, value] : captures) {
                     if(key == c.getCapturedVar()) {
                         addToInits(GetName(*key), value, false, captureInit);
                         break;
@@ -2734,7 +2731,7 @@ void CodeGenerator::WrapInParensOrCurlys(const BraceKind braceKind, T&& lambda, 
 template<typename T>
 void CodeGenerator::WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Parens, std::forward<T>(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 
@@ -2742,7 +2739,7 @@ template<typename T>
 void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(needsParens) {
-        WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+        WrapInParensOrCurlys(BraceKind::Parens, std::forward<T>(lambda), addSpaceAtTheEnd);
     } else {
         lambda();
     }
@@ -2752,7 +2749,7 @@ void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const Add
 template<typename T>
 void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, std::move(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Curlys, std::forward<T>(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 

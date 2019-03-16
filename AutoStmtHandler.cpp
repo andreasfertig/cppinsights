@@ -21,7 +21,7 @@ using namespace clang::ast_matchers;
 namespace clang::ast_matchers {
 
 // XXX: recent clang source has a declType matcher. Try to figure out a migration path.
-const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType> myDecltypeType;
+const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType> myDecltypeType;  // NOLINT
 //-----------------------------------------------------------------------------
 }  // namespace clang::ast_matchers
 

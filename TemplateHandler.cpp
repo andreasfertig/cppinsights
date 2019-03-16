@@ -21,7 +21,7 @@ using namespace clang::ast_matchers;
 //-----------------------------------------------------------------------------
 
 namespace clang::ast_matchers {
-const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;
+const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;  // NOLINT
 }
 
 namespace clang::insights {
@@ -45,7 +45,7 @@ InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceMan
 
 // Workaround to keep clang 6 Linux build alive
 template<class T, class U>
-inline constexpr bool is_same_v = std::is_same<T, U>::value;
+inline constexpr bool is_same_v = std::is_same<T, U>::value;  // NOLINT
 //-----------------------------------------------------------------------------
 
 /// \brief Insert the instantiated template with the resulting code.
@@ -58,7 +58,7 @@ static OutputFormatHelper InsertInstantiatedTemplate(const T& decl, const MatchF
 
     const auto& sm = GetSM(result);
 
-    if constexpr(not is_same_v<VarTemplateDecl, T>) {
+    if constexpr(not is_same_v<VarTemplateDecl, T>) {  // NOLINT
         InsertInstantiationPoint(outputFormatHelper, sm, decl.getPointOfInstantiation());
     }
 

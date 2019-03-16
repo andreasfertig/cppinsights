@@ -31,19 +31,11 @@ protected:
     }
 
 protected:
-    bool SkipIfAlreadySeen(const Stmt* stmt);
-
     void InsertIndentedText(SourceLocation loc, OutputFormatHelper& outputFormatHelper);
 
 private:
     std::unordered_map<intptr_t, bool> mMap;
 };
-//-----------------------------------------------------------------------------
-
-#define SKIP_IF_ALREADY_SEEN(expr)                                                                                     \
-    if(SkipIfAlreadySeen(expr)) {                                                                                      \
-        return;                                                                                                        \
-    }
 //-----------------------------------------------------------------------------
 
 }  // namespace clang::insights

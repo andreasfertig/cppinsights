@@ -176,8 +176,9 @@ protected:
     void InsertSuffix(const QualType& type);
     void InsertTemplateArgs(const ArrayRef<TemplateArgument>& array);
     void InsertTemplateArg(const TemplateArgument& arg);
+    bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
 
-    void print(const NestedNameSpecifier* namespaceSpecifier);
+    void PrintNamespace(const NestedNameSpecifier* namespaceSpecifier);
     void ParseDeclContext(const DeclContext* Ctx);
 
     /// \brief Check whether or not this statement will add curlys or parentheses and add them only if required.
