@@ -948,8 +948,9 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
     InsertArg(stmt->getCallee());
 
     if(isa<UserDefinedLiteral>(stmt)) {
-        if(const auto* DRE = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
-            if(const TemplateArgumentList* args = cast<FunctionDecl>(DRE->getDecl())->getTemplateSpecializationArgs()) {
+        if(const auto* declRefExpr = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
+            if(const TemplateArgumentList* args =
+                   cast<FunctionDecl>(declRefExpr->getDecl())->getTemplateSpecializationArgs()) {
                 if(1 != args->size()) {
                     InsertTemplateArgs(args->asArray());
                 } else {
@@ -958,8 +959,8 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
                     const TemplateArgument& pack = args->get(0);
 
                     ForEachArg(pack.pack_elements(), [&](const auto& arg) {
-                        const char C{static_cast<char>(arg.getAsIntegral().getZExtValue())};
-                        mOutputFormatHelper.Append("'", std::string{C}, "'");
+                        const char c{static_cast<char>(arg.getAsIntegral().getZExtValue())};
+                        mOutputFormatHelper.Append("'", std::string{c}, "'");
                     });
 
                     mOutputFormatHelper.Append('>');
@@ -1846,8 +1847,8 @@ void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
             const Type* type = stmt->getAsType();
             mOutputFormatHelper.Append(GetName(QualType(type, 0)));
 
-            if(const auto* SpecType = dyn_cast<TemplateSpecializationType>(type)) {
-                InsertTemplateArgs(SpecType->template_arguments());
+            if(const auto* tmplSpecType = dyn_cast<TemplateSpecializationType>(type)) {
+                InsertTemplateArgs(tmplSpecType->template_arguments());
                 //            } else if(const auto* subs = dyn_cast_or_null<SubstTemplateTypeParmType>(T)) {
                 //                mOutputFormatHelper.Append(GetName(subs->getReplacementType()));
             }
@@ -1860,48 +1861,48 @@ void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::ParseDeclContext(const DeclContext* Ctx)
+void CodeGenerator::ParseDeclContext(const DeclContext* ctx)
 {
     SmallVector<const DeclContext*, 8> contexts{};
 
-    while(Ctx) {
-        if(isa<NamedDecl>(Ctx)) {
-            contexts.push_back(Ctx);
+    while(ctx) {
+        if(isa<NamedDecl>(ctx)) {
+            contexts.push_back(ctx);
         }
-        Ctx = Ctx->getParent();
+        ctx = ctx->getParent();
     }
 
-    for(const auto* DC : llvm::reverse(contexts)) {
-        if(const auto* Spec = dyn_cast<ClassTemplateSpecializationDecl>(DC)) {
-            mOutputFormatHelper.Append(Spec->getName());
-            InsertTemplateArgs(*Spec);
+    for(const auto* declContext : llvm::reverse(contexts)) {
+        if(const auto* classTmplSpec = dyn_cast<ClassTemplateSpecializationDecl>(declContext)) {
+            mOutputFormatHelper.Append(classTmplSpec->getName());
+            InsertTemplateArgs(*classTmplSpec);
 
-        } else if(const auto* ND = dyn_cast<NamespaceDecl>(DC)) {
-            if(ND->isAnonymousNamespace() || ND->isInline()) {
+        } else if(const auto* nd = dyn_cast<NamespaceDecl>(declContext)) {
+            if(nd->isAnonymousNamespace() || nd->isInline()) {
                 continue;
             }
 
-            mOutputFormatHelper.Append(ND->getNameAsString());
+            mOutputFormatHelper.Append(nd->getNameAsString());
 
-        } else if(const auto* RD = dyn_cast<RecordDecl>(DC)) {
-            if(!RD->getIdentifier()) {
+        } else if(const auto* rd = dyn_cast<RecordDecl>(declContext)) {
+            if(!rd->getIdentifier()) {
                 continue;
             }
 
-            mOutputFormatHelper.Append(RD->getNameAsString());
+            mOutputFormatHelper.Append(rd->getNameAsString());
 
-        } else if(dyn_cast<FunctionDecl>(DC)) {
+        } else if(dyn_cast<FunctionDecl>(declContext)) {
             continue;
 
-        } else if(const auto* ED = dyn_cast<EnumDecl>(DC)) {
-            if(!ED->isScoped()) {
+        } else if(const auto* ed = dyn_cast<EnumDecl>(declContext)) {
+            if(!ed->isScoped()) {
                 continue;
             }
 
-            mOutputFormatHelper.Append(ED->getNameAsString());
+            mOutputFormatHelper.Append(ed->getNameAsString());
 
         } else {
-            mOutputFormatHelper.Append(cast<NamedDecl>(DC)->getNameAsString());
+            mOutputFormatHelper.Append(cast<NamedDecl>(declContext)->getNameAsString());
         }
 
         mOutputFormatHelper.Append("::");
@@ -2730,7 +2731,7 @@ void CodeGenerator::WrapInParensOrCurlys(const BraceKind braceKind, T&& lambda, 
 template<typename T>
 void CodeGenerator::WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Parens, std::forward<T>(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 
@@ -2738,7 +2739,7 @@ template<typename T>
 void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(needsParens) {
-        WrapInParensOrCurlys(BraceKind::Parens, std::move(lambda), addSpaceAtTheEnd);
+        WrapInParensOrCurlys(BraceKind::Parens, std::forward<T>(lambda), addSpaceAtTheEnd);
     } else {
         lambda();
     }
@@ -2748,7 +2749,7 @@ void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const Add
 template<typename T>
 void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, std::move(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Curlys, std::forward<T>(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 
