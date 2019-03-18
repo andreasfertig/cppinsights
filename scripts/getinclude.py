@@ -20,17 +20,17 @@ def main():
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
-    m = re.findall('\n (/.*)', stderr)
+    m = re.findall(b'\n (/.*)', stderr)
 
     includes = ''
 
     for x in m:
-        if -1 != x.find('(framework directory)'):
+        if -1 != x.find(b'(framework directory)'):
             continue
 
-        includes += '-isystem%s ' %(x)
+        includes += '-isystem%s ' % os.path.normpath(x.decode())
 
-    print includes
+    print(includes)
 
     return 1
 #------------------------------------------------------------------------------
