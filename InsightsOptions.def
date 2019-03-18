@@ -1,0 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// C++ Insights, copyright (C) by Andreas Fertig
+// Distributed under an MIT license. See LICENSE for details
+//
+///////////////////////////////////////////////////////////////////////////////
+
+/// \brief C++ Insights options definition
+#ifndef INSIGHTS_OPT
+#define INSIGHTS_OPT(opt, name, deflt, description)
+#endif
+
+#undef INSIGHTS_OPT
