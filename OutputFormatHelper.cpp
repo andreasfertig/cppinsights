@@ -73,16 +73,4 @@ void OutputFormatHelper::RemoveIndent()
 }
 //-----------------------------------------------------------------------------
 
-void OutputFormatHelper::RemoveIndentIncludingLastNewLine()
-{
-
-    while('\n' != mOutput.back()) {
-        RemoveIndent();
-    }
-
-    mOutput.pop_back();
-    mOutput += ' ';
-}
-//-----------------------------------------------------------------------------
-
 }  // namespace clang::insights

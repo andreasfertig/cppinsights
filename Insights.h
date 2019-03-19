@@ -9,6 +9,9 @@
 #define INSIGHTS_H
 //-----------------------------------------------------------------------------
 
+#include "clang/AST/ASTContext.h"
+//-----------------------------------------------------------------------------
+
 /// \brief Global C++ Insights command line options.
 struct InsightsOptions
 {
@@ -18,7 +21,11 @@ struct InsightsOptions
 //-----------------------------------------------------------------------------
 
 /// \brief Get the global C++ Insights options.
-const InsightsOptions& GetInsightsOptions();
+extern const InsightsOptions& GetInsightsOptions();
+//-----------------------------------------------------------------------------
+
+/// \brief Get access to the ASTContext
+extern const clang::ASTContext& GetGlobalAST();
 //-----------------------------------------------------------------------------
 
 #endif /* INSIGHTS_H */

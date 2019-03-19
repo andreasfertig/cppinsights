@@ -75,6 +75,13 @@ static llvm::cl::opt<bool> gStdinMode("stdin",
 #include "InsightsOptions.def"
 //-----------------------------------------------------------------------------
 
+static const ASTContext* gAST{};
+const ASTContext&        GetGlobalAST()
+{
+    return *gAST;
+}
+//-----------------------------------------------------------------------------
+
 class CppInsightASTConsumer final : public ASTConsumer
 {
 public:

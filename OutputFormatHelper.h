@@ -57,8 +57,6 @@ public:
         }
     }
 
-    void RemoveIndentIncludingLastNewLine();
-
     /// \brief Check whether the buffer is empty.
     ///
     /// This also treats a string of just whitespaces as empty.

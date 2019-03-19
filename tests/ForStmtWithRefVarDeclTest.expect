@@ -1,0 +1,14 @@
+// cmdlineinsights:-alt-syntax-for
+int main()
+{
+  int x = {};
+  {
+    int & z = x;
+    int & y = z;
+    while(true) {
+    }
+    
+  }
+  
+}
+

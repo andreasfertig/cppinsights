@@ -7,8 +7,10 @@
 
 #include "CodeGenerator.h"
 #include <algorithm>
+#include <vector>
 #include "ClangCompat.h"
 #include "DPrint.h"
+#include "Insights.h"
 #include "InsightsBase.h"
 #include "InsightsMatchers.h"
 #include "InsightsOnce.h"
@@ -134,75 +136,88 @@ void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+template<typename T>
+static void AddStmt(std::vector<Stmt*>& v, const T& stmt)
+{
+    if(stmt) {
+        v.push_back(const_cast<Stmt*>(static_cast<const Stmt*>(stmt)));
+    }
+}
+//-----------------------------------------------------------------------------
+
+static void AddBodyStmts(std::vector<Stmt*>& v, Stmt* body)
+{
+    if(auto* b = dyn_cast_or_null<CompoundStmt>(body)) {
+        for(auto* st : b->children()) {
+            v.push_back(st);
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 {
-    mOutputFormatHelper.OpenScope();
-
     auto&      langOpts{GetLangOpts(*rangeForStmt->getLoopVariable())};
     const bool onlyCpp11{not langOpts.CPlusPlus14};
 
+    auto* rwStmt = const_cast<CXXForRangeStmt*>(rangeForStmt);
+
+    std::vector<Stmt*> outerScopeStmts{};
+    std::vector<Stmt*> bodyStmts{};
+
 #if IS_CLANG_NEWER_THAN(7)
     // C++20 init-statement
-    InsertArg(rangeForStmt->getInit());
+    AddStmt(outerScopeStmts, rangeForStmt->getInit());
 #endif
 
     // range statement
-    InsertArg(rangeForStmt->getRangeStmt());
+    AddStmt(outerScopeStmts, rangeForStmt->getRangeStmt());
 
     if(not onlyCpp11) {
-        InsertArg(rangeForStmt->getBeginStmt());
-        InsertArg(rangeForStmt->getEndStmt());
+        AddStmt(outerScopeStmts, rangeForStmt->getBeginStmt());
+        AddStmt(outerScopeStmts, rangeForStmt->getEndStmt());
     }
 
-    // add blank line after the declarations
-    mOutputFormatHelper.AppendNewLine();
+    // add the loop variable to the body
+    AddStmt(bodyStmts, rangeForStmt->getLoopVarStmt());
 
-    mOutputFormatHelper.Append("for( ");
+    // add the body itself, without the CompoundStmt
+    AddBodyStmts(bodyStmts, rwStmt->getBody());
 
-    if(not onlyCpp11) {
-        mOutputFormatHelper.Append("; ");
-    } else {
-        mUseCommaInsteadOfSemi = UseCommaInsteadOfSemi::Yes;
+    const auto& ctx = rangeForStmt->getLoopVariable()->getASTContext();
+    Decl*       decls[2]{rwStmt->getBeginStmt()->getSingleDecl(), rwStmt->getEndStmt()->getSingleDecl()};
+    auto        dgRef = DeclGroupRef::Create(const_cast<ASTContext&>(ctx), decls, 2);
 
-        InsertArg(rangeForStmt->getBeginStmt());
+    auto* declStmt = [&]() -> DeclStmt* {
+        if(onlyCpp11) {
+            return new(ctx) DeclStmt(dgRef, rangeForStmt->getBeginLoc(), rangeForStmt->getEndLoc());
+        }
 
-        mUseCommaInsteadOfSemi = UseCommaInsteadOfSemi::No;
-        mSkipVarDecl           = SkipVarDecl::Yes;
-        InsertArg(rangeForStmt->getEndStmt());
-        mSkipVarDecl = SkipVarDecl::No;
-    }
+        return nullptr;
+    }();
 
-    InsertArg(rangeForStmt->getCond());
+    ArrayRef<Stmt*> innerScopeStmtsRef{bodyStmts};
+    auto*           innerScope =
+        CompoundStmt::Create(ctx, innerScopeStmtsRef, rangeForStmt->getBeginLoc(), rangeForStmt->getEndLoc());
 
-    mOutputFormatHelper.Append("; ");
+    auto* forStmt = new(ctx) ForStmt(ctx,
+                                     declStmt,
+                                     rwStmt->getCond(),
+                                     rwStmt->getLoopVariable(),
+                                     rwStmt->getInc(),
+                                     innerScope,
+                                     rangeForStmt->getBeginLoc(),
+                                     rangeForStmt->getEndLoc(),
+                                     rangeForStmt->getEndLoc());
 
-    InsertArg(rangeForStmt->getInc());
+    AddStmt(outerScopeStmts, forStmt);
 
-    mOutputFormatHelper.AppendNewLine(" )");
-    // open for loop scope
-    mOutputFormatHelper.OpenScope();
+    ArrayRef<Stmt*> outerScopeStmtsRef{outerScopeStmts};
+    auto*           outerScope =
+        CompoundStmt::Create(ctx, outerScopeStmtsRef, rangeForStmt->getBeginLoc(), rangeForStmt->getEndLoc());
 
-    InsertArg(rangeForStmt->getLoopVariable());
+    InsertArg(outerScope);
 
-    const auto* body         = rangeForStmt->getBody();
-    const bool  isBodyBraced = isa<CompoundStmt>(body);
-
-    /* we already opened a scope. Skip the initial one */
-    if(!isBodyBraced) {
-        InsertArg(body);
-    } else {
-        HandleCompoundStmt(dyn_cast_or_null<CompoundStmt>(body));
-    }
-
-    if(!isBodyBraced && !isa<NullStmt>(body)) {
-        mOutputFormatHelper.AppendSemiNewLine();
-    }
-
-    // close range-for scope in for
-    mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
-
-    // close outer range-for scope
-    mOutputFormatHelper.CloseScope();
     mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
@@ -321,8 +336,13 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 
 void CodeGenerator::InsertArg(const WhileStmt* stmt)
 {
-    mOutputFormatHelper.Append("while");
-    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    {
+        // We need to handle the case that a lambda is used in the init-statement of the for-loop.
+        LAMBDA_SCOPE_HELPER(VarDecl);
+
+        mOutputFormatHelper.Append("while");
+        WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    }
 
     const auto* body = stmt->getBody();
     const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
@@ -367,8 +387,8 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
     const auto*       meDecl = stmt->getMemberDecl();
     bool              skipTemplateArgs{false};
     const auto        name = [&]() -> std::string {
-        // Handle a special case where we have a lambda static invoke operator. In that case use the appropriate using
-        // retType as return type
+        // Handle a special case where we have a lambda static invoke operator. In that case use the appropriate
+        // using retType as return type
         if(const auto* m = dyn_cast_or_null<CXXMethodDecl>(meDecl)) {
             if(const auto* rd = m->getParent(); rd && rd->isLambda()) {
                 skipTemplateArgs = true;
@@ -643,9 +663,11 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 {
     LAMBDA_SCOPE_HELPER(VarDecl);
 
-    const bool isTemplateSpecialization{isa<VarTemplateSpecializationDecl>(stmt)};
+    if(InsertComma()) {
+        mOutputFormatHelper.Append(',');
+    }
 
-    if(isTemplateSpecialization) {
+    if(isa<VarTemplateSpecializationDecl>(stmt)) {
         mOutputFormatHelper.AppendNewLine("template<>");
     }
 
@@ -655,7 +677,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         HandleLocalStaticNonTrivialClass(stmt);
 
     } else {
-        if(SkipVarDecl::No == mSkipVarDecl) {
+        if(InsertVarDecl()) {
             mOutputFormatHelper.Append(GetQualifiers(*stmt));
 
             if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
@@ -669,7 +691,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                     std::string name{GetName(*stmt)};
 
                     if(const auto* tvd = dyn_cast_or_null<VarTemplateSpecializationDecl>(stmt)) {
-                        OutputFormatHelper outputFormatHelper;
+                        OutputFormatHelper outputFormatHelper{};
                         CodeGenerator      codeGenerator{outputFormatHelper};
 
                         codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
@@ -708,10 +730,8 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
             mOutputFormatHelper.Append(" /* NRVO variable */");
         }
 
-        if(UseCommaInsteadOfSemi::No == mUseCommaInsteadOfSemi) {
+        if(InsertSemi()) {
             mOutputFormatHelper.AppendSemiNewLine();
-        } else {
-            mOutputFormatHelper.Append(',');
         }
     }
 }
@@ -1118,42 +1138,83 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
 void CodeGenerator::InsertArg(const ForStmt* stmt)
 {
-    mOutputFormatHelper.Append("for");
+    // https://github.com/vtjnash/clang-ast-builder/blob/master/AstBuilder.cpp
+    // http://clang-developers.42468.n3.nabble.com/Adding-nodes-to-Clang-s-AST-td4054800.html
+    // https://stackoverflow.com/questions/30451485/how-to-clone-or-create-an-ast-stmt-node-of-clang/38899615
 
-    WrapInParens(
-        [&]() {
-            if(const auto* init = stmt->getInit()) {
-                InsertArg(init);
+    if(GetInsightsOptions().UseAltForSyntax) {
+        auto* rwStmt = const_cast<ForStmt*>(stmt);
 
-                // the init-stmt carries a ; at the end plus a newline. Remove and replace it with
-                // a space
-                mOutputFormatHelper.RemoveIndentIncludingLastNewLine();
-            } else {
-                mOutputFormatHelper.Append("; ");
+        const auto&        ctx = GetGlobalAST();
+        std::vector<Stmt*> bodyStmts{};
+
+        AddBodyStmts(bodyStmts, rwStmt->getBody());
+        AddStmt(bodyStmts, rwStmt->getInc());
+
+        auto* condition = [&]() -> Expr* {
+            if(rwStmt->getCond()) {
+                return rwStmt->getCond();
             }
 
-            InsertArg(stmt->getCond());
-            mOutputFormatHelper.Append("; ");
+            return new(ctx) CXXBoolLiteralExpr(true, {}, stmt->getBeginLoc());
+        }();
 
-            InsertArg(stmt->getInc());
-        },
-        AddSpaceAtTheEnd::Yes);
+        ArrayRef<Stmt*> bodyStmtsRef{bodyStmts};
+        auto*           outerBody = CompoundStmt::Create(ctx, bodyStmtsRef, stmt->getBeginLoc(), stmt->getEndLoc());
+        auto*           whileStmt = WhileStmt::Create(ctx, nullptr, condition, outerBody, stmt->getBeginLoc());
 
-    const auto* body = stmt->getBody();
-    const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
+        std::vector<Stmt*> outerScopeStmts{};
+        AddStmt(outerScopeStmts, rwStmt->getInit());
+        AddStmt(outerScopeStmts, whileStmt);
 
-    if(hasCompoundStmt) {
+        ArrayRef<Stmt*> outerScopeStmtsRef{outerScopeStmts};
+        auto* outerScopeBody = CompoundStmt::Create(ctx, outerScopeStmtsRef, stmt->getBeginLoc(), stmt->getEndLoc());
+
+        InsertArg(outerScopeBody);
         mOutputFormatHelper.AppendNewLine();
-    }
 
-    InsertArg(body);
-
-    // Note: an empty for-loop carries a simi-colon at the end
-    if(hasCompoundStmt) {
-        mOutputFormatHelper.AppendNewLine();
     } else {
-        if(!isa<CompoundStmt>(body) && !isa<NullStmt>(body)) {
-            mOutputFormatHelper.AppendSemiNewLine();
+
+        {
+            // We need to handle the case that a lambda is used in the init-statement of the for-loop.
+            LAMBDA_SCOPE_HELPER(VarDecl);
+
+            mOutputFormatHelper.Append("for");
+
+            WrapInParens(
+                [&]() {
+                    if(const auto* init = stmt->getInit()) {
+                        MultiStmtDeclCodeGenerator codeGenerator{mOutputFormatHelper, mLambdaStack};
+                        codeGenerator.InsertArg(init);
+
+                    } else {
+                        mOutputFormatHelper.Append("; ");
+                    }
+
+                    InsertArg(stmt->getCond());
+                    mOutputFormatHelper.Append("; ");
+
+                    InsertArg(stmt->getInc());
+                },
+                AddSpaceAtTheEnd::Yes);
+        }
+
+        const auto* body = stmt->getBody();
+        const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
+
+        if(hasCompoundStmt) {
+            mOutputFormatHelper.AppendNewLine();
+        }
+
+        InsertArg(body);
+
+        // Note: an empty for-loop carries a simi-colon at the end
+        if(hasCompoundStmt) {
+            mOutputFormatHelper.AppendNewLine();
+        } else {
+            if(!isa<CompoundStmt>(body) && !isa<NullStmt>(body)) {
+                mOutputFormatHelper.AppendSemiNewLine();
+            }
         }
     }
 
@@ -1606,8 +1667,8 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
     initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
     CXXConstructorDecl* cxxInheritedCtorDecl{nullptr};
 
-    // travers the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the name
-    // and the type. The CXXMethodDecl above knows only the type.
+    // travers the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the
+    // name and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         CodeGenerator codeGenerator{initOutputFormatHelper};
         OnceTrue      first{};
@@ -2031,8 +2092,8 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             continue;
         }
 
-        // Insert a newline when the decl kind changes. This for example, inserts a newline when after a FieldDecl we
-        // see a CXXMethodDecl.
+        // Insert a newline when the decl kind changes. This for example, inserts a newline when after a FieldDecl
+        // we see a CXXMethodDecl.
         if(not firstDecl && (d->getKind() != formerKind)) {
             // mOutputFormatHelper.AppendNewLine();
         }
@@ -2124,8 +2185,8 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
         ctorInitializers.append("}");
 
-        // generate the ctor only if it is required, i.e. we have captures. This is in fact a trick to get compiliing
-        // code out of it. The compiler itself does not generate a constructor in many many cases.
+        // generate the ctor only if it is required, i.e. we have captures. This is in fact a trick to get
+        // compiliing code out of it. The compiler itself does not generate a constructor in many many cases.
         if(ctorRequired) {
             mOutputFormatHelper.AppendNewLine(")");
             mOutputFormatHelper.AppendNewLine(ctorInitializerList);
@@ -2763,8 +2824,8 @@ void StructuredBindingsCodeGenerator::InsertArg(const DeclRefExpr* stmt)
 {
     const auto name = GetName(*stmt);
 
-    // Special case for structured bindings, probably only with std::tuple. The get which is used to retrieve the value
-    // seems to carry no std:: in front. Insert it to make the code compile.
+    // Special case for structured bindings, probably only with std::tuple. The get which is used to retrieve the
+    // value seems to carry no std:: in front. Insert it to make the code compile.
     if(not name.empty() && BeginsWith(name, "get")) {
         mOutputFormatHelper.Append("std::");
     }

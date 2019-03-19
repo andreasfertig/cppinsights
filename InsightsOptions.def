@@ -10,4 +10,6 @@
 #define INSIGHTS_OPT(opt, name, deflt, description)
 #endif
 
+INSIGHTS_OPT("alt-syntax-for", UseAltForSyntax, false, "Transform all for-loops into their equivalent while-loop.")
+
 #undef INSIGHTS_OPT

@@ -1,0 +1,66 @@
+// cmdlineinsights:-alt-syntax-for
+int main()
+{
+  int x = 0;
+  {
+    while(x < 20) {
+      x += x;
+      ++x;
+    }
+    
+  }
+  
+  {
+    int i = 0;
+    while(x < 20) {
+      x += i;
+      ++x;
+    }
+    
+  }
+  
+  {
+    int i = 0;
+    int y = 2;
+    int t = 4;
+    int o = 5;
+    while(i < 20) {
+      x += i;
+      ++i;
+    }
+    
+  }
+  
+  {
+    int * i = &x;
+    int * y = &x;
+    while(i) {
+      x += *i;
+      ++i;
+    }
+    
+  }
+  
+  {
+    while(true) {
+    }
+    
+  }
+  
+  char data[5] = {'\0', '\0', '\0', '\0', '\0'};
+  {
+    char (&__range1)[5] = data;
+    char * __begin1 = __range1;
+    char * __end1 = __range1 + 5l;
+    {
+      while(__begin1 != __end1) {
+        char & x = *__begin1;
+        x = 2;
+        ++__begin1;
+      }
+      
+    }
+    
+  }
+}
+
