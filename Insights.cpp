@@ -26,6 +26,7 @@
 #include "AutoStmtHandler.h"
 #include "CodeGenerator.h"
 #include "CompilerGeneratedHandler.h"
+#include "DPrint.h"
 #include "FunctionDeclHandler.h"
 #include "GlobalVariableHandler.h"
 #include "Insights.h"

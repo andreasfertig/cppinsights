@@ -84,14 +84,6 @@ AST_MATCHER(CXXMethodDecl, isTemplated)
     return Node.isTemplated();
 }
 
-/// \brief Matches AST nodes with a matching cast kind for our ImplicitCastExpr
-AST_MATCHER(ImplicitCastExpr, hasMatchingCast)
-{
-    SILENCE;
-
-    return IsMatchingCast(Node.getCastKind());
-}
-
 AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl, Stmt))
 {
     SILENCE;
