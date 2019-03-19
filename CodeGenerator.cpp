@@ -934,11 +934,21 @@ void CodeGenerator::InsertArg(const ArrayInitIndexExpr* stmt)
 
 void CodeGenerator::InsertArg(const ArraySubscriptExpr* stmt)
 {
-    InsertArg(stmt->getLHS());
+    if((not GetInsightsOptions().UseAltArraySubscriptionSyntax) || stmt->getLHS()->isLValue()) {
+        InsertArg(stmt->getLHS());
 
-    mOutputFormatHelper.Append('[');
-    InsertArg(stmt->getRHS());
-    mOutputFormatHelper.Append(']');
+        mOutputFormatHelper.Append('[');
+        InsertArg(stmt->getRHS());
+        mOutputFormatHelper.Append(']');
+    } else {
+
+        mOutputFormatHelper.Append("(*(");
+        InsertArg(stmt->getLHS());
+        mOutputFormatHelper.Append(" + ");
+
+        InsertArg(stmt->getRHS());
+        mOutputFormatHelper.Append("))");
+    }
 }
 //-----------------------------------------------------------------------------
 

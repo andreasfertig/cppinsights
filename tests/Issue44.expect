@@ -1,0 +1,8 @@
+// cmdlineinsights:-alt-syntax-subscription
+int main()
+{
+  int E1[2] = {0, 2};
+  (*(E1 + 1)) = 1;
+}
+
+

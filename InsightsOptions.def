@@ -11,5 +11,9 @@
 #endif
 
 INSIGHTS_OPT("alt-syntax-for", UseAltForSyntax, false, "Transform all for-loops into their equivalent while-loop.")
+INSIGHTS_OPT("alt-syntax-subscription",
+             UseAltArraySubscriptionSyntax,
+             false,
+             "Transform array subscriptions E1[E2] into (*(E1 + E2)).")
 
 #undef INSIGHTS_OPT
