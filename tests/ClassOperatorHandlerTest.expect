@@ -149,7 +149,8 @@ inline bool operator<(const Hello::Bello::Fest & LHS, const Hello::Bello::Fest &
 }
 
 
-static Fest sF{3};
+static Hello::Bello::Fest sF = Hello::Bello::Fest{3};
+
 }
 }
 

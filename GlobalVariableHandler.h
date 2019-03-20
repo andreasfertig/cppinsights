@@ -8,8 +8,6 @@
 #ifndef INSIGHTS_GLOBAL_VARIABLE_HANDLER_H
 #define INSIGHTS_GLOBAL_VARIABLE_HANDLER_H
 
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTContext.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Rewrite/Core/Rewriter.h"
@@ -19,7 +17,7 @@
 
 namespace clang::insights {
 
-/// \brief Show the result of a static_assert.
+/// \brief Replace global variables to show e.g. implicit conversions.
 class GlobalVariableHandler final : public ast_matchers::MatchFinder::MatchCallback, public InsightsBase
 {
 public:

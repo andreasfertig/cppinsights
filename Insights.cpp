@@ -21,9 +21,6 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include "DPrint.h"
-
-#include "AutoStmtHandler.h"
 #include "CodeGenerator.h"
 #include "CompilerGeneratedHandler.h"
 #include "DPrint.h"
@@ -93,7 +90,6 @@ public:
     , mStaticAssertHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
     , mGlobalVariableHandler{rewriter, mMatcher}
-    , mAutoStmtHandler{rewriter, mMatcher}
     , mFunctionDeclHandler{rewriter, mMatcher}
     , mRewriter{rewriter}
     {
@@ -121,7 +117,6 @@ private:
     StaticAssertHandler      mStaticAssertHandler;
     TemplateHandler          mTemplateHandler;
     GlobalVariableHandler    mGlobalVariableHandler;
-    AutoStmtHandler          mAutoStmtHandler;
     FunctionDeclHandler      mFunctionDeclHandler;
     Rewriter&                mRewriter;
 };
