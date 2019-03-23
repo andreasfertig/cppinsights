@@ -9,7 +9,6 @@
 #define INSIGHTS_STRCAT_H
 
 #include "clang/AST/AST.h"
-#include "clang/AST/ASTContext.h"
 
 #include <string>
 #include <utility>

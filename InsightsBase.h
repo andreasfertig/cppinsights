@@ -9,13 +9,19 @@
 #define INSIGHTS_BASE_H
 //-----------------------------------------------------------------------------
 
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-
-#include <unordered_map>
-
-#include "OutputFormatHelper.h"
+#include <stdint.h>       // for intptr_t
+#include <unordered_map>  // for unordered_map
+namespace clang {
+class Rewriter;
+}
+namespace clang {
+class SourceLocation;
+}
+namespace clang {
+namespace insights {
+class OutputFormatHelper;
+}
+}  // namespace clang
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {

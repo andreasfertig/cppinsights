@@ -12,6 +12,7 @@
 #include "DPrint.h"
 #include "Insights.h"
 #include "InsightsBase.h"
+#include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
 #include "InsightsOnce.h"
 #include "InsightsStrCat.h"

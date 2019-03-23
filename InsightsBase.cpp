@@ -5,8 +5,10 @@
  *
  ****************************************************************************/
 
+#include "clang/Rewrite/Core/Rewriter.h"
+
 #include "InsightsBase.h"
-#include "DPrint.h"
+#include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
