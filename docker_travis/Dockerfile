@@ -6,18 +6,18 @@ LABEL maintainer "Andreas Fertig"
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates gnupg wget ninja-build
 
-RUN echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main" >> /etc/apt/sources.list
+RUN echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main" >> /etc/apt/sources.list
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends llvm-7-dev libclang-7-dev g++-8 cmake zlib1g-dev doxygen graphviz && \
+    apt-get install -y --no-install-recommends llvm-8-dev libclang-8-dev g++-8 cmake zlib1g-dev doxygen graphviz && \
     rm -rf /var/lib/apt/lists/*
 
 RUN useradd builder \
     && mkdir /home/builder \
     && chown -R builder:builder /home/builder
 
-RUN ln -s /usr/bin/llvm-config-7 /usr/bin/llvm-config
+RUN ln -s /usr/bin/llvm-config-8 /usr/bin/llvm-config
 
 RUN ln -fs /usr/bin/g++-8 /usr/bin/g++
 RUN ln -fs /usr/bin/g++-8 /usr/bin/c++

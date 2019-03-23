@@ -18,13 +18,13 @@ matrix:
   include:
 
     # OSX clang 7 build
-  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='No' SKIP_TESTS='Yes' TIDY='No' SHACMD='shasum -a 256'
     os: osx
     osx_image: xcode9.3
     compiler: clang
 
     # OSX clang 8 build
-  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='No' SKIP_TESTS='Yes' TIDY='No' SHACMD='shasum -a 256'
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
     osx_image: xcode9.3
     compiler: clang
@@ -50,7 +50,7 @@ matrix:
       ssh_known_hosts: cppinsights.io
     before_install:
     - cd docker_travis && docker build -t cppinsights-travis .
-    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG=/usr/bin/llvm-config-7  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
+    env: COMPILER='clang++-8' COMPILER_CC='clang-8' LLVM_CONFIG=/usr/bin/llvm-config-8  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
     
   # Linux g++ Build
   - os: linux
