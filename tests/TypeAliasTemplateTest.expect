@@ -19,7 +19,7 @@ struct F
 template<>
 struct F<int>
 {
-  using SameSize = bool_constant<1 == 0>;
+  using SameSize = bool_constant<1 == sizeof...(B)>;
   template<>
   inline F<int, bool_constant<1> >(int __0)
   {
