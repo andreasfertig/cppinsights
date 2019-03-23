@@ -21,6 +21,8 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/raw_ostream.h"
 
+#include "DPrint.h"
+
 #include "CodeGenerator.h"
 #include "CompilerGeneratedHandler.h"
 #include "DPrint.h"

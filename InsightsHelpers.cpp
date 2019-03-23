@@ -552,8 +552,59 @@ std::string GetName(const DeclRefExpr& declRefExpr)
 }
 //-----------------------------------------------------------------------------
 
+/*
+ * Go deep in a Stmt if necessary and look to all childs for a DeclRefExpr.
+ */
+static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
+{
+    if(const auto* dref = dyn_cast_or_null<DeclRefExpr>(stmt)) {
+        return dref;
+    } else if(const auto* arrayInitExpr = dyn_cast_or_null<ArrayInitLoopExpr>(stmt)) {
+        const auto* srcExpr = arrayInitExpr->getCommonExpr()->getSourceExpr();
+
+        if(const auto* arrayDeclRefExpr = dyn_cast_or_null<DeclRefExpr>(srcExpr)) {
+            return arrayDeclRefExpr;
+        }
+    } else if(const auto func = dyn_cast_or_null<CXXFunctionalCastExpr>(stmt)) {
+        //        TODO(stmt, "");
+    }
+
+    if(stmt) {
+        for(const auto* child : stmt->children()) {
+            if(const auto* childRef = FindDeclRef(child)) {
+                return childRef;
+            }
+        }
+    }
+
+    return nullptr;
+}
+//-----------------------------------------------------------------------------
+
 std::string GetName(const VarDecl& VD)
 {
+    // Handle a special case of DecompositionDecl. A DecompositionDecl does not have a name. Hence we make one up from
+    // the original name of the variable that is decomposed plus line number where the decomposition was written.
+    if(const auto* decompositionDeclStmt = dyn_cast_or_null<DecompositionDecl>(&VD)) {
+        const auto baseVarName{[&]() {
+            if(const auto* declName = FindDeclRef(decompositionDeclStmt->getInit())) {
+                std::string name = GetPlainName(*declName);
+
+                const std::string operatorName{"operator"};
+                if(Contains(name, operatorName)) {
+                    return operatorName;
+                }
+
+                return name;
+            }
+
+            // We approached an unnamed decl. This happens for example like this: auto& [x, y] = Point{};
+            return std::string{};
+        }()};
+
+        return {BuildInternalVarName(baseVarName, GetBeginLoc(decompositionDeclStmt), GetSM(*decompositionDeclStmt))};
+    }
+
     std::string name{VD.getNameAsString()};
 
     return GetTemplateParameterPackArgumentName(name, &VD);
