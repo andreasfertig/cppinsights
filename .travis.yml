@@ -199,11 +199,11 @@ after_success:
       export GZ_FILE_NAME=${BIN_FILE_NAME}.tar.gz
       export HASH_GZ_FILE_NAME=${GZ_FILE_NAME}.sha256
       export HASH_FILE_NAME=${BIN_FILE_NAME}.sha256
-      ${SHACMD} ${GZ_FILE_NAME} | cut -d ' ' -f 1 > ${HASH_GZ_FILE_NAME}
       ${SHACMD} ${TRAVIS_BUILD_DIR}/build/insights | cut -d ' ' -f 1 > ${HASH_FILE_NAME}
       export BIN_HASH=$(cat ${HASH_FILE_NAME})
       echo "C++ Insights sha256: ${BIN_HASH}"
       tar -czf ${GZ_FILE_NAME} -C ${TRAVIS_BUILD_DIR}/build insights ${HASH_FILE_NAME}
+      ${SHACMD} ${GZ_FILE_NAME} | cut -d ' ' -f 1 > ${HASH_GZ_FILE_NAME}
       bash upload.sh ${GZ_FILE_NAME} ${HASH_GZ_FILE_NAME} ${HASH_FILE_NAME}
   fi
 
