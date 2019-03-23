@@ -1,0 +1,28 @@
+#include <chrono>
+
+template <typename T>
+void Test(){
+    typedef std::chrono::duration<double, std::ratio<60>> simple;
+    typedef std::chrono::duration<double, std::ratio<60*60*24*365>> withCalculation; // contains an implicit cast in the template definition
+}
+
+/* First instantiated from: ImplicitCast4Test.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Test<int>()
+{
+  using simple = std::chrono::duration<double, std::ratio<60, 1> >;
+  using withCalculation = std::chrono::duration<double, std::ratio<31536000, 1> >;
+}
+#endif
+
+  
+
+int main()
+{
+  using simple = std::chrono::duration<double, std::ratio<60, 1> >;
+  using withCalculation = std::chrono::duration<double, std::ratio<31536000, 1> >;
+  Test<int>();
+}
+
+
