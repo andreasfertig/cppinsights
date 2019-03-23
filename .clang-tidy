@@ -1,4 +1,4 @@
-Checks: '-*,clang-diagnostic-*,misc-*,-misc-unused-parameters,readability-identifier-naming'
+Checks: '-*,clang-diagnostic-*,misc-*,-misc-unused-parameters,readability-identifier-naming,modernize-return-braced-init-list'
 #Checks: '-*,readability-identifier-naming,performance-*,modernize-use-*,misc-string-*,misc-use-after-move,misc-suspicious-*,misc-static-assert,misc-move-*,misc-macro-*,misc-dangling-handle,cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-reinterpret-cast'
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,          value: lower_case }
