@@ -229,6 +229,8 @@ if (${LLVM_PACKAGE_VERSION} VERSION_LESS ${INSIGHTS_MIN_LLVM_VERSION})
     message(FATAL_ERROR "LLVM version ${INSIGHTS_MIN_LLVM_VERSION} or higher required. Current version is: ${LLVM_PACKAGE_VERSION}.")
 endif()
 
+# clang 8 and later or better ld warn, if the visibility is not the same as for the libs.
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
   execute_process(
