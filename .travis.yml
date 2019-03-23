@@ -91,6 +91,18 @@ matrix:
         - *all_llvm_current_packages
     env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
 
+  # Clang-format check
+  - os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources: *all_sources
+        packages:
+        - g++-8
+        - clang-format-9
+        - *all_llvm_current_packages
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes'
+
     # Linux Clang Coverage Build
   - os: linux
     compiler: gcc
@@ -136,6 +148,8 @@ before_script:
   - |
     if [[ "${DEPLOY}" == "Yes" ]]; then
       docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes .."
+    elif [[ "${CFORMAT}" == "Yes" ]]; then
+      echo "Nothing to do here for the clang-format check run."
     else
       cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG} -DINSIGHTS_TIDY=${TIDY} ..
     fi
@@ -149,6 +163,8 @@ script:
     echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
   elif [[ "${TIDY}" == "Yes" ]]; then
     $TRAVIS_BUILD_DIR/scripts/travis-run-make-tidy.sh
+  elif [[ "${CFORMAT}" == "Yes" ]]; then
+    cd $TRAVIS_BUILD_DIR && $TRAVIS_BUILD_DIR/scripts/travis-clang-format-check.sh
   else
     make -j 2
   fi
