@@ -174,11 +174,11 @@ script:
   fi  
 - |
   if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
-      export GZ_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-macos.tar.gz
+      export BIN_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-macos
   fi
 - |
   if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
-      export GZ_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-ubuntu-14.04.tar.gz
+      export BIN_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-ubuntu-14.04
   fi
   
 after_success:
@@ -196,9 +196,15 @@ after_success:
   if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${UPLOAD}" = "Yes" ]]; then
       cd ${TRAVIS_BUILD_DIR}/build/
       wget -c https://raw.githubusercontent.com/andreasfertig/uploadtool/27066299131e9af259821bdc4508c8469eb1997c/upload.sh
-      tar -czf ${GZ_FILE_NAME} -C ${TRAVIS_BUILD_DIR}/build insights
-      ${SHACMD} ${GZ_FILE_NAME} > ${GZ_FILE_NAME}.sha256      
-      bash upload.sh ${GZ_FILE_NAME} ${GZ_FILE_NAME}.sha256
+      export GZ_FILE_NAME=${BIN_FILE_NAME}.tar.gz
+      export HASH_GZ_FILE_NAME=${GZ_FILE_NAME}.sha256
+      export HASH_FILE_NAME=${BIN_FILE_NAME}.sha256
+      ${SHACMD} ${GZ_FILE_NAME} | cut -d ' ' -f 1 > ${GZ_HASH_FILE_NAME}
+      ${SHACMD} ${TRAVIS_BUILD_DIR}/build/insights | cut -d ' ' -f 1 > ${HASH_FILE_NAME}
+      export BIN_HASH=$(cat ${HASH_FILE_NAME})
+      echo "C++ Insights sha256: ${BIN_HASH}"
+      tar -czf ${GZ_FILE_NAME} -C ${TRAVIS_BUILD_DIR}/build insights ${HASH_FILE_NAME}
+      bash upload.sh ${GZ_FILE_NAME} ${HASH_GZ_FILE_NAME} ${HASH_FILE_NAME}
   fi
 
 branches:
