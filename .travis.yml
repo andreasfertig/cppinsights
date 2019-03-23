@@ -27,7 +27,7 @@ matrix:
   include:
 
     # 1/ OSX Builds
-  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='No' SKIP_TESTS='No' TIDY='No'
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
     osx_image: xcode9.3
     compiler: clang
@@ -53,7 +53,7 @@ matrix:
       ssh_known_hosts: cppinsights.io
     before_install:
     - cd docker_travis && docker build -t cppinsights-travis .
-    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG=/usr/bin/llvm-config-7  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No'
+    env: COMPILER='clang++-7' COMPILER_CC='clang-7' LLVM_CONFIG=/usr/bin/llvm-config-7  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
     
   # Linux g++ Build
   - os: linux
@@ -195,9 +195,10 @@ after_success:
 - |
   if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${UPLOAD}" = "Yes" ]]; then
       cd ${TRAVIS_BUILD_DIR}/build/
-      wget -c https://raw.githubusercontent.com/probonopd/uploadtool/27acba5793df031bd0884b2e0a31b4692332b7ba/upload.sh
+      wget -c https://raw.githubusercontent.com/andreasfertig/uploadtool/27066299131e9af259821bdc4508c8469eb1997c/upload.sh
       tar -czf ${GZ_FILE_NAME} -C ${TRAVIS_BUILD_DIR}/build insights
-      bash upload.sh ${GZ_FILE_NAME}
+      ${SHACMD} ${GZ_FILE_NAME} > ${GZ_FILE_NAME}.sha256      
+      bash upload.sh ${GZ_FILE_NAME} ${GZ_FILE_NAME}.sha256
   fi
 
 branches:
