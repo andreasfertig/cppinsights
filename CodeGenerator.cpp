@@ -2405,11 +2405,8 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
     }
 
     mOutputFormatHelper.Append("new (&", internalVarName, ") ");
-    if(stmt->hasInit()) {
-        InsertArg(stmt->getInit());
-    } else {
-        mOutputFormatHelper.Append(typeName);
-    }
+    // VarDecl of a static expression always have an initializer
+    InsertArg(stmt->getInit());
 
     mOutputFormatHelper.AppendNewLine(';');
     mOutputFormatHelper.AppendNewLine(compilerBoolVarName, " = true;");
