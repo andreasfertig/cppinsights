@@ -28,6 +28,7 @@
 #include "CompilerGeneratedHandler.h"
 #include "FunctionDeclHandler.h"
 #include "GlobalVariableHandler.h"
+#include "Insights.h"
 #include "StaticAssertHandler.h"
 #include "TemplateHandler.h"
 #include "version.h"
@@ -38,6 +39,15 @@ using namespace clang::ast_matchers;
 using namespace clang::driver;
 using namespace clang::tooling;
 using namespace clang::insights;
+//-----------------------------------------------------------------------------
+
+static InsightsOptions gInsightsOptions{};
+//-----------------------------------------------------------------------------
+
+const InsightsOptions& GetInsightsOptions()
+{
+    return gInsightsOptions;
+}
 //-----------------------------------------------------------------------------
 
 static llvm::cl::OptionCategory gInsightCategory("Insights");
@@ -51,6 +61,25 @@ static llvm::cl::opt<bool> gStdinMode("stdin",
                                                      "used for editor integration."),
                                       llvm::cl::init(false),
                                       llvm::cl::cat(gInsightCategory));
+//-----------------------------------------------------------------------------
+
+#define INSIGHTS_OPT(option, name, deflt, description)                                                                 \
+    static llvm::cl::opt<bool, true> g##name(option,                                                                   \
+                                             llvm::cl::desc(description),                                              \
+                                             llvm::cl::NotHidden,                                                      \
+                                             llvm::cl::location(gInsightsOptions.name),                                \
+                                             llvm::cl::init(deflt),                                                    \
+                                             llvm::cl::cat(gInsightCategory));
+//-----------------------------------------------------------------------------
+
+#include "InsightsOptions.def"
+//-----------------------------------------------------------------------------
+
+static const ASTContext* gAST{};
+const ASTContext&        GetGlobalAST()
+{
+    return *gAST;
+}
 //-----------------------------------------------------------------------------
 
 class CppInsightASTConsumer final : public ASTConsumer
@@ -71,6 +100,7 @@ public:
 
     void HandleTranslationUnit(ASTContext& context) override
     {
+        gAST = &context;
         mMatcher.matchAST(context);
 
         // Check whether we had static local variables which we transformed. Then for the placement-new we need to

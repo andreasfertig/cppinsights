@@ -1,0 +1,212 @@
+#include <cstdio>
+
+int main()
+{
+  int x = 0;
+      
+  class __lambda_7_17
+  {
+    int & x;
+    public: inline /*constexpr */ int operator()() const
+    {
+      return x * 2;
+    }
+    
+    public: __lambda_7_17(int & _x)
+    : x{_x}
+    {}
+    
+  } __lambda_7_17{x};
+  
+  for(int i = __lambda_7_17.operator()(); i < 20; ++i) 
+  {
+    x += i;
+  }
+  
+      
+  class __lambda_11_17
+  {
+    int & x;
+    public: inline /*constexpr */ int operator()() const
+    {
+      return x * 2;
+    }
+    
+    public: __lambda_11_17(int & _x)
+    : x{_x}
+    {}
+    
+  } __lambda_11_17{x};
+  
+    
+  class __lambda_11_43
+  {
+    int & x;
+    public: inline /*constexpr */ int operator()() const
+    {
+      return x * 2;
+    }
+    
+    public: __lambda_11_43(int & _x)
+    : x{_x}
+    {}
+    
+  } __lambda_11_43{x};
+  
+  for(int i = __lambda_11_17.operator()(), z = __lambda_11_43.operator()(); i < 20; ++i) 
+  {
+    x += i;
+  }
+  
+      
+  class __lambda_15_9
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("started\n");
+    }
+    
+    public: using retType_15_9 = auto (*)() -> void;
+    inline /*constexpr */ operator retType_15_9 () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("started\n");
+    }
+    
+    
+  } __lambda_15_9{};
+  
+    
+  class __lambda_15_37
+  {
+    int & x;
+    public: inline /*constexpr */ int operator()() const
+    {
+      return --x;
+    }
+    
+    public: __lambda_15_37(int & _x)
+    : x{_x}
+    {}
+    
+  } __lambda_15_37{x};
+  
+    
+  class __lambda_15_59
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("after\n");
+    }
+    
+    public: using retType_15_59 = auto (*)() -> void;
+    inline /*constexpr */ operator retType_15_59 () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("after\n");
+    }
+    
+    
+  } __lambda_15_59{};
+  
+  for(__lambda_15_9.operator()(); static_cast<bool>(__lambda_15_37.operator()()); __lambda_15_59.operator()()) 
+  {
+  }
+  
+      
+  class __lambda_19_9
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("started\n");
+    }
+    
+    public: using retType_19_9 = auto (*)() -> void;
+    inline /*constexpr */ operator retType_19_9 () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("started\n");
+    }
+    
+    
+  } __lambda_19_9{};
+  
+    
+  class __lambda_20_9
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("started\n");
+    }
+    
+    public: using retType_20_9 = auto (*)() -> void;
+    inline /*constexpr */ operator retType_20_9 () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("started\n");
+    }
+    
+    
+  } __lambda_20_9{};
+  
+    
+  class __lambda_20_37
+  {
+    int & x;
+    public: inline /*constexpr */ int operator()() const
+    {
+      return --x;
+    }
+    
+    public: __lambda_20_37(int & _x)
+    : x{_x}
+    {}
+    
+  } __lambda_20_37{x};
+  
+    
+  class __lambda_20_59
+  {
+    public: inline /*constexpr */ void operator()() const
+    {
+      printf("after\n");
+    }
+    
+    public: using retType_20_59 = auto (*)() -> void;
+    inline /*constexpr */ operator retType_20_59 () const
+    {
+      return __invoke;
+    };
+    
+    private: static inline void __invoke()
+    {
+      printf("after\n");
+    }
+    
+    
+  } __lambda_20_59{};
+  
+  for(__lambda_19_9.operator()() , __lambda_20_9.operator()(); static_cast<bool>(__lambda_20_37.operator()()); __lambda_20_59.operator()()) 
+  {
+  }
+  
+}
+
+
+

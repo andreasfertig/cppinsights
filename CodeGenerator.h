@@ -153,6 +153,10 @@ public:
     static bool NeedToInsertNewHeader() { return mHaveLocalStatic; }
 
 protected:
+    virtual bool InsertVarDecl() { return true; }
+    virtual bool InsertComma() { return false; }
+    virtual bool InsertSemi() { return true; }
+
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
     void HandleCompoundStmt(const CompoundStmt* stmt);
     /// \brief Show what is behind a local static variable.
@@ -267,6 +271,36 @@ public:
     void InsertArg(const CXXThisExpr* stmt) override;
 
     bool mCapturedThisAsCopy;
+};
+//-----------------------------------------------------------------------------
+
+/*
+ * \brief Special case to generate the inits of e.g. a \c ForStmt.
+ *
+ * This class is a specialization to handle cases where we can have multiple init statements to the same variable and
+ * hence need only one time the \c VarDecl. An example a for-loops:
+\code
+for(int x=2, y=3, z=4; i < x; ++i) {}
+\endcode
+ */
+class MultiStmtDeclCodeGenerator final : public CodeGenerator
+{
+public:
+    using CodeGenerator::CodeGenerator;
+
+    // Insert the semi after the last declaration. This implies that this class always requires its own scope.
+    ~MultiStmtDeclCodeGenerator() { mOutputFormatHelper.Append("; "); }
+
+    using CodeGenerator::InsertArg;
+
+protected:
+    OnceTrue  mInsertVarDecl;  //! Insert the \c VarDecl only once.
+    OnceFalse mInsertComma;    //! Insert the comma after we have generated the first \c VarDecl and we are about to
+                               //! insert another one.
+
+    bool InsertVarDecl() override { return mInsertVarDecl; }
+    bool InsertComma() override { return mInsertComma; }
+    bool InsertSemi() override { return false; }
 };
 //-----------------------------------------------------------------------------
 

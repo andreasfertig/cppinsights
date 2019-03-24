@@ -127,16 +127,23 @@ def main():
 
     defaultIncludeDirs = getDefaultIncludeDirs(args['cxx'])
 
-    regEx = re.compile('.*cmdline:(.*)')
+    regEx         = re.compile('.*cmdline:(.*)')
+    regExInsights = re.compile('.*cmdlineinsights:(.*)')
+
     for f in sorted(cppFiles):
-        fileName   = os.path.splitext(f)[0]
-        expectFile = os.path.join(mypath, fileName + '.expect')
-        cppStd     = defaultCppStd
+        fileName     = os.path.splitext(f)[0]
+        expectFile   = os.path.join(mypath, fileName + '.expect')
+        cppStd       = defaultCppStd
+        insightsOpts = ''
 
         fileHeader = open(f, 'r').readline().strip()
         m = regEx.match(fileHeader)
         if None != m:
             cppStd = m.group(1)
+
+        m = regExInsights.match(fileHeader)
+        if None != m:
+            insightsOpts = m.group(1)
 
         if not os.path.isfile(expectFile):
             print 'Missing expect for: %s' %(f)
@@ -149,7 +156,12 @@ def main():
                 p   = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate(input=data)
         else:
-                cmd   = [insightsPath, f, '--', cppStd, '-m64'] + defaultIncludeDirs
+#                cmd   = [insightsPath, f, '-for2while', '--', cppStd, '-m64'] + defaultIncludeDirs
+                if '' == insightsOpts:
+                    cmd   = [insightsPath, f, '--', cppStd, '-m64'] + defaultIncludeDirs
+                else:
+                    cmd   = [insightsPath, f, insightsOpts, '--', cppStd, '-m64'] + defaultIncludeDirs
+
                 begin = datetime.datetime.now()
                 p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 end   = datetime.datetime.now()
