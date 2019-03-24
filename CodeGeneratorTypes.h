@@ -106,9 +106,7 @@ SUPPORTED_STMT(CXXDependentScopeMemberExpr)
 SUPPORTED_STMT(CXXNoexceptExpr)
 SUPPORTED_STMT(ParenListExpr)
 SUPPORTED_STMT(SizeOfPackExpr)
-#if IS_CLANG_NEWER_THAN(7)
 SUPPORTED_STMT(ConstantExpr)
-#endif
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

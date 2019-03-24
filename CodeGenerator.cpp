@@ -191,10 +191,8 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
     std::vector<Stmt*> outerScopeStmts{};
     std::vector<Stmt*> bodyStmts{};
 
-#if IS_CLANG_NEWER_THAN(7)
     // C++20 init-statement
     AddStmt(outerScopeStmts, rangeForStmt->getInit());
-#endif
 
     // range statement
     AddStmt(outerScopeStmts, rangeForStmt->getRangeStmt());
@@ -1401,11 +1399,8 @@ void CodeGenerator::InsertArg(const PredefinedExpr* stmt)
     if(const auto* functionName = stmt->getFunctionName()) {
         InsertArg(functionName);
     } else {
-#if IS_CLANG_NEWER_THAN(7)
         const auto name = PredefinedExpr::getIdentKindName(stmt->getIdentKind());
-#else
-        const auto name = PredefinedExpr::getIdentTypeName(stmt->getIdentType());
-#endif
+
         mOutputFormatHelper.Append(name.str());
     }
 }
@@ -1460,9 +1455,7 @@ static std::string GetValueOfValueInit(const QualType& t)
 
                 break;
 
-#if IS_CLANG_NEWER_THAN(7)
             case Type::STK_FixedPoint: Error("STK_FixedPoint is not implemented"); break;
-#endif
         }
 
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
@@ -1540,12 +1533,10 @@ void CodeGenerator::InsertArg(const CXXThrowExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-#if IS_CLANG_NEWER_THAN(7)
 void CodeGenerator::InsertArg(const ConstantExpr* stmt)
 {
     InsertArg(stmt->getSubExpr());
 }
-#endif
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)

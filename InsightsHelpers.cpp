@@ -633,19 +633,11 @@ const std::string GetNoExcept(const FunctionDecl& decl)
                 if(const auto* boolExpr = dyn_cast_or_null<CXXBoolLiteralExpr>(expr)) {
                     return boolExpr->getValue();
 
-                } else if(const auto* noExceptExpr = dyn_cast_or_null<CXXNoexceptExpr>(expr)) {
-                    return noExceptExpr->getValue();
-
                 } else if(const auto* bExpr = dyn_cast_or_null<BinaryOperator>(expr)) {
                     return EvaluateAsBoolenCondition(*bExpr, decl);
 
-                } else if(const auto* coExpr = dyn_cast_or_null<ConditionalOperator>(expr)) {
-                    return EvaluateAsBoolenCondition(*coExpr, decl);
-
-#if IS_CLANG_NEWER_THAN(7)
                 } else if(const auto* cExpr = dyn_cast_or_null<ConstantExpr>(expr)) {
                     return EvaluateAsBoolenCondition(*cExpr, decl);
-#endif
                 }
 
                 Error(expr, "INSIGHTS: Unexpected noexcept expr\n");
