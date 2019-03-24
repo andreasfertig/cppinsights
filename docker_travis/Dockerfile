@@ -4,7 +4,7 @@ LABEL maintainer "Andreas Fertig"
 
 # Install compiler, python
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates gnupg wget ninja-build
+    apt-get install -y --no-install-recommends ca-certificates gnupg wget ninja-build git
 
 RUN echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main" >> /etc/apt/sources.list
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -

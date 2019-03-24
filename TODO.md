@@ -11,7 +11,10 @@ This is a list of things I plan to do. If you like to jump in that's great. Plea
 - [ ] Linux debian package
 - [ ] Improve tests on other platforms than macOS
 - [ ] Temporary execute tests and check only for signals on other platforms than macOS
-- [ ] Publish doxygen output
+- [X] Publish doxygen output -> see [https://docs.cppinsights.io](https://docs.cppinsights.io)
 - [ ] Switch between libc++ and libstdc++ headers?
 - [ ] Add more headers like boost
+- [ ] Catch insights crashes and provide easy issue reporting including error output.
+- [ ] Short links (public database?)
+- [ ] Provide easy local installation (via docker)
 

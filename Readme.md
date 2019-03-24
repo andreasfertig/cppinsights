@@ -186,11 +186,7 @@ Currently, the most recent stable version of clang is supported as well as the c
 
 ## ToDo's
 
-+ Catch insights crashes and provide easy issue reporting including error output.
-+ Short links (public database?)
-+ Time tests to see performance changes
-+ Provide easy local installation (via docker)
-+ short links
+See [TODO.md](TODO.md).
 
 
 ## Get Involved
