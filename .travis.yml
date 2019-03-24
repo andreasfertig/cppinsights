@@ -17,12 +17,6 @@ llvm_current_packages: &all_llvm_current_packages
 matrix:
   include:
 
-    # OSX clang 7 build
-  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='7.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='No' SKIP_TESTS='Yes' TIDY='No' SHACMD='shasum -a 256'
-    os: osx
-    osx_image: xcode9.3
-    compiler: clang
-
     # OSX clang 8 build
   - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
@@ -81,19 +75,6 @@ matrix:
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
-  # Debug build with coverage
-  - os: linux
-    compiler: gcc
-    addons:
-      apt:
-        sources: *all_sources
-        packages:
-        - g++-7
-        - libstdc++-6-dev
-        - *all_llvm_current_packages
-        - lcov
-    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
-
   # Clang-tidy analysis
   - os: linux
     compiler: gcc
@@ -106,10 +87,10 @@ matrix:
     addons: *clang80
     env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-8'
 
-    # Linux Clang Coverage Build
+  # Debug build with coverage
   - os: linux
     compiler: gcc
-    addons:
+    addons: &covcurrent
       apt:
         sources: *all_sources
         packages:
@@ -117,6 +98,12 @@ matrix:
         - libstdc++-6-dev
         - *all_llvm_current_packages
         - lcov
+    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
+
+    # Linux Clang Coverage Build
+  - os: linux
+    compiler: gcc
+    addons: *covcurrent
     env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
 
 install:
