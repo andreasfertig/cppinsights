@@ -104,7 +104,7 @@ def main():
     parser.add_argument('--docker',         help='Run tests in docker container', action='store_true')
     parser.add_argument('--docker-image',   help='Docker image name', default='cppinsights-runtime')
     parser.add_argument('--failure-is-ok',  help='Failing tests are ok', default=False, action='store_true')
-    parser.add_argument('--std',            help='C++ Standard to used', default='c++1z')
+    parser.add_argument('--std',            help='C++ Standard to used', default='c++17')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = vars(parser.parse_args())
 

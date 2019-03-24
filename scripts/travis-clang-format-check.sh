@@ -1,9 +1,14 @@
 #! /bin/bash
 
-CLANG_FORMAT=clang-format
+CLANG_FORMAT=$1
 
 echo -n "Running clang-format checks, version: "
 ${CLANG_FORMAT} --version
+
+if [ 0 != $? ]; then
+    echo -e "\033[1;31mclang-format missing: ${CLANG_FORMAT}\033[0m"
+    exit 1
+fi
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
   # Not in a pull request, so compare against parent commit

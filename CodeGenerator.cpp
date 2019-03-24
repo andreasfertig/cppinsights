@@ -2166,7 +2166,13 @@ void CodeGenerator::InsertArg(const SubstNonTypeTemplateParmExpr* stmt)
 
 void CodeGenerator::InsertArg(const SizeOfPackExpr* stmt)
 {
-    mOutputFormatHelper.Append(stmt->getPackLength());
+    if(stmt->isPartiallySubstituted()) {
+        mOutputFormatHelper.Append(stmt->getPartialArguments().size());
+    } else if(!stmt->isValueDependent()) {
+        mOutputFormatHelper.Append(stmt->getPackLength());
+    } else {
+        mOutputFormatHelper.Append("sizeof...(", GetName(*stmt->getPack()), ")");
+    }
 }
 //-----------------------------------------------------------------------------
 
