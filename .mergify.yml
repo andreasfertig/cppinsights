@@ -1,0 +1,10 @@
+pull_request_rules:
+  - name: merge pull requests from andreasfertig if CI passes
+    conditions:
+      - author=andreasfertig
+      - status-success=continuous-integration/travis/pr
+      - status-success=codecov/patch
+      - status-success=coverage/coveralls
+    actions:
+      merge:
+        method: merge
