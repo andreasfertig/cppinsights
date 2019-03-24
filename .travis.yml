@@ -123,6 +123,8 @@ install:
 
     mkdir current
     tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1
+  elif [[ "${DEPLOY}" == "Yes" ]]; then
+    npm install github-release-notes -g
   fi
     
 before_script:
@@ -195,6 +197,7 @@ after_success:
       tar -czf ${GZ_FILE_NAME} -C ${TRAVIS_BUILD_DIR}/build insights ${HASH_FILE_NAME}
       ${SHACMD} ${GZ_FILE_NAME} | cut -d ' ' -f 1 > ${HASH_GZ_FILE_NAME}
       bash upload.sh ${GZ_FILE_NAME} ${HASH_GZ_FILE_NAME} ${HASH_FILE_NAME}
+      cd ${TRAVIS_BUILD_DIR} && gren release --override --username=andreasfertig --repo=cppinsights -t `git tag --sort=-creatordate | grep -v continuous | head -n 1 `..continuous -c .github/grenrc.json  -P
   fi
 
 branches:

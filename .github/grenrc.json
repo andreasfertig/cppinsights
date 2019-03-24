@@ -1,0 +1,21 @@
+{
+    "dataSource": "issues",
+    "prefix": "",
+    "onlyMilestones": false,
+    "groupBy": "label",
+    "changelogFilename": "CHANGELOG.md",
+    "groupBy": {
+        "Bug Fixes:": ["bug"],
+        "Enhancements:": ["enhancement", "internal"],
+        "Closed:": ["closed"]        
+    },
+    "ignore-labels": ["duplicate", "wontfix"],
+    "template": {
+        "issue": "- {{name}} ([{{text}}]({{url}}))",
+        "changelogTitle": "# Changelog\n\n",
+        "group": "\n#### {{heading}}\n",
+        "noLabel": "closed",
+        "release": "## {{release}} ({{date}})\n{{body}}",
+        "releaseSeparator": "\n---\n\n"        
+    }
+}
