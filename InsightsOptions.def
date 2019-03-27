@@ -15,5 +15,6 @@ INSIGHTS_OPT("alt-syntax-subscription",
              UseAltArraySubscriptionSyntax,
              false,
              "Transform array subscriptions E1[E2] into (*(E1 + E2)).")
+INSIGHTS_OPT("show-all-implicit-casts", ShowAllImplicitCasts, false, "Show all implicit casts which can be noisy.")
 
 #undef INSIGHTS_OPT
