@@ -50,7 +50,7 @@ void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
         CodeGenerator      codeGenerator{outputFormatHelper};
         codeGenerator.InsertArg(matchedDecl);
 
-        const auto sr = GetSourceRangeAfterSemi(matchedDecl->getSourceRange(), result);
+        const auto sr = GetSourceRangeAfterSemi(matchedDecl->getSourceRange(), result, RequireSemi::Yes);
 
         mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
     }

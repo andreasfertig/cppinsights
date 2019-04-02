@@ -62,7 +62,7 @@ void AutoStmtHandler::run(const MatchFinder::MatchResult& result)
         // 1              2   3
         // the SourceRange starts at (1) end ends at (3). The Location in the other hand starts at (1) and ends
         // at (2)
-        const auto sr = GetSourceRangeAfterSemi(autoDecl->getSourceRange(), result);
+        const auto sr = GetSourceRangeAfterSemi(autoDecl->getSourceRange(), result, RequireSemi::Yes);
 
         mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
     }
