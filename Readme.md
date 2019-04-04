@@ -156,7 +156,7 @@ Using C++ Insights is fairly simple:
 insights <YOUR_CPP_FILE> -- -std=c++17
 ```
 
-Things get complicate with when it comes to the system include paths. There are path hard-coded in the binary which seem
+Things get complicated when it comes to the system include paths. There are path hard-coded in the binary which seem
 to come from the compiler C++ Insights was build with. To help with that check out [scripts/getinclude.py](scripts/getinclude.py). It tries to
 collect the system include paths from the compiler. Without an option it uses `g++`, you can also pass another compiler
 as a first argument.
