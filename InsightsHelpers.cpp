@@ -55,22 +55,35 @@ static const LangOptions& GetLangOpts(const ast_matchers::MatchFinder::MatchResu
 }
 //-----------------------------------------------------------------------------
 
-SourceLocation FindLocationAfterSemi(const SourceLocation loc, const ast_matchers::MatchFinder::MatchResult& result)
+SourceLocation FindLocationAfterSemi(const SourceLocation                          loc,
+                                     const ast_matchers::MatchFinder::MatchResult& result,
+                                     RequireSemi                                   requireSemi)
 {
-    const SourceLocation locEnd =
-        clang::Lexer::findLocationAfterToken(loc, tok::semi, GetSM(result), GetLangOpts(result), false);
+    auto findLocation = [&](const tok::TokenKind tKind) {
+        return clang::Lexer::findLocationAfterToken(loc, tKind, GetSM(result), GetLangOpts(result), false);
+    };
 
-    if(locEnd.isValid()) {
+    if(const auto locEnd{findLocation(tok::semi)}; locEnd.isValid()) {
         return locEnd;
+
+    } else if(RequireSemi::Yes == requireSemi) {
+        // if we do not find a ; then it can possibly be a brace init like this:
+        // auto x {23};
+        // Try to find the right curly which seems to also contain the semi.
+        if(const auto locEnd2{findLocation(tok::r_brace)}; locEnd2.isValid()) {
+            return locEnd2;
+        }
     }
 
     return loc;
 }
 //-----------------------------------------------------------------------------
 
-SourceRange GetSourceRangeAfterSemi(const SourceRange range, const ast_matchers::MatchFinder::MatchResult& result)
+SourceRange GetSourceRangeAfterSemi(const SourceRange                             range,
+                                    const ast_matchers::MatchFinder::MatchResult& result,
+                                    RequireSemi                                   requireSemi)
 {
-    const SourceLocation locEnd = FindLocationAfterSemi(range.getEnd(), result);
+    const SourceLocation locEnd = FindLocationAfterSemi(range.getEnd(), result, requireSemi);
 
     return {range.getBegin(), locEnd};
 }
