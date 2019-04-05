@@ -1,0 +1,9 @@
+# The Docker image to run your workspace in. Defaults to gitpod/workspace-full
+image:
+  file: .gitpod/Dockerfile
+  # Context is optional, defaults to an empty context
+  context: docker
+
+tasks:
+    - init: cd ~/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes -DINSIGHTS_COVERAGE=No -DINSIGHTS_LLVM_CONFIG=/usr/bin/llvm-config /workspaces/cppinsights
+      command: cd ~/build
