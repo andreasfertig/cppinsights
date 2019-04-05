@@ -6,7 +6,8 @@ enum class Order {
     B,
 };
 
-inline constexpr Order OrderA = Order::A;
+inline constexpr const Test::Order OrderA = Test::Order::A;
+
 
 class West
 {

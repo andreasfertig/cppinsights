@@ -3,6 +3,7 @@
 namespace mine {
     inline namespace __1 {
         static const int x = 1;
+
     }
 }
 

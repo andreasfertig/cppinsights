@@ -89,7 +89,8 @@ namespace Test
     namespace Inner
     {
         inline namespace v1 /*inline namespace*/ {
-            static const int zz=0;
+            static const int zz = 0;
+
             using type = int;
 
             namespace /*anonymous namespace*/ {

@@ -290,7 +290,6 @@ endif()
 
 # name the executable and all source files
 add_clang_tool(insights
-    AutoStmtHandler.cpp
     CodeGenerator.cpp
     CompilerGeneratedHandler.cpp
     DPrint.cpp
