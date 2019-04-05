@@ -151,6 +151,8 @@ static void AddBodyStmts(std::vector<Stmt*>& v, Stmt* body)
         for(auto* st : b->children()) {
             v.push_back(st);
         }
+    } else if(not isa<NullStmt>(body)) {
+        v.push_back(body);
     }
 }
 //-----------------------------------------------------------------------------
