@@ -80,6 +80,29 @@ public:
 };
 //-----------------------------------------------------------------------------
 
+/// Handling specialties for decomposition declarations.
+///
+/// Decompositions declarations have no name. This class stores the made up name and returns it each time the anonymous
+/// declaration is asked for a name.
+class StructuredBindingsCodeGenerator final : public CodeGenerator
+{
+    std::string mVarName;
+
+public:
+    StructuredBindingsCodeGenerator(OutputFormatHelper& _outputFormatHelper, std::string&& varName)
+    : CodeGenerator{_outputFormatHelper}
+    , mVarName{std::move(varName)}
+    {
+    }
+
+    using CodeGenerator::InsertArg;
+    void InsertArg(const DeclRefExpr* stmt) override;
+
+    /// Inserts the bindings of a decompositions declaration.
+    void InsertDecompositionBindings(const DecompositionDecl& decompositionDeclStmt);
+};
+//-----------------------------------------------------------------------------
+
 CodeGenerator::LambdaScopeHandler::LambdaScopeHandler(LambdaStackType&       stack,
                                                       OutputFormatHelper&    outputFormatHelper,
                                                       const LambdaCallerType lambdaCallerType)
@@ -504,123 +527,6 @@ void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static bool IsReference(const QualType& type)
-{
-    return GetDesugarType(type)->isLValueReferenceType();
-}
-//-----------------------------------------------------------------------------
-
-static bool IsReference(const ValueDecl& valDecl)
-{
-    return IsReference(valDecl.getType());
-}
-//-----------------------------------------------------------------------------
-
-/*
- * Go deep in a Stmt if necessary and look to all childs for a DeclRefExpr.
- */
-static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
-{
-    if(const auto* dref = dyn_cast_or_null<DeclRefExpr>(stmt)) {
-        return dref;
-    } else if(const auto* arrayInitExpr = dyn_cast_or_null<ArrayInitLoopExpr>(stmt)) {
-        const auto* srcExpr = arrayInitExpr->getCommonExpr()->getSourceExpr();
-
-        if(const auto* arrayDeclRefExpr = dyn_cast_or_null<DeclRefExpr>(srcExpr)) {
-            return arrayDeclRefExpr;
-        }
-    } else if(const auto func = dyn_cast_or_null<CXXFunctionalCastExpr>(stmt)) {
-        //        TODO(stmt, "");
-    }
-
-    if(stmt) {
-        for(const auto* child : stmt->children()) {
-            if(const auto* childRef = FindDeclRef(child)) {
-                return childRef;
-            }
-        }
-    }
-
-    return nullptr;
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertArg(const DecompositionDecl* decompositionDeclStmt)
-{
-    const auto baseVarName{[&]() {
-        if(const auto* declName = FindDeclRef(decompositionDeclStmt->getInit())) {
-            std::string name = GetPlainName(*declName);
-
-            const std::string operatorName{"operator"};
-            if(Contains(name, operatorName)) {
-                return operatorName;
-            }
-
-            return name;
-        }
-
-        // We approached an unnamed decl. This happens for example like this: auto& [x, y] = Point{};
-        return std::string{};
-    }()};
-
-    const std::string tmpVarName{
-        BuildInternalVarName(baseVarName, GetBeginLoc(decompositionDeclStmt), GetSM(*decompositionDeclStmt))};
-
-    mOutputFormatHelper.Append(GetTypeNameAsParameter(decompositionDeclStmt->getType(), tmpVarName), " = ");
-
-    InsertArg(decompositionDeclStmt->getInit());
-
-    mOutputFormatHelper.AppendSemiNewLine();
-
-    for(const auto* bindingDecl : decompositionDeclStmt->bindings()) {
-        if(const auto* binding = bindingDecl->getBinding()) {
-
-            DPrint("sb name: %s\n", GetName(binding->getType()));
-
-            const auto* holdingVarOrMemberExpr = [&]() -> const Expr* {
-                if(const auto* holdingVar = bindingDecl->getHoldingVar()) {
-                    return holdingVar->getAnyInitializer();
-                }
-
-                return dyn_cast_or_null<MemberExpr>(binding);
-            }();
-
-            const std::string refOrRefRef = [&]() -> std::string {
-                const bool isRefToObject{IsReference(*decompositionDeclStmt)};
-                const bool isArrayBinding{isa<ArraySubscriptExpr>(binding) && isRefToObject};
-                const bool isNotTemporary{holdingVarOrMemberExpr && !isa<ExprWithCleanups>(holdingVarOrMemberExpr)};
-                if(isArrayBinding || isNotTemporary) {
-                    return "&";
-                }
-
-                return {};
-            }();
-
-            mOutputFormatHelper.Append(GetName(bindingDecl->getType()), refOrRefRef, " ", GetName(*bindingDecl), " = ");
-
-            // tuple decomposition
-            if(holdingVarOrMemberExpr) {
-                DPrint("4444\n");
-
-                StructuredBindingsCodeGenerator codeGenerator{mOutputFormatHelper, tmpVarName};
-                codeGenerator.InsertArg(holdingVarOrMemberExpr);
-
-                // array decomposition
-            } else if(const auto* arraySubscription = dyn_cast_or_null<ArraySubscriptExpr>(binding)) {
-                mOutputFormatHelper.Append(tmpVarName);
-
-                InsertArg(arraySubscription);
-
-            } else {
-                TODO(bindingDecl, mOutputFormatHelper);
-            }
-
-            mOutputFormatHelper.AppendSemiNewLine();
-        }
-    }
-}
-//-----------------------------------------------------------------------------
-
 static const char* GetStorageClassAsString(const StorageClass& sc)
 {
     if(SC_None != sc) {
@@ -673,9 +579,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         mOutputFormatHelper.AppendNewLine("template<>");
     }
 
-    if(const auto* decompDecl = dyn_cast_or_null<DecompositionDecl>(stmt)) {
-        InsertArg(decompDecl);
-    } else if(IsTrivialStaticClassVarDecl(*stmt)) {
+    if(IsTrivialStaticClassVarDecl(*stmt)) {
         HandleLocalStaticNonTrivialClass(stmt);
 
     } else {
@@ -734,6 +638,13 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
         if(InsertSemi()) {
             mOutputFormatHelper.AppendSemiNewLine();
+        }
+
+        // Insert the bindings of a DecompositionDecl if this VarDecl is a DecompositionDecl.
+        if(const auto* decompDecl = dyn_cast_or_null<DecompositionDecl>(stmt)) {
+            StructuredBindingsCodeGenerator codeGenerator{mOutputFormatHelper, GetName(*stmt)};
+
+            codeGenerator.InsertDecompositionBindings(*decompDecl);
         }
     }
 }
@@ -916,7 +827,7 @@ void CodeGenerator::InsertArg(const UnaryOperator* stmt)
         mOutputFormatHelper.Append(opCodeName);
     }
 }
-//-----------------------------------------------------------------------------
+//-------------	----------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const StringLiteral* stmt)
 {
@@ -2829,6 +2740,64 @@ template<typename T>
 void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     WrapInParensOrCurlys(BraceKind::Curlys, std::forward<T>(lambda), addSpaceAtTheEnd);
+}
+//-----------------------------------------------------------------------------
+
+static bool IsReference(const QualType& type)
+{
+    return GetDesugarType(type)->isLValueReferenceType();
+}
+//-----------------------------------------------------------------------------
+
+static bool IsReference(const ValueDecl& valDecl)
+{
+    return IsReference(valDecl.getType());
+}
+//-----------------------------------------------------------------------------
+
+void StructuredBindingsCodeGenerator::InsertDecompositionBindings(const DecompositionDecl& decompositionDeclStmt)
+{
+    for(const auto* bindingDecl : decompositionDeclStmt.bindings()) {
+        if(const auto* binding = bindingDecl->getBinding()) {
+
+            DPrint("sb name: %s\n", GetName(binding->getType()));
+
+            const auto* holdingVarOrMemberExpr = [&]() -> const Expr* {
+                if(const auto* holdingVar = bindingDecl->getHoldingVar()) {
+                    return holdingVar->getAnyInitializer();
+                }
+
+                return dyn_cast_or_null<MemberExpr>(binding);
+            }();
+
+            const std::string refOrRefRef = [&]() -> std::string {
+                const bool isRefToObject{IsReference(decompositionDeclStmt)};
+                const bool isArrayBinding{isa<ArraySubscriptExpr>(binding) && isRefToObject};
+                const bool isNotTemporary{holdingVarOrMemberExpr && !isa<ExprWithCleanups>(holdingVarOrMemberExpr)};
+                if(isArrayBinding || isNotTemporary) {
+                    return "&";
+                }
+
+                return {};
+            }();
+
+            mOutputFormatHelper.Append(GetName(bindingDecl->getType()), refOrRefRef, " ", GetName(*bindingDecl), " = ");
+
+            // tuple decomposition
+            if(holdingVarOrMemberExpr) {
+                InsertArg(holdingVarOrMemberExpr);
+
+                // array decomposition
+            } else if(const auto* arraySubscription = dyn_cast_or_null<ArraySubscriptExpr>(binding)) {
+                InsertArg(arraySubscription);
+
+            } else {
+                TODO(bindingDecl, mOutputFormatHelper);
+            }
+
+            mOutputFormatHelper.AppendSemiNewLine();
+        }
+    }
 }
 //-----------------------------------------------------------------------------
 

@@ -246,22 +246,6 @@ protected:
 };
 //-----------------------------------------------------------------------------
 
-class StructuredBindingsCodeGenerator final : public CodeGenerator
-{
-    const std::string& mVarName;
-
-public:
-    StructuredBindingsCodeGenerator(OutputFormatHelper& _outputFormatHelper, const std::string& varName)
-    : CodeGenerator{_outputFormatHelper}
-    , mVarName{varName}
-    {
-    }
-
-    using CodeGenerator::InsertArg;
-    void InsertArg(const DeclRefExpr* stmt) override;
-};
-//-----------------------------------------------------------------------------
-
 class LambdaCodeGenerator final : public CodeGenerator
 {
 public:
