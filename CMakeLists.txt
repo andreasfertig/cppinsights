@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.4.3)
 
 option(INSIGHTS_STRIP    "Strip insight after build" On )
 option(INSIGHTS_TIDY     "Run clang-tidy"            Off)
+option(INSIGHTS_IWYU     "Run include-what-you-use"  Off)
 option(INSIGHTS_STATIC   "Use static linking"        Off)
 option(INSIGHTS_COVERAGE "Enable code coverage"      Off)
 option(DEBUG             "Enable debug"              Off)
@@ -276,6 +277,15 @@ else()
   set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" )
 endif()
 
+
+find_program(IWYU_EXE NAMES include-what-you-use iwyu)
+if(IWYU_EXE)
+    message(STATUS "Found include-what-you-use: ${IWYU_EXE}")
+    set(DO_IWYU "${IWYU_EXE}" )
+else()
+    message(STATUS "Could not find the program include-what-you-use")
+endif()
+
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     message(STATUS "Found ccache: ${CCACHE_FOUND}")
@@ -317,6 +327,14 @@ if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
 else()
   set(RUN_CLANG_TIDY Off)
 endif()
+
+if(IWYU_EXE AND INSIGHTS_IWYU)
+    set(RUN_IWYU On)
+  set_target_properties(insights PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "${DO_IWYU}")
+else()
+  set(RUN_IWYU Off)
+endif()
+
 
 install( TARGETS insights RUNTIME DESTINATION bin )
 
@@ -449,6 +467,7 @@ message(STATUS "Code Coverage         : ${INSIGHTS_COVERAGE}")
 message(STATUS "Static linking        : ${INSIGHTS_STATIC}")
 message(STATUS "Strip executable      : ${INSIGHTS_STRIP}")
 message(STATUS "clang-tidy            : ${RUN_CLANG_TIDY}")
+message(STATUS "include-what-you-use  : ${RUN_IWYU}")
 message(STATUS "")
 
 

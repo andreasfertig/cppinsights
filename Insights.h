@@ -9,7 +9,9 @@
 #define INSIGHTS_H
 //-----------------------------------------------------------------------------
 
-#include "clang/AST/ASTContext.h"
+namespace clang {
+class ASTContext;
+}
 //-----------------------------------------------------------------------------
 
 /// \brief Global C++ Insights command line options.

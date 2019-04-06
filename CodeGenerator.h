@@ -8,14 +8,12 @@
 #ifndef INSIGHTS_CODE_GENERATOR_H
 #define INSIGHTS_CODE_GENERATOR_H
 
-#include "clang/AST/AST.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 
 #include "ClangCompat.h"
-#include "InsightsHelpers.h"
 #include "InsightsStaticStrings.h"
 #include "InsightsStrongTypes.h"
 #include "OutputFormatHelper.h"
