@@ -931,7 +931,7 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 
     if(!clang::ast_matchers::IsMatchingCast(castKind)) {
         InsertArg(subExpr);
-    } else if(isa<IntegerLiteral>(subExpr)) {
+    } else if(isa<IntegerLiteral>(subExpr) && not GetInsightsOptions().ShowAllImplicitCasts) {
         InsertArg(stmt->IgnoreCasts());
 
     } else {
