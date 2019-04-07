@@ -5,5 +5,4 @@ image:
   context: docker
 
 tasks:
-    - init: cd ~/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes -DINSIGHTS_COVERAGE=No -DINSIGHTS_LLVM_CONFIG=/usr/bin/llvm-config /workspace/cppinsights && ninja -j 2
-      command: cd ~/build
+    - command: cd ~/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes -DINSIGHTS_COVERAGE=No -DINSIGHTS_LLVM_CONFIG=/usr/bin/llvm-config /workspace/cppinsights && echo "Run: ninja -j2"
