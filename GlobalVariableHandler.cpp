@@ -37,6 +37,7 @@ GlobalVariableHandler::GlobalVariableHandler(Rewriter& rewrite, MatchFinder& mat
                     hasAncestor(cxxRecordDecl()),
                     hasAncestor(typeAliasDecl()),
                     hasAncestor(cxxMethodDecl()),
+                    parmVarDecl(),
                     // don't match a VarDecl within a VarDecl. Happens for example in lambdas.
                     hasAncestor(varDecl()),
                     varTemplateSpecDecl(),

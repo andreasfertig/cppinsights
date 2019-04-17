@@ -1,0 +1,40 @@
+// From: https://en.cppreference.com/w/cpp/language/lambda
+
+
+class __lambda_3_12
+{
+  public: inline /*constexpr */ int operator()(int (*fp)(int), int a) const
+  {
+    return fp(a);
+  }
+  
+};
+
+__lambda_3_12 Fwd = __lambda_3_12{};
+
+
+
+class __lambda_5_10
+{
+  public: inline /*constexpr */ int operator()(int a) const
+  {
+    return a;
+  }
+  public: using retType_5_10 = int (*)(int);
+  inline /*constexpr */ operator retType_5_10 () const
+  {
+    return __invoke;
+  }
+  private: static inline int __invoke(int a)
+  {
+    return a;
+  }
+  
+};
+
+__lambda_5_10 C = __lambda_5_10{};
+
+
+/* PASSED: static_assert(Fwd.operator()(static_cast<int (*)(int)>(C.operator __lambda_5_10::retType_5_10()), 3) == 3); */
+
+
