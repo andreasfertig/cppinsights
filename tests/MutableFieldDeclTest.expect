@@ -4,6 +4,7 @@ int main()
   class Test
   {
     mutable int x;
+    public: 
     // inline constexpr Test(const Test &) = default;
     // inline constexpr Test & operator=(const Test &) = default;
   };

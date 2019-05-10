@@ -11,20 +11,22 @@ inline constexpr const Test::Order OrderA = Test::Order::A;
 
 class West
 {
-    public: inline West()
-            {
-            }
-            
-            
-
-    inline int load(const Test::Order order)
-    {
-      return 2;
-    }
-    
-// public: inline constexpr West(const Test::West &);
-// public: inline constexpr West(Test::West &&);
+  
+  public: 
+  inline West()
+  {
+  }
+  
+  inline int load(const Test::Order order)
+  {
+    return 2;
+  }
+  
+  // inline constexpr West(const Test::West &) = default;
+  // inline constexpr West(Test::West &&) = default;
 };
+
+
 }
 
 int main()

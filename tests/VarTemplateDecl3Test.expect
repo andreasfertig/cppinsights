@@ -4,11 +4,8 @@
 template<class T>
 constexpr T pi = T(3.1415926535897932385L);
 
-#ifdef INSIGHTS_USE_TEMPLATE
-/* First instantiated from: VarTemplateDecl3Test.cpp:10 */
 template<>
 constexpr const int pi<int> = int(static_cast<int>(3.14159265358979323851L));
-#endif
 
  
 template<class T>

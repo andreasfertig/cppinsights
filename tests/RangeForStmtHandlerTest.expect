@@ -4,85 +4,81 @@
 
 struct A
 {
-    inline A()
+  inline A()
+  {
+    int i = 0;
+        
+    class __lambda_10_38
     {
-      int i = 0;
-            
-      class __lambda_10_38
+      int & i;
+      public: 
+      inline /*constexpr */ int operator()() const
       {
-        int & i;
-        public: inline /*constexpr */ int operator()() const
-        {
-          return ++i;
-        }
-        
-        public: __lambda_10_38(int & _i)
-        : i{_i}
-        {}
-        
-      };
+        return ++i;
+      }
       
-      std::generate(&this->v[0], &this->v[10], __lambda_10_38{i});
-    }
+      public: __lambda_10_38(int & _i)
+      : i{_i}
+      {}
+      
+    };
     
-    
-
-    int v[10];
-// public: inline constexpr A(const A &);
-// public: inline constexpr A(A &&);
+    std::generate(&this->v[0], &this->v[10], __lambda_10_38{i});
+  }
+  
+  int v[10];
+  // inline constexpr A(const A &) = default;
+  // inline constexpr A(A &&) = default;
 };
+
+
 
 
 struct B
 {
-    inline B()
+  inline B()
+  {
+    int i = 0;
+        
+    class __lambda_22_38
     {
-      int i = 0;
-            
-      class __lambda_22_38
+      int & i;
+      public: 
+      inline /*constexpr */ int operator()() const
       {
-        int & i;
-        public: inline /*constexpr */ int operator()() const
-        {
-          return ++i;
-        }
-        
-        public: __lambda_22_38(int & _i)
-        : i{_i}
-        {}
-        
-      };
+        return ++i;
+      }
       
-      std::generate(&this->v[0], &this->v[10], __lambda_22_38{i});
-    }
+      public: __lambda_22_38(int & _i)
+      : i{_i}
+      {}
+      
+    };
     
-    
-
-    
-    inline bool operator!=(const B & rhs)
-    {
-      return this != &rhs;
-    }
-    
-
-
-    inline int * begin()
-    {
-      return &this->v[0];
-    }
-    
-
-    inline int * end()
-    {
-      return &this->v[10];
-    }
-    
-
-
-    int v[10];
-// public: inline constexpr B(const B &);
-// public: inline constexpr B(B &&);
+    std::generate(&this->v[0], &this->v[10], __lambda_22_38{i});
+  }
+  
+  inline bool operator!=(const B & rhs)
+  {
+    return this != &rhs;
+  }
+  
+  inline int * begin()
+  {
+    return &this->v[0];
+  }
+  
+  inline int * end()
+  {
+    return &this->v[10];
+  }
+  
+  int v[10];
+  // inline constexpr B(const B &) = default;
+  // inline constexpr B(B &&) = default;
 };
+
+
 
 int * begin(A & v)
 {

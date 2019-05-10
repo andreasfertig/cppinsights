@@ -14,8 +14,14 @@ struct FunctionArgs<int (__lambda_12_14::*)(int) const>
 #endif
 
 
-template <typename R, typename C, typename... Args>
-struct FunctionArgs<R(C::*)(Args...) const>  {};
+#ifdef INSIGHTS_USE_TEMPLATE
+template<typename R, typename C, typename ... Args>
+struct FunctionArgs<R (C::*)(Args...) const>
+{
+};
+
+#endif
+
 
 
 int main()
@@ -26,7 +32,8 @@ int main()
   class __lambda_12_14
   {
     int & y;
-    public: inline /*constexpr */ int operator()(int x) const
+    public: 
+    inline /*constexpr */ int operator()(int x) const
     {
       return x + y;
     }

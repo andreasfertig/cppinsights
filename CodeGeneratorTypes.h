@@ -20,6 +20,7 @@ IGNORED_STMT(OMPParallelForDirective)
 IGNORED_DECL(UsingShadowDecl)
 IGNORED_DECL(UsingPackDecl)
 
+SUPPORTED_DECL(CXXDeductionGuideDecl)
 SUPPORTED_DECL(VarDecl)
 SUPPORTED_DECL(TypeAliasDecl)
 SUPPORTED_DECL(TypedefDecl)
@@ -38,6 +39,7 @@ SUPPORTED_DECL(NamespaceAliasDecl)
 SUPPORTED_DECL(FunctionTemplateDecl)
 SUPPORTED_DECL(TypeAliasTemplateDecl)
 SUPPORTED_DECL(LabelDecl)
+SUPPORTED_DECL(ClassTemplateDecl)
 
 SUPPORTED_STMT(CXXDeleteExpr)
 SUPPORTED_STMT(CXXDefaultInitExpr)
@@ -106,7 +108,11 @@ SUPPORTED_STMT(CXXDependentScopeMemberExpr)
 SUPPORTED_STMT(CXXNoexceptExpr)
 SUPPORTED_STMT(ParenListExpr)
 SUPPORTED_STMT(SizeOfPackExpr)
+// SUPPORTED_STMT(ParenListExpr)
 SUPPORTED_STMT(ConstantExpr)
+SUPPORTED_STMT(CXXUnresolvedConstructExpr)
+SUPPORTED_STMT(UnresolvedMemberExpr)
+SUPPORTED_STMT(PackExpansionExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

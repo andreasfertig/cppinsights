@@ -3,36 +3,41 @@
 
 class C
 {
-public:
-    int i;
-
-    virtual ~C() = default;
-// public: inline virtual ~C() noexcept;
-// public: inline C & operator=(const C &);
-// public: inline constexpr C(const C &) noexcept;
-// public: inline C() noexcept;
+  
+  public: 
+  int i;
+  inline virtual ~C() noexcept = default;
+  // inline C & operator=(const C &) = default;
+  // inline constexpr C(const C &) noexcept = default;
+  // inline C() noexcept = default;
 };
+
+
 
 class C2
 {
-public:
-    const int i{2};
-
-    C2() noexcept = default;
-// public: inline constexpr C2();
+  
+  public: 
+  const int i{2};
+  inline constexpr C2() = default;
 };
+
+
 
 
 class D : public C
 {
-    public:
-        int x;
-// public: inline constexpr D(const D &);
-// public: inline constexpr D(D &&);
-// public: inline D & operator=(const D &);
-// public: inline D & operator=(D &&);
-// public: inline virtual ~D() noexcept;
+  
+  public: 
+  int x;
+  // inline constexpr D(const D &) = default;
+  // inline constexpr D(D &&) = default;
+  // inline D & operator=(const D &) = default;
+  // inline D & operator=(D &&) = default;
+  // inline virtual ~D() noexcept = default;
 };
+
+
 
 
 int main()

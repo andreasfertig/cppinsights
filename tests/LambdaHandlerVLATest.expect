@@ -40,7 +40,8 @@ struct SA<2>
     {
       unsigned long;
       float (&e)[this->nt];
-      public: inline /*constexpr */ bool operator()(int i, int j) const
+      public: 
+      inline /*constexpr */ bool operator()(int i, int j) const
       {
         return e[i] < e[j];
       }

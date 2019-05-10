@@ -1,54 +1,61 @@
-class Foo{ 
-public:
-    inline Foo(double amount)
-    {
-    }
-    
-     
-    inline Foo(int x, int y)
-    {
-    }
-    
-    
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
-// public: inline ~Foo();
+class Foo
+{
+  
+  public: 
+  inline Foo(double amount)
+  {
+  }
+  
+  inline Foo(int x, int y)
+  {
+  }
+  
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
+  // inline ~Foo() = default;
 };
 
-class Bar: public Foo{ 
-public:
-      public: inline Bar(double amount) noexcept(false)
-                       : Foo(amount)
-                       {
-                       }
-                       
-                       public: inline Bar(int x, int y) noexcept(false)
-                       : Foo(x, y)
-                       {
-                       }
-                       
-                       
 
-int mX;
-// public: inline Bar();
-// public: inline constexpr Bar(const Bar &);
-// public: inline constexpr Bar(Bar &&);
+
+class Bar : public Foo
+{
+  
+  public: 
+  int mX;
+  // inline Bar() = default;
+  // inline constexpr Bar(const Bar &) = default;
+  // inline constexpr Bar(Bar &&) = default;
+  public: inline Bar(double amount) noexcept(false)
+  : Foo(amount)
+  {
+  }
+  
+  public: inline Bar(int x, int y) noexcept(false)
+  : Foo(x, y)
+  {
+  }
+  
 };
 
-class Bla: public Foo{ 
-private:
-      public: inline Bla(int x, int y) noexcept(false)
-                       : Foo(x, y)
-                       {
-                       }
-                       
-                       
 
-int mX;
-// public: inline Bla();
-// public: inline constexpr Bla(const Bla &);
-// public: inline constexpr Bla(Bla &&);
+
+class Bla : public Foo
+{
+  
+  private: 
+  int mX;
+  public: 
+  // inline Bla() = default;
+  // inline constexpr Bla(const Bla &) = default;
+  // inline constexpr Bla(Bla &&) = default;
+  public: inline Bla(int x, int y) noexcept(false)
+  : Foo(x, y)
+  {
+  }
+  
 };
+
+
 
 
 int main()

@@ -26,8 +26,8 @@ template<>
 struct Foo<int>
 {
   int raw;
-  // inline Foo() noexcept = default;
-  // inline constexpr Foo(const Foo<int> & v) noexcept = default;
+  inline Foo() noexcept = default;
+  inline constexpr Foo(const Foo<int> & v) noexcept = default;
   inline constexpr Foo(int v);
   
   using retType_12_5 = int;
@@ -36,7 +36,7 @@ struct Foo<int>
     return this->raw;
   }
   
-  // inline constexpr Foo<int> & operator=(const Foo<int> & rhs) = default;
+  inline constexpr Foo<int> & operator=(const Foo<int> & rhs) = default;
   inline Foo<int> & operator=(int v);
   
   inline volatile void operator=(int v);
@@ -53,14 +53,14 @@ template<>
 struct Foo<char>
 {
   char raw;
-  // inline Foo() noexcept = default;
-  // inline constexpr Foo(const Foo<char> & v) = default;
+  inline Foo() noexcept = default;
+  inline constexpr Foo(const Foo<char> & v) = default;
   inline constexpr Foo(char v);
   
   using retType_12_5 = char;
   inline constexpr operator retType_12_5 () const;
   
-  // inline constexpr Foo<char> & operator=(const Foo<char> & rhs) = default;
+  inline constexpr Foo<char> & operator=(const Foo<char> & rhs) = default;
   inline Foo<char> & operator=(char v)
   {
     this->raw = v;
@@ -80,46 +80,49 @@ using Char = Foo<char>;
 
 class Test
 {
-public:
-    inline void Apply()
-    {
-      Foo<char> * data = this->mData;
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\0');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\n');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\\');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\'');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\a');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\b');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\f');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\r');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\t');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\v');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(L'\n'));
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(u8'\n');
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(u'\n'));
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(U'\n'));
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3u);
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ul);
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ull);
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ll);
-      data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3l);
-    }
-    
-
-    inline Foo<int> GetLength() const
-    {
-      return Foo<int>(this->mLength);
-    }
-    
-
-private:
-    Char mData[1024];
-    Int  mLength;
-// public: inline constexpr Test(const Test &);
-// public: inline constexpr Test(Test &&);
-// public: inline constexpr Test & operator=(Test &&);
-// public: inline Test() noexcept;
+  
+  public: 
+  inline void Apply()
+  {
+    Foo<char> * data = this->mData;
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\0');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\n');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\\');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\'');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\a');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\b');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\f');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\r');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\t');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\v');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(L'\n'));
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(u8'\n');
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(u'\n'));
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(U'\n'));
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3u);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ul);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ull);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ll);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3l);
+  }
+  
+  inline Foo<int> GetLength() const
+  {
+    return Foo<int>(this->mLength);
+  }
+  
+  
+  private: 
+  Char mData[1024];
+  Foo<int> mLength;
+  public: 
+  // inline constexpr Test(const Test &) = default;
+  // inline constexpr Test(Test &&) = default;
+  // inline constexpr Test & operator=(Test &&) = default;
+  // inline Test() noexcept = default;
 };
+
+
 
 int main()
 {

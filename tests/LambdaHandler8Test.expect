@@ -20,7 +20,8 @@ int get(int & v)
   class __lambda_9_18
   {
     int & v;
-    public: inline /*constexpr */ int operator()() const
+    public: 
+    inline /*constexpr */ int operator()() const
     {
       return v;
     }

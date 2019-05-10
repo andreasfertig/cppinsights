@@ -1,0 +1,14 @@
+#include <string>
+
+struct Test
+{
+  std::basic_string<char> s = std::basic_string<char>{"333"};
+  int x{2};
+  // inline Test(const Test &) = default;
+  // inline Test(Test &&) = default;
+  // inline Test & operator=(Test &&) = default;
+  // inline ~Test() = default;
+};
+
+
+

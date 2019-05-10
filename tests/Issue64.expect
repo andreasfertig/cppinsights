@@ -6,13 +6,14 @@ void func(const std::basic_string<char> & arg)
   class __lambda_5_11
   {
     const std::basic_string<char> arg;
-    public: inline /*constexpr */ unsigned long operator()() const
+    public: 
+    inline /*constexpr */ unsigned long operator()() const
     {
       return arg.size();
     }
     
-    // public: inline __lambda_5_11(const __lambda_5_11 &) = default;
-    // public: inline __lambda_5_11(__lambda_5_11 &&) = default;
+    // inline __lambda_5_11(const __lambda_5_11 &) = default;
+    // inline __lambda_5_11(__lambda_5_11 &&) = default;
     public: __lambda_5_11(const std::basic_string<char> _arg)
     : arg{_arg}
     {}

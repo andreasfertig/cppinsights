@@ -76,14 +76,6 @@ static inline bool IsMatchingCast(const CastKind kind)
 }
 //-----------------------------------------------------------------------------
 
-/// \brief Matches AST nodes which are a templated CXXMethodDecl
-AST_MATCHER(CXXMethodDecl, isTemplated)
-{
-    SILENCE;
-
-    return Node.isTemplated();
-}
-
 AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl, Stmt))
 {
     SILENCE;

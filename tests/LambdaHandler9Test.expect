@@ -5,7 +5,8 @@ int main()
     
   class __lambda_5_14
   {
-    public: inline void operator()() const
+    public: 
+    inline void operator()() const
     {
       volatile char buffer[10];
       {
@@ -29,7 +30,8 @@ int main()
     
   class __lambda_14_14
   {
-    public: inline void operator()() const
+    public: 
+    inline void operator()() const
     {
       volatile char buffer[10];
       int i = 0;
@@ -47,7 +49,8 @@ int main()
     
   class __lambda_25_14
   {
-    public: inline /*constexpr */ void operator()(int x) const
+    public: 
+    inline /*constexpr */ void operator()(int x) const
     {
       switch(x) {
         case 2: printf("is 2\n");
@@ -64,7 +67,8 @@ int main()
     
   class __lambda_36_14
   {
-    public: inline void operator()() const
+    public: 
+    inline void operator()() const
     {
       volatile char buffer[10];
       for(int i = 0; static_cast<unsigned long>(i) < sizeof(buffer); ++i) 
@@ -82,7 +86,8 @@ int main()
     
   class __lambda_45_15
   {
-    public: inline void operator()() const
+    public: 
+    inline void operator()() const
     {
       volatile char buffer[10];
       int i = 0;

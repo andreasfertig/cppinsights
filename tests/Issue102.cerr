@@ -1,0 +1,226 @@
+.tmp.cpp:16:46: error: type 'std::__1::basic_string<char> ((lambda at .tmp.cpp:347:4)::*)(std::__1::basic_string<char>) const' cannot be used prior to '::' because it has no members
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                                             ^
+.tmp.cpp:16:23: note: in instantiation of template class 'FunctionArgs<std::__1::basic_string<char> ((lambda at .tmp.cpp:347:4)::*)(std::__1::basic_string<char>) const>' requested here
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                      ^
+.tmp.cpp:247:27: note: in instantiation of template class 'FunctionArgs<(lambda at .tmp.cpp:347:4)>' requested here
+    using args = typename FunctionArgs<Case>::args;
+                          ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<int &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:612:24: note: in instantiation of function template specialization 'test<int>' requested here
+  std::cout.operator<<(test(200)).operator<<(std::endl);
+                       ^
+In file included from .tmp.cpp:2:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/functional:487:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/memory:658:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/utility:200:
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:468:1: error: implicit instantiation of undefined template 'std::__1::tuple_element<0, int>'
+using tuple_element_t = typename tuple_element <_Ip, _Tp...>::type;
+^
+.tmp.cpp:248:14: note: in instantiation of template type alias 'tuple_element_t' requested here
+        using arg = tuple_element_t<0, args>;
+                    ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<int &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:612:24: note: in instantiation of function template specialization 'test<int>' requested here
+  std::cout.operator<<(test(200)).operator<<(std::endl);
+                       ^
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:57:61: note: template is declared here
+template <size_t _Ip, class _Tp> class _LIBCPP_TEMPLATE_VIS tuple_element;
+                                                            ^
+.tmp.cpp:185:10: error: no matching function for call to object of type 'const (lambda at .tmp.cpp:347:4)'
+                return _case(std::forward<T>(value));
+                       ^~~~~
+.tmp.cpp:250:18: note: in instantiation of function template specialization 'details::match_call<int &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+        return details::match_call(_case, std::forward<T>(value), match{}, cases...);
+                        ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<int &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:612:24: note: in instantiation of function template specialization 'test<int>' requested here
+  std::cout.operator<<(test(200)).operator<<(std::endl);
+                       ^
+.tmp.cpp:347:4: note: candidate function not viable: no known conversion from 'int' to 'std::string' (aka 'basic_string<char, char_traits<char>, allocator<char> >') for 1st argument
+                ,[](std::string value)  { std::cout << "This is string "; return value + " Hi!"; }
+                 ^
+.tmp.cpp:347:4: note: conversion candidate of type 'std::__1::basic_string<char> (*)(std::string)' (aka 'std::__1::basic_string<char> (*)(basic_string<char, char_traits<char>, allocator<char> >)')
+.tmp.cpp:16:46: error: type 'std::__1::basic_string<char> ((lambda at .tmp.cpp:347:4)::*)(std::__1::basic_string<char>) const' cannot be used prior to '::' because it has no members
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                                             ^
+.tmp.cpp:16:23: note: in instantiation of template class 'FunctionArgs<std::__1::basic_string<char> ((lambda at .tmp.cpp:347:4)::*)(std::__1::basic_string<char>) const>' requested here
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                      ^
+.tmp.cpp:247:27: note: in instantiation of template class 'FunctionArgs<(lambda at .tmp.cpp:347:4)>' requested here
+    using args = typename FunctionArgs<Case>::args;
+                          ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<char const (&)[3], (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:613:24: note: in instantiation of function template specialization 'test<char const (&)[3]>' requested here
+  std::cout.operator<<(test("RR")).operator<<(std::endl);
+                       ^
+In file included from .tmp.cpp:2:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/functional:487:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/memory:658:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/utility:200:
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:468:1: error: implicit instantiation of undefined template 'std::__1::tuple_element<0, int>'
+using tuple_element_t = typename tuple_element <_Ip, _Tp...>::type;
+^
+.tmp.cpp:248:14: note: in instantiation of template type alias 'tuple_element_t' requested here
+        using arg = tuple_element_t<0, args>;
+                    ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<char const (&)[3], (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:613:24: note: in instantiation of function template specialization 'test<char const (&)[3]>' requested here
+  std::cout.operator<<(test("RR")).operator<<(std::endl);
+                       ^
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:57:61: note: template is declared here
+template <size_t _Ip, class _Tp> class _LIBCPP_TEMPLATE_VIS tuple_element;
+                                                            ^
+.tmp.cpp:16:46: error: type 'int ((lambda at .tmp.cpp:348:4)::*)(int) const' cannot be used prior to '::' because it has no members
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                                             ^
+.tmp.cpp:16:23: note: in instantiation of template class 'FunctionArgs<int ((lambda at .tmp.cpp:348:4)::*)(int) const>' requested here
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                      ^
+.tmp.cpp:247:27: note: in instantiation of template class 'FunctionArgs<(lambda at .tmp.cpp:348:4)>' requested here
+    using args = typename FunctionArgs<Case>::args;
+                          ^
+.tmp.cpp:210:10: note: in instantiation of function template specialization 'match<char const (&)[3], (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+                return match(std::forward<T>(value), other...);
+                       ^
+.tmp.cpp:250:18: note: in instantiation of function template specialization 'details::match_call<char const (&)[3], (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+        return details::match_call(_case, std::forward<T>(value), match{}, cases...);
+                        ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<char const (&)[3], (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:613:24: note: in instantiation of function template specialization 'test<char const (&)[3]>' requested here
+  std::cout.operator<<(test("RR")).operator<<(std::endl);
+                       ^
+In file included from .tmp.cpp:2:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/functional:487:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/memory:658:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/utility:200:
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:468:1: error: implicit instantiation of undefined template 'std::__1::tuple_element<0, int>'
+using tuple_element_t = typename tuple_element <_Ip, _Tp...>::type;
+^
+.tmp.cpp:248:14: note: in instantiation of template type alias 'tuple_element_t' requested here
+        using arg = tuple_element_t<0, args>;
+                    ^
+.tmp.cpp:210:10: note: in instantiation of function template specialization 'match<char const (&)[3], (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+                return match(std::forward<T>(value), other...);
+                       ^
+.tmp.cpp:250:18: note: in instantiation of function template specialization 'details::match_call<char const (&)[3], (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+        return details::match_call(_case, std::forward<T>(value), match{}, cases...);
+                        ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<char const (&)[3], (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:613:24: note: in instantiation of function template specialization 'test<char const (&)[3]>' requested here
+  std::cout.operator<<(test("RR")).operator<<(std::endl);
+                       ^
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:57:61: note: template is declared here
+template <size_t _Ip, class _Tp> class _LIBCPP_TEMPLATE_VIS tuple_element;
+                                                            ^
+.tmp.cpp:16:46: error: type 'std::__1::basic_string<char> ((lambda at .tmp.cpp:347:4)::*)(std::__1::basic_string<char>) const' cannot be used prior to '::' because it has no members
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                                             ^
+.tmp.cpp:16:23: note: in instantiation of template class 'FunctionArgs<std::__1::basic_string<char> ((lambda at .tmp.cpp:347:4)::*)(std::__1::basic_string<char>) const>' requested here
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                      ^
+.tmp.cpp:247:27: note: in instantiation of template class 'FunctionArgs<(lambda at .tmp.cpp:347:4)>' requested here
+    using args = typename FunctionArgs<Case>::args;
+                          ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<std::__1::basic_string<char> &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:614:30: note: in instantiation of function template specialization 'test<std::__1::basic_string<char> >' requested here
+  std::operator<<(std::cout, test(std::basic_string<char>{"ARR"})).operator<<(std::endl);
+                             ^
+In file included from .tmp.cpp:2:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/functional:487:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/memory:658:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/utility:200:
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:468:1: error: implicit instantiation of undefined template 'std::__1::tuple_element<0, int>'
+using tuple_element_t = typename tuple_element <_Ip, _Tp...>::type;
+^
+.tmp.cpp:248:14: note: in instantiation of template type alias 'tuple_element_t' requested here
+        using arg = tuple_element_t<0, args>;
+                    ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<std::__1::basic_string<char> &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:614:30: note: in instantiation of function template specialization 'test<std::__1::basic_string<char> >' requested here
+  std::operator<<(std::cout, test(std::basic_string<char>{"ARR"})).operator<<(std::endl);
+                             ^
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:57:61: note: template is declared here
+template <size_t _Ip, class _Tp> class _LIBCPP_TEMPLATE_VIS tuple_element;
+                                                            ^
+.tmp.cpp:16:46: error: type 'int ((lambda at .tmp.cpp:348:4)::*)(int) const' cannot be used prior to '::' because it has no members
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                                             ^
+.tmp.cpp:16:23: note: in instantiation of template class 'FunctionArgs<int ((lambda at .tmp.cpp:348:4)::*)(int) const>' requested here
+struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
+                      ^
+.tmp.cpp:247:27: note: in instantiation of template class 'FunctionArgs<(lambda at .tmp.cpp:348:4)>' requested here
+    using args = typename FunctionArgs<Case>::args;
+                          ^
+.tmp.cpp:210:10: note: in instantiation of function template specialization 'match<std::__1::basic_string<char> &, (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+                return match(std::forward<T>(value), other...);
+                       ^
+.tmp.cpp:250:18: note: in instantiation of function template specialization 'details::match_call<std::__1::basic_string<char> &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+        return details::match_call(_case, std::forward<T>(value), match{}, cases...);
+                        ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<std::__1::basic_string<char> &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:614:30: note: in instantiation of function template specialization 'test<std::__1::basic_string<char> >' requested here
+  std::operator<<(std::cout, test(std::basic_string<char>{"ARR"})).operator<<(std::endl);
+                             ^
+In file included from .tmp.cpp:2:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/functional:487:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/memory:658:
+In file included from /usr/local/clang-8/bin/../include/c++/v1/utility:200:
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:468:1: error: implicit instantiation of undefined template 'std::__1::tuple_element<0, int>'
+using tuple_element_t = typename tuple_element <_Ip, _Tp...>::type;
+^
+.tmp.cpp:248:14: note: in instantiation of template type alias 'tuple_element_t' requested here
+        using arg = tuple_element_t<0, args>;
+                    ^
+.tmp.cpp:210:10: note: in instantiation of function template specialization 'match<std::__1::basic_string<char> &, (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+                return match(std::forward<T>(value), other...);
+                       ^
+.tmp.cpp:250:18: note: in instantiation of function template specialization 'details::match_call<std::__1::basic_string<char> &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+        return details::match_call(_case, std::forward<T>(value), match{}, cases...);
+                        ^
+.tmp.cpp:346:12: note: in instantiation of function template specialization 'match<std::__1::basic_string<char> &, (lambda at .tmp.cpp:347:4), (lambda at .tmp.cpp:348:4), (lambda at .tmp.cpp:349:4)>' requested here
+    return match(value
+           ^
+.tmp.cpp:614:30: note: in instantiation of function template specialization 'test<std::__1::basic_string<char> >' requested here
+  std::operator<<(std::cout, test(std::basic_string<char>{"ARR"})).operator<<(std::endl);
+                             ^
+/usr/local/clang-8/bin/../include/c++/v1/__tuple:57:61: note: template is declared here
+template <size_t _Ip, class _Tp> class _LIBCPP_TEMPLATE_VIS tuple_element;
+                                                            ^
+.tmp.cpp:614:3: error: call to 'operator<<' is ambiguous
+  std::operator<<(std::cout, test(std::basic_string<char>{"ARR"})).operator<<(std::endl);
+  ^~~~~~~~~~~~~~~
+/usr/local/clang-8/bin/../include/c++/v1/ostream:788:1: note: candidate function [with _Traits = std::__1::char_traits<char>]
+operator<<(basic_ostream<char, _Traits>& __os, char __c)
+^
+/usr/local/clang-8/bin/../include/c++/v1/ostream:755:1: note: candidate function [with _CharT = char, _Traits = std::__1::char_traits<char>]
+operator<<(basic_ostream<_CharT, _Traits>& __os, char __cn)
+^
+/usr/local/clang-8/bin/../include/c++/v1/ostream:795:1: note: candidate function [with _Traits = std::__1::char_traits<char>]
+operator<<(basic_ostream<char, _Traits>& __os, signed char __c)
+^
+/usr/local/clang-8/bin/../include/c++/v1/ostream:802:1: note: candidate function [with _Traits = std::__1::char_traits<char>]
+operator<<(basic_ostream<char, _Traits>& __os, unsigned char __c)
+^
+12 errors generated.

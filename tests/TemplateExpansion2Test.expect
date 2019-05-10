@@ -1,5 +1,7 @@
-#include <type_traits>
+#define INSIGHTS_USE_TEMPLATE
+
 #include <cstddef>
+#include <type_traits>
 
 namespace details {
   template<class T>
@@ -14,10 +16,24 @@ namespace details {
   
   #endif
   
-  template<class T>
-  struct remove_reference<T&>  { typedef T type; };
-  template<class T>
-  struct remove_reference<T&&> { typedef T type; };
+  #ifdef INSIGHTS_USE_TEMPLATE
+template<class T>
+struct remove_reference<T &>
+{
+  using type = T;
+};
+
+#endif
+
+  #ifdef INSIGHTS_USE_TEMPLATE
+template<class T>
+struct remove_reference<T &&>
+{
+  using type = T;
+};
+
+#endif
+
 
   template<class T, size_t N = 0>
   struct extent
@@ -32,19 +48,24 @@ namespace details {
   struct extent<int [16], 0>
   {
     inline static constexpr const size_t value = 16ul;
+    
     /* PASSED: static_assert(16ul != 0, "Arrays only"); */
   };
   
   #endif
   
 
-  template<class T, size_t I>
-  struct extent<T[I], 0>
-  {
-    static constexpr size_t value = I;
+  #ifdef INSIGHTS_USE_TEMPLATE
+template<class T, size_t I>
+struct extent<T [I], 0>
+{
+  inline static constexpr const size_t value = I;
+  
+  /* PASSED: static_assert(I != 0, "Arrays only"); */
+};
 
-    static_assert(I != 0, "Arrays only");
-  };
+#endif
+
 
 }  // namespace details
 
@@ -54,28 +75,37 @@ namespace details {
 
 class B
 {
-// public: inline constexpr B() noexcept;
-// public: inline ~B();
-// public: inline constexpr B(const B &);
-// public: inline constexpr B(B &&);
+  public: 
+  // inline constexpr B() noexcept = default;
+  // inline ~B() = default;
+  // inline constexpr B(const B &) = default;
+  // inline constexpr B(B &&) = default;
 };
 
-class E{// public: inline constexpr E() noexcept;
-// public: inline ~E();
-// public: inline constexpr E(const E &);
-// public: inline constexpr E(E &&);
+
+
+class E
+{
+  public: 
+  // inline constexpr E() noexcept = default;
+  // inline ~E() = default;
+  // inline constexpr E(const E &) = default;
+  // inline constexpr E(E &&) = default;
 };
+
+
 
 template<typename T>
 class S : public B
 {
 };
 
-/* First instantiated from: TemplateExpansion2Test.cpp:57 */
+/* First instantiated from: TemplateExpansion2Test.cpp:59 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 class S<int> : public B
 {
+  public: 
   // inline constexpr S() noexcept = default;
   // inline constexpr S(const S<int> &) = default;
   // inline constexpr S(S<int> &&) = default;
@@ -84,11 +114,12 @@ class S<int> : public B
 #endif
 
 
-/* First instantiated from: TemplateExpansion2Test.cpp:46 */
+/* First instantiated from: TemplateExpansion2Test.cpp:48 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 class S<double> : public B
 {
+  public: 
   // inline constexpr S() noexcept = default;
   // inline ~S() = default;
   // inline constexpr S(const S<double> &) = default;
@@ -103,11 +134,12 @@ class Y : public S<T>, public E
 {
 };
 
-/* First instantiated from: TemplateExpansion2Test.cpp:59 */
+/* First instantiated from: TemplateExpansion2Test.cpp:61 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 class Y<double> : public S<double>, public E
 {
+  public: 
   // inline constexpr Y() noexcept = default;
   // inline constexpr Y(const Y<double> &) = default;
   // inline constexpr Y(Y<double> &&) = default;

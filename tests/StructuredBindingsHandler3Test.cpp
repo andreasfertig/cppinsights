@@ -15,7 +15,6 @@ namespace constant {
   Q q;
   // This creates and lifetime-extends a temporary to hold the result of each get() call.
   auto [a, b, c] = q;    // expected-note {{temporary}}
-
   constexpr bool f() {
     auto [a, b, c] = q;
     return a == 0 && b == 1 && c == 4;

@@ -25,13 +25,37 @@ void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3]
     
   class __lambda_11_28
   {
-    public: inline /*constexpr */ void operator()(const double & arg) const
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(const type_parameter_0_0 & arg) const
+    {
+      std::operator<<(std::cout, ' ') << arg;
+    }
+    
+    /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:16 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ void operator()(const double & arg) const
     {
       std::operator<<(std::cout, ' ').operator<<(arg);
     }
-    public: inline /*constexpr */ void operator()(const std::basic_string<char> & arg) const
+    #endif
+    
+    
+    /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:16 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ void operator()(const std::basic_string<char> & arg) const
     {
       std::operator<<(std::operator<<(std::cout, ' '), arg);
+    }
+    #endif
+    
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(const type_parameter_0_0 & arg)
+    {
+      std::operator<<(std::cout, ' ') << arg;
     }
     
   };

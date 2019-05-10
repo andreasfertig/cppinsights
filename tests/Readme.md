@@ -20,3 +20,8 @@ the transformed code.
 Currently, it is hard to do this tests. One reason is, that the transformation result is different between glibc and
 libstd++. This results in many difference, if tests are executed under Linux. As my main development environment is
 currently macOS all the test results are based on that.
+
+To run a single test you can use this:
+```
+./runTest.py --insights=PATH-TO-insights --cxx=PATH-TO-COMPILER TemplatesWithAutoAndLambdaTest.cpp
+```

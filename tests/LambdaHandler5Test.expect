@@ -3,17 +3,19 @@ int main()
     
   class __lambda_4_5
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
     }
     
-    public: using retType_4_5 = auto (*)() -> void;
+    using retType_4_5 = auto (*)() -> void;
     inline /*constexpr */ operator retType_4_5 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
     }
     
@@ -24,18 +26,20 @@ int main()
     
   class __lambda_7_5
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       1 * 2;
     }
     
-    public: using retType_7_5 = auto (*)() -> void;
+    using retType_7_5 = auto (*)() -> void;
     inline /*constexpr */ operator retType_7_5 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       1 * 2;
     }
@@ -49,18 +53,20 @@ int main()
     
   class __lambda_13_5
   {
-    public: inline /*constexpr */ void operator()(int & x, int & y) const
+    public: 
+    inline /*constexpr */ void operator()(int & x, int & y) const
     {
       x = x + y;
     }
     
-    public: using retType_13_5 = void (*)(int &, int &);
+    using retType_13_5 = void (*)(int &, int &);
     inline /*constexpr */ operator retType_13_5 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke(int & x, int & y)
+    private: 
+    static inline void __invoke(int & x, int & y)
     {
       x = x + y;
     }

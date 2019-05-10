@@ -1,13 +1,13 @@
-.tmp.cpp:29:16: error: template argument for non-type template parameter must be an expression
+.tmp.cpp:34:16: error: template argument for non-type template parameter must be an expression
 B<A> b1 = B<A, void (A::*)()>();
                ^~~~~~~~~~~~~
-.tmp.cpp:10:28: note: template parameter is declared here
+.tmp.cpp:14:28: note: template parameter is declared here
 template<class T, void(T::*SomeMethod)() = nullptr>
                            ^
-.tmp.cpp:32:25: error: template argument for non-type template parameter must be an expression
+.tmp.cpp:37:25: error: template argument for non-type template parameter must be an expression
 B<A, nullptr> b3 = B<A, void (A::*)()>();
                         ^~~~~~~~~~~~~
-.tmp.cpp:10:28: note: template parameter is declared here
+.tmp.cpp:14:28: note: template parameter is declared here
 template<class T, void(T::*SomeMethod)() = nullptr>
                            ^
 2 errors generated.

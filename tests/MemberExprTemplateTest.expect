@@ -1,9 +1,28 @@
-  class X {
-      public:
-    template<typename T> void f(T);
+  class X
+{
+  
+  public: 
+  template<typename T>
+  void f(T);
+  
+  /* First instantiated from: MemberExprTemplateTest.cpp:11 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  void f<int>(int);
+  #endif
+  
+  template<typename ... Args>
+  void ff(Args...);
+  
+  /* First instantiated from: MemberExprTemplateTest.cpp:12 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  void ff<int, int, double>(int __0, int __1, double __2);
+  #endif
+  
+};
 
-    template<typename... Args> void ff(Args...);
-  };
+
 
 
   void test(X x)
@@ -12,7 +31,8 @@
     class __lambda_10_5
     {
       X & x;
-      public: inline /*constexpr */ void operator()() const
+      public: 
+      inline /*constexpr */ void operator()() const
       {
         x.f(17);
         x.ff(17, 2, 55.5);

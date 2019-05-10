@@ -5,6 +5,7 @@ template<typename T> class my_array {};
 template<>
 class my_array<int>
 {
+  public: 
   // inline constexpr my_array() noexcept = default;
   // inline ~my_array() = default;
   // inline constexpr my_array(const my_array<int> &) = default;
@@ -29,6 +30,7 @@ class Map<int, int, my_array>
 {
   my_array<int> key;
   my_array<int> value;
+  public: 
   // inline constexpr Map() noexcept = default;
   // inline constexpr Map(const Map<int, int, my_array> &) = default;
   // inline constexpr Map(Map<int, int, my_array> &&) = default;

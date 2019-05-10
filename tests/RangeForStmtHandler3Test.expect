@@ -5,66 +5,63 @@
 #include <iterator>
 #include <iostream>
 
-    struct null_sentinal_t {
-      template<class Rhs,
-        std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>{},int> =0
-      >
-      friend bool operator==(Rhs const& ptr, null_sentinal_t) {
-        return !*ptr;
-      }
-      
-      /* First instantiated from: RangeForStmtHandler3Test.cpp:19 */
-      #ifdef INSIGHTS_USE_TEMPLATE
-      template<>
-      inline bool operator==<const char *, 0>(const char *const & ptr, null_sentinal_t)
-      {
-        return !static_cast<bool>(*ptr);
-      }
-      #endif
-      
-      template<class Rhs,
-        std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>{},int> =0
-      >
-      friend bool operator!=(Rhs const& ptr, null_sentinal_t) {
-        return !(ptr==null_sentinal_t{});
-      }
-      
-      /* First instantiated from: RangeForStmtHandler3Test.cpp:49 */
-      #ifdef INSIGHTS_USE_TEMPLATE
-      template<>
-      inline bool operator!=<const char *, 0>(const char *const & ptr, null_sentinal_t)
-      {
-        return !(operator==(ptr, null_sentinal_t{}));
-      }
-      #endif
-      
-      template<class Lhs,
-        std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>{},int> =0
-      >
-      friend bool operator==(null_sentinal_t, Lhs const& ptr) {
-        return !*ptr;
-      }
-      template<class Lhs,
-        std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>{},int> =0
-      >
-      friend bool operator!=(null_sentinal_t, Lhs const& ptr) {
-        return !(null_sentinal_t{}==ptr);
-      }
-      friend inline bool operator==(null_sentinal_t, null_sentinal_t)
-      {
-        return true;
-      }
-      
-      friend inline bool operator!=(null_sentinal_t, null_sentinal_t)
-      {
-        return false;
-      }
-      
-    // public: inline ~null_sentinal_t() noexcept;
-    // public: inline constexpr null_sentinal_t();
-    // public: inline constexpr null_sentinal_t(const null_sentinal_t &) noexcept;
-    // public: inline constexpr null_sentinal_t(null_sentinal_t &&);
-    };
+    struct null_sentinal_t
+{
+  template<class Rhs, std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>({}), int>  = 0>
+  friend inline bool operator==(const Rhs & ptr, null_sentinal_t)
+  {
+    return !*ptr;
+  }
+  
+  /* First instantiated from: RangeForStmtHandler3Test.cpp:19 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  friend inline bool operator==<const char *, 0>(const char *const & ptr, null_sentinal_t)
+  {
+    return !static_cast<bool>(*ptr);
+  }
+  #endif
+  
+  template<class Rhs, std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>({}), int>  = 0>
+  friend inline bool operator!=(const Rhs & ptr, null_sentinal_t)
+  {
+    return !(ptr == null_sentinal_t{});
+  }
+  
+  /* First instantiated from: RangeForStmtHandler3Test.cpp:49 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  friend inline bool operator!=<const char *, 0>(const char *const & ptr, null_sentinal_t)
+  {
+    return !(operator==(ptr, null_sentinal_t{}));
+  }
+  #endif
+  
+  template<class Lhs, std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>({}), int>  = 0>
+  friend inline bool operator==(null_sentinal_t, const Lhs & ptr)
+  {
+    return !*ptr;
+  }
+  template<class Lhs, std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>({}), int>  = 0>
+  friend inline bool operator!=(null_sentinal_t, const Lhs & ptr)
+  {
+    return !(null_sentinal_t{} == ptr);
+  }
+  friend inline bool operator==(null_sentinal_t, null_sentinal_t)
+  {
+    return true;
+  }
+  friend inline bool operator!=(null_sentinal_t, null_sentinal_t)
+  {
+    return false;
+  }
+  // inline ~null_sentinal_t() noexcept = default;
+  // inline constexpr null_sentinal_t() = default;
+  // inline constexpr null_sentinal_t(const null_sentinal_t &) noexcept = default;
+  // inline constexpr null_sentinal_t(null_sentinal_t &&) = default;
+};
+
+
 
 template<class Char>
 struct str_view {

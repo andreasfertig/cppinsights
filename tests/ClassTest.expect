@@ -1,77 +1,56 @@
 class Test
 {
-public:
-    inline Test(int v)
-    : mV{v}
-    {
-    }
-    
-    
-
-    inline Test(Test & v)
-    : mV{v.mV}
-    {
-    }
-    
-    
-
   
-    inline Test & operator=(const Test & other)
-    {
-      this->mV = other.mV;
-      return *this;
-    }
-    
-
-#if 0  
-    Test& operator=( Test&& other)
-    {
-        mV = other.mV;
-        return *this;
-    }
-#endif
+  public: 
+  inline Test(int v)
+  : mV{v}
+  {
+  }
   
-#if 0  
-    Test& operator=(Test arg) noexcept // copy/move constructor is called to construct arg
-    {
-        mV = arg.mV;
-        return *this;
-    }
-  #endif
-
-    inline Test & operator++()
-    {
-      this->mV++;
-      return *this;
-    }
-    
-
-    inline Test operator++(int)
-    {
-      Test tmp = Test(*this) /* NRVO variable */;
-      this->operator++();
-      return Test(tmp);
-    }
-        
-
-    inline Test & operator+=(const Test & rhs)
-    {
-      this->mV += rhs.mV;
-      return *this;
-    }
-    
- 
+  inline Test(Test & v)
+  : mV{v.mV}
+  {
+  }
+  
+  inline Test & operator=(const Test & other)
+  {
+    this->mV = other.mV;
+    return *this;
+  }
+  
+  inline Test & operator++()
+  {
+    this->mV++;
+    return *this;
+  }
+  
+  inline Test operator++(int)
+  {
+    Test tmp = Test(*this) /* NRVO variable */;
+    this->operator++();
+    return Test(tmp);
+  }
+  
+  inline Test & operator+=(const Test & rhs)
+  {
+    this->mV += rhs.mV;
+    return *this;
+  }
+  
   using retType_54_3 = int;
   inline operator retType_54_3 ()
   {
     return this->mV;
   }
   
-
-private:
-    int mV;
-// public: inline ~Test() noexcept;
+  
+  private: 
+  int mV;
+  public: 
+  // inline ~Test() noexcept = default;
 };
+
+
 
 int main()
 {

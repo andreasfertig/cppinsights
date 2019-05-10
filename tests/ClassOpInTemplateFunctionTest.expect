@@ -1,61 +1,64 @@
 class Foo
 {
-public:
-    inline Foo(int x)
-    : mX{x}
-    {
+  
+  public: 
+  inline Foo(int x)
+  : mX{x}
+  {
+  }
+  
+  inline Foo(const char c)
+  : mX{0}
+  {
+    (*this).operator=(Foo(c));
+  }
+  
+  inline bool operator==(const int & right)
+  {
+    return false;
+  }
+  
+  inline bool operator==(const long & right)
+  {
+    return false;
+  }
+  
+  template<int N>
+  inline constexpr decltype(auto) get() const noexcept
+  {
+    if constexpr(N == 1) {
+      return this->mX;
+    } else /* constexpr */ {
+      if constexpr(N == 0) {
+        return 2;
+      }
+      
+      
     }
     
-    
-
-     inline Foo(const char c)
-     : mX{0}
-     {
-       (*this).operator=(Foo(c));
-     }
-     
-     
-
-    inline bool operator==(const int & right)
-    {
-      return false;
+  }
+  
+  /* First instantiated from: ClassOpInTemplateFunctionTest.cpp:37 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline constexpr int get<1>() const noexcept
+  {
+    if constexpr(1 == 1) {
+      return this->mX;
     }
     
-
-    inline bool operator==(const long & right)
-    {
-      return false;
-    }
-    
-
-
-   template<int N>
-   constexpr decltype(auto) get() const  noexcept {
-     if      constexpr(N == 1) { return mX; } 
-     else if constexpr(N == 0) { return 2;   }
-   }
-   
-   /* First instantiated from: ClassOpInTemplateFunctionTest.cpp:37 */
-   #ifdef INSIGHTS_USE_TEMPLATE
-   template<>
-   inline constexpr int get<1>() const noexcept
-   {
-     if constexpr(1 == 1) {
-       return this->mX;
-     }
-     
-   }
-   #endif
-   
-
-
-    int mX;
-// public: inline Foo & operator=(const Foo &);
-// public: inline Foo & operator=(Foo &&) noexcept;
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
-// public: inline ~Foo() noexcept;
+  }
+  #endif
+  
+  int mX;
+  // inline Foo & operator=(const Foo &) = default;
+  // inline Foo & operator=(Foo &&) noexcept = default;
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
+  // inline ~Foo() noexcept = default;
 };
+
+
 
 
 int main()

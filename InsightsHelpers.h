@@ -28,6 +28,8 @@ static inline bool IsNewLine(const char c)
 }
 //-----------------------------------------------------------------------------
 
+std::string ReplaceDash(std::string&& str);
+
 std::string BuildInternalVarName(const std::string& varName);
 std::string BuildInternalVarName(const std::string& varName, const SourceLocation& loc, const SourceManager& SM);
 
@@ -140,7 +142,7 @@ std::string GetName(const VarDecl& VD);
 
 static inline std::string GetName(const NamedDecl& ND)
 {
-    return ND.getNameAsString();
+    return ReplaceDash(ND.getNameAsString());
 }
 //-----------------------------------------------------------------------------
 
@@ -155,14 +157,7 @@ static inline std::string GetLambdaName(const LambdaExpr& lambda)
 }
 //-----------------------------------------------------------------------------
 
-static inline std::string GetName(const CXXRecordDecl& RD)
-{
-    if(RD.isLambda()) {
-        return GetLambdaName(RD);
-    }
-
-    return RD.getNameAsString();
-}
+std::string GetName(const CXXRecordDecl& RD);
 //-----------------------------------------------------------------------------
 
 static inline std::string GetName(const CXXMethodDecl& RD)

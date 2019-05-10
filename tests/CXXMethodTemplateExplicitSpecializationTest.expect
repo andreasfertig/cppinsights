@@ -45,12 +45,10 @@ void Foo<int>::Func()
 {
 }
 
-
 template<>
 void Foo<char>::Func()
 {
 }
-
 
 int main()
 {

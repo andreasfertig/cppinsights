@@ -7,7 +7,8 @@ int main()
   class __lambda_7_17
   {
     int & x;
-    public: inline /*constexpr */ int operator()() const
+    public: 
+    inline /*constexpr */ int operator()() const
     {
       return x * 2;
     }
@@ -27,7 +28,8 @@ int main()
   class __lambda_11_17
   {
     int & x;
-    public: inline /*constexpr */ int operator()() const
+    public: 
+    inline /*constexpr */ int operator()() const
     {
       return x * 2;
     }
@@ -42,7 +44,8 @@ int main()
   class __lambda_11_43
   {
     int & x;
-    public: inline /*constexpr */ int operator()() const
+    public: 
+    inline /*constexpr */ int operator()() const
     {
       return x * 2;
     }
@@ -61,18 +64,20 @@ int main()
       
   class __lambda_15_9
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("started\n");
     }
     
-    public: using retType_15_9 = auto (*)() -> void;
+    using retType_15_9 = auto (*)() -> void;
     inline /*constexpr */ operator retType_15_9 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("started\n");
     }
@@ -84,7 +89,8 @@ int main()
   class __lambda_15_37
   {
     int & x;
-    public: inline /*constexpr */ int operator()() const
+    public: 
+    inline /*constexpr */ int operator()() const
     {
       return --x;
     }
@@ -98,18 +104,20 @@ int main()
     
   class __lambda_15_59
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("after\n");
     }
     
-    public: using retType_15_59 = auto (*)() -> void;
+    using retType_15_59 = auto (*)() -> void;
     inline /*constexpr */ operator retType_15_59 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("after\n");
     }
@@ -124,18 +132,20 @@ int main()
       
   class __lambda_19_9
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("started\n");
     }
     
-    public: using retType_19_9 = auto (*)() -> void;
+    using retType_19_9 = auto (*)() -> void;
     inline /*constexpr */ operator retType_19_9 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("started\n");
     }
@@ -146,18 +156,20 @@ int main()
     
   class __lambda_20_9
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("started\n");
     }
     
-    public: using retType_20_9 = auto (*)() -> void;
+    using retType_20_9 = auto (*)() -> void;
     inline /*constexpr */ operator retType_20_9 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("started\n");
     }
@@ -169,7 +181,8 @@ int main()
   class __lambda_20_37
   {
     int & x;
-    public: inline /*constexpr */ int operator()() const
+    public: 
+    inline /*constexpr */ int operator()() const
     {
       return --x;
     }
@@ -183,18 +196,20 @@ int main()
     
   class __lambda_20_59
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("after\n");
     }
     
-    public: using retType_20_59 = auto (*)() -> void;
+    using retType_20_59 = auto (*)() -> void;
     inline /*constexpr */ operator retType_20_59 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("after\n");
     }

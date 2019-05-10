@@ -40,6 +40,7 @@ void foo2()
   template<>
   class B<Test, Test>
   {
+    public: 
     // inline constexpr B() noexcept = default;
     // inline ~B() = default;
     // inline constexpr B(const B<Test, Test> &) = default;
@@ -58,6 +59,7 @@ void foo2()
   template<>
   class testType<int>
   {
+    public: 
     // inline constexpr testType() noexcept = default;
     // inline constexpr testType(const testType<int> &) = default;
     // inline constexpr testType(testType<int> &&) = default;
@@ -95,6 +97,7 @@ void foo2()
   template<>
   class testIntegral<2>
   {
+    public: 
     // inline constexpr testIntegral() noexcept = default;
     // inline constexpr testIntegral(const testIntegral<2> &) = default;
     // inline constexpr testIntegral(testIntegral<2> &&) = default;
@@ -106,15 +109,13 @@ void foo2()
   template<template<typename> class> class testTemplate { };
   
 
-/* First instantiated from: TemplateExpansionTest.cpp:24 */
-#ifdef INSIGHTS_USE_TEMPLATE
 template<>
 class testTemplate<A>
 {
 };
 
-#endif
-;
+
+
 
   template<template<typename> class ...T> class C {
     B<T...> testTemplateExpansion;
@@ -126,6 +127,7 @@ class testTemplate<A>
   class C<Test, Test>
   {
     B<Test, Test> testTemplateExpansion;
+    public: 
     // inline constexpr C() noexcept = default;
     // inline constexpr C(const C<Test, Test> &) = default;
     // inline constexpr C(C<Test, Test> &&) = default;
@@ -141,6 +143,7 @@ class testTemplate<A>
   template<>
   class testExpr<4, 1>
   {
+    public: 
     // inline constexpr testExpr() noexcept = default;
     // inline constexpr testExpr(const testExpr<4, 1> &) = default;
     // inline constexpr testExpr(testExpr<4, 1> &&) = default;
@@ -156,6 +159,7 @@ class testTemplate<A>
   template<>
   class testPack<0, 1, 2, 4>
   {
+    public: 
     // inline constexpr testPack() noexcept = default;
     // inline constexpr testPack(const testPack<0, 1, 2, 4> &) = default;
     // inline constexpr testPack(testPack<0, 1, 2, 4> &&) = default;

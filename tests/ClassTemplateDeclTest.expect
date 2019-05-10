@@ -1,0 +1,35 @@
+// A test for future reference. As C++ Insights does currently not match a TemplateDecl
+// it is wrapped in a CXXRecordDecl which is matched. This should ensure that the code for
+// that stays alive to the day all Decl's are matched.
+class Test
+{
+  
+  public: 
+  template<typename T>
+  class Tmpl
+  {
+    T m;
+  };
+  
+  /* First instantiated from: ClassTemplateDeclTest.cpp:16 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  class Tmpl<int>
+  {
+    int m;
+    public: 
+    // inline Tmpl() noexcept = default;
+    // inline constexpr Tmpl(const Tmpl<int> &) = default;
+    // inline constexpr Tmpl(Tmpl<int> &&) = default;
+  };
+  
+  #endif
+};
+
+
+
+int main()
+{
+  Test::Tmpl<int> x = Tmpl<int>();
+}
+

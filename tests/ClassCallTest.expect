@@ -1,55 +1,61 @@
 #include <cstdio>
 
-class Foo {
-public:
+class Foo
+{
+  
+  public: 
   inline Foo(int foo)
   : mFoo{foo}
   {
   }
   
-  
-
   inline int Mul(int f)
   {
     return f * this->GetFoo();
   }
   
-
-protected:
+  
+  protected: 
   inline int GetFoo() const
   {
     return this->mFoo;
   }
   
-
-private:
+  
+  private: 
   int mFoo;
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
-// public: inline ~Foo();
+  public: 
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
+  // inline ~Foo() = default;
 };
 
-class Bar : public Foo {
-public:
+
+
+class Bar : public Foo
+{
+  
+  public: 
   inline Bar(int foo, int bar)
   : Foo(foo)
   , mBar{bar}
   {
   }
   
-  
-
   inline int Sum()
   {
     return this->mBar + /* static_cast<const Foo *>(this)-> */ GetFoo();
   }
   
-
-private:
+  
+  private: 
   int mBar;
-// public: inline constexpr Bar(const Bar &);
-// public: inline constexpr Bar(Bar &&);
+  public: 
+  // inline constexpr Bar(const Bar &) = default;
+  // inline constexpr Bar(Bar &&) = default;
 };
+
+
 
 int main()
 {

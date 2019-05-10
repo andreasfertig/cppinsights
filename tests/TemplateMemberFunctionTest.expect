@@ -2,62 +2,59 @@
 
 class Foo
 {
-public:
-    Foo() = default;
-
-    template<typename T>
-    void Do(T&& t)
-    {
-        t();
-    }
-    
-    /* First instantiated from: TemplateMemberFunctionTest.cpp:33 */
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    inline void Do<__lambda_33_10>(__lambda_33_10 && t)
-    {
-      t.operator()();
-    }
-    #endif
-    
-
-
-    template<int X, typename T>
-    void DoOther(T&& t)
-    {
-        t();        
-    }
-    
-    /* First instantiated from: TemplateMemberFunctionTest.cpp:35 */
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    inline void DoOther<1, __lambda_35_18>(__lambda_35_18 && t)
-    {
-      t.operator()();
-    }
-    #endif
-    
-
-    template<int X, char c, typename T>
-    void DoBar(T&& t)
-    {
-        t();        
-    }
-    
-    /* First instantiated from: TemplateMemberFunctionTest.cpp:37 */
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    inline void DoBar<1, 116, __lambda_37_21>(__lambda_37_21 && t)
-    {
-      t.operator()();
-    }
-    #endif
-    
-    
-// public: inline constexpr Foo() noexcept;
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
+  
+  public: 
+  inline constexpr Foo() noexcept = default;
+  template<typename T>
+  inline void Do(T && t)
+  {
+    t();
+  }
+  
+  /* First instantiated from: TemplateMemberFunctionTest.cpp:33 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline void Do<__lambda_33_10>(__lambda_33_10 && t)
+  {
+    t.operator()();
+  }
+  #endif
+  
+  template<int X, typename T>
+  inline void DoOther(T && t)
+  {
+    t();
+  }
+  
+  /* First instantiated from: TemplateMemberFunctionTest.cpp:35 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline void DoOther<1, __lambda_35_18>(__lambda_35_18 && t)
+  {
+    t.operator()();
+  }
+  #endif
+  
+  template<int X, char c, typename T>
+  inline void DoBar(T && t)
+  {
+    t();
+  }
+  
+  /* First instantiated from: TemplateMemberFunctionTest.cpp:37 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline void DoBar<1, 116, __lambda_37_21>(__lambda_37_21 && t)
+  {
+    t.operator()();
+  }
+  #endif
+  
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
 };
+
+
 
 int main()
 {
@@ -65,18 +62,20 @@ int main()
     
   class __lambda_33_10
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("hello\n");
     }
     
-    public: using retType_33_10 = void (*)();
+    using retType_33_10 = void (*)();
     inline /*constexpr */ operator retType_33_10 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("hello\n");
     }
@@ -88,18 +87,20 @@ int main()
     
   class __lambda_35_18
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("hello\n");
     }
     
-    public: using retType_35_18 = void (*)();
+    using retType_35_18 = void (*)();
     inline /*constexpr */ operator retType_35_18 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("hello\n");
     }
@@ -111,18 +112,20 @@ int main()
     
   class __lambda_37_21
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
       printf("hello\n");
     }
     
-    public: using retType_37_21 = void (*)();
+    using retType_37_21 = void (*)();
     inline /*constexpr */ operator retType_37_21 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
       printf("hello\n");
     }

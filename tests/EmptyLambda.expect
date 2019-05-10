@@ -3,17 +3,19 @@ void foo()
     
   class __lambda_2_1
   {
-    public: inline /*constexpr */ void operator()() const
+    public: 
+    inline /*constexpr */ void operator()() const
     {
     }
     
-    public: using retType_2_1 = void (*)();
+    using retType_2_1 = void (*)();
     inline /*constexpr */ operator retType_2_1 () const
     {
       return __invoke;
     };
     
-    private: static inline void __invoke()
+    private: 
+    static inline void __invoke()
     {
     }
     

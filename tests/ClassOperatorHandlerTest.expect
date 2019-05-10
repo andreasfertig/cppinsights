@@ -1,147 +1,142 @@
 class Test
 {
-public:
-    inline Test(int x)
-    : mX{x}
-    {
-    }
-    
-    
-
-    //    void operator++() { mX++; }
-    inline Test operator++()
-    {
-      this->mX++;
-      return Test(*this);
-    }
-    
-
-    inline Test operator++(int)
-    {
-      Test tmp = Test{*this} /* NRVO variable */;
-      this->mX++;
-      return Test(tmp);
-    }
-    
-
-    inline Test operator--()
-    {
-      this->mX--;
-      return Test(*this);
-    }
-    
-    
-    inline Test operator--(int)
-    {
-      Test tmp = Test{*this} /* NRVO variable */;
-      this->mX--;
-      return Test(tmp);
-    }
-    
-    
-    inline Test & operator+=(const Test & rhs)
-    {
-      this->mX += rhs.mX;
-      return *this;
-    }
-    
-
-    inline Test & operator<<(const Test & rhs)
-    {
-      this->mX += rhs.mX;
-      return *this;
-    }
-    
-
-    inline bool operator>(const Test & rhs)
-    {
-      return this->mX > rhs.mX;
-    }
-    
-
-    inline bool operator>=(const Test & rhs)
-    {
-      return this->mX >= rhs.mX;
-    }
-    
-
-    inline Test & operator[](const int index)
-    {
-      return *this;
-    }
-    ;
-
-private:
-    int mX;
-// public: inline constexpr Test(const Test &) noexcept;
-// public: inline constexpr Test(Test &&) noexcept;
-// public: inline ~Test() noexcept;
+  
+  public: 
+  inline Test(int x)
+  : mX{x}
+  {
+  }
+  
+  inline Test operator++()
+  {
+    this->mX++;
+    return Test(*this);
+  }
+  
+  inline Test operator++(int)
+  {
+    Test tmp = Test{*this} /* NRVO variable */;
+    this->mX++;
+    return Test(tmp);
+  }
+  
+  inline Test operator--()
+  {
+    this->mX--;
+    return Test(*this);
+  }
+  
+  inline Test operator--(int)
+  {
+    Test tmp = Test{*this} /* NRVO variable */;
+    this->mX--;
+    return Test(tmp);
+  }
+  
+  inline Test & operator+=(const Test & rhs)
+  {
+    this->mX += rhs.mX;
+    return *this;
+  }
+  
+  inline Test & operator<<(const Test & rhs)
+  {
+    this->mX += rhs.mX;
+    return *this;
+  }
+  
+  inline bool operator>(const Test & rhs)
+  {
+    return this->mX > rhs.mX;
+  }
+  
+  inline bool operator>=(const Test & rhs)
+  {
+    return this->mX >= rhs.mX;
+  }
+  
+  inline Test & operator[](const int index)
+  {
+    return *this;
+  }
+  
+  
+  private: 
+  int mX;
+  public: 
+  // inline constexpr Test(const Test &) noexcept = default;
+  // inline constexpr Test(Test &&) noexcept = default;
+  // inline ~Test() noexcept = default;
 };
+
+
 
 class Fest
 {
-public:
-    inline Fest(int x)
-    : mX{x}
-    {
-    }
-    
-    
-
-    inline int Get() const
-    {
-      return this->mX;
-    }
-    
-    inline int & Get()
-    {
-      return this->mX;
-    }
-    
-
-private:
-    int mX;
-// public: inline constexpr Fest(const Fest &);
-// public: inline constexpr Fest(Fest &&);
+  
+  public: 
+  inline Fest(int x)
+  : mX{x}
+  {
+  }
+  
+  inline int Get() const
+  {
+    return this->mX;
+  }
+  
+  inline int & Get()
+  {
+    return this->mX;
+  }
+  
+  
+  private: 
+  int mX;
+  public: 
+  // inline constexpr Fest(const Fest &) = default;
+  // inline constexpr Fest(Fest &&) = default;
 };
+
+
 
 
 namespace Hello {
     namespace Bello {
-class Fest
+class Hello::Bello::Fest
 {
-public:
-    inline Fest(int x)
-    : mX{x}
-    {
-    }
-    
-    
-
-    inline int Get() const
-    {
-      return this->mX;
-    }
-    
-    inline int & Get()
-    {
-      return this->mX;
-    }
-    
-
-    inline Hello::Bello::Fest & operator<<(const Hello::Bello::Fest & rhs)
-    {
-      this->mX += rhs.mX;
-      return *this;
-    }
-    
-
-
-private:
-    int mX;
-// public: inline constexpr Fest(const Hello::Bello::Fest &);
-// public: inline constexpr Fest(Hello::Bello::Fest &&);
+  
+  public: 
+  inline Hello::Bello::Fest(int x)
+  : mX{x}
+  {
+  }
+  
+  inline int Get() const
+  {
+    return this->mX;
+  }
+  
+  inline int & Get()
+  {
+    return this->mX;
+  }
+  
+  inline Hello::Bello::Fest & operator<<(const Hello::Bello::Fest & rhs)
+  {
+    this->mX += rhs.mX;
+    return *this;
+  }
+  
+  
+  private: 
+  int mX;
+  public: 
+  // inline constexpr Hello::Bello::Fest(const Hello::Bello::Fest &) = default;
+  // inline constexpr Hello::Bello::Fest(Hello::Bello::Fest &&) = default;
 };
+
+
 
 inline bool operator<(const Hello::Bello::Fest & LHS, const Hello::Bello::Fest & RHS)
 {

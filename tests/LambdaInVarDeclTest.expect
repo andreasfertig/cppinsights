@@ -12,7 +12,8 @@ int main()
       class __lambda_6_17
       {
         char & c;
-        public: inline /*constexpr */ char operator()() const
+        public: 
+        inline /*constexpr */ char operator()() const
         {
           return c;
         }

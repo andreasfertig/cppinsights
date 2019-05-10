@@ -1,10 +1,14 @@
-class A {
-public:
-inline void SomeMethod()
+class A
 {
-}
-
+  
+  public: 
+  inline void SomeMethod()
+  {
+  }
+  
 };
+
+
 
 
 template<class T, void(T::*SomeMethod)() = nullptr>
@@ -18,6 +22,7 @@ class B {
 template<>
 class B<A, void (A::*)()>
 {
+  public: 
   // inline constexpr B() noexcept = default;
   // inline constexpr B(const B<A, void (A::*)()> &) = default;
   // inline constexpr B(B<A, void (A::*)()> &&) = default;

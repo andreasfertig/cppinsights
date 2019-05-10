@@ -78,6 +78,8 @@ struct MACAddress
   unsigned char value[6];
 };
 
+
+
 void Main()
 {
   const MACAddress macA = {{1, 1, 1, 1, 1, 1}};

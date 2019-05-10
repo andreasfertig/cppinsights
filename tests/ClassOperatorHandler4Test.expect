@@ -1,18 +1,19 @@
 
 class Foo
 {
-public:
-    inline Foo(int x)
-    : mX{x}
-    {
-    }
-    
-    
-
-    int mX;
-// public: inline constexpr Foo(const Foo &);
-// public: inline constexpr Foo(Foo &&);
+  
+  public: 
+  inline Foo(int x)
+  : mX{x}
+  {
+  }
+  
+  int mX;
+  // inline constexpr Foo(const Foo &) = default;
+  // inline constexpr Foo(Foo &&) = default;
 };
+
+
 
 
 bool operator==(const Foo & left, const Foo & right)
