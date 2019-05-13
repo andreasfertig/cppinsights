@@ -1,0 +1,7 @@
+.tmp.cpp:85:63: error: 'protectedMember' is a protected member of 'ProtectedMember'
+  static_cast<ProtectedMember&>(usingProtectedToPublicMember).protectedMember = 1;
+                                                              ^
+.tmp.cpp:58:7: note: declared protected here
+  int protectedMember;
+      ^
+1 error generated.
