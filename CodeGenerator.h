@@ -154,6 +154,7 @@ protected:
     virtual bool InsertVarDecl() { return true; }
     virtual bool InsertComma() { return false; }
     virtual bool InsertSemi() { return true; }
+    virtual bool InsertNamespace() const { return false; }
 
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
     void HandleCompoundStmt(const CompoundStmt* stmt);
@@ -187,6 +188,9 @@ protected:
 
     void PrintNamespace(const NestedNameSpecifier* namespaceSpecifier);
     void ParseDeclContext(const DeclContext* Ctx);
+
+    STRONG_BOOL(SkipBody);
+    void InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody);
 
     /// \brief Check whether or not this statement will add curlys or parentheses and add them only if required.
     void InsertCurlysIfRequired(const Stmt* stmt);

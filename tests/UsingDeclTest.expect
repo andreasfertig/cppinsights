@@ -52,18 +52,22 @@ struct D : B {
 template<>
 struct D<int> : public B
 {
-  using D<int>::m;
-  using D<int>::value_type;
-  using D<int>::f;
+  using B::m;
+  // int m;
+  
+  using B::value_type;
+  using B::f;
   inline virtual void f(int)
   {
     std::operator<<(std::cout, "D::f\n");
   }
   
-  using D<int>::g;
+  using B::g;
+  // inline void B::g(char);
+  
   inline void g(int);
   
-  using D<int>::h;
+  using B::h;
   inline void h(int);
   
   // inline D<int> & operator=(const D<int> &) = default;

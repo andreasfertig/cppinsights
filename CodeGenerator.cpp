@@ -105,6 +105,40 @@ public:
 };
 //-----------------------------------------------------------------------------
 
+/// Handle using statements which pull functions ore members from a base class into the class.
+class UsingCodeGenerator final : public CodeGenerator
+{
+public:
+    UsingCodeGenerator(OutputFormatHelper& _outputFormatHelper)
+    : CodeGenerator{_outputFormatHelper}
+    {
+    }
+
+    using CodeGenerator::InsertArg;
+    void InsertArg(const CXXMethodDecl* stmt) override
+    {
+        mOutputFormatHelper.Append("// ");
+
+        InsertCXXMethodDecl(stmt, SkipBody::Yes);
+    }
+
+    void InsertArg(const FieldDecl* stmt) override
+    {
+        mOutputFormatHelper.Append("// ");
+        CodeGenerator::InsertArg(stmt);
+    }
+
+    // makes no sense to insert the class when applying it to using
+    void InsertArg(const CXXRecordDecl*) override {}
+
+    // makes no sense to insert the typedef when applying it to using
+    void InsertArg(const TypedefDecl*) override {}
+
+protected:
+    bool InsertNamespace() const override { return true; }
+};
+//-----------------------------------------------------------------------------
+
 CodeGenerator::LambdaScopeHandler::LambdaScopeHandler(LambdaStackType&       stack,
                                                       OutputFormatHelper&    outputFormatHelper,
                                                       const LambdaCallerType lambdaCallerType)
@@ -1749,7 +1783,7 @@ void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
+void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody)
 {
     OutputFormatHelper initOutputFormatHelper{};
     initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
@@ -1813,18 +1847,26 @@ void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
         }
     }
 
-    if(stmt->doesThisDeclarationHaveABody() && not stmt->isLambdaStaticInvoker()) {
+    if((SkipBody::No == skipBody) && stmt->doesThisDeclarationHaveABody() && not stmt->isLambdaStaticInvoker()) {
         mOutputFormatHelper.AppendNewLine();
         InsertArg(stmt->getBody());
         mOutputFormatHelper.AppendNewLine();
 
-    } else if(not InsertLambdaStaticInvoker(stmt)) {
+    } else if(not InsertLambdaStaticInvoker(stmt) || (SkipBody::Yes == skipBody)) {
         mOutputFormatHelper.AppendSemiNewLine();
     }
 
     InsertTemplateGuardEnd(stmt);
 
-    mOutputFormatHelper.AppendNewLine();
+    if(SkipBody::No == skipBody) {
+        mOutputFormatHelper.AppendNewLine();
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
+{
+    InsertCXXMethodDecl(stmt, SkipBody::No);
 }
 //-----------------------------------------------------------------------------
 
@@ -2015,6 +2057,7 @@ void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
 }
 //-----------------------------------------------------------------------------
 
+// own implementation due to lambdas
 void CodeGenerator::ParseDeclContext(const DeclContext* ctx)
 {
     SmallVector<const DeclContext*, 8> contexts{};
@@ -2066,6 +2109,9 @@ void CodeGenerator::ParseDeclContext(const DeclContext* ctx)
 
 void CodeGenerator::InsertArg(const UsingDecl* stmt)
 {
+    OutputFormatHelper ofm{};
+    ofm.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
+
     // Skip UsingDecl's which have ConstructorUsingShadowDecl attached. This means that we will create the associated
     // constructors from the base class later. Having this \c using still in the code prevents compiling the transformed
     // code.
@@ -2073,23 +2119,23 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
         for(const auto* shadow : stmt->shadows()) {
             if(isa<ConstructorUsingShadowDecl>(shadow)) {
                 return;
+            } else if(const auto* shadowUsing = dyn_cast_or_null<UsingShadowDecl>(shadow)) {
+                UsingCodeGenerator codeGenerator{ofm};
+                codeGenerator.InsertArg(shadowUsing->getTargetDecl());
             }
         }
     }
 
     mOutputFormatHelper.Append("using ");
 
-    // own implementation due to lambdas
-    if(const DeclContext* ctx = stmt->getDeclContext()) {
-        if(ctx->isFunctionOrMethod()) {
-            PrintNamespace(stmt->getQualifier());
-
-        } else {
-            ParseDeclContext(ctx);
-        }
-    }
+    PrintNamespace(stmt->getQualifier());
 
     mOutputFormatHelper.AppendNewLine(stmt->getNameAsString(), ";");
+
+    // Insert what a using declaration pulled into this scope.
+    if(not ofm.GetString().empty()) {
+        mOutputFormatHelper.AppendNewLine(ofm.GetString());
+    }
 }
 //-----------------------------------------------------------------------------
 
@@ -2852,7 +2898,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     OutputFormatHelper outputFormatHelper{};
 
     if(methodDecl) {
-        if(!isFirstCxxMethodDecl) {
+        if(not isFirstCxxMethodDecl || InsertNamespace()) {
             const auto* parent = methodDecl->getParent();
             outputFormatHelper.Append(parent->getNameAsString());
 

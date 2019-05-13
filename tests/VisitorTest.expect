@@ -5,8 +5,12 @@ template<class... Ts> struct visitor: Ts... { using Ts::operator()...; };
 template<>
 struct visitor<__lambda_8_7, __lambda_9_7> : public __lambda_8_7, public __lambda_9_7
 {
-  using visitor<__lambda_8_7, __lambda_9_7>::operator();
-  using visitor<__lambda_8_7, __lambda_9_7>::operator();
+  using __lambda_8_7::operator();
+  // inline /*constexpr */ void ::operator()(int value) const;
+  
+  using __lambda_9_7::operator();
+  // inline /*constexpr */ void ::operator()(const char * value) const;
+  
   // inline constexpr visitor<__lambda_8_7, __lambda_9_7> & operator=(visitor<__lambda_8_7, __lambda_9_7> &&) = default;
   // inline ~visitor() noexcept = default;
 };
