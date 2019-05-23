@@ -1,5 +1,6 @@
 language: cpp
 sudo: false
+dist: xenial
 
 cache:
   ccache: true
@@ -7,8 +8,9 @@ cache:
     - $HOME/Library/Caches/Homebrew
 
 common_sources: &all_sources
-- ubuntu-toolchain-r-test
-- llvm-toolchain-trusty
+- sourceline: 'ppa:ubuntu-toolchain-r/test'
+- sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main'
+  key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
 llvm_current_packages: &all_llvm_current_packages
 - llvm-9-dev
@@ -70,8 +72,8 @@ matrix:
         - clang-tidy-8
         sources:
         - ubuntu-toolchain-r-test
-        - llvm-toolchain-trusty-8
-        - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-8 main'
+        - llvm-toolchain-xenial-8
+        - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main'
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
