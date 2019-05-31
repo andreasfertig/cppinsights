@@ -189,7 +189,12 @@ OutputFormatHelper& CodeGenerator::LambdaScopeHandler::GetBuffer(OutputFormatHel
 
 void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
 {
-    InsertArg(stmt->getBase());
+    if(not stmt->isImplicitAccess()) {
+        InsertArg(stmt->getBase());
+    } else {
+        mOutputFormatHelper.Append(GetName(stmt->getBaseType()));
+    }
+
     const std::string op{stmt->isArrow() ? "->" : "."};
 
     mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getAsString());
