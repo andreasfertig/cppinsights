@@ -192,10 +192,18 @@ void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
     if(not stmt->isImplicitAccess()) {
         InsertArg(stmt->getBase());
     } else {
-        mOutputFormatHelper.Append(GetName(stmt->getBaseType()));
+        if(const auto* ql = stmt->getQualifier()) {
+            PrintNamespace(ql);
+        }
     }
 
-    const std::string op{stmt->isArrow() ? "->" : "."};
+    const std::string op{[&] {
+        if(stmt->isImplicitAccess()) {
+            return "";
+        }
+
+        return stmt->isArrow() ? "->" : ".";
+    }()};
 
     mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getAsString());
 }
@@ -2196,7 +2204,13 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
         mOutputFormatHelper.AppendSemiNewLine();
 
     } else {
-        InsertArg(stmt->getFriendDecl());
+        if(const auto* fd = dyn_cast_or_null<FunctionDecl>(stmt->getFriendDecl())) {
+            InsertArg(fd);
+        } else if(const auto* fdt = dyn_cast_or_null<FunctionTemplateDecl>(stmt->getFriendDecl())) {
+            InsertArg(fdt);
+        } else {
+            mOutputFormatHelper.AppendNewLine("friend ", GetName(*stmt->getFriendDecl()), ";");
+        }
     }
 }
 //-----------------------------------------------------------------------------
