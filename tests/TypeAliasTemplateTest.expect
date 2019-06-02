@@ -19,6 +19,7 @@ struct F
 template<>
 struct F<int>
 {
+  template<typename ... B>
   using SameSize = bool_constant<1 == sizeof...(B)>;
   template<typename ... B, typename type_parameter_0_1 = SameSize<B...>>
   inline F(B...);
