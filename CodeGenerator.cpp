@@ -1939,7 +1939,9 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
             if(stmt == thisCapture) {
                 name = "__this";
             } else {
-                for(const auto& [key, value] : captures) {
+                for(const auto& info : captures) {
+                    const auto& key = info.first;
+                    const auto& value = info.second;
                     if(value == stmt) {
                         name = GetName(*key);
                         break;
@@ -2396,7 +2398,9 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     continue;
                 }
 
-                for(const auto& [key, value] : captures) {
+                for(const auto& info : captures) {
+                    const auto& key   = info.first;
+                    const auto& value = info.second;
                     if(key == c.getCapturedVar()) {
                         addToInits(GetName(*key), value, false, captureInit);
                         break;
