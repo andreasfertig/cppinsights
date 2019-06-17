@@ -13,7 +13,6 @@
 - [What](#what)
 - [Why](#why)
 - [Building](#building)
-- [Building on Windows](#buildingonwindows)
 - [Usage](#usage)
 - [Get Involved](#getinvolved)
 - [Support](#support)
@@ -101,6 +100,9 @@ See yourself, C++ Insights is available online: [cppinsights.io](https://cppinsi
 
 C++ Insights can be build inside the clang-source tree or outside.
 
+### Building on Windows
+
+See [Readme_Windows.md](Readme_Windows.md)
 
 ### Building outside clang
 
@@ -150,10 +152,6 @@ cmake -G"Eclipse CDT4 - Unix Makefiles" ../cppinsights/
 
 Then in [Cevelop](https://www.cevelop.com) Import -> General -> Existing Project into Workspace. Select `build_eclipse`. Enjoy editing with
 [Cevelop](https://www.cevelop.com).
-
-## Building on Windows
-
-See ![Readme_Windows.md](Readme_Windows.md)
 
 ## Usage
 
