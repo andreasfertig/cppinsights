@@ -15,7 +15,7 @@ namespace clang::insights {
 
 namespace details {
 
-static inline const char* NormalizeP(const std::string& arg)
+static inline const char* Normalize(const std::string& arg)
 {
     static constexpr const char emptyString[]{""};
 
@@ -27,26 +27,26 @@ static inline const char* NormalizeP(const std::string& arg)
 }
 //-----------------------------------------------------------------------------
 
-static inline uint64_t NormalizeP(const llvm::APInt& arg)
+static inline uint64_t Normalize(const llvm::APInt& arg)
 {
     return arg.getZExtValue();
 }
 //-----------------------------------------------------------------------------
 
-static inline const char* NormalizeP(const llvm::APSInt& arg)
+static inline const char* Normalize(const llvm::APSInt& arg)
 {
-    return NormalizeP(ToString(arg));
+    return Normalize(ToString(arg));
 }
 //-----------------------------------------------------------------------------
 
-static inline const char* NormalizeP(const StringRef& arg)
+static inline const char* Normalize(const StringRef& arg)
 {
-    return NormalizeP(arg.str());
+    return Normalize(arg.str());
 }
 //-----------------------------------------------------------------------------
 
 template<class T>
-static inline const T& NormalizeP(const T& arg)
+static inline const T& Normalize(const T& arg)
 {
     return arg;
 }
@@ -56,7 +56,7 @@ template<typename... Args>
 inline void FPrintf(const char* fmt, Args&&... args)
 {
     if constexpr(0 < (sizeof...(args))) {
-        fprintf(stderr, fmt, NormalizeP(std::forward<Args>(args))...);
+        fprintf(stderr, fmt, Normalize(std::forward<Args>(args))...);
     } else {
         fprintf(stderr, "%s", fmt);
     }

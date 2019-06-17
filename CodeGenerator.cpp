@@ -1939,9 +1939,9 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
             if(stmt == thisCapture) {
                 name = "__this";
             } else {
-                for(const auto& info : captures) {
-                    const auto& key = info.first;
-                    const auto& value = info.second;
+                // No `const` as workaround for Clang bug on Windows,
+                // see https://bugs.llvm.org/show_bug.cgi?id=33236
+                for(/*const*/ auto& [key, value] : captures) {
                     if(value == stmt) {
                         name = GetName(*key);
                         break;
@@ -2398,9 +2398,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     continue;
                 }
 
-                for(const auto& info : captures) {
-                    const auto& key   = info.first;
-                    const auto& value = info.second;
+                for(/*const*/ auto& [key, value] : captures) {
                     if(key == c.getCapturedVar()) {
                         addToInits(GetName(*key), value, false, captureInit);
                         break;
