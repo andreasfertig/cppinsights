@@ -2219,6 +2219,8 @@ void CodeGenerator::InsertArg(const FunctionTemplateDecl* stmt)
 
 void CodeGenerator::InsertArg(const TypeAliasTemplateDecl* stmt)
 {
+    InsertTemplateParameters(*stmt->getTemplateParameters());
+
     InsertArg(stmt->getTemplatedDecl());
 }
 //-----------------------------------------------------------------------------
