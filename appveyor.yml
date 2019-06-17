@@ -1,0 +1,10 @@
+version: '{build}'
+image: Visual Studio 2017
+build_script:
+  - cmd: mkdir "%APPVEYOR_BUILD_FOLDER%/build"
+  - cmd: cd "%APPVEYOR_BUILD_FOLDER%/build"
+  - cmd: clang++ --version
+  - cmd: cmake -G "Visual Studio 15 2017 Win64" -T LLVM ..
+
+  - cmd: cmake --build . --config Release --target insights    
+  - cmd: 7z a insights-windows-64bit.zip insights.exe
