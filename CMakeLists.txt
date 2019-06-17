@@ -1,11 +1,20 @@
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+# 3.8* is required because of C++17 support
 
-option(INSIGHTS_STRIP    "Strip insight after build" On )
-option(INSIGHTS_TIDY     "Run clang-tidy"            Off)
-option(INSIGHTS_IWYU     "Run include-what-you-use"  Off)
-option(INSIGHTS_STATIC   "Use static linking"        Off)
-option(INSIGHTS_COVERAGE "Enable code coverage"      Off)
-option(DEBUG             "Enable debug"              Off)
+set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+
+include(CMakePrintHelpers)
+
+# TODO: enable those options on Windows once tested
+if(NOT WIN32)
+    option(DEBUG             "Enable debug"              Off)
+    option(INSIGHTS_STRIP    "Strip insight after build" On )
+    option(INSIGHTS_TIDY     "Run clang-tidy"            Off)
+    option(INSIGHTS_IWYU     "Run include-what-you-use"  Off)
+    option(INSIGHTS_STATIC   "Use static linking"        Off)
+    option(INSIGHTS_COVERAGE "Enable code coverage"      Off)
+endif()
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
@@ -20,14 +29,18 @@ if(INSIGHTS_COVERAGE OR DEBUG)
     set(INSIGHTS_STRIP Off)
 endif()
 
+if (NOT BUILD_INSIGHTS_OUTSIDE_LLVM AND WIN32)
+  message(FATAL_ERROR "Building inside LLVM on Windows was never tested")
+endif ()
+
 if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     project(cpp-insights)
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(IS_GNU On)
+    set(IS_GNU On)
 else()
-  set(IS_GNU Off)
+    set(IS_GNU Off)
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -36,6 +49,23 @@ else()
     set(IS_CLANG Off)
 endif()
 
+if(IS_GNU AND WIN32)
+    message(FATAL_ERROR "GCC on Windows was never tested")
+endif()
+
+# Clang On Windows mimics MSVC, but sometimes we need to know
+# if we really have CL.exe (not clang-cl.exe)
+if(NOT IS_CLANG AND MSVC)
+    set(IS_MSVC_CL 1)
+endif()
+
+cmake_print_variables(
+    CMAKE_CXX_COMPILER_ID
+    BUILD_INSIGHTS_OUTSIDE_LLVM
+    IS_CLANG
+    IS_GNU
+    IS_MSVC_CL
+    MSVC)
 
 if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     function(check_compiler COMPILER version)
@@ -50,6 +80,11 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
 
     check_compiler("GNU" 7.3)
     check_compiler("Clang" 6.0)
+
+    # TODO: add check for cl.exe
+    if(IS_MSVC_CL)
+        set(HAVE_COMPILER ON)
+    endif()
 
     if(NOT HAVE_COMPILER)
         message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang and GCC.")
@@ -69,18 +104,20 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
       set(INSIGHTS_VERSION_SUFFIX git)
     endif()
 
-    if (NOT INSIGHTS_PACKAGE_VERSION)
-      set(INSIGHTS_PACKAGE_VERSION "${INSIGHTS_VERSION_MAJOR}.${INSIGHTS_VERSION_MINOR}.${INSIGHTS_VERSION_PATCH}${INSIGHTS_VERSION_SUFFIX}")
+    if(NOT INSIGHTS_PACKAGE_VERSION)
+        set(INSIGHTS_PACKAGE_VERSION "${INSIGHTS_VERSION_MAJOR}.${INSIGHTS_VERSION_MINOR}.${INSIGHTS_VERSION_PATCH}${INSIGHTS_VERSION_SUFFIX}")
     endif()
 
 
     # Find LLVM Config binary for LLVM
     # If you're on debian, go to http://llvm.org/apt/ and install the development
     # release of LLVM (all packages).
-    find_program(LLVM_CONFIG_PATH "${INSIGHTS_LLVM_CONFIG}")    
+    # If you're on Windows, build LLVM from scratch,
+    # see Readme_Windows.md instructions.
+    find_program(LLVM_CONFIG_PATH "${INSIGHTS_LLVM_CONFIG}")
     if(NOT LLVM_CONFIG_PATH)
         message(FATAL_ERROR "llvm-config not found -- ${LLVM_CONFIG_PATH}: ${INSIGHTS_LLVM_CONFIG}")
-    endif()    
+    endif()
 
     if(INSIGHTS_STATIC)
         if(APPLE)
@@ -89,7 +126,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             set(LIB_TYPE "--link-static")
         endif()
 
-        set( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -static" )
+        set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif()
     
     # This function saves the output of the llvm-config command with the given
@@ -117,7 +154,14 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             CONFIG_OUTPUT ${CONFIG_OUTPUT})
 
         # make all includes system include to prevent the compiler to warn about issues in LLVM/Clang
-        string(REGEX REPLACE "-I" "-isystem" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
+        if(NOT WIN32)
+            string(REGEX REPLACE "-I" "-isystem" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
+        else()
+            if(IS_MSVC_CL)
+                # See https://devblogs.microsoft.com/cppblog/broken-warnings-theory/
+                string(REGEX REPLACE "-I" "/external:I" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
+            endif()
+        endif()
 
         # remove certain options clang doesn't like
         if(IS_CLANG)
@@ -144,20 +188,54 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     
     llvm_config(LLVM_CXXFLAGS "--cxxflags")
     llvm_config(LLVM_LDFLAGS "--ldflags")
-    llvm_config(LLVM_LIBS "--libs")
+
+    llvm_config(LLVM_LIBS2 "--libs")
+    if(WIN32)
+        # libs list separated with " " (space).
+        # CMake does not understand list with spaces,
+        # but instead requires ; (semicolon).
+        # Use ".lib " as string to replace instead of single " " (space)
+        # since LLVM/Clang libraries can be installed into folder
+        # with spaces (e.g., C:\Program Files (x86)\LLVM\bin)
+        string(REPLACE ".lib " ".lib;" LLVM_LIBS "${LLVM_LIBS2}")
+    else()
+        set(LLVM_LIBS ${LLVM_LIBS2})
+    endif()
+
     llvm_config(LLVM_LIBDIR "--libdir")
     llvm_config(LLVM_INCLUDE_DIR "--includedir")
-    llvm_config(LLVM_SYSTEM_LIBS "--system-libs")
+
+    llvm_config(LLVM_SYSTEM_LIBS2 "--system-libs")
+    if(WIN32)
+        string(REPLACE ".lib " ".lib;" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS2}")
+        # For Win10 (?) some Win API things moved to Mincore.lib.
+        # (VerQueryValue, GetFileVersionInfoSize, GetFileVersionInfo)
+        # llvm-config does not contain it. Add manually.
+        set(LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS};Mincore.lib")
+    else()
+        set(LLVM_SYSTEM_LIBS ${LLVM_SYSTEM_LIBS2})
+    endif()
+
     llvm_config(LLVM_PACKAGE_VERSION "--version")
 
     # always generate the compile commands
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-    
+    if(WIN32)
+        # Make compile_commands.json work on Windows.
+        # Requires CMake > version 3.15 with fix of
+        # https://gitlab.kitware.com/cmake/cmake/issues/17482
+        set(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
+        set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
+    endif()
+
     add_definitions(${LLVM_CXXFLAGS})
-    add_definitions(-std=c++1z)
-    add_definitions(-Wextra)
-    add_definitions(-Wold-style-cast)
-    add_definitions(-Werror)
+
+    if(NOT WIN32)
+        # To many warnings/errors from Clang's internals
+        add_definitions(-Wextra)
+        add_definitions(-Wold-style-cast)
+        add_definitions(-Werror)
+    endif ()
     
     if(IS_GNU AND NOT INSIGHTS_TIDY)
         add_definitions(-Wsuggest-override)
@@ -175,9 +253,37 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         add_definitions(-O0)
     endif()
 
+    if(WIN32)
+        # Ignore deprecated std::iterator<> usage from Clang's sources
+        add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
+
+        # For Debug configuration - link against Release version of CRT
+        # since we link with only Release version of LLVM/Clang libraries
+        # and don't have Debug versions.
+        set(CompilerFlags CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_DEBUG)
+        foreach(CompilerFlag ${CompilerFlags})
+            string(REPLACE "/MDd" "/MD" ${CompilerFlag} "${${CompilerFlag}}")
+        endforeach()
+    endif()
+    
+    if(IS_MSVC_CL)
+        # To support /external:I:
+        # - enables "system headers" and
+        # - sets warning level 0 for them
+        add_definitions(/experimental:external /external:W0)
+
+        # Use sane and nice C++ for MSVC.
+        # This makes alternative tokens (not, and, ...) as actual keywords and
+        # enables more conformant C++ in general
+        add_definitions(/permissive-)
+
+        # llvm-config says /EHs-c-.
+        # C++ exception handler used, but unwind semantics are not enabled
+        add_definitions(/wd4530)
+    endif()
 
     include_directories(${LLVM_INCLUDE_DIR} .)
-    link_directories(${LLVM_LIBDIR})    
+    link_directories(${LLVM_LIBDIR})
 
     if(INSIGHTS_COVERAGE)
         message(STATUS "Code coveraging enabled")
@@ -200,7 +306,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     endmacro(add_clang_tool)
 
     # additional libs required when building insights outside llvm
-    set(ADDITIONAL_LIBS         
+    set(ADDITIONAL_LIBS
         ${LLVM_LDFLAGS}
         clangFrontend
         clangDriver
@@ -338,116 +444,120 @@ endif()
 
 install( TARGETS insights RUNTIME DESTINATION bin )
 
-# additional includes we need when building outside the llvm-folder
-if (BUILD_INSIGHTS_OUTSIDE_LLVM)
-    if(INSIGHTS_STRIP)
-        if(APPLE)
-            # Apple's strip seems to dislike -s even as it is given at strip --help
-            set(STRIP_OPTION "")
-        else()
-            set(STRIP_OPTION "-s")
-        endif()
-
-        ADD_CUSTOM_COMMAND(
-            TARGET insights
-            POST_BUILD
-            COMMAND ${CMAKE_STRIP} ${STRIP_OPTION} insights
-            COMMENT "Stripping ${TARGET}"
-        )
-    endif()
-endif()
-
-
-
-# add a target to generate API documentation with Doxygen
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-    add_custom_target(doc
-        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating API documentation with Doxygen" VERBATIM
-    )
-endif()
-
-# XXX: hack to allow coverage build to run tests which fail
-set(TEST_FAILURE_IS_OK "")
-if(INSIGHTS_COVERAGE)
-    set(TEST_FAILURE_IS_OK "--failure-is-ok")
-endif()
-
-# add a target to generate run tests
-add_custom_target(tests
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK}
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
-    COMMENT "Running tests" VERBATIM
-)
-
-# run tests in a docker container
-add_custom_target(tests-docker
-    ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights /usr/bin/insights --cxx ${CMAKE_CXX_COMPILER} --docker
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
-    COMMENT "Running tests in docker" VERBATIM
-)
-
-# run tests in a docker container
-add_custom_target(docker-build-container
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
-    COMMENT "Bulding insights in docker" VERBATIM
-)
-
-add_custom_target(docker-build
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
-    DEPENDS docker-build-container ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
-    COMMENT "Bulding insights in docker" VERBATIM
-)
-
-add_custom_target(docker-build-run
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/run.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
-    DEPENDS docker-build-container ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
-    COMMENT "Bulding insights in docker" VERBATIM
-)
-
-# code coverage
-if(INSIGHTS_COVERAGE)
-    find_program(LCOV_BIN lcov)
-    find_program(GENHTML_BIN genhtml)
-    find_package_handle_standard_args(lcov
-        REQUIRED_VARS LCOV_BIN GENHTML_BIN
-    )
+if (NOT WIN32)
+    # Not ready for Windows yet
+    #
     
-    if (NOT LCOV_FOUND)
-        message(WARNING "Lcov not found")
-    else()
-        message(STATUS "Target coverage available")
+    # additional includes we need when building outside the llvm-folder
+    if (BUILD_INSIGHTS_OUTSIDE_LLVM)
+        if(INSIGHTS_STRIP)
+            if(APPLE)
+                # Apple's strip seems to dislike -s even as it is given at strip --help
+                set(STRIP_OPTION "")
+            else()
+                set(STRIP_OPTION "-s")
+            endif()
 
-        add_custom_target(coverage
-            COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
-            COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
-            COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.info --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
-            COMMENT "Running code coverage analysis" VERBATIM
-        )
-
-        add_dependencies(coverage tests)
-
+            ADD_CUSTOM_COMMAND(
+                TARGET insights
+                POST_BUILD
+                COMMAND ${CMAKE_STRIP} ${STRIP_OPTION} insights
+                COMMENT "Stripping ${TARGET}"
+            )
+        endif()
     endif()
-endif()
 
-if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
-    add_custom_command(TARGET insights
-        POST_BUILD
-        COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clang-tidy-check.sh ${CMAKE_CURRENT_BINARY_DIR}/output.txt ${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy-ignore
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Analyzing clang-tidy output..."
+
+
+    # add a target to generate API documentation with Doxygen
+    find_package(Doxygen)
+    if(DOXYGEN_FOUND)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+        add_custom_target(doc
+            ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen" VERBATIM
+        )
+    endif()
+
+    # XXX: hack to allow coverage build to run tests which fail
+    set(TEST_FAILURE_IS_OK "")
+    if(INSIGHTS_COVERAGE)
+        set(TEST_FAILURE_IS_OK "--failure-is-ok")
+    endif()
+
+    # add a target to generate run tests
+    add_custom_target(tests
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+        COMMENT "Running tests" VERBATIM
     )
-endif()
 
+    # run tests in a docker container
+    add_custom_target(tests-docker
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights /usr/bin/insights --cxx ${CMAKE_CXX_COMPILER} --docker
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+        COMMENT "Running tests in docker" VERBATIM
+    )
+
+    # run tests in a docker container
+    add_custom_target(docker-build-container
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
+        COMMENT "Bulding insights in docker" VERBATIM
+    )
+
+    add_custom_target(docker-build
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
+        DEPENDS docker-build-container ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
+        COMMENT "Bulding insights in docker" VERBATIM
+    )
+
+    add_custom_target(docker-build-run
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/run.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
+        DEPENDS docker-build-container ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
+        COMMENT "Bulding insights in docker" VERBATIM
+    )
+
+    # code coverage
+    if(INSIGHTS_COVERAGE)
+        find_program(LCOV_BIN lcov)
+        find_program(GENHTML_BIN genhtml)
+        find_package_handle_standard_args(lcov
+            REQUIRED_VARS LCOV_BIN GENHTML_BIN
+        )
+        
+        if (NOT LCOV_FOUND)
+            message(WARNING "Lcov not found")
+        else()
+            message(STATUS "Target coverage available")
+
+            add_custom_target(coverage
+                COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
+                COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.info --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out
+                DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+                COMMENT "Running code coverage analysis" VERBATIM
+            )
+
+            add_dependencies(coverage tests)
+
+        endif()
+    endif()
+
+    if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
+        add_custom_command(TARGET insights
+            POST_BUILD
+            COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clang-tidy-check.sh ${CMAKE_CURRENT_BINARY_DIR}/output.txt ${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy-ignore
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Analyzing clang-tidy output..."
+        )
+    endif()
+endif ()
 
 message(STATUS "")
 message(STATUS "[ Build summary ]")

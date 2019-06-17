@@ -100,6 +100,9 @@ See yourself, C++ Insights is available online: [cppinsights.io](https://cppinsi
 
 C++ Insights can be build inside the clang-source tree or outside.
 
+### Building on Windows
+
+See [Readme_Windows.md](Readme_Windows.md)
 
 ### Building outside clang
 

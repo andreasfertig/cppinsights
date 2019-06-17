@@ -95,7 +95,7 @@ namespace details {
 template<typename T, typename... Args>
 void StrCat(std::string& ret, T&& t, Args&&... args)
 {
-    ret.append(Normalize(std::forward<T>(t)));
+    ret.append(::clang::insights::Normalize(std::forward<T>(t)));
 
     if constexpr(0 < sizeof...(args)) {
         StrCat(ret, std::forward<Args>(args)...);
