@@ -34,7 +34,7 @@ if (NOT BUILD_INSIGHTS_OUTSIDE_LLVM AND WIN32)
 endif ()
 
 if (BUILD_INSIGHTS_OUTSIDE_LLVM)
-    project(cpp-insights)
+    project(cpp-insights CXX)
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
