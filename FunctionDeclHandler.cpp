@@ -28,7 +28,7 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
                                                  isTemplate,
                                                  hasAncestor(friendDecl()),    // friendDecl has functionDecl as child
                                                  hasAncestor(functionDecl()),  // prevent forward declarations
-                                                 isMacroOrInvalidLocation())))
+                                                 isInvalidLocation())))
                            .bind("funcDecl"),
                        this);
 
@@ -42,7 +42,7 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
                                                isTemplate,
                                                hasTemplateDescendant,
                                                hasAncestor(functionDecl()),  // prevent forward declarations
-                                               isMacroOrInvalidLocation())))
+                                               isInvalidLocation())))
                            .bind("friendDecl"),
                        this);
 }
@@ -59,13 +59,10 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 
         // Find the correct ending of the source range. In case of a declaration we need to find the ending semi,
         // otherwise the provided source range is correct.
-        const auto sr = [&]() {
-            if(!funcDecl->doesThisDeclarationHaveABody()) {
-                return GetSourceRangeAfterSemi(funcDecl->getSourceRange(), result);
-            }
-
-            return funcDecl->getSourceRange();
-        }();
+        const auto sr =
+            GetSourceRangeAfterSemi(funcDecl->getSourceRange(),
+                                    result,
+                                    funcDecl->doesThisDeclarationHaveABody() ? RequireSemi::No : RequireSemi::Yes);
 
         // DPrint("fd rw:  %d %s\n", (sr.getBegin() == sr.getEnd()), outputFormatHelper.GetString());
 

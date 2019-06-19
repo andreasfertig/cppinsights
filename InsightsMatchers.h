@@ -84,6 +84,13 @@ AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPE
             insights::IsInvalidLocation(insights::GetBeginLoc(Node)));
 }
 
+AST_POLYMORPHIC_MATCHER(isInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl, Stmt))
+{
+    SILENCE;
+
+    return insights::IsInvalidLocation(insights::GetBeginLoc(Node));
+}
+
 }  // namespace ast_matchers
 }  // namespace clang
 //-----------------------------------------------------------------------------

@@ -5,7 +5,7 @@ std::chrono::duration<double, std::ratio<1, 1> > Bar()
   std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long long, std::ratio<1, 1000000> > > begin = std::chrono::system_clock::now();
   return std::chrono::duration<double, std::ratio<1, 1> >(std::chrono::operator-(std::chrono::system_clock::now(), begin), 0);
 }
-;
+
 
 
 void Foo()
