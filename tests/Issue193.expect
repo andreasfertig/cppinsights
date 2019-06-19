@@ -1,0 +1,35 @@
+struct cppcmb_rule_tag16
+{
+};
+
+
+
+template <typename Val, typename Tag>
+class rule_t {};
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class rule_t<int, cppcmb_rule_tag16>
+{
+  public: 
+  // inline constexpr rule_t() noexcept = default;
+  // inline constexpr rule_t(const rule_t<int, cppcmb_rule_tag16> &) = default;
+  // inline constexpr rule_t(rule_t<int, cppcmb_rule_tag16> &&) = default;
+  // inline ~rule_t() noexcept = default;
+};
+
+#endif
+
+
+#define cppcmb_prelude_cat(x, y) x ## y
+
+#define cppcmb_cat(x, y) cppcmb_prelude_cat(x, y)
+
+#define cppcmb_unique_id(prefix) cppcmb_cat(prefix, __LINE__)
+
+#define cppcmb_decl(name, ...) \
+auto const name =              \
+rule_t<__VA_ARGS__, struct cppcmb_unique_id(cppcmb_rule_tag)>()
+
+const rule_t<int, cppcmb_rule_tag16> expr_top = rule_t<int, cppcmb_rule_tag16>();
+

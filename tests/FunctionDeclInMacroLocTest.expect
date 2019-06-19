@@ -1,0 +1,6 @@
+#define MACRO(name) void name(int) {}
+
+void test(int)
+                    {
+                    }
+                    

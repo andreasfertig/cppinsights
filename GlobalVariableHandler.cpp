@@ -31,7 +31,7 @@ GlobalVariableHandler::GlobalVariableHandler(Rewriter& rewrite, MatchFinder& mat
     matcher.addMatcher(
         varDecl(unless(anyOf(
                     isExpansionInSystemHeader(),
-                    isMacroOrInvalidLocation(),
+                    isInvalidLocation(),
                     hasAncestor(varTemplateDecl()),
                     hasAncestor(functionDecl()),
                     hasAncestor(cxxRecordDecl()),

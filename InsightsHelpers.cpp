@@ -102,7 +102,25 @@ SourceRange GetSourceRangeAfterSemi(const SourceRange                           
 {
     const SourceLocation locEnd = FindLocationAfterSemi(range.getEnd(), result, requireSemi);
 
-    return {range.getBegin(), locEnd};
+    // Special handling for macro locations.
+    const auto startLoc = [&] {
+        if(range.getBegin().isMacroID()) {
+            return GetSM(result).getImmediateExpansionRange(range.getBegin()).getBegin();
+        }
+
+        return range.getBegin();
+    }();
+
+    // Special handling for macro locations.
+    const auto locEnd2 = [&] {
+        if(locEnd.isMacroID()) {
+            return GetSM(result).getImmediateExpansionRange(locEnd).getEnd();
+        }
+
+        return locEnd;
+    }();
+
+    return {startLoc, locEnd2};
 }
 //-----------------------------------------------------------------------------
 
