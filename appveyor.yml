@@ -1,5 +1,8 @@
 version: '{build}'
 image: Visual Studio 2017
+environment:
+  auth_token:
+    secure: 2CkXU3zp0qx8s0lktLoLk+o9XO1/wGUdH5+HYxIzSwc7XU4rP8kphX1RtFycnWfa
 
 install:
   - cmd: if not exist C:\llvm-bin\downloaded ( 
@@ -8,9 +11,15 @@ install:
             (powershell Start-FileDownload "https://ziglang.org/deps/llvm+clang-8.0.0-win64-msvc-release.tar.xz" -FileName llvm.tar.xz) &&
             7z x C:\llvm-bin\llvm.tar.xz &&
             7z x C:\llvm-bin\llvm.tar &&
+            del llvm.tar &&
             echo "downloaded" > downloaded )
   - cmd: set PATH=%PATH%;C:\llvm-bin\llvm+clang-8.0.0-win64-msvc-release\bin
   - cmd: echo PATH %PATH%
+  - cmd: md c:\ciuploadtool
+  - cmd: cd c:\ciuploadtool
+  - cmd: curl -fsSL https://github.com/d1vanov/ciuploadtool/releases/download/continuous-master/ciuploadtool_windows_x86.zip -o ciuploadtool_windows_x86.zip
+  - cmd: 7z x ciuploadtool_windows_x86.zip
+    
 
 cache:
   - C:\llvm-bin -> appveyor.yml
@@ -25,3 +34,10 @@ build_script:
   - cmd: cd Release
   - cmd: dir
   - cmd: 7z a insights-windows-64bit.zip insights.exe
+
+on_finish:
+  - c:\ciuploadtool\ciuploadtool.exe insights-windows-64bit.zip
+
+branches:
+  except:
+    - /^(?i:continuous)$/
