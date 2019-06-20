@@ -1,10 +1,23 @@
 version: '{build}'
 image: Visual Studio 2017
+
+install:
+  - cmd: mkdir C:\llvm-bin
+  - cmd: cd C:\llvm-bin
+  - ps: Start-FileDownload https://ziglang.org/deps/llvm%2bclang-8.0.0-win64-msvc-release.tar.xz -FileName llvm.tar.xz 
+  - cmd: 7z x C:\llvm-bin\llvm.tar.xz
+  - cmd: 7z x C:\llvm-bin\llvm.tar
+  - cmd: dir
+  - cmd: set PATH=%PATH%;C:\llvm-bin\llvm+clang-8.0.0-win64-msvc-release\bin
+  - cmd: echo PATH %PATH%
+
 build_script:
   - cmd: mkdir "%APPVEYOR_BUILD_FOLDER%/build"
   - cmd: cd "%APPVEYOR_BUILD_FOLDER%/build"
   - cmd: clang++ --version
-  - cmd: cmake -G "Visual Studio 15 2017 Win64" -T LLVM ..
+  - cmd: cmake -G "Visual Studio 15 2017 Win64" -T LLVM -DINSIGHTS_LLVM_CONFIG=C:\llvm-bin\llvm+clang-8.0.0-win64-msvc-release\bin\llvm-config ..
 
-  - cmd: cmake --build . --config Release --target insights    
+  - cmd: cmake --build . --config Release --target insights
+  - cmd: cd Release
+  - cmd: dir
   - cmd: 7z a insights-windows-64bit.zip insights.exe
