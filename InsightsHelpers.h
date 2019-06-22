@@ -185,6 +185,9 @@ STRONG_BOOL(Unqualified);
 std::string GetName(const QualType& t, const Unqualified unqualified = Unqualified::No);
 //-----------------------------------------------------------------------------
 
+std::string GetUnqualifiedScopelessName(const Type* type);
+//-----------------------------------------------------------------------------
+
 std::string
 GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified = Unqualified::No);
 //-----------------------------------------------------------------------------
