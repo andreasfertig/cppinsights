@@ -36,7 +36,7 @@ build_script:
   - cmd: 7z a insights-windows-64bit.zip insights.exe
 
 on_finish:
-  - c:\ciuploadtool\ciuploadtool.exe insights-windows-64bit.zip
+  - cmd: if "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" ( if "%APPVEYOR_REPO_BRANCH%" == "master" ( c:\ciuploadtool\ciuploadtool.exe insights-windows-64bit.zip ) )
 
 branches:
   except:
