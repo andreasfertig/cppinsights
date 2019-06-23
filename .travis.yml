@@ -189,7 +189,7 @@ after_success:
     bash <(curl -s https://codecov.io/bash) -f ${TRAVIS_BUILD_DIR}/build/filtered.info || echo "Codecov did not collect coverage reports"
   fi
 - |
-  if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${UPLOAD}" = "Yes" ]]; then
+  if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] && [[ "${UPLOAD}" = "Yes" ]]; then
       cd ${TRAVIS_BUILD_DIR}/build/
       wget -c https://raw.githubusercontent.com/andreasfertig/uploadtool/27066299131e9af259821bdc4508c8469eb1997c/upload.sh
       export GZ_FILE_NAME=${BIN_FILE_NAME}.tar.gz
@@ -231,6 +231,13 @@ deploy:
   on:
     branch: master
     condition: $DEPLOY = Yes
+after_deploy:
+- |
+  if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] && [[ "${UPLOAD}" = "Yes" ]] && [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+    cd ${TRAVIS_BUILD_DIR}/build/
+    wget -c https://raw.githubusercontent.com/andreasfertig/travisci-trigger-build/master/trigger_travisci_build.sh
+    bash trigger_travisci_build.sh > /dev/null
+  fi  
 #
 env:
   global:
