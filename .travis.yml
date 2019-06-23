@@ -231,6 +231,13 @@ deploy:
   on:
     branch: master
     condition: $DEPLOY = Yes
+after_deploy:
+- |
+  if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] && [[ "${UPLOAD}" = "Yes" ]] && [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+    cd ${TRAVIS_BUILD_DIR}/build/
+    wget -c https://raw.githubusercontent.com/andreasfertig/travisci-trigger-build/master/trigger_travisci_build.sh
+    bash trigger_travisci_build.sh > /dev/null
+  fi  
 #
 env:
   global:
