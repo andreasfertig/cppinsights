@@ -262,7 +262,11 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         # and don't have Debug versions.
         set(CompilerFlags CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_DEBUG)
         foreach(CompilerFlag ${CompilerFlags})
-            string(REPLACE "/MDd" "/MD" ${CompilerFlag} "${${CompilerFlag}}")
+            if(INSIGHTS_STATIC)
+              string(REPLACE "/MTd" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+            else()
+              string(REPLACE "/MDd" "/MD" ${CompilerFlag} "${${CompilerFlag}}")
+            endif()
         endforeach()
     endif()
     

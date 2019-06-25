@@ -28,7 +28,7 @@ build_script:
   - cmd: mkdir "%APPVEYOR_BUILD_FOLDER%/build"
   - cmd: cd "%APPVEYOR_BUILD_FOLDER%/build"
   - cmd: clang++ --version
-  - cmd: cmake -G "Visual Studio 15 2017 Win64" -T LLVM -DINSIGHTS_LLVM_CONFIG=C:\llvm-bin\llvm+clang-8.0.0-win64-msvc-release\bin\llvm-config ..
+  - cmd: cmake -G "Visual Studio 15 2017 Win64" -T LLVM -DINSIGHTS_STATIC=Yes -DINSIGHTS_LLVM_CONFIG=C:\llvm-bin\llvm+clang-8.0.0-win64-msvc-release\bin\llvm-config ..
 
   - cmd: cmake --build . --config Release --target insights
   - cmd: cd Release
