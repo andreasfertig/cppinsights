@@ -19,6 +19,11 @@
 namespace clang::insights {
 //-----------------------------------------------------------------------------
 
+// Workaround to keep clang 6 Linux build alive
+template<class T, class U>
+inline constexpr bool is_same_v = std::is_same<T, U>::value;  // NOLINT
+//-----------------------------------------------------------------------------
+
 /// \brief The C++ Insights formatter.
 ///
 /// Most of the code is handed to \ref OutputFormatHelper for easy code formatting.
@@ -157,6 +162,12 @@ public:
     {
         OnceFalse needsComma{};
         for(const auto& arg : arguments) {
+            if constexpr(is_same_v<const TemplateArgument&, decltype(arg)>) {
+                if((TemplateArgument::Pack == arg.getKind()) && (0 == arg.pack_size())) {
+                    break;
+                }
+            }
+
             if(needsComma) {
                 outputFormatHelper.Append(", ");
             }

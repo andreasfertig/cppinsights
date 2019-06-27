@@ -1,0 +1,36 @@
+template<typename U, typename ...T>
+void f(U, T... rest)
+{
+  if constexpr (sizeof...(rest) != 0)
+    f(rest...);
+}
+
+/* First instantiated from: Issue199.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void f<int, int>(int, int __rest1)
+{
+  if constexpr(1 != 0) f(__rest1);
+  
+  
+}
+#endif
+
+
+/* First instantiated from: Issue199.cpp:5 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void f<int>(int)
+{
+  if constexpr(0 != 0) ;
+  
+  
+}
+#endif
+
+
+int main()
+{
+  f(0, 1);
+}
+

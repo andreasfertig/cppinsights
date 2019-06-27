@@ -182,7 +182,7 @@ void tprintf<char, int>(const char * format, char value, int __Fargs2)
 /* First instantiated from: TemplateHandlerTest.cpp:44 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void tprintf<int, >(const char * format, int value)
+void tprintf<int>(const char * format, int value)
 {
   for(; static_cast<int>(*format) != static_cast<int>('\0'); format++) 
   {

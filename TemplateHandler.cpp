@@ -26,11 +26,6 @@ const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDe
 
 namespace clang::insights {
 
-// Workaround to keep clang 6 Linux build alive
-template<class T, class U>
-inline constexpr bool is_same_v = std::is_same<T, U>::value;  // NOLINT
-//-----------------------------------------------------------------------------
-
 /// \brief Insert the instantiated template with the resulting code.
 template<typename T>
 static OutputFormatHelper InsertInstantiatedTemplate(const T& decl)
