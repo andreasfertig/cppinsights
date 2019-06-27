@@ -38,7 +38,6 @@ static constexpr const char kwExtern[] = KW_EXTERN;
 static constexpr const char kwConstSpace[] = BUILD_WITH_SPACE_AFTER(KW_CONST);
 // static constexpr const char kwAutoSpace[]      = BUILD_WITH_SPACE_AFTER(KW_AUTO);
 static constexpr const char kwConstExprSpace[] = BUILD_WITH_SPACE_AFTER(KW_CONSTEXPR);
-static constexpr const char kwVolatileSpace[]  = BUILD_WITH_SPACE_AFTER(KW_VOLATILE);
 static constexpr const char kwStaticSpace[]    = BUILD_WITH_SPACE_AFTER(KW_STATIC);
 static constexpr const char kwExternSpace[]    = BUILD_WITH_SPACE_AFTER(KW_EXTERN);
 // static constexpr const char kwNoexceptSpace[]  = BUILD_WITH_SPACE_AFTER(KW_NOEXCEPT);
@@ -50,6 +49,7 @@ static constexpr const char kwInlineSpace[]  = BUILD_WITH_SPACE_AFTER(KW_INLINE)
 static constexpr const char kwSpaceNoexcept[]  = BUILD_WITH_SPACE_BEFORE(KW_NOEXCEPT);
 static constexpr const char kwSpaceConst[]     = BUILD_WITH_SPACE_BEFORE(KW_CONST);
 static constexpr const char kwSpaceConstExpr[] = BUILD_WITH_SPACE_BEFORE(KW_CONSTEXPR);
+static constexpr const char kwSpaceVolatile[]  = BUILD_WITH_SPACE_BEFORE(KW_VOLATILE);
 //-----------------------------------------------------------------------------
 
 #endif /* INSIGHTS_STATIC_STRINGS_H */

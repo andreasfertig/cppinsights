@@ -39,7 +39,7 @@ struct Foo<int>
   inline constexpr Foo<int> & operator=(const Foo<int> & rhs) = default;
   inline Foo<int> & operator=(int v);
   
-  inline volatile void operator=(int v);
+  inline void operator=(int v) volatile;
   
   // inline ~Foo() noexcept = default;
 };
@@ -67,7 +67,7 @@ struct Foo<char>
     return *this;
   }
   
-  inline volatile void operator=(char v);
+  inline void operator=(char v) volatile;
   
   // inline ~Foo() = default;
 };
