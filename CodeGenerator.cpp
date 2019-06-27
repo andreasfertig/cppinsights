@@ -2874,10 +2874,6 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
             mOutputFormatHelper.Append(kwVirtualSpace);
         }
 
-        if(methodDecl->isVolatile()) {
-            mOutputFormatHelper.Append(kwVolatileSpace);
-        }
-
         if(const auto* ctorDecl = dyn_cast_or_null<CXXConstructorDecl>(methodDecl)) {
             if(isFirstCxxMethodDecl && ctorDecl->isExplicit()) {
                 mOutputFormatHelper.Append("explicit ");
@@ -2958,6 +2954,10 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     }
 
     mOutputFormatHelper.Append(GetConst(decl));
+
+    if(methodDecl && methodDecl->isVolatile()) {
+        mOutputFormatHelper.Append(kwSpaceVolatile);
+    }
 
     switch(decl.getType()->getAs<FunctionProtoType>()->getRefQualifier()) {
         case RQ_None: break;
