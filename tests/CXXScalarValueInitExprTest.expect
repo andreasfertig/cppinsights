@@ -8,7 +8,7 @@ T create(Args&& ... args){
 /* First instantiated from: CXXScalarValueInitExprTest.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-double create<double, >()
+double create<double>()
 {
   return double();
 }
