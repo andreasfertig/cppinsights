@@ -730,7 +730,7 @@ InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceMan
 
 void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
 {
-    if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
+    if(stmt->isFunctionTemplateSpecialization()) {
         InsertInstantiationPoint(mOutputFormatHelper, GetSM(*stmt), stmt->getPointOfInstantiation());
         mOutputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
     }
@@ -739,7 +739,7 @@ void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
 
 void CodeGenerator::InsertTemplateGuardEnd(const FunctionDecl* stmt)
 {
-    if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
+    if(stmt->isFunctionTemplateSpecialization()) {
         mOutputFormatHelper.AppendNewLine("#endif");
     }
 }
@@ -2853,7 +2853,7 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
             InsertTemplateParameters(*decl.getDescribedTemplate()->getTemplateParameters());
         }
 
-    } else if(decl.isTemplateInstantiation() && decl.isFunctionTemplateSpecialization()) {
+    } else if(decl.isFunctionTemplateSpecialization()) {
         mOutputFormatHelper.AppendNewLine("template<>");
     }
 
