@@ -730,7 +730,7 @@ InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceMan
 
 void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
 {
-    if(stmt->isFunctionTemplateSpecialization()) {
+    if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
         InsertInstantiationPoint(mOutputFormatHelper, GetSM(*stmt), stmt->getPointOfInstantiation());
         mOutputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
     }
@@ -739,7 +739,7 @@ void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
 
 void CodeGenerator::InsertTemplateGuardEnd(const FunctionDecl* stmt)
 {
-    if(stmt->isFunctionTemplateSpecialization()) {
+    if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
         mOutputFormatHelper.AppendNewLine("#endif");
     }
 }
