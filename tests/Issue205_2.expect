@@ -1,0 +1,50 @@
+#include <functional>
+#include <iostream>
+class EventContainer
+{
+  
+  private: 
+  int val;
+  std::function<void ()> something;
+  
+  public: 
+    
+  class __lambda_6_43
+  {
+    EventContainer * __this;
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+      std::cout.operator<<(__this->val);
+    }
+    
+    // inline /*constexpr */ __lambda_6_43 & operator=(const __lambda_6_43 &) = default;
+    // inline /*constexpr */ __lambda_6_43(const __lambda_6_43 &) noexcept = default;
+    // inline /*constexpr */ __lambda_6_43(__lambda_6_43 &&) noexcept = default;
+    public: __lambda_6_43(EventContainer * _this)
+    : __this{_this}
+
+    {}
+    
+  } __lambda_6_43{this};
+  
+  inline EventContainer()
+  : val{1235}
+  , something{std::function<void ()>(__lambda_6_43)}
+  {
+  }
+  
+  // inline EventContainer(const EventContainer &) = default;
+  // inline EventContainer(EventContainer &&) = default;
+  // inline EventContainer & operator=(EventContainer &&) = default;
+  // inline ~EventContainer() noexcept = default;
+  
+};
+
+
+
+int main()
+{
+  EventContainer e = EventContainer();
+}
+

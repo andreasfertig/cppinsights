@@ -40,6 +40,7 @@ protected:
         LambdaExpr,
         ReturnStmt,
         BinaryOperator,
+        CXXMethodDecl,
     };
 
     class LambdaHelper : public StackListEntry<LambdaHelper>
@@ -182,6 +183,10 @@ protected:
     void InsertTemplateArg(const TemplateArgument& arg);
     bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
     void InsertTemplateParameters(const TemplateParameterList& list);
+
+    /// For a special case, when a LambdaExpr occurs in a Constructor from an
+    /// in class initializer, there is a need for a more narrow scope for the \c LAMBDA_SCOPE_HELPER.
+    void InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputFormatHelper& initOutputFormatHelper);
 
     void InsertTemplateGuardBegin(const FunctionDecl* stmt);
     void InsertTemplateGuardEnd(const FunctionDecl* stmt);

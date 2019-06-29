@@ -1,0 +1,93 @@
+// std::function mock up
+template<typename ReturnValue, typename... Args>
+class function
+{
+public:
+    function() = default;
+
+    template<typename T>
+    function(T&& f)
+    {}
+};
+
+/* First instantiated from: LambdaAndInClassInitializerTest.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class function<void ()>
+{
+  
+  public: 
+  inline constexpr function() = default;
+  template<typename T>
+  inline function(T && f);
+  
+  
+  /* First instantiated from: LambdaAndInClassInitializerTest.cpp:17 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline function<__lambda_17_38>(__lambda_17_38 && f)
+  {
+  }
+  #endif
+  
+  
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline function<const function<void ()> &>(function<void ()> & f);
+  #endif
+  
+  
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline function<function<void ()> >(function<void ()> && f);
+  #endif
+  
+  
+  // inline constexpr function(const function<void ()> &) = default;
+  // inline constexpr function(function<void ()> &&) = default;
+  // inline ~function() noexcept = default;
+};
+
+#endif
+
+
+// part of #205
+class EventContainer
+{
+  
+  private: 
+  int val;
+  function<void ()> something;
+  
+  public: 
+    
+  class __lambda_17_38
+  {
+    EventContainer * __this;
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+      __this->val;
+    }
+    
+    public: __lambda_17_38(EventContainer * _this)
+    : __this{_this}
+
+    {}
+    
+  } __lambda_17_38{this};
+  
+  // inline constexpr EventContainer() noexcept(false) = default;
+  // inline constexpr EventContainer(const EventContainer &) = default;
+  // inline constexpr EventContainer(EventContainer &&) = default;
+};
+
+
+
+int main()
+{
+  EventContainer e = EventContainer();
+}
+
