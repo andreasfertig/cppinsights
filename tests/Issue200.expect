@@ -17,12 +17,10 @@ void f<int, int>(int, int __rest1)
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<>
 void f<int>(int)
 {
 }
-#endif
 
 
 int main()
