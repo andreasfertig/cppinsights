@@ -45,7 +45,7 @@ matrix:
     addons:
       ssh_known_hosts: cppinsights.io
     before_install:
-    - cd docker_travis && docker build -t cppinsights-travis .
+    - cd docker_travis && docker pull andreasfertig/cppinsights-builder
     env: COMPILER='clang++-8' COMPILER_CC='clang-8' LLVM_CONFIG=/usr/bin/llvm-config-8  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
     
   # Linux g++ Build
@@ -143,7 +143,7 @@ before_script:
   - cd build
   - |
     if [[ "${DEPLOY}" == "Yes" ]]; then
-      docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes .."
+      docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes .."
     elif [[ "${CFORMAT}" == "Yes" ]]; then
       echo "Nothing to do here for the clang-format check run."
     else
@@ -153,9 +153,9 @@ before_script:
 script:
 - |
   if [[ "${DEPLOY}" == "Yes" ]]; then
-    docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cmake --build /home/builder/build"
+    docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cmake --build /home/builder/build"
     mkdir ${TRAVIS_BUILD_DIR}/build/html
-    docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm cppinsights-travis /bin/bash -c "cmake --build /home/builder/build --target doc"
+    docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cmake --build /home/builder/build --target doc"
     echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
   elif [[ "${TIDY}" == "Yes" ]]; then
     $TRAVIS_BUILD_DIR/scripts/travis-run-make-tidy.sh
