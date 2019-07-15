@@ -1845,12 +1845,18 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
                 codeGenerator.InsertCurlysIfRequired(init->getInit());
             } else {
                 const auto* inlineInit = init->getInit();
+                bool        useCurlies{false};
 
                 if(const auto* cxxInheritedCtorInitExpr = dyn_cast_or_null<CXXInheritedCtorInitExpr>(inlineInit)) {
                     cxxInheritedCtorDecl = cxxInheritedCtorInitExpr->getConstructor();
+
+                    // Insert the base class name only, if it is not a CXXContructorExpr which already carries the type.
+                } else if(init->isBaseInitializer() && not isa<CXXConstructExpr>(inlineInit)) {
+                    initOutputFormatHelper.Append(GetName(QualType(init->getBaseClass(), 0)));
+                    useCurlies = true;
                 }
 
-                codeGenerator.InsertArg(inlineInit);
+                codeGenerator.WrapInCurliesIfNeeded(useCurlies, [&] { codeGenerator.InsertArg(inlineInit); });
             }
         }
     }
@@ -2088,13 +2094,7 @@ void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
         case NestedNameSpecifier::TypeSpec: {
 
             mOutputFormatHelper.Append(GetUnqualifiedScopelessName(stmt->getAsType()));
-
-            // XXX: Leave this for now, it inserts a second pair of <...> which seems to be not required.
-            // if(const auto* tmplSpecType = dyn_cast<TemplateSpecializationType>(type)) {
-            //     InsertTemplateArgs(tmplSpecType->template_arguments());
-            //    //            } else if(const auto* subs = dyn_cast_or_null<SubstTemplateTypeParmType>(T)) {
-            //    //                mOutputFormatHelper.Append(GetName(subs->getReplacementType()));
-            //}
+            // The template parameters are already contained in the type we inserted above.
         } break;
 
         default: break;
@@ -3080,6 +3080,17 @@ void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const Add
 {
     if(needsParens) {
         WrapInParensOrCurlys(BraceKind::Parens, std::forward<T>(lambda), addSpaceAtTheEnd);
+    } else {
+        lambda();
+    }
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+void CodeGenerator::WrapInCurliesIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+{
+    if(needsParens) {
+        WrapInParensOrCurlys(BraceKind::Curlys, std::forward<T>(lambda), addSpaceAtTheEnd);
     } else {
         lambda();
     }
