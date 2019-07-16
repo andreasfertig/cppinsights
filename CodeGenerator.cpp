@@ -170,7 +170,8 @@ OutputFormatHelper& CodeGenerator::LambdaScopeHandler::GetBuffer(OutputFormatHel
                 case LambdaCallerType::ReturnStmt:
                 case LambdaCallerType::OperatorCallExpr:
                 case LambdaCallerType::MemberCallExpr:
-                case LambdaCallerType::BinaryOperator: return &l;
+                case LambdaCallerType::BinaryOperator:
+                case LambdaCallerType::CXXMethodDecl: return &l;
                 default: break;
             }
         }
@@ -1783,16 +1784,15 @@ void CodeGenerator::InsertArg(const TypedefDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody)
+void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputFormatHelper& initOutputFormatHelper)
 {
-    OutputFormatHelper initOutputFormatHelper{};
-    initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
+    LAMBDA_SCOPE_HELPER(CXXMethodDecl);
     CXXConstructorDecl* cxxInheritedCtorDecl{nullptr};
 
-    // travers the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the
+    // Traverse the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the
     // name and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
-        CodeGenerator codeGenerator{initOutputFormatHelper};
+        CodeGenerator codeGenerator{initOutputFormatHelper, mLambdaStack};
         OnceTrue      first{};
 
         for(const auto* init : ctor->inits()) {
@@ -1827,6 +1827,15 @@ void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skip
     } else if(stmt->isDeleted()) {
         mOutputFormatHelper.AppendNewLine(" = delete;");
     }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody)
+{
+    OutputFormatHelper initOutputFormatHelper{};
+    initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
+
+    InsertCXXMethodHeader(stmt, initOutputFormatHelper);
 
     if(not stmt->isUserProvided()) {
         InsertTemplateGuardEnd(stmt);
@@ -2227,6 +2236,11 @@ void CodeGenerator::InsertArg(const TypeAliasTemplateDecl* stmt)
 
 void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
+    // Prevent a case like in #205 where the lambda appears twice.
+    if(stmt->isLambda() && (mLambdaStack.empty() || (nullptr == mLambdaExpr))) {
+        return;
+    }
+
     // we require the if-guard only if it is a compiler generated specialization. If it is a hand-written variant it
     // should compile.
     const bool isClassTemplateSpecialization{[&] {
