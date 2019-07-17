@@ -1752,6 +1752,10 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
     mOutputFormatHelper.Append("using ", GetName(*stmt), " = ");
 
     if(auto* templateSpecializationType = stmt->getUnderlyingType()->getAs<TemplateSpecializationType>()) {
+        if(const auto elaboratedType = stmt->getUnderlyingType()->getAs<ElaboratedType>()) {
+            PrintNamespace(elaboratedType->getQualifier());
+        }
+
         std::string              name{};
         llvm::raw_string_ostream stream(name);
         templateSpecializationType->getTemplateName().dump(stream);
