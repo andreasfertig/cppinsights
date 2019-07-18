@@ -1750,8 +1750,13 @@ void CodeGenerator::InsertArg(const ConstantExpr* stmt)
 void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 {
     mOutputFormatHelper.Append("using ", GetName(*stmt), " = ");
+    const auto& underlyingType = stmt->getUnderlyingType();
 
-    if(auto* templateSpecializationType = stmt->getUnderlyingType()->getAs<TemplateSpecializationType>()) {
+    if(auto* templateSpecializationType = underlyingType->getAs<TemplateSpecializationType>()) {
+        if(const auto elaboratedType = underlyingType->getAs<ElaboratedType>()) {
+            PrintNamespace(elaboratedType->getQualifier());
+        }
+
         std::string              name{};
         llvm::raw_string_ostream stream(name);
         templateSpecializationType->getTemplateName().dump(stream);
@@ -1767,8 +1772,28 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         });
 
         mOutputFormatHelper.Append(">");
+    } else if(auto* templateSpecializationType = underlyingType->getAs<DependentTemplateSpecializationType>()) {
+
+        if(ETK_None != templateSpecializationType->getKeyword()) {
+            mOutputFormatHelper.Append(TypeWithKeyword::getKeywordName(templateSpecializationType->getKeyword()), " ");
+        }
+
+        PrintNamespace(templateSpecializationType->getQualifier());
+
+        mOutputFormatHelper.Append("template ", templateSpecializationType->getIdentifier()->getName(), "<");
+
+        ForEachArg(templateSpecializationType->template_arguments(), [&](const auto& arg) {
+            if(arg.getKind() == TemplateArgument::Expression) {
+                InsertArg(arg.getAsExpr());
+            } else {
+                InsertTemplateArg(arg);
+            }
+        });
+
+        mOutputFormatHelper.Append('>');
+
     } else {
-        mOutputFormatHelper.Append(GetName(stmt->getUnderlyingType()));
+        mOutputFormatHelper.Append(GetName(underlyingType));
     }
 
     mOutputFormatHelper.AppendSemiNewLine();
@@ -2051,14 +2076,14 @@ void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
         case NestedNameSpecifier::TypeSpecWithTemplate:
         case NestedNameSpecifier::TypeSpec: {
 
-            const Type* type = stmt->getAsType();
-            mOutputFormatHelper.Append(GetName(QualType(type, 0)));
+            mOutputFormatHelper.Append(GetUnqualifiedScopelessName(stmt->getAsType()));
 
-            if(const auto* tmplSpecType = dyn_cast<TemplateSpecializationType>(type)) {
-                InsertTemplateArgs(tmplSpecType->template_arguments());
-                //            } else if(const auto* subs = dyn_cast_or_null<SubstTemplateTypeParmType>(T)) {
-                //                mOutputFormatHelper.Append(GetName(subs->getReplacementType()));
-            }
+            // XXX: Leave this for now, it inserts a second pair of <...> which seems to be not required.
+            // if(const auto* tmplSpecType = dyn_cast<TemplateSpecializationType>(type)) {
+            //     InsertTemplateArgs(tmplSpecType->template_arguments());
+            //    //            } else if(const auto* subs = dyn_cast_or_null<SubstTemplateTypeParmType>(T)) {
+            //    //                mOutputFormatHelper.Append(GetName(subs->getReplacementType()));
+            //}
         } break;
 
         default: break;

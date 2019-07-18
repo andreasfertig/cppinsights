@@ -29,6 +29,16 @@ static const struct CppInsightsPrintingPolicy : PrintingPolicy
 } InsightsPrintingPolicy{};  // NOLINT
 //-----------------------------------------------------------------------------
 
+static const struct CppInsightsNoScopePrintingPolicy : CppInsightsPrintingPolicy
+{
+    CppInsightsNoScopePrintingPolicy()
+    : CppInsightsPrintingPolicy{}
+    {
+        SuppressScope = true;
+    }
+} InsightsNoScopePrintingPolicy{};  // NOLINT
+//-----------------------------------------------------------------------------
+
 static std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
 {
     if(Contains(str, "type-parameter-")) {
@@ -45,9 +55,16 @@ std::string ReplaceDash(std::string&& str)
 {
     return ReplaceAll(str, "-", "_");
 }
+//-----------------------------------------------------------------------------
 
-static const std::string GetAsCPPStyleString(const QualType& t)
+STRONG_BOOL(SupressScope);
+
+static const std::string GetAsCPPStyleString(const QualType& t, const SupressScope supressScope = SupressScope::No)
 {
+    if(SupressScope::Yes == supressScope) {
+        return ReplaceDash(t.getAsString(InsightsNoScopePrintingPolicy));
+    }
+
     return ReplaceDash(t.getAsString(InsightsPrintingPolicy));
 }
 //-----------------------------------------------------------------------------
@@ -248,7 +265,8 @@ static std::string GetScope(const DeclContext* declCtx)
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetNameInternal(const QualType& t, const Unqualified unqualified)
+static std::string
+GetNameInternal(const QualType& t, const Unqualified unqualified, const SupressScope supressScope = SupressScope::No)
 {
     if(const auto* memberPointerType = t->getAs<MemberPointerType>()) {
         if(const auto* recordType2 = dyn_cast_or_null<RecordType>(memberPointerType->getClass())) {
@@ -342,10 +360,10 @@ static std::string GetNameInternal(const QualType& t, const Unqualified unqualif
     }
 
     if(Unqualified::Yes == unqualified) {
-        return GetAsCPPStyleString(t.getUnqualifiedType());
+        return GetAsCPPStyleString(t.getUnqualifiedType(), supressScope);
     }
 
-    return GetAsCPPStyleString(t);
+    return GetAsCPPStyleString(t, supressScope);
 }
 //-----------------------------------------------------------------------------
 
@@ -361,7 +379,9 @@ static bool IsDecltypeType(const QualType& t)
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetName(const QualType& t, const Unqualified unqualified = Unqualified::No)
+static std::string GetName(const QualType&    t,
+                           const Unqualified  unqualified  = Unqualified::No,
+                           const SupressScope supressScope = SupressScope::No)
 {
     const auto  t2 = GetDesugarType(t);
     const auto* at = t2->getContainedAutoType();
@@ -372,14 +392,14 @@ static std::string GetName(const QualType& t, const Unqualified unqualified = Un
         // treat LValueReference special at this point. This means we are coming from auto&& and it decayed to an
         // l-value reference.
         if(dt->isLValueReferenceType()) {
-            return GetNameInternal(dt, unqualified);
+            return GetNameInternal(dt, unqualified, supressScope);
         }
 
     } else if(IsDecltypeType(t)) {  // Handle decltype(var)
-        return GetNameInternal(t2, unqualified);
+        return GetNameInternal(t2, unqualified, supressScope);
     }
 
-    return GetNameInternal(t, unqualified);
+    return GetNameInternal(t, unqualified, supressScope);
 }
 }  // namespace details
 //-----------------------------------------------------------------------------
@@ -406,7 +426,13 @@ std::string GetName(const CXXRecordDecl& RD)
 
 std::string GetName(const QualType& t, const Unqualified unqualified)
 {
-    return details::GetName(t, unqualified);
+    return details::GetName(t, unqualified, SupressScope::No);
+}
+//-----------------------------------------------------------------------------
+
+std::string GetUnqualifiedScopelessName(const Type* type)
+{
+    return details::GetName(QualType(type, 0), Unqualified::Yes, SupressScope::Yes);
 }
 //-----------------------------------------------------------------------------
 
