@@ -113,7 +113,7 @@ class Test
   
   
   private: 
-  Char mData[1024];
+  Foo<char> mData[1024];
   Foo<int> mLength;
   public: 
   // inline constexpr Test(const Test &) = default;
