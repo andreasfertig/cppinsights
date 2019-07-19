@@ -560,20 +560,13 @@ static std::string GetName(const QualType&    t,
                            const Unqualified  unqualified  = Unqualified::No,
                            const SupressScope supressScope = SupressScope::No)
 {
-    const auto  t2 = GetDesugarType(t);
-    const auto* at = t2->getContainedAutoType();
+    const auto  desugaredType = GetDesugarType(t);
+    const auto* autoType      = desugaredType->getContainedAutoType();
+    const bool  isAutoType{autoType && autoType->isSugared()};
 
-    if(at && at->isSugared()) {
-        const auto dt = at->getDeducedType();
-
-        // treat LValueReference special at this point. This means we are coming from auto&& and it decayed to an
-        // l-value reference.
-        if(dt->isLValueReferenceType()) {
-            return GetNameInternal(dt, unqualified, supressScope);
-        }
-
-    } else if(IsDecltypeType(t)) {  // Handle decltype(var)
-        return GetNameInternal(t2, unqualified, supressScope);
+    // Handle decltype(var)
+    if(not isAutoType && IsDecltypeType(t)) {
+        return GetNameInternal(desugaredType, unqualified, supressScope);
     }
 
     return GetNameInternal(t, unqualified, supressScope);
