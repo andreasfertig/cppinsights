@@ -232,8 +232,7 @@ namespace details {
 
 static std::string GetQualifiedName(const NamedDecl& decl)
 {
-    std::string              name;
-    llvm::raw_string_ostream stream(name);
+    StringStream stream{};
     decl.printQualifiedName(stream, CppInsightsPrintingPolicy{});
 
     return stream.str();

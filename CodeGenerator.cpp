@@ -1019,8 +1019,7 @@ void CodeGenerator::InsertArg(const UnaryOperator* stmt)
 
 void CodeGenerator::InsertArg(const StringLiteral* stmt)
 {
-    std::string              data{};
-    llvm::raw_string_ostream stream{data};
+    StringStream stream{};
     stmt->outputString(stream);
 
     mOutputFormatHelper.Append(stream.str());
@@ -1757,8 +1756,7 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
             PrintNamespace(elaboratedType->getQualifier());
         }
 
-        std::string              name{};
-        llvm::raw_string_ostream stream(name);
+        StringStream stream{};
         templateSpecializationType->getTemplateName().dump(stream);
 
         mOutputFormatHelper.Append(stream.str(), "<");

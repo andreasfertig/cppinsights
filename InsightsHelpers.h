@@ -206,6 +206,20 @@ void for_each(T start, T end, TFunc&& func)
 }
 //-----------------------------------------------------------------------------
 
+/// \brief Specialization for \c ::llvm::raw_string_ostream with an internal \c std::string buffer.
+///
+class StringStream : public ::llvm::raw_string_ostream
+{
+private:
+    std::string mData;
+
+public:
+    StringStream()
+    : ::llvm::raw_string_ostream{mData}
+    {
+    }
+};
+
 }  // namespace clang::insights
 
 #endif /* INSIGHTS_HELPERS_H */
