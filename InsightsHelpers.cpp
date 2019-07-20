@@ -15,9 +15,13 @@
 
 namespace clang::insights {
 
-static const struct CppInsightsPrintingPolicy : PrintingPolicy
+STRONG_BOOL(SupressScope);
+
+struct CppInsightsPrintingPolicy : PrintingPolicy
 {
-    CppInsightsPrintingPolicy()
+    unsigned CppInsightsUnqualified : 1;  // NOLINT
+
+    CppInsightsPrintingPolicy(const Unqualified unqualified, const SupressScope supressScope)
     : PrintingPolicy{LangOptions{}}
     {
         adjustForCPlusPlus();
@@ -25,18 +29,16 @@ static const struct CppInsightsPrintingPolicy : PrintingPolicy
         Alignof                = true;
         ConstantsAsWritten     = true;
         AnonymousTagLocations  = false;  // does remove filename and line for from lambdas in parameters
-    }
-} InsightsPrintingPolicy{};  // NOLINT
-//-----------------------------------------------------------------------------
 
-static const struct CppInsightsNoScopePrintingPolicy : CppInsightsPrintingPolicy
-{
-    CppInsightsNoScopePrintingPolicy()
-    : CppInsightsPrintingPolicy{}
-    {
-        SuppressScope = true;
+        CppInsightsUnqualified = (Unqualified::Yes == unqualified);
+        SuppressScope          = (SupressScope::Yes == supressScope);
     }
-} InsightsNoScopePrintingPolicy{};  // NOLINT
+
+    CppInsightsPrintingPolicy()
+    : CppInsightsPrintingPolicy{Unqualified::No, SupressScope::No}
+    {
+    }
+};
 //-----------------------------------------------------------------------------
 
 static std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
@@ -57,15 +59,9 @@ std::string ReplaceDash(std::string&& str)
 }
 //-----------------------------------------------------------------------------
 
-STRONG_BOOL(SupressScope);
-
-static const std::string GetAsCPPStyleString(const QualType& t, const SupressScope supressScope = SupressScope::No)
+static const std::string GetAsCPPStyleString(const QualType& t, const CppInsightsPrintingPolicy& printingPolicy)
 {
-    if(SupressScope::Yes == supressScope) {
-        return ReplaceDash(t.getAsString(InsightsNoScopePrintingPolicy));
-    }
-
-    return ReplaceDash(t.getAsString(InsightsPrintingPolicy));
+    return ReplaceDash(t.getAsString(printingPolicy));
 }
 //-----------------------------------------------------------------------------
 
@@ -228,7 +224,7 @@ std::string GetNameAsWritten(const QualType& t)
 {
     SplitQualType splitted = t.split();
 
-    return QualType::getAsString(splitted, InsightsPrintingPolicy);
+    return QualType::getAsString(splitted, CppInsightsPrintingPolicy{});
 }
 //-----------------------------------------------------------------------------
 
@@ -238,7 +234,7 @@ static std::string GetQualifiedName(const NamedDecl& decl)
 {
     std::string              name;
     llvm::raw_string_ostream stream(name);
-    decl.printQualifiedName(stream, InsightsPrintingPolicy);
+    decl.printQualifiedName(stream, CppInsightsPrintingPolicy{});
 
     return stream.str();
 }
@@ -278,12 +274,12 @@ static std::string GetScope(const DeclContext* declCtx)
 class SimpleTypePrinter
 {
 private:
-    const QualType&    mType;
-    const Unqualified  mUnqualified;
-    OutputFormatHelper mData{};
-    std::string        mDataAfter{};
-    bool               mHasData{false};
-    bool               mSkipSpace{false};
+    const QualType&                  mType;
+    const CppInsightsPrintingPolicy& mPrintingPolicy;
+    OutputFormatHelper               mData{};
+    std::string                      mDataAfter{};
+    bool                             mHasData{false};
+    bool                             mSkipSpace{false};
 
     bool HandleType(const TemplateTypeParmType* type)
     {
@@ -423,7 +419,7 @@ private:
 
     bool HandleType(const BuiltinType* type)
     {
-        mData.Append(type->getName(InsightsPrintingPolicy));
+        mData.Append(type->getName(mPrintingPolicy));
 
         if(not mSkipSpace) {
             mData.Append(' ');
@@ -496,7 +492,7 @@ private:
 
     void AddCVQualifiers(const Qualifiers& quals)
     {
-        if((Unqualified::No == mUnqualified) && not quals.empty()) {
+        if((false == mPrintingPolicy.CppInsightsUnqualified) && not quals.empty()) {
             mData.Append(quals.getAsString());
 
             if(not mData.empty() && not mSkipSpace) {
@@ -506,9 +502,9 @@ private:
     }
 
 public:
-    SimpleTypePrinter(const QualType& qt, const Unqualified unqualified)
+    SimpleTypePrinter(const QualType& qt, const CppInsightsPrintingPolicy& printingPolicy)
     : mType{qt}
-    , mUnqualified{unqualified}
+    , mPrintingPolicy{printingPolicy}
     {
     }
 
@@ -530,17 +526,16 @@ public:
 };
 //-----------------------------------------------------------------------------
 
-static std::string
-GetNameInternal(const QualType& t, const Unqualified unqualified, const SupressScope supressScope = SupressScope::No)
+static std::string GetNameInternal(const QualType& t, const CppInsightsPrintingPolicy& printingPolicy)
 {
-    if(SimpleTypePrinter st{t, unqualified}; st.GetTypeString()) {
+    if(SimpleTypePrinter st{t, printingPolicy}; st.GetTypeString()) {
         return st.GetString();
 
-    } else if(Unqualified::Yes == unqualified) {
-        return GetAsCPPStyleString(t.getUnqualifiedType(), supressScope);
+    } else if(true == printingPolicy.CppInsightsUnqualified) {
+        return GetAsCPPStyleString(t.getUnqualifiedType(), printingPolicy);
     }
 
-    return GetAsCPPStyleString(t, supressScope);
+    return GetAsCPPStyleString(t, printingPolicy);
 }
 //-----------------------------------------------------------------------------
 
@@ -560,16 +555,17 @@ static std::string GetName(const QualType&    t,
                            const Unqualified  unqualified  = Unqualified::No,
                            const SupressScope supressScope = SupressScope::No)
 {
-    const auto  desugaredType = GetDesugarType(t);
-    const auto* autoType      = desugaredType->getContainedAutoType();
-    const bool  isAutoType{autoType && autoType->isSugared()};
+    const auto                      desugaredType = GetDesugarType(t);
+    const auto*                     autoType      = desugaredType->getContainedAutoType();
+    const bool                      isAutoType{autoType && autoType->isSugared()};
+    const CppInsightsPrintingPolicy printingPolicy{unqualified, supressScope};
 
     // Handle decltype(var)
     if(not isAutoType && IsDecltypeType(t)) {
-        return GetNameInternal(desugaredType, unqualified, supressScope);
+        return GetNameInternal(desugaredType, printingPolicy);
     }
 
-    return GetNameInternal(t, unqualified, supressScope);
+    return GetNameInternal(t, printingPolicy);
 }
 }  // namespace details
 //-----------------------------------------------------------------------------
