@@ -6,7 +6,7 @@ This is a list of things I plan to do. If you like to jump in that's great. Plea
 - [x] Add TODO.md
 - [x] Add CODE_OF_CONDUCT.md
 - [x] Add CONTRIBUTING.md
-- [ ] Add Windows support
+- [x] Add Windows support
 - [ ] macOS homebrew package
 - [ ] Linux debian package
 - [ ] Improve tests on other platforms than macOS
