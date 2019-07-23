@@ -15,9 +15,13 @@
 
 namespace clang::insights {
 
-static const struct CppInsightsPrintingPolicy : PrintingPolicy
+STRONG_BOOL(SupressScope);
+
+struct CppInsightsPrintingPolicy : PrintingPolicy
 {
-    CppInsightsPrintingPolicy()
+    unsigned CppInsightsUnqualified : 1;  // NOLINT
+
+    CppInsightsPrintingPolicy(const Unqualified unqualified, const SupressScope supressScope)
     : PrintingPolicy{LangOptions{}}
     {
         adjustForCPlusPlus();
@@ -25,18 +29,16 @@ static const struct CppInsightsPrintingPolicy : PrintingPolicy
         Alignof                = true;
         ConstantsAsWritten     = true;
         AnonymousTagLocations  = false;  // does remove filename and line for from lambdas in parameters
-    }
-} InsightsPrintingPolicy{};  // NOLINT
-//-----------------------------------------------------------------------------
 
-static const struct CppInsightsNoScopePrintingPolicy : CppInsightsPrintingPolicy
-{
-    CppInsightsNoScopePrintingPolicy()
-    : CppInsightsPrintingPolicy{}
-    {
-        SuppressScope = true;
+        CppInsightsUnqualified = (Unqualified::Yes == unqualified);
+        SuppressScope          = (SupressScope::Yes == supressScope);
     }
-} InsightsNoScopePrintingPolicy{};  // NOLINT
+
+    CppInsightsPrintingPolicy()
+    : CppInsightsPrintingPolicy{Unqualified::No, SupressScope::No}
+    {
+    }
+};
 //-----------------------------------------------------------------------------
 
 static std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
@@ -57,15 +59,9 @@ std::string ReplaceDash(std::string&& str)
 }
 //-----------------------------------------------------------------------------
 
-STRONG_BOOL(SupressScope);
-
-static const std::string GetAsCPPStyleString(const QualType& t, const SupressScope supressScope = SupressScope::No)
+static const std::string GetAsCPPStyleString(const QualType& t, const CppInsightsPrintingPolicy& printingPolicy)
 {
-    if(SupressScope::Yes == supressScope) {
-        return ReplaceDash(t.getAsString(InsightsNoScopePrintingPolicy));
-    }
-
-    return ReplaceDash(t.getAsString(InsightsPrintingPolicy));
+    return ReplaceDash(t.getAsString(printingPolicy));
 }
 //-----------------------------------------------------------------------------
 
@@ -161,27 +157,28 @@ static void InsertAfter(std::string& source, const std::string& find, const std:
 }
 //-----------------------------------------------------------------------------
 
+static std::string MakeLineColumnName(const Decl& decl, const std::string& prefix)
+{
+    const auto& sm       = GetSM(decl);
+    const auto  locBegin = GetBeginLoc(decl);
+    const auto  lineNo   = sm.getSpellingLineNumber(locBegin);
+    const auto  columnNo = sm.getSpellingColumnNumber(locBegin);
+
+    return StrCat(prefix, lineNo, "_", columnNo);
+}
+//-----------------------------------------------------------------------------
+
 std::string GetLambdaName(const CXXRecordDecl& lambda)
 {
     static const std::string lambdaPrefix{"__lambda_"};
-    const auto&              sm       = GetSM(lambda);
-    const auto               locBegin = GetBeginLoc(lambda);
-    const auto               lineNo   = sm.getSpellingLineNumber(locBegin);
-    const auto               columnNo = sm.getSpellingColumnNumber(locBegin);
-
-    return StrCat(lambdaPrefix, lineNo, "_", columnNo);
+    return MakeLineColumnName(lambda, lambdaPrefix);
 }
 //-----------------------------------------------------------------------------
 
 std::string BuildRetTypeName(const Decl& decl)
 {
     static const std::string retTypePrefix{"retType_"};
-    const auto&              sm       = GetSM(decl);
-    const auto               locBegin = GetBeginLoc(decl);
-    const auto               lineNo   = sm.getSpellingLineNumber(locBegin);
-    const auto               columnNo = sm.getSpellingColumnNumber(locBegin);
-
-    return StrCat(retTypePrefix, lineNo, "_", columnNo);
+    return MakeLineColumnName(decl, retTypePrefix);
 }
 //-----------------------------------------------------------------------------
 
@@ -227,7 +224,7 @@ std::string GetNameAsWritten(const QualType& t)
 {
     SplitQualType splitted = t.split();
 
-    return QualType::getAsString(splitted, InsightsPrintingPolicy);
+    return QualType::getAsString(splitted, CppInsightsPrintingPolicy{});
 }
 //-----------------------------------------------------------------------------
 
@@ -235,9 +232,8 @@ namespace details {
 
 static std::string GetQualifiedName(const NamedDecl& decl)
 {
-    std::string              name;
-    llvm::raw_string_ostream stream(name);
-    decl.printQualifiedName(stream, InsightsPrintingPolicy);
+    StringStream stream{};
+    decl.printQualifiedName(stream, CppInsightsPrintingPolicy{});
 
     return stream.str();
 }
@@ -265,105 +261,280 @@ static std::string GetScope(const DeclContext* declCtx)
 }
 //-----------------------------------------------------------------------------
 
-static std::string
-GetNameInternal(const QualType& t, const Unqualified unqualified, const SupressScope supressScope = SupressScope::No)
+/// \brief SimpleTypePrinter a partially substitution of Clang's TypePrinter.
+///
+/// With Clang 9 there seems to be a change in `lib/AST/TypePrinter.cpp` in `printTemplateTypeParmBefore`. It now
+/// inserts `auto` when it is a lambda auto parameter. Which is correct, but C++ Insights needs the
+/// template parameter name to make up compiling code. Hence, this `if` "overrides" the implementation of
+/// TypePrinter in that case.
+///
+/// It also drops some former code which handled `ClassTemplateSpecializationDecl` in a special way. Here the template
+/// parameters can be lambdas. Those they need a proper name.
+class SimpleTypePrinter
 {
-    if(const auto* memberPointerType = t->getAs<MemberPointerType>()) {
-        if(const auto* recordType2 = dyn_cast_or_null<RecordType>(memberPointerType->getClass())) {
-            if(const auto* decl = recordType2->getDecl()) {
-                if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(decl)) {
-                    if(cxxRecordDecl->isLambda()) {
-                        std::string result{GetAsCPPStyleString(t)};
+private:
+    const QualType&                  mType;
+    const CppInsightsPrintingPolicy& mPrintingPolicy;
+    OutputFormatHelper               mData{};
+    std::string                      mDataAfter{};
+    bool                             mHasData{false};
+    bool                             mSkipSpace{false};
 
-                        static const std::string clangLambdaName{"(lambda)::*"};
-                        if(auto pos = result.find(clangLambdaName); std::string::npos != pos) {
-                            std::string lambdaName = GetLambdaName(*cxxRecordDecl);
-                            lambdaName += "::*";
+    bool HandleType(const TemplateTypeParmType* type)
+    {
+        if(nullptr == type->getIdentifier()) {
+            mData.Append("type_parameter_", type->getDepth(), "_", type->getIndex());
 
-                            result.replace(pos, clangLambdaName.length(), lambdaName);
-                            return result;
-                        }
-                    }
-                }
+            return true;
+        }
+
+        return false;
+    }
+
+    bool HandleType(const LValueReferenceType* type)
+    {
+        mDataAfter += " &";
+
+        return HandleType(type->getPointeeType().getTypePtrOrNull());
+    }
+
+    bool HandleType(const RValueReferenceType* type)
+    {
+        mDataAfter += " &&";
+
+        return HandleType(type->getPointeeType().getTypePtrOrNull());
+    }
+
+    bool HandleType(const PointerType* type)
+    {
+        mDataAfter += " *";
+
+        return HandleType(type->getPointeeType().getTypePtrOrNull());
+    }
+
+    bool HandleType(const RecordType* type)
+    {
+        /// In case one of the template parameters is a lambda we need to insert the made up name.
+        if(const auto* tt = dyn_cast_or_null<ClassTemplateSpecializationDecl>(type->getDecl())) {
+            if(const auto* x = mType.getBaseTypeIdentifier()) {
+                mData.Append(GetScope(type->getDecl()->getDeclContext()), x->getName());
+                CodeGenerator codeGenerator{mData};
+                codeGenerator.InsertTemplateArgs(*tt);
+
+                return true;
+            }
+        } else if(const auto* cxxRecordDecl = type->getAsCXXRecordDecl()) {
+            if(cxxRecordDecl->isLambda()) {
+                mData.Append(GetLambdaName(*cxxRecordDecl));
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool HandleType(const AutoType* type)
+    {
+        if(not type->getDeducedType().isNull()) {
+            return HandleType(type->getDeducedType().getTypePtrOrNull());
+        }
+
+        return false;
+    }
+
+    bool HandleType(const SubstTemplateTypeParmType* type)
+    {
+        // At least when coming from a TypedefType there can be a `const` attached to the actual type. To get it to
+        // another round of `AddCVQulifiers` here.
+        AddCVQualifiers(QualType(type, 0).getQualifiers());
+
+        return HandleType(type->getReplacementType().getTypePtrOrNull());
+    }
+
+    bool HandleType(const ElaboratedType* type) { return HandleType(type->getNamedType().getTypePtrOrNull()); }
+    bool HandleType(const TemplateSpecializationType* type)
+    {
+        if(type->getAsRecordDecl()) {
+            // Only if it was some sort of "used" `RecordType` we continue here.
+            if(HandleType(type->getAsRecordDecl()->getTypeForDecl())) {
+                HandleType(type->getPointeeType().getTypePtrOrNull());
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool HandleType(const MemberPointerType* type)
+    {
+        HandleType(type->getPointeeType().getTypePtrOrNull());
+
+        mData.Append('(');
+
+        const bool ret = HandleType(type->getClass());
+
+        mData.Append("::*)");
+
+        HandleTypeAfter(type->getPointeeType().getTypePtrOrNull());
+
+        return ret;
+    }
+
+    bool HandleType(const FunctionProtoType* type) { return HandleType(type->getReturnType().getTypePtrOrNull()); }
+
+    void HandleTypeAfter(const FunctionProtoType* type)
+    {
+        mData.Append('(');
+        OnceFalse needsComma{};
+
+        mSkipSpace = true;
+        for(unsigned i = 0, e = type->getNumParams(); i != e; ++i) {
+
+            HandleType(type->getParamType(i).getTypePtrOrNull());
+
+            if(needsComma) {
+                mData.Append(", ");
+            }
+        }
+
+        mSkipSpace = false;
+
+        mData.Append(')');
+
+#if IS_CLANG_NEWER_THAN(8)
+        if(not type->getMethodQuals().empty()) {
+            mData.Append(" ", type->getMethodQuals().getAsString());
+        }
+#else
+        if(not type->getTypeQuals().empty()) {
+            mData.Append(" ", type->getTypeQuals().getAsString());
+        }
+#endif
+
+        /// Currently, we are skipping `T->getRefQualifier()` and the exception specification, as well as the trailing
+        /// return type.
+    }
+
+    bool HandleType(const BuiltinType* type)
+    {
+        mData.Append(type->getName(mPrintingPolicy));
+
+        if(not mSkipSpace) {
+            mData.Append(' ');
+        }
+
+        return false;
+    }
+
+    bool HandleType(const TypedefType* type)
+    {
+        if(type->getDecl()) {
+            return HandleType(type->getDecl()->getUnderlyingType().getTypePtrOrNull());
+        }
+
+        return HandleType(type->getPointeeType().getTypePtrOrNull());
+    }
+
+    bool HandleType(const ConstantArrayType* type)
+    {
+        const bool ret = HandleType(type->getElementType().getTypePtrOrNull());
+
+        mData.Append("[", type->getSize().getZExtValue(), "]");
+
+        return ret;
+    }
+
+    bool HandleType(const Type* type)
+    {
+#define HANDLE_TYPE(t)                                                                                                 \
+    if(isa<t>(type)) {                                                                                                 \
+        return HandleType(dyn_cast_or_null<t>(type));                                                                  \
+    }
+
+        if(nullptr == type) {
+            return false;
+        }
+
+        HANDLE_TYPE(FunctionProtoType);
+        HANDLE_TYPE(PointerType);
+        HANDLE_TYPE(LValueReferenceType);
+        HANDLE_TYPE(RValueReferenceType);
+        HANDLE_TYPE(TemplateTypeParmType);
+        HANDLE_TYPE(RecordType);
+        HANDLE_TYPE(AutoType);
+        HANDLE_TYPE(SubstTemplateTypeParmType);
+        HANDLE_TYPE(ElaboratedType);
+        HANDLE_TYPE(TemplateSpecializationType);
+        HANDLE_TYPE(MemberPointerType);
+        HANDLE_TYPE(BuiltinType);
+        HANDLE_TYPE(TypedefType);
+        HANDLE_TYPE(ConstantArrayType);
+
+#undef HANDLE_TYPE
+        return false;
+    }
+
+    void HandleTypeAfter(const Type* type)
+    {
+#define HANDLE_TYPE(t)                                                                                                 \
+    if(isa<t>(type)) {                                                                                                 \
+        HandleTypeAfter(dyn_cast_or_null<t>(type));                                                                    \
+    }
+
+        if(nullptr == type) {
+            return;
+        }
+
+        HANDLE_TYPE(FunctionProtoType);
+    }
+
+    void AddCVQualifiers(const Qualifiers& quals)
+    {
+        if((false == mPrintingPolicy.CppInsightsUnqualified) && not quals.empty()) {
+            mData.Append(quals.getAsString());
+
+            if(not mData.empty() && not mSkipSpace) {
+                mData.Append(' ');
             }
         }
     }
 
-    if(t.getTypePtrOrNull()) {
-        std::string       refOrPointer{};
-        const RecordType* recordType = [&]() -> const RecordType* {
-            const auto& ct  = t.getCanonicalType();
-            const auto* ctp = ct.getTypePtrOrNull();
+public:
+    SimpleTypePrinter(const QualType& qt, const CppInsightsPrintingPolicy& printingPolicy)
+    : mType{qt}
+    , mPrintingPolicy{printingPolicy}
+    {
+    }
 
-            if(const auto* sta = dyn_cast_or_null<RValueReferenceType>(ctp)) {
-                refOrPointer = "&&";
-                return dyn_cast_or_null<RecordType>(sta->getPointeeTypeAsWritten().getTypePtrOrNull());
+    std::string& GetString() { return mData.GetString(); }
 
-            } else if(const auto* ref = dyn_cast_or_null<ReferenceType>(ctp)) {
-                refOrPointer = "&";
-                return dyn_cast_or_null<RecordType>(ref->getPointeeTypeAsWritten().getTypePtrOrNull());
-
-            } else if(const auto* ptr = dyn_cast_or_null<PointerType>(ctp)) {
-                refOrPointer = "*";
-                return dyn_cast_or_null<RecordType>(ptr->getPointeeType().getTypePtrOrNull());
-            }
-
-            return dyn_cast_or_null<RecordType>(ctp);
-        }();
-
-        if(recordType) {
-            if(const auto* decl = recordType->getDecl()) {
-                const std::string cvqStr{[&]() {
-                    if(const auto* refType = dyn_cast_or_null<ReferenceType>(t.getTypePtrOrNull())) {
-                        return refType->getPointeeTypeAsWritten().getLocalQualifiers().getAsString();
-                    }
-
-                    return t.getCanonicalType().getLocalQualifiers().getAsString();
-                }()};
-
-                if(const auto* tt = dyn_cast_or_null<ClassTemplateSpecializationDecl>(decl)) {
-                    if(const auto* x = t.getBaseTypeIdentifier()) {
-                        OutputFormatHelper ofm{};
-
-                        if((Unqualified::No == unqualified) && !cvqStr.empty()) {
-                            ofm.Append(cvqStr, " ");
-                        }
-
-                        ofm.Append(GetScope(decl->getDeclContext()), x->getName());
-                        CodeGenerator codeGenerator{ofm};
-                        codeGenerator.InsertTemplateArgs(*tt);
-
-                        if(!refOrPointer.empty()) {
-                            ofm.Append(" ", refOrPointer);
-                        }
-
-                        return ofm.GetString();
-                    }
-                } else if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(decl)) {
-                    if(cxxRecordDecl->isLambda()) {
-                        std::string result{cvqStr};
-                        if(!cvqStr.empty()) {
-                            result += ' ';
-                        }
-
-                        result += GetLambdaName(*cxxRecordDecl);
-                        if(!refOrPointer.empty()) {
-                            result += ' ';
-                            result += refOrPointer;
-                        }
-
-                        return result;
-                    }
-                }
-            }
+    bool GetTypeString()
+    {
+        if(const SplitQualType splitted{mType.split()}; splitted.Quals.empty()) {
+            AddCVQualifiers(mType->getPointeeType().getLocalQualifiers());
+        } else {
+            AddCVQualifiers(splitted.Quals);
         }
+
+        mHasData = HandleType(mType.getTypePtrOrNull());
+        mData.Append(mDataAfter);
+
+        return mHasData;
+    }
+};
+//-----------------------------------------------------------------------------
+
+static std::string GetNameInternal(const QualType& t, const CppInsightsPrintingPolicy& printingPolicy)
+{
+    if(SimpleTypePrinter st{t, printingPolicy}; st.GetTypeString()) {
+        return st.GetString();
+
+    } else if(true == printingPolicy.CppInsightsUnqualified) {
+        return GetAsCPPStyleString(t.getUnqualifiedType(), printingPolicy);
     }
 
-    if(Unqualified::Yes == unqualified) {
-        return GetAsCPPStyleString(t.getUnqualifiedType(), supressScope);
-    }
-
-    return GetAsCPPStyleString(t, supressScope);
+    return GetAsCPPStyleString(t, printingPolicy);
 }
 //-----------------------------------------------------------------------------
 
@@ -383,23 +554,17 @@ static std::string GetName(const QualType&    t,
                            const Unqualified  unqualified  = Unqualified::No,
                            const SupressScope supressScope = SupressScope::No)
 {
-    const auto  t2 = GetDesugarType(t);
-    const auto* at = t2->getContainedAutoType();
+    const auto                      desugaredType = GetDesugarType(t);
+    const auto*                     autoType      = desugaredType->getContainedAutoType();
+    const bool                      isAutoType{autoType && autoType->isSugared()};
+    const CppInsightsPrintingPolicy printingPolicy{unqualified, supressScope};
 
-    if(at && at->isSugared()) {
-        const auto dt = at->getDeducedType();
-
-        // treat LValueReference special at this point. This means we are coming from auto&& and it decayed to an
-        // l-value reference.
-        if(dt->isLValueReferenceType()) {
-            return GetNameInternal(dt, unqualified, supressScope);
-        }
-
-    } else if(IsDecltypeType(t)) {  // Handle decltype(var)
-        return GetNameInternal(t2, unqualified, supressScope);
+    // Handle decltype(var)
+    if(not isAutoType && IsDecltypeType(t)) {
+        return GetNameInternal(desugaredType, printingPolicy);
     }
 
-    return GetNameInternal(t, unqualified, supressScope);
+    return GetNameInternal(t, printingPolicy);
 }
 }  // namespace details
 //-----------------------------------------------------------------------------

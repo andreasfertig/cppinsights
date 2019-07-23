@@ -51,7 +51,7 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
 
             if ce == stderr:
                 print '[PASSED] Compile: %s' %(f)
-                return True
+                return True, None
 
         compileErrorFile = os.path.join(mypath, fileName + '.ccerr')
         if os.path.isfile(compileErrorFile):
@@ -60,11 +60,10 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
 
                 if ce == stderr:
                     print '[PASSED] Compile: %s' %(f)
-                    return True
+                    return True, None
 
         print '[ERROR] Compile failed: %s' %(f)
         print stderr
-        ret = 1
     else:
         if os.path.isfile(compileErrorFile):
             print 'unused file: %s' %(compileErrorFile)
@@ -73,9 +72,9 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
         os.remove(objFileName)
 
         print '[PASSED] Compile: %s' %(f)
-        return True
+        return True, None
 
-    return False
+    return False, stderr
 #------------------------------------------------------------------------------
 
 def getDefaultIncludeDirs(cxx):
@@ -104,6 +103,7 @@ def main():
     parser.add_argument('--docker',         help='Run tests in docker container', action='store_true')
     parser.add_argument('--docker-image',   help='Docker image name', default='cppinsights-runtime')
     parser.add_argument('--failure-is-ok',  help='Failing tests are ok', default=False, action='store_true')
+    parser.add_argument('--update-tests',   help='Update failing tests', default=False, action='store_true')
     parser.add_argument('--std',            help='C++ Standard to used', default='c++17')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = vars(parser.parse_args())
@@ -111,6 +111,7 @@ def main():
     insightsPath  = args['insights']
     remainingArgs = args['args']
     bFailureIsOk  = args['failure_is_ok']
+    bUpdateTests  = args['update_tests']
     defaultCppStd = '-std=%s'% (args['std'])
 
     if 0 == len(remainingArgs):
@@ -211,9 +212,21 @@ def main():
                 tmp.write(stdout)
 
             equal = testCompare(tmpFileName, stdout, expectFile, f, args, end-begin)
+            bCompiles, stderr = testCompile(tmpFileName, f, args, fileName, cppStd)
+            compileErrorFile = os.path.join(mypath, fileName + '.cerr')
 
-            if testCompile(tmpFileName, f, args, fileName, cppStd) and equal:
+
+            if bCompiles and equal:
                 filesPassed += 1
+            elif bUpdateTests:
+                if bCompiles and not equal:
+                    open(expectFile, 'w').write(stdout)
+                    print('Updating test')
+                elif not bCompiles and os.path.exists(compileErrorFile):
+                    open(expectFile, 'w').write(stdout)
+                    open(compileErrorFile, 'w').write(stderr)
+                    print('Updating test cerr')
+
 
         finally:
             os.remove(tmpFileName)

@@ -34,7 +34,7 @@ class function<void ()>
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline function<const function<void ()> &>(function<void ()> & f);
+  inline function<const function<void ()> &>(const function<void ()> & f);
   #endif
   
   
