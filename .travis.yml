@@ -25,6 +25,11 @@ jobs:
     osx_image: xcode9.3
     compiler: clang
 
+  - env: COMPILER='clang++' COMPILER_CC='clang' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+    os: osx
+    osx_image: xcode9.3
+    compiler: clang
+
     # Linux Clang Build
   - os: linux
     compiler: clang
@@ -130,6 +135,7 @@ install:
     brew update > /dev/null
     brew install cmake || brew upgrade cmake
     brew install xz || brew upgrade xz
+    brew install lcov || brew upgrade lcov
 
     brew install ccache
     export PATH="/usr/local/opt/ccache/libexec:$PATH"
