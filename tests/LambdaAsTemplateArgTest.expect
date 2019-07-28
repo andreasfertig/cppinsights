@@ -4,11 +4,11 @@ struct FunctionArgs  {};
 /* First instantiated from: LambdaAsTemplateArgTest.cpp:14 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<int (__lambda_12_14::*)(int) const>
+struct FunctionArgs<int (__lambda_12_14::*)(int, int) const>
 {
   // inline constexpr FunctionArgs() noexcept = default;
-  // inline constexpr FunctionArgs(const FunctionArgs<int (__lambda_12_14::*)(int) const> &) = default;
-  // inline constexpr FunctionArgs(FunctionArgs<int (__lambda_12_14::*)(int) const> &&) = default;
+  // inline constexpr FunctionArgs(const FunctionArgs<int (__lambda_12_14::*)(int, int) const> &) = default;
+  // inline constexpr FunctionArgs(FunctionArgs<int (__lambda_12_14::*)(int, int) const> &&) = default;
 };
 
 #endif
@@ -33,9 +33,9 @@ int main()
   {
     int & y;
     public: 
-    inline /*constexpr */ int operator()(int x) const
+    inline /*constexpr */ int operator()(int x, int b) const
     {
-      return x + y;
+      return x + y + b;
     }
     
     public: __lambda_12_14(int & _y)
@@ -45,6 +45,6 @@ int main()
   };
   
   __lambda_12_14 l = __lambda_12_14{y};
-  FunctionArgs<decltype(&decltype(l)::operator())> a = FunctionArgs<int (__lambda_12_14::*)(int) const>();
+  FunctionArgs<decltype(&decltype(l)::operator())> a = FunctionArgs<int (__lambda_12_14::*)(int, int) const>();
 }
 
