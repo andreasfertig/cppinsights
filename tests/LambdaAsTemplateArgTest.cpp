@@ -9,7 +9,7 @@ int main()
 {
     int y = 2;
     int z = 3;
-    auto l = [&](int x) { return x + y; };
+    auto l = [&](int x, int b) { return x + y + b; };
 
     FunctionArgs<decltype(&decltype(l)::operator())> a;
 }

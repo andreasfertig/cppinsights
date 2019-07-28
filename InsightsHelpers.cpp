@@ -390,12 +390,11 @@ private:
 
         mSkipSpace = true;
         for(unsigned i = 0, e = type->getNumParams(); i != e; ++i) {
-
-            HandleType(type->getParamType(i).getTypePtrOrNull());
-
             if(needsComma) {
                 mData.Append(", ");
             }
+
+            HandleType(type->getParamType(i).getTypePtrOrNull());
         }
 
         mSkipSpace = false;
