@@ -389,12 +389,12 @@ private:
         OnceFalse needsComma{};
 
         mSkipSpace = true;
-        for(unsigned i = 0, e = type->getNumParams(); i != e; ++i) {
+        for(const auto& t : type->getParamTypes()) {
             if(needsComma) {
                 mData.Append(", ");
             }
 
-            HandleType(type->getParamType(i).getTypePtrOrNull());
+            HandleType(t.getTypePtrOrNull());
         }
 
         mSkipSpace = false;
