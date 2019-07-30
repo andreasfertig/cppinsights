@@ -103,6 +103,12 @@ SourceLocation FindLocationAfterSemi(const SourceLocation                       
         if(const auto locEnd2{findLocation(tok::r_brace)}; locEnd2.isValid()) {
             return locEnd2;
         }
+        // if we do not find a ; then it can possibly be a paren init like this:
+        // int x(23);
+        // Try to find the right paren which seems to also contain the semi.
+        else if(const auto locEnd2{findLocation(tok::r_paren)}; locEnd2.isValid()) {
+            return locEnd2;
+        }
     }
 
     return loc;
