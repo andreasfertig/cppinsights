@@ -9,7 +9,7 @@
         "Enhancements:": ["enhancement", "internal"],
         "Closed:": ["closed"]        
     },
-    "ignore-labels": ["duplicate", "wontfix"],
+    "ignore-labels": ["duplicate", "wontfix", "stale"],
     "template": {
         "issue": "- {{name}} ([{{text}}]({{url}}))",
         "changelogTitle": "# Changelog\n\n",
