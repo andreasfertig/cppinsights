@@ -1850,9 +1850,10 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
                 if(const auto* cxxInheritedCtorInitExpr = dyn_cast_or_null<CXXInheritedCtorInitExpr>(inlineInit)) {
                     cxxInheritedCtorDecl = cxxInheritedCtorInitExpr->getConstructor();
 
-                    // Insert the base class name only, if it is not a CXXContructorExpr which already carries the type.
+                    // Insert the base class name only, if it is not a CXXContructorExpr and not a
+                    // CXXDependentScopeMemberExpr which already carry the type.
                 } else if(init->isBaseInitializer() && not isa<CXXConstructExpr>(inlineInit)) {
-                    initOutputFormatHelper.Append(GetName(QualType(init->getBaseClass(), 0)));
+                    initOutputFormatHelper.Append(GetUnqualifiedScopelessName(init->getBaseClass()));
                     useCurlies = true;
                 }
 

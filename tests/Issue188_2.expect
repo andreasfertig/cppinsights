@@ -220,21 +220,21 @@ struct _Tuple_impl<_Idx, _Head, _Tail...> : public _Tuple_impl<_Idx + 1, _Tail..
   using _Inherited = _Tuple_impl<_Idx + 1, _Tail...>;
   using _Base = _Head_base<_Idx, _Head, __empty_not_final<_Head>::value>;
   inline constexpr _Tuple_impl()
-  : mstd::_Tuple_impl<_Idx, type_parameter_0_1, type_parameter_0_2...>::_Inherited{}
-  , mstd::_Tuple_impl<_Idx, type_parameter_0_1, type_parameter_0_2...>::_Base{}
+  : _Inherited{}
+  , _Base{}
   {
   }
   
   inline explicit constexpr _Tuple_impl(const _Head & __head, const _Tail &... __tail)
-  : mstd::_Tuple_impl<_Idx, type_parameter_0_1, type_parameter_0_2...>::_Inherited{__tail... }
-  , mstd::_Tuple_impl<_Idx, type_parameter_0_1, type_parameter_0_2...>::_Base{__head}
+  : _Inherited{__tail... }
+  , _Base{__head}
   {
   }
   
   template<typename ... _UElements>
   inline constexpr _Tuple_impl(const _Tuple_impl<_Idx, _UElements...> & __in)
-  : mstd::_Tuple_impl<_Idx, type_parameter_0_1, type_parameter_0_2...>::_Inherited{_Tuple_impl<_Idx, _UElements...>::_M_tail(__in)}
-  , mstd::_Tuple_impl<_Idx, type_parameter_0_1, type_parameter_0_2...>::_Base{_Tuple_impl<_Idx, _UElements...>::_M_head(__in)}
+  : _Inherited{_Tuple_impl<_Idx, _UElements...>::_M_tail(__in)}
+  , _Base{_Tuple_impl<_Idx, _UElements...>::_M_head(__in)}
   {
   }
   
