@@ -318,6 +318,8 @@ private:
         return HandleType(type->getPointeeType().getTypePtrOrNull());
     }
 
+    bool HandleType(const InjectedClassNameType* type) { return HandleType(type->getInjectedTST()); }
+
     bool HandleType(const RecordType* type)
     {
         /// In case one of the template parameters is a lambda we need to insert the made up name.
@@ -367,6 +369,32 @@ private:
                 HandleType(type->getPointeeType().getTypePtrOrNull());
                 return true;
             }
+        }
+
+        /// This is a specialty discovered with #188_2. In some cases there is a `TemplateTypeParmDecl` which has no
+        /// identifier name. Then it will end up as `type-parameter-...`. At least in #188_2: _Head_base<_Idx,
+        /// type_parameter_0_1, true> the repetition of the template specialization arguments is not required.
+        /// `hasNoName` tries to detect this case and does then print the name of the template only.
+        const bool hasNoName{[&] {
+            for(const auto& arg : type->template_arguments()) {
+                StringStream sstream{};
+                arg.print(mPrintingPolicy, sstream);
+
+                if(Contains(sstream.str(), "type-parameter")) {
+                    return true;
+                }
+            }
+
+            return false;
+        }()};
+
+        if(hasNoName) {
+            StringStream sstream{};
+            type->getTemplateName().print(sstream, mPrintingPolicy, true);
+
+            mData.Append(sstream.str());
+
+            return true;
         }
 
         return false;
@@ -475,6 +503,7 @@ private:
         HANDLE_TYPE(BuiltinType);
         HANDLE_TYPE(TypedefType);
         HANDLE_TYPE(ConstantArrayType);
+        HANDLE_TYPE(InjectedClassNameType);
 
 #undef HANDLE_TYPE
         return false;

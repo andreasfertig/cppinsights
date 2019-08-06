@@ -64,7 +64,7 @@ struct _Head_base<_Idx, _Head, true> : public _Head
   {
   }
   
-  inline constexpr _Head_base(const _Head_base<_Idx, type_parameter_0_1, true> &) = default;
+  inline constexpr _Head_base(const _Head_base &) = default;
 };
 
 
@@ -82,7 +82,7 @@ struct _Head_base<_Idx, _Head, false>
   {
   }
   
-  inline constexpr _Head_base(const _Head_base<_Idx, type_parameter_0_1, false> &) = default;
+  inline constexpr _Head_base(const _Head_base &) = default;
   _Head _M_head_impl;
 };
 

@@ -1,0 +1,19 @@
+.tmp.cpp:474:33: error: use of undeclared identifier 'type_parameter_0_0'
+  template<typename C = compose<type_parameter_0_0, type_parameter_0_1...>::continuation>
+                                ^
+.tmp.cpp:474:75: error: expected ',' or '>' in template-parameter-list
+  template<typename C = compose<type_parameter_0_0, type_parameter_0_1...>::continuation>
+                                                                          ^
+.tmp.cpp:478:45: error: use 'template' keyword to treat 'compose' as a dependent template name
+    using result = typename compose<Fs...>::compose<Fs...>::to<typename F::to<C> >::template result<Ts...>;
+                                            ^
+                                            template
+.tmp.cpp:478:61: error: use 'template' keyword to treat 'to' as a dependent template name
+    using result = typename compose<Fs...>::compose<Fs...>::to<typename F::to<C> >::template result<Ts...>;
+                                                            ^
+                                                            template
+.tmp.cpp:478:76: error: use 'template' keyword to treat 'to' as a dependent template name
+    using result = typename compose<Fs...>::compose<Fs...>::to<typename F::to<C> >::template result<Ts...>;
+                                                                           ^
+                                                                           template
+5 errors generated.
