@@ -475,7 +475,7 @@ struct compose<F, Fs...>
   struct to
   {
     template<typename ... Ts>
-    using result = typename compose<Fs...>::compose<Fs...>::to<typename F::to<C> >::template result<Ts...>;
+    using result = typename compose<Fs...>::template compose<Fs...>::template to<typename F::template to<C> >::template result<Ts...>;
   };
   
 };

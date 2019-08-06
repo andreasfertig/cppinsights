@@ -361,6 +361,25 @@ private:
     }
 
     bool HandleType(const ElaboratedType* type) { return HandleType(type->getNamedType().getTypePtrOrNull()); }
+
+    bool HandleType(const DependentTemplateSpecializationType* type)
+    {
+        mData.Append(GetElaboratedTypeKeyword(type->getKeyword()));
+
+        if(type->getQualifier()) {
+            StringStream sstream{};
+            type->getQualifier()->print(sstream, mPrintingPolicy);
+            mData.Append(sstream.str());
+        }
+
+        mData.Append("template ", type->getIdentifier()->getName().str());
+
+        CodeGenerator codeGenerator{mData};
+        codeGenerator.InsertTemplateArgs(type->template_arguments());
+
+        return true;
+    }
+
     bool HandleType(const TemplateSpecializationType* type)
     {
         if(type->getAsRecordDecl()) {
@@ -513,6 +532,7 @@ private:
         HANDLE_TYPE(TypedefType);
         HANDLE_TYPE(ConstantArrayType);
         HANDLE_TYPE(InjectedClassNameType);
+        HANDLE_TYPE(DependentTemplateSpecializationType);
 
 #undef HANDLE_TYPE
         return false;
@@ -966,6 +986,16 @@ const char* GetConst(const FunctionDecl& decl)
     }
 
     return "";
+}
+//-----------------------------------------------------------------------------
+
+std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
+{
+    if(ETK_None != keyword) {
+        return TypeWithKeyword::getKeywordName(keyword).str() + " ";
+    }
+
+    return {};
 }
 //-----------------------------------------------------------------------------
 

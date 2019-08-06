@@ -151,6 +151,8 @@ public:
     /// If so we need to insert the <new> header for the placement-new.
     static bool NeedToInsertNewHeader() { return mHaveLocalStatic; }
 
+    void InsertTemplateArgs(const ArrayRef<TemplateArgument>& array);
+
 protected:
     virtual bool InsertVarDecl() { return true; }
     virtual bool InsertComma() { return false; }
@@ -178,7 +180,6 @@ protected:
 
     void InsertArgWithParensIfNeeded(const Stmt* stmt);
     void InsertSuffix(const QualType& type);
-    void InsertTemplateArgs(const ArrayRef<TemplateArgument>& array);
     void InsertTemplateArgs(const ArrayRef<TemplateArgumentLoc>& array);
     void InsertTemplateArg(const TemplateArgument& arg);
     bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);

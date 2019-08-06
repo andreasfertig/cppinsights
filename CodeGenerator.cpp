@@ -1783,17 +1783,16 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         });
 
         mOutputFormatHelper.Append(">");
-    } else if(auto* templateSpecializationType = underlyingType->getAs<DependentTemplateSpecializationType>()) {
+    } else if(auto* dependentTemplateSpecializationType =
+                  underlyingType->getAs<DependentTemplateSpecializationType>()) {
 
-        if(ETK_None != templateSpecializationType->getKeyword()) {
-            mOutputFormatHelper.Append(TypeWithKeyword::getKeywordName(templateSpecializationType->getKeyword()), " ");
-        }
+        mOutputFormatHelper.Append(GetElaboratedTypeKeyword(dependentTemplateSpecializationType->getKeyword()));
 
-        PrintNamespace(templateSpecializationType->getQualifier());
+        PrintNamespace(dependentTemplateSpecializationType->getQualifier());
 
-        mOutputFormatHelper.Append("template ", templateSpecializationType->getIdentifier()->getName(), "<");
+        mOutputFormatHelper.Append("template ", dependentTemplateSpecializationType->getIdentifier()->getName(), "<");
 
-        ForEachArg(templateSpecializationType->template_arguments(), [&](const auto& arg) {
+        ForEachArg(dependentTemplateSpecializationType->template_arguments(), [&](const auto& arg) {
             if(arg.getKind() == TemplateArgument::Expression) {
                 InsertArg(arg.getAsExpr());
             } else {
@@ -2091,9 +2090,9 @@ void CodeGenerator::PrintNamespace(const NestedNameSpecifier* stmt)
             mOutputFormatHelper.Append(stmt->getAsNamespaceAlias()->getName());
             break;
 
-        case NestedNameSpecifier::TypeSpecWithTemplate:
-        case NestedNameSpecifier::TypeSpec: {
+        case NestedNameSpecifier::TypeSpecWithTemplate: mOutputFormatHelper.Append("template "); [[fallthrough]];
 
+        case NestedNameSpecifier::TypeSpec: {
             mOutputFormatHelper.Append(GetUnqualifiedScopelessName(stmt->getAsType()));
             // The template parameters are already contained in the type we inserted above.
         } break;

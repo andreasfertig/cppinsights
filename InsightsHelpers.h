@@ -197,6 +197,9 @@ const std::string GetNoExcept(const FunctionDecl& decl);
 const char*       GetConst(const FunctionDecl& decl);
 //-----------------------------------------------------------------------------
 
+std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
+//-----------------------------------------------------------------------------
+
 template<typename T, typename TFunc>
 void for_each(T start, T end, TFunc&& func)
 {
