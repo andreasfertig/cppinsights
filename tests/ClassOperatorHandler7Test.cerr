@@ -1,26 +1,26 @@
-.tmp.cpp:61:5: error: use of undeclared identifier 'type_parameter_0_0'
+.tmp.cpp:60:5: error: use of undeclared identifier 'type_parameter_0_0'
   A<type_parameter_0_0 *>::B foo;
     ^
-.tmp.cpp:61:25: error: expected expression
+.tmp.cpp:60:25: error: expected expression
   A<type_parameter_0_0 *>::B foo;
                         ^
-.tmp.cpp:61:28: error: non-friend class member 'B' cannot have a qualified name
+.tmp.cpp:60:28: error: non-friend class member 'B' cannot have a qualified name
   A<type_parameter_0_0 *>::B foo;
                          ~~^
-.tmp.cpp:61:29: error: expected ';' at end of declaration list
+.tmp.cpp:60:29: error: expected ';' at end of declaration list
   A<type_parameter_0_0 *>::B foo;
                             ^
                             ;
-.tmp.cpp:96:15: warning: explicit instantiation of 'foo<int>' that occurs after an explicit specialization has no effect [-Winstantiation-after-specialization]
+.tmp.cpp:94:15: warning: explicit instantiation of 'foo<int>' that occurs after an explicit specialization has no effect [-Winstantiation-after-specialization]
 template void foo<int>(); // first case
               ^
-.tmp.cpp:77:6: note: previous template specialization is here
+.tmp.cpp:75:6: note: previous template specialization is here
 void foo<int>()
      ^
-.tmp.cpp:97:15: warning: explicit instantiation of 'foo<int *>' that occurs after an explicit specialization has no effect [-Winstantiation-after-specialization]
+.tmp.cpp:95:15: warning: explicit instantiation of 'foo<int *>' that occurs after an explicit specialization has no effect [-Winstantiation-after-specialization]
 template void foo<int*>(); // second case
               ^
-.tmp.cpp:88:6: note: previous template specialization is here
+.tmp.cpp:86:6: note: previous template specialization is here
 void foo<int *>()
      ^
 2 warnings and 4 errors generated.

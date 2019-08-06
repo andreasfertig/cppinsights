@@ -2209,7 +2209,19 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
         } else if(const auto* fdt = dyn_cast_or_null<FunctionTemplateDecl>(stmt->getFriendDecl())) {
             InsertArg(fdt);
         } else {
-            mOutputFormatHelper.AppendNewLine("friend ", GetName(*stmt->getFriendDecl()), ";");
+            std::string cls{};
+            if(const auto* ctd = dyn_cast_or_null<ClassTemplateDecl>(stmt->getFriendDecl())) {
+                InsertTemplateParameters(*ctd->getTemplateParameters());
+
+                if(ctd->getTemplatedDecl()->isClass()) {
+                    cls = kwClassSpace;
+
+                } else {
+                    cls = "struct ";
+                }
+            }
+
+            mOutputFormatHelper.AppendNewLine("friend ", cls, GetName(*stmt->getFriendDecl()), ";");
         }
     }
 }
@@ -2298,7 +2310,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     const bool tmplRequiresIfDef{[&] {
         if(const auto* spec = dyn_cast_or_null<ClassTemplatePartialSpecializationDecl>(stmt)) {
-            return true;
+            return spec->isImplicit();
 
         } else if(const auto* spec = dyn_cast_or_null<ClassTemplateSpecializationDecl>(stmt)) {
             return not spec->isExplicitInstantiationOrSpecialization();

@@ -51,7 +51,6 @@ struct _Head_base<1, short, 0>
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<std::size_t _Idx, typename _Head>
 struct _Head_base<_Idx, _Head, true> : public _Head
 {
@@ -68,10 +67,8 @@ struct _Head_base<_Idx, _Head, true> : public _Head
   inline constexpr _Head_base(const _Head_base<_Idx, type_parameter_0_1, true> &) = default;
 };
 
-#endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<std::size_t _Idx, typename _Head>
 struct _Head_base<_Idx, _Head, false>
 {
@@ -89,7 +86,6 @@ struct _Head_base<_Idx, _Head, false>
   _Head _M_head_impl;
 };
 
-#endif
 
   
 template <std::size_t _Idx, typename... _Elements>
@@ -161,7 +157,8 @@ struct _Tuple_impl<2, long> : public mstd::_Tuple_impl<3>, private mstd::_Head_b
 template<>
 struct _Tuple_impl<3>
 {
-  friend _Tuple_impl;
+  template<std::size_t , typename ... type_parameter_0_1>
+  friend class _Tuple_impl;
   inline constexpr _Tuple_impl() noexcept = default;
   // inline constexpr _Tuple_impl(const mstd::_Tuple_impl<3> &) = default;
   // inline constexpr _Tuple_impl(mstd::_Tuple_impl<3> &&) = default;
@@ -173,15 +170,14 @@ struct _Tuple_impl<3>
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<std::size_t _Idx>
 struct _Tuple_impl<_Idx>
 {
-  friend _Tuple_impl;
+  template<std::size_t , typename ... type_parameter_1_1>
+  friend class _Tuple_impl;
   inline _Tuple_impl() = default;
 };
 
-#endif
 
 
 template <typename _Tp>
@@ -207,20 +203,17 @@ struct __is_empty_non_tuple<short> : public std::is_empty<short>
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<typename _El0, typename ... _El>
 struct __is_empty_non_tuple<tuple<_El0, _El...> > : public std::integral_constant<bool, 0>
 {
 };
 
-#endif
 
 
 template <typename _Tp>
 using __empty_not_final = typename std::conditional<__is_final(_Tp), std::false_type,
                                                __is_empty_non_tuple<_Tp>>::type;
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<std::size_t _Idx, typename _Head, typename ... _Tail>
 struct _Tuple_impl<_Idx, _Head, _Tail...> : public _Tuple_impl<_Idx + 1, _Tail...>, private _Head_base<_Idx, _Head, __empty_not_final<_Head>::value>
 {
@@ -247,7 +240,6 @@ struct _Tuple_impl<_Idx, _Head, _Tail...> : public _Tuple_impl<_Idx + 1, _Tail..
   
 };
 
-#endif
 
 
 }  // namespace std
