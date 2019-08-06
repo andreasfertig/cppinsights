@@ -471,7 +471,7 @@ template<typename F, typename ... Fs>
 struct compose<F, Fs...>
 {
   using continuation = typename F::continuation;
-  template<typename C = compose<type_parameter_0_0, type_parameter_0_1...>::continuation>
+  template<typename C = continuation>
   struct to
   {
     template<typename ... Ts>

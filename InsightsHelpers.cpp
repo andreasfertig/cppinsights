@@ -462,8 +462,17 @@ private:
 
     bool HandleType(const TypedefType* type)
     {
-        if(type->getDecl()) {
-            return HandleType(type->getDecl()->getUnderlyingType().getTypePtrOrNull());
+        if(const auto* decl = type->getDecl()) {
+            /// Another filter place for type-parameter where it is contained in the FQN but leads to none compiling
+            /// code. Remove it to keep the code valid.
+            if(Contains(decl->getQualifiedNameAsString(), "type-parameter")) {
+                auto* identifierInfo = decl->getIdentifier();
+                mData.Append(identifierInfo->getName().str());
+
+                return true;
+            }
+
+            return HandleType(decl->getUnderlyingType().getTypePtrOrNull());
         }
 
         return HandleType(type->getPointeeType().getTypePtrOrNull());
