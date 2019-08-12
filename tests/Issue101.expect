@@ -120,14 +120,12 @@ struct has_continuation<to<to<wrap> >, void>
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<typename T>
 struct has_continuation<T, std::void_t<typename T::continuation> >
 {
   inline static constexpr const bool value = true;
 };
 
-#endif
 
 
 template <typename T, bool = has_continuation<T>::value>
@@ -191,14 +189,12 @@ struct to_<to<to<wrap> >, 0>
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<typename T>
 struct to_<T, true>
 {
   using type = typename T::template to<typename T::continuation>;
 };
 
-#endif
 
 
 
@@ -471,21 +467,19 @@ struct compose<>
 
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<typename F, typename ... Fs>
 struct compose<F, Fs...>
 {
   using continuation = typename F::continuation;
-  template<typename C = compose<type_parameter_0_0, type_parameter_0_1...>::continuation>
+  template<typename C = continuation>
   struct to
   {
     template<typename ... Ts>
-    using result = typename compose<Fs...>::compose<Fs...>::to<typename F::to<C> >::template result<Ts...>;
+    using result = typename compose<Fs...>::template compose<Fs...>::template to<typename F::template to<C> >::template result<Ts...>;
   };
   
 };
 
-#endif
 
 
 struct add_const

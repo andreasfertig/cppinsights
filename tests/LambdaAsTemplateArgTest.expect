@@ -14,13 +14,11 @@ struct FunctionArgs<int (__lambda_12_14::*)(int, int) const>
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<typename R, typename C, typename ... Args>
 struct FunctionArgs<R (C::*)(Args...) const>
 {
 };
 
-#endif
 
 
 

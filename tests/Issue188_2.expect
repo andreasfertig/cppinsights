@@ -1,0 +1,249 @@
+// Modified version of #188 to not rely on libstd++ tuple.
+#include <type_traits>
+
+namespace mstd {
+
+template<typename... Ts>
+struct tuple {};
+
+template <std::size_t _Idx, typename _Head, bool _IsEmptyNotFinal>
+struct _Head_base;
+
+/* First instantiated from: Issue188_2.cpp:52 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct _Head_base<2, long, 0>
+{
+  inline constexpr _Head_base()
+  : _M_head_impl{0}
+  {
+  }
+  
+  inline constexpr _Head_base(const long & __h);
+  
+  inline constexpr _Head_base(const mstd::_Head_base<2, long, 0> &) = default;
+  long _M_head_impl;
+  // inline ~_Head_base() = default;
+  // inline constexpr mstd::_Head_base<2, long, 0> & operator=(const mstd::_Head_base<2, long, 0> &) = default;
+};
+
+#endif
+
+
+/* First instantiated from: Issue188_2.cpp:52 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct _Head_base<1, short, 0>
+{
+  inline constexpr _Head_base()
+  : _M_head_impl{0}
+  {
+  }
+  
+  inline constexpr _Head_base(const short & __h);
+  
+  inline constexpr _Head_base(const mstd::_Head_base<1, short, 0> &) = default;
+  short _M_head_impl;
+  // inline ~_Head_base() = default;
+  // inline constexpr mstd::_Head_base<1, short, 0> & operator=(const mstd::_Head_base<1, short, 0> &) = default;
+};
+
+#endif
+
+
+template<std::size_t _Idx, typename _Head>
+struct _Head_base<_Idx, _Head, true> : public _Head
+{
+  inline constexpr _Head_base()
+  : _Head{}
+  {
+  }
+  
+  inline constexpr _Head_base(const _Head & __h)
+  : _Head{__h}
+  {
+  }
+  
+  inline constexpr _Head_base(const _Head_base &) = default;
+};
+
+
+
+template<std::size_t _Idx, typename _Head>
+struct _Head_base<_Idx, _Head, false>
+{
+  inline constexpr _Head_base()
+  : _M_head_impl{}
+  {
+  }
+  
+  inline constexpr _Head_base(const _Head & __h)
+  : _M_head_impl{__h}
+  {
+  }
+  
+  inline constexpr _Head_base(const _Head_base &) = default;
+  _Head _M_head_impl;
+};
+
+
+  
+template <std::size_t _Idx, typename... _Elements>
+struct _Tuple_impl;
+
+/* First instantiated from: Issue188_2.cpp:70 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct _Tuple_impl<1, short, long> : public mstd::_Tuple_impl<2, long>, private mstd::_Head_base<1, short, 0>
+{
+  using _Inherited = mstd::_Tuple_impl<2, long>;
+  using _Base = mstd::_Head_base<1, short, 0>;
+  inline constexpr _Tuple_impl()
+  : mstd::_Tuple_impl<2, long>()
+  , mstd::_Head_base<1, short, 0>()
+  {
+  }
+  
+  inline explicit constexpr _Tuple_impl(const short & __head, const long & ____tail1);
+  
+  template<typename ... _UElements>
+  inline constexpr _Tuple_impl(const _Tuple_impl<1UL, _UElements...> & __in);
+  
+  // inline constexpr _Tuple_impl(const mstd::_Tuple_impl<1, short, long> &) = default;
+  // inline constexpr _Tuple_impl(mstd::_Tuple_impl<1, short, long> &&) = default;
+  // inline constexpr mstd::_Tuple_impl<1, short, long> & operator=(mstd::_Tuple_impl<1, short, long> &&) = default;
+};
+
+#endif
+
+
+/* First instantiated from: Issue188_2.cpp:51 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct _Tuple_impl<2, long> : public mstd::_Tuple_impl<3>, private mstd::_Head_base<2, long, 0>
+{
+  using _Inherited = mstd::_Tuple_impl<3>;
+  using _Base = mstd::_Head_base<2, long, 0>;
+  inline constexpr _Tuple_impl()
+  : mstd::_Tuple_impl<3>()
+  , mstd::_Head_base<2, long, 0>()
+  {
+  }
+  
+  inline explicit constexpr _Tuple_impl(const long & __head);
+  
+  template<typename ... _UElements>
+  inline constexpr _Tuple_impl(const _Tuple_impl<2UL, _UElements...> & __in);
+  
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline constexpr _Tuple_impl<long>(const mstd::_Tuple_impl<2, long> & __in);
+  #endif
+  
+  
+  // inline constexpr _Tuple_impl(const mstd::_Tuple_impl<2, long> &) = default;
+  // inline constexpr _Tuple_impl(mstd::_Tuple_impl<2, long> &&) = default;
+  // inline constexpr mstd::_Tuple_impl<2, long> & operator=(mstd::_Tuple_impl<2, long> &&) = default;
+  // inline ~_Tuple_impl() = default;
+  // inline constexpr mstd::_Tuple_impl<2, long> & operator=(const mstd::_Tuple_impl<2, long> &) = default;
+};
+
+#endif
+
+
+/* First instantiated from: Issue188_2.cpp:51 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct _Tuple_impl<3>
+{
+  template<std::size_t , typename ... type_parameter_0_1>
+  friend class _Tuple_impl;
+  inline constexpr _Tuple_impl() noexcept = default;
+  // inline constexpr _Tuple_impl(const mstd::_Tuple_impl<3> &) = default;
+  // inline constexpr _Tuple_impl(mstd::_Tuple_impl<3> &&) = default;
+  // inline ~_Tuple_impl() = default;
+  // inline constexpr mstd::_Tuple_impl<3> & operator=(const mstd::_Tuple_impl<3> &) = default;
+  // inline constexpr mstd::_Tuple_impl<3> & operator=(mstd::_Tuple_impl<3> &&) = default;
+};
+
+#endif
+
+
+template<std::size_t _Idx>
+struct _Tuple_impl<_Idx>
+{
+  template<std::size_t , typename ... type_parameter_1_1>
+  friend class _Tuple_impl;
+  inline _Tuple_impl() = default;
+};
+
+
+
+template <typename _Tp>
+struct __is_empty_non_tuple : std::is_empty<_Tp> {};
+
+/* First instantiated from: Issue188_2.cpp:52 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct __is_empty_non_tuple<long> : public std::is_empty<long>
+{
+};
+
+#endif
+
+
+/* First instantiated from: Issue188_2.cpp:52 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct __is_empty_non_tuple<short> : public std::is_empty<short>
+{
+};
+
+#endif
+
+
+template<typename _El0, typename ... _El>
+struct __is_empty_non_tuple<tuple<_El0, _El...> > : public std::integral_constant<bool, 0>
+{
+};
+
+
+
+template <typename _Tp>
+using __empty_not_final = typename std::conditional<__is_final(_Tp), std::false_type,
+                                               __is_empty_non_tuple<_Tp>>::type;
+
+template<std::size_t _Idx, typename _Head, typename ... _Tail>
+struct _Tuple_impl<_Idx, _Head, _Tail...> : public _Tuple_impl<_Idx + 1, _Tail...>, private _Head_base<_Idx, _Head, __empty_not_final<_Head>::value>
+{
+  using _Inherited = _Tuple_impl<_Idx + 1, _Tail...>;
+  using _Base = _Head_base<_Idx, _Head, __empty_not_final<_Head>::value>;
+  inline constexpr _Tuple_impl()
+  : _Inherited{}
+  , _Base{}
+  {
+  }
+  
+  inline explicit constexpr _Tuple_impl(const _Head & __head, const _Tail &... __tail)
+  : _Inherited{__tail... }
+  , _Base{__head}
+  {
+  }
+  
+  template<typename ... _UElements>
+  inline constexpr _Tuple_impl(const _Tuple_impl<_Idx, _UElements...> & __in)
+  : _Inherited{_Tuple_impl<_Idx, _UElements...>::_M_tail(__in)}
+  , _Base{_Tuple_impl<_Idx, _UElements...>::_M_head(__in)}
+  {
+  }
+  
+};
+
+
+
+}  // namespace std
+
+mstd::_Tuple_impl<1, short, long> one_s_l = mstd::_Tuple_impl<1, short, long>();
+
+

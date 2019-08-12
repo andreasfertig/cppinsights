@@ -318,6 +318,8 @@ private:
         return HandleType(type->getPointeeType().getTypePtrOrNull());
     }
 
+    bool HandleType(const InjectedClassNameType* type) { return HandleType(type->getInjectedTST()); }
+
     bool HandleType(const RecordType* type)
     {
         /// In case one of the template parameters is a lambda we need to insert the made up name.
@@ -359,6 +361,25 @@ private:
     }
 
     bool HandleType(const ElaboratedType* type) { return HandleType(type->getNamedType().getTypePtrOrNull()); }
+
+    bool HandleType(const DependentTemplateSpecializationType* type)
+    {
+        mData.Append(GetElaboratedTypeKeyword(type->getKeyword()));
+
+        if(type->getQualifier()) {
+            StringStream sstream{};
+            type->getQualifier()->print(sstream, mPrintingPolicy);
+            mData.Append(sstream.str());
+        }
+
+        mData.Append("template ", type->getIdentifier()->getName().str());
+
+        CodeGenerator codeGenerator{mData};
+        codeGenerator.InsertTemplateArgs(type->template_arguments());
+
+        return true;
+    }
+
     bool HandleType(const TemplateSpecializationType* type)
     {
         if(type->getAsRecordDecl()) {
@@ -367,6 +388,32 @@ private:
                 HandleType(type->getPointeeType().getTypePtrOrNull());
                 return true;
             }
+        }
+
+        /// This is a specialty discovered with #188_2. In some cases there is a `TemplateTypeParmDecl` which has no
+        /// identifier name. Then it will end up as `type-parameter-...`. At least in #188_2: _Head_base<_Idx,
+        /// type_parameter_0_1, true> the repetition of the template specialization arguments is not required.
+        /// `hasNoName` tries to detect this case and does then print the name of the template only.
+        const bool hasNoName{[&] {
+            for(const auto& arg : type->template_arguments()) {
+                StringStream sstream{};
+                arg.print(mPrintingPolicy, sstream);
+
+                if(Contains(sstream.str(), "type-parameter")) {
+                    return true;
+                }
+            }
+
+            return false;
+        }()};
+
+        if(hasNoName) {
+            StringStream sstream{};
+            type->getTemplateName().print(sstream, mPrintingPolicy, true);
+
+            mData.Append(sstream.str());
+
+            return true;
         }
 
         return false;
@@ -434,8 +481,17 @@ private:
 
     bool HandleType(const TypedefType* type)
     {
-        if(type->getDecl()) {
-            return HandleType(type->getDecl()->getUnderlyingType().getTypePtrOrNull());
+        if(const auto* decl = type->getDecl()) {
+            /// Another filter place for type-parameter where it is contained in the FQN but leads to none compiling
+            /// code. Remove it to keep the code valid.
+            if(Contains(decl->getQualifiedNameAsString(), "type-parameter")) {
+                auto* identifierInfo = decl->getIdentifier();
+                mData.Append(identifierInfo->getName().str());
+
+                return true;
+            }
+
+            return HandleType(decl->getUnderlyingType().getTypePtrOrNull());
         }
 
         return HandleType(type->getPointeeType().getTypePtrOrNull());
@@ -475,6 +531,8 @@ private:
         HANDLE_TYPE(BuiltinType);
         HANDLE_TYPE(TypedefType);
         HANDLE_TYPE(ConstantArrayType);
+        HANDLE_TYPE(InjectedClassNameType);
+        HANDLE_TYPE(DependentTemplateSpecializationType);
 
 #undef HANDLE_TYPE
         return false;
@@ -928,6 +986,16 @@ const char* GetConst(const FunctionDecl& decl)
     }
 
     return "";
+}
+//-----------------------------------------------------------------------------
+
+std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
+{
+    if(ETK_None != keyword) {
+        return TypeWithKeyword::getKeywordName(keyword).str() + " ";
+    }
+
+    return {};
 }
 //-----------------------------------------------------------------------------
 

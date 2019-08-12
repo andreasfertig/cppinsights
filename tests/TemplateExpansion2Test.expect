@@ -16,23 +16,19 @@ namespace details {
   
   #endif
   
-  #ifdef INSIGHTS_USE_TEMPLATE
-template<class T>
+  template<class T>
 struct remove_reference<T &>
 {
   using type = T;
 };
 
-#endif
 
-  #ifdef INSIGHTS_USE_TEMPLATE
-template<class T>
+  template<class T>
 struct remove_reference<T &&>
 {
   using type = T;
 };
 
-#endif
 
 
   template<class T, size_t N = 0>
@@ -55,8 +51,7 @@ struct remove_reference<T &&>
   #endif
   
 
-  #ifdef INSIGHTS_USE_TEMPLATE
-template<class T, size_t I>
+  template<class T, size_t I>
 struct extent<T [I], 0>
 {
   inline static constexpr const size_t value = I;
@@ -64,7 +59,6 @@ struct extent<T [I], 0>
   /* PASSED: static_assert(I != 0, "Arrays only"); */
 };
 
-#endif
 
 
 }  // namespace details

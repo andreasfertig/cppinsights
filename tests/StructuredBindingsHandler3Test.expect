@@ -86,14 +86,12 @@ struct tuple_size<constant::Q>
 };
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<size_t N>
 struct tuple_element<N, constant::Q>
 {
   using type = int;
 };
 
-#endif
 
 namespace constant {
   constant::Q q = constant::Q();

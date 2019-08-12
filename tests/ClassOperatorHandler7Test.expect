@@ -48,7 +48,6 @@ struct A<int *>
 #endif
 
 
-#ifdef INSIGHTS_USE_TEMPLATE
 template<typename T>
 struct A<T *>
 {
@@ -61,7 +60,6 @@ struct A<T *>
   A<type_parameter_0_0 *>::B foo;
 };
 
-#endif
 
 
 template <typename T>
