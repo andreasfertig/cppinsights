@@ -136,7 +136,15 @@ public:
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& CI, StringRef /*file*/) override
     {
         mRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-        return llvm::make_unique<CppInsightASTConsumer>(mRewriter);
+        return
+#if IS_CLANG_NEWER_THAN(9)
+
+            std
+#else
+            llvm
+#endif
+
+            ::make_unique<CppInsightASTConsumer>(mRewriter);
     }
 
 private:
