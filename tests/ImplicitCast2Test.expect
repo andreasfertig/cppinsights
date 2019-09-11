@@ -26,7 +26,7 @@ struct A
 
 int main()
 {
-  float f = 1.0f;
+  float f = 1.0F;
   FloatingCast(static_cast<double>(f));
   int i = 1;
   IntegralToBoolean(static_cast<bool>(i));

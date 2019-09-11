@@ -2859,13 +2859,13 @@ const char* CodeGenerator::GetBuiltinTypeSuffix(const BuiltinType::Kind& kind)
 #define CASE(K, retVal)                                                                                                \
     case BuiltinType::K: return retVal
     switch(kind) {
-        CASE(UInt, "u");
-        CASE(ULong, "ul");
-        CASE(ULongLong, "ull");
-        CASE(UInt128, "ulll");
-        CASE(Long, "l");
-        CASE(LongLong, "ll");
-        CASE(Float, "f");
+        CASE(UInt, "U");
+        CASE(ULong, "UL");
+        CASE(ULongLong, "ULL");
+        CASE(UInt128, "ULLL");
+        CASE(Long, "L");
+        CASE(LongLong, "LL");
+        CASE(Float, "F");
         CASE(LongDouble, "L");
         default: return "";
     }

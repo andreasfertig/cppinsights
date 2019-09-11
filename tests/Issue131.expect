@@ -4,6 +4,6 @@ std::tuple<int, float> foo();
 
  
 std::tuple<int, float> __foo5 = foo();
-std::tuple_element<0, std::tuple<int, float> >::type& a = std::get<0ul>(__foo5);
-std::tuple_element<1, std::tuple<int, float> >::type& b = std::get<1ul>(__foo5);
+std::tuple_element<0, std::tuple<int, float> >::type& a = std::get<0UL>(__foo5);
+std::tuple_element<1, std::tuple<int, float> >::type& b = std::get<1UL>(__foo5);
 

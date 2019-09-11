@@ -122,7 +122,7 @@ int main()
   std::string str = std::basic_string<char>("Example");
   D<int> d = D<int>();
   using namespace std::string_literals;
-  std::basic_string<char> str2 = std::operator""s("abc", 3ul);
+  std::basic_string<char> str2 = std::operator""s("abc", 3UL);
   using Vec = Test::Alloc;
   Vec v = Vec();
   using W = Test::West;

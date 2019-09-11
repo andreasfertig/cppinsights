@@ -16,7 +16,7 @@ namespace details::array_single_compare {
   template<>
   inline constexpr bool Compare<unsigned char, 6, int, 0, 1, 2, 3, 4, 5>(const unsigned char (&ar)[6], const int & to, std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>)
   {
-    return (to == static_cast<int>(ar[0ul])) && (to == static_cast<int>(ar[1ul])) && (to == static_cast<int>(ar[2ul])) && (to == static_cast<int>(ar[3ul])) && (to == static_cast<int>(ar[4ul])) && (to == static_cast<int>(ar[5ul]));
+    return (to == static_cast<int>(ar[0UL])) && (to == static_cast<int>(ar[1UL])) && (to == static_cast<int>(ar[2UL])) && (to == static_cast<int>(ar[3UL])) && (to == static_cast<int>(ar[4UL])) && (to == static_cast<int>(ar[5UL]));
   }
   #endif
   
@@ -50,7 +50,7 @@ namespace details::array_compare {
   template<>
   inline constexpr bool Compare<unsigned char, 6, 0, 1, 2, 3, 4, 5>(const unsigned char (&ar)[6], const unsigned char (&to)[6], std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>)
   {
-    return (static_cast<int>(to[0ul]) == static_cast<int>(ar[0ul])) && (static_cast<int>(to[1ul]) == static_cast<int>(ar[1ul])) && (static_cast<int>(to[2ul]) == static_cast<int>(ar[2ul])) && (static_cast<int>(to[3ul]) == static_cast<int>(ar[3ul])) && (static_cast<int>(to[4ul]) == static_cast<int>(ar[4ul])) && (static_cast<int>(to[5ul]) == static_cast<int>(ar[5ul]));
+    return (static_cast<int>(to[0UL]) == static_cast<int>(ar[0UL])) && (static_cast<int>(to[1UL]) == static_cast<int>(ar[1UL])) && (static_cast<int>(to[2UL]) == static_cast<int>(ar[2UL])) && (static_cast<int>(to[3UL]) == static_cast<int>(ar[3UL])) && (static_cast<int>(to[4UL]) == static_cast<int>(ar[4UL])) && (static_cast<int>(to[5UL]) == static_cast<int>(ar[5UL]));
   }
   #endif
   

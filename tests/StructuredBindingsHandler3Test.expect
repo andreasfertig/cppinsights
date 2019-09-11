@@ -98,19 +98,19 @@ namespace constant {
 
   // This creates and lifetime-extends a temporary to hold the result of each get() call.
   constant::Q __q17 = constant::Q(constant::q);
-std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(constant::__q17);
-std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(constant::__q17);
-std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(conststd::tuple_element<0, constant::Q>::type && a = constant::get<0ul>(constant::);
-ntstd::tuple_element<1, constant::Q>::type && b = constant::get<1ul>(constant::);
-:_std::tuple_element<2, constant::Q>::type && c = constant::get<2ul>(constant::);
+std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(constant::__q17);
+std::tuple_element<1, constant::Q>::type b = constant::get<1UL>(constant::__q17);
+std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(conststd::tuple_element<0, constant::Q>::type && a = constant::get<0UL>(constant::);
+ntstd::tuple_element<1, constant::Q>::type && b = constant::get<1UL>(constant::);
+:_std::tuple_element<2, constant::Q>::type && c = constant::get<2UL>(constant::);
 q17);
     // expected-note {{temporary}}
   inline constexpr bool f()
   {
     constant::Q __q19 = constant::Q(constant::q);
-    std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q19);
-    std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q19);
-    std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q19);
+    std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(__q19);
+    std::tuple_element<1, constant::Q>::type b = constant::get<1UL>(__q19);
+    std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(__q19);
     return a == 0 && b == 1 && c == 4;
   }
   
@@ -120,9 +120,9 @@ q17);
     int * p = nullptr;
     {
       constant::Q __q26 = constant::Q(constant::q);
-      std::tuple_element<0, constant::Q>::type a = constant::get<0ul>(__q26);
-      std::tuple_element<1, constant::Q>::type b = constant::get<1ul>(__q26);
-      std::tuple_element<2, constant::Q>::type c = constant::get<2ul>(__q26);
+      std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(__q26);
+      std::tuple_element<1, constant::Q>::type b = constant::get<1UL>(__q26);
+      std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(__q26);
       p = &c;
     };
     return *p;
