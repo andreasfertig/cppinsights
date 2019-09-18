@@ -16,7 +16,7 @@ void func(const std::basic_string<char> & arg)
     public: 
     // inline __lambda_5_11(const __lambda_5_11 &) = default;
     // inline __lambda_5_11(__lambda_5_11 &&) = default;
-    public: __lambda_5_11(const std::basic_string<char> _arg)
+    __lambda_5_11(const std::basic_string<char> _arg)
     : arg{_arg}
     {}
     

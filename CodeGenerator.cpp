@@ -2422,98 +2422,124 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     if(stmt->isLambda()) {
         const LambdaCallerType lambdaCallerType = mLambdaStack.back().callerType();
-        const bool             ctorRequired{stmt->captures_begin() != stmt->captures_end()};
+        const bool             ctorRequired{(stmt->captures_begin() != stmt->captures_end()) ||
+                                stmt->lambdaIsDefaultConstructibleAndAssignable()};
 
         if(ctorRequired) {
-            mOutputFormatHelper.Append("public: ", GetName(*stmt), "(");
+            if(AS_public != lastAccess) {
+                mOutputFormatHelper.AppendNewLine();
+                mOutputFormatHelper.AppendNewLine("public:");
+            }
+
+            if(stmt->lambdaIsDefaultConstructibleAndAssignable()) {
+                mOutputFormatHelper.Append("// ");
+
+                if(stmt->hasConstexprDefaultConstructor()) {
+                    mOutputFormatHelper.Append("/*constexpr */ ");
+                }
+            }
+
+            mOutputFormatHelper.Append(GetName(*stmt), "(");
         }
 
-        std::string ctorInitializerList{};
-        std::string ctorInitializers{"{"};
+        SmallVector<std::string, 5> ctorInitializerList{};
+        std::string                 ctorArguments{"{"};
+        OnceTrue                    bFirst{};
 
-        OnceTrue bFirst{};
-
-        auto addToInits = [&](std::string name, const FieldDecl* fd, bool isThis, const Expr* expr) {
-            if(bFirst) {
-                ctorInitializerList.append(": ");
-            } else {
-                mOutputFormatHelper.Append(", ");
-                ctorInitializerList.append("\n, ");
-                ctorInitializers.append(", ");
-            }
-
-            if(isThis) {
-                ctorInitializerList.append(StrCat("__", name, "{", "_", name, "}\n"));
-
-            } else {
-                ctorInitializerList.append(StrCat(name, "{", "_", name, "}"));
-            }
-
-            if(not isThis && expr) {
-                OutputFormatHelper ofm{};
-                CodeGenerator      codeGenerator{ofm, mLambdaStack};
-                codeGenerator.InsertArg(expr);
-                ctorInitializers.append(ofm.GetString());
-            } else {
-                if(isThis && not fd->getType()->isPointerType()) {
-                    ctorInitializers.append("*");
+        auto addToInits =
+            [&](std::string name, const FieldDecl* fd, bool isThis, const Expr* expr, bool /*useBraces*/) {
+                if(bFirst) {
+                } else {
+                    mOutputFormatHelper.Append(", ");
+                    ctorArguments.append(", ");
                 }
 
-                ctorInitializers.append(name);
-            }
+                const auto& fieldName{StrCat(isThis ? "__" : "", name)};
 
-            mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat("_", name)));
-        };
+                /*if(useBraces) {*/
+                ctorInitializerList.push_back(StrCat(fieldName, "{", "_", name, "}"));
+                /*} else {
+                    ctorInitializerList.push_back(StrCat(fieldName, "(", "_", name, ")"));
+                }*/
+
+                if(not isThis && expr) {
+                    OutputFormatHelper ofm{};
+                    CodeGenerator      codeGenerator{ofm, mLambdaStack};
+                    codeGenerator.InsertArg(expr);
+                    ctorArguments.append(ofm.GetString());
+                } else {
+                    if(isThis && not fd->getType()->isPointerType()) {
+                        ctorArguments.append("*");
+                    }
+
+                    ctorArguments.append(name);
+                }
+
+                mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat("_", name)));
+            };
 
         llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
         FieldDecl*                                 thisCapture{};
 
         stmt->getCaptureFields(captures, thisCapture);
 
-        const auto* captureInits = mLambdaExpr->capture_init_begin();
-        const auto* captureInit  = *captureInits;
-
         // Check if it captures this
         if(thisCapture) {
-            addToInits("this", thisCapture, true, captureInit);
+            const auto* captureInit = mLambdaExpr->capture_init_begin();
+
+            addToInits("this", thisCapture, true, *captureInit, false);
         } else {
             // Find the corresponding capture in the DenseMap. The DenseMap seems to be change its order each time.
             // Hence we use \c captures() to keep the order stable. While using \c Captures to generate the code as
             // it carries the better type infos.
-            for(const auto& c : mLambdaExpr->captures()) {
-                captureInit = *captureInits;
-                ++captureInits;
-
+            for(const auto& [c, cinit] : zip(mLambdaExpr->captures(), mLambdaExpr->capture_inits())) {
                 if(not c.capturesVariable()) {
                     continue;
                 }
 
-                for(/*const*/ auto& [key, value] : captures) {
-                    if(key == c.getCapturedVar()) {
-                        addToInits(GetName(*key), value, false, captureInit);
-                        break;
-                    }
+                const auto* capturedVar = c.getCapturedVar();
+                if(const auto* value = captures[capturedVar]) {
+                    addToInits(
+                        GetName(*capturedVar), value, false, cinit, VarDecl::ListInit == capturedVar->getInitStyle());
                 }
             }
         }
 
-        ctorInitializers.append("}");
+        ctorArguments.append("}");
 
         // generate the ctor only if it is required, i.e. we have captures. This is in fact a trick to get
-        // compiliing code out of it. The compiler itself does not generate a constructor in many many cases.
+        // compiling code out of it. The compiler itself does not generate a constructor in many many cases.
         if(ctorRequired) {
-            mOutputFormatHelper.AppendNewLine(")");
-            mOutputFormatHelper.AppendNewLine(ctorInitializerList);
-            mOutputFormatHelper.AppendNewLine("{}");
+            mOutputFormatHelper.Append(")");
+
+            if(stmt->lambdaIsDefaultConstructibleAndAssignable()) {
+                mOutputFormatHelper.AppendNewLine(" = default;");
+
+            } else {
+                mOutputFormatHelper.AppendNewLine();
+
+                OnceTrue bFirst{};
+                for(const auto& initializer : ctorInitializerList) {
+                    if(bFirst) {
+                        mOutputFormatHelper.Append(": ");
+                    } else {
+                        mOutputFormatHelper.Append(", ");
+                    }
+
+                    mOutputFormatHelper.AppendNewLine(initializer);
+                }
+
+                mOutputFormatHelper.AppendNewLine("{}");
+            }
         }
 
         // close the class scope
         mOutputFormatHelper.CloseScope();
 
         if((LambdaCallerType::VarDecl != lambdaCallerType) && (LambdaCallerType::CallExpr != lambdaCallerType)) {
-            mOutputFormatHelper.Append(" ", GetLambdaName(*stmt), ctorInitializers);
+            mOutputFormatHelper.Append(" ", GetLambdaName(*stmt), ctorArguments);
         } else {
-            mLambdaStack.back().inits().append(ctorInitializers);
+            mLambdaStack.back().inits().append(ctorArguments);
         }
 
     } else {

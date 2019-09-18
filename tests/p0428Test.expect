@@ -25,6 +25,9 @@ class __lambda_3_10
     return i;
   }
   
+  public:
+  // /*constexpr */ __lambda_3_10() = default;
+  
 };
 
 __lambda_3_10 l = __lambda_3_10{};

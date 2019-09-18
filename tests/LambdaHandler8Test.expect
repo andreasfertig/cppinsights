@@ -27,7 +27,9 @@ int get(int & v)
     
     private: 
     int & v;
-    public: __lambda_9_18(int & _v)
+    
+    public:
+    __lambda_9_18(int & _v)
     : v{_v}
     {}
     

@@ -17,7 +17,9 @@ int main()
     
     private: 
     char uuu;
-    public: __lambda_9_11(char _uuu)
+    
+    public:
+    __lambda_9_11(char _uuu)
     : uuu{_uuu}
     {}
     

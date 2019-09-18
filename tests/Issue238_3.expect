@@ -33,6 +33,9 @@ void f()
       }
     }
     
+    public:
+    // /*constexpr */ __lambda_2_26() = default;
+    
   };
   
   __lambda_2_26 lambda = __lambda_2_26{};

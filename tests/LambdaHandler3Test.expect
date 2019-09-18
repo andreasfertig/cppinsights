@@ -28,7 +28,9 @@ int main()
     
     private: 
     int & y;
-    public: __lambda_10_13(int & _y)
+    
+    public:
+    __lambda_10_13(int & _y)
     : y{_y}
     {}
     

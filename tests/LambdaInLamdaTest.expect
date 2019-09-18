@@ -18,7 +18,9 @@ int main()
         
         private: 
         char & buffer;
-        public: __lambda_6_9(char & _buffer)
+        
+        public:
+        __lambda_6_9(char & _buffer)
         : buffer{_buffer}
         {}
         
@@ -29,7 +31,9 @@ int main()
     
     private: 
     char & buffer;
-    public: __lambda_4_5(char & _buffer)
+    
+    public:
+    __lambda_4_5(char & _buffer)
     : buffer{_buffer}
     {}
     

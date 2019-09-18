@@ -19,7 +19,9 @@ int main()
         
         private: 
         char & c;
-        public: __lambda_6_17(char & _c)
+        
+        public:
+        __lambda_6_17(char & _c)
         : c{_c}
         {}
         
