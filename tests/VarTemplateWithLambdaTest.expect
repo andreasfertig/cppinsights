@@ -19,7 +19,7 @@ class __lambda_5_23
   template<>
   inline /*constexpr */ double operator()(int x) const
   {
-    return double(static_cast<double>(x));
+    return double(x);
   }
   #endif
   

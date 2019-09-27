@@ -128,7 +128,7 @@ int main()
   const bool b4 = f1.operator==(NULL);
   const bool b5 = f1.operator==(static_cast<const int>((t == nullptr)));
   unsigned long l = 2;
-  const bool b6 = f1.operator==(static_cast<int>(static_cast<int>(l)));
+  const bool b6 = f1.operator==(static_cast<int>(l));
   const bool b7 = f1.operator==(dynamic_cast<Bar *>(&f2));
   const bool b8 = f1.operator==(reinterpret_cast<char *>(t));
   const bool b9 = f1.operator==(new char[2]);
