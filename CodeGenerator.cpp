@@ -2003,6 +2003,11 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
 
         mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), name));
 
+        if(const auto* constantExpr = dyn_cast_or_null<ConstantExpr>(stmt->getBitWidth())) {
+            mOutputFormatHelper.Append(':');
+            InsertArg(constantExpr);
+        }
+
         // Keep the inline init for aggregates, as we do not see it somewhere else.
         if(cxxRecordDecl->isAggregate()) {
             const auto* initializer = stmt->getInClassInitializer();
