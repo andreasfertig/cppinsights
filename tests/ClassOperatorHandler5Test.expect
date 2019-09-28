@@ -8,11 +8,11 @@ std::basic_string<char> trim(const std::basic_string<char> & input)
   
   std::string final = std::basic_string<char>(input);
   int i = 0;
-  while(i < static_cast<int>(static_cast<int>(input.length())) && static_cast<int>(input.operator[](i)) <= static_cast<int>(' ')) {
+  while(i < static_cast<int>(input.length()) && static_cast<int>(input.operator[](i)) <= static_cast<int>(' ')) {
     i++;
   }
   
-  if(i >= static_cast<int>(static_cast<int>(input.length()))) {
+  if(i >= static_cast<int>(input.length())) {
     return std::basic_string<char>("");
   }
   
@@ -20,7 +20,7 @@ std::basic_string<char> trim(const std::basic_string<char> & input)
     final.operator=(input.substr(static_cast<unsigned long>(i), input.length() - static_cast<unsigned long>(i)));
   }
   
-  i = static_cast<int>(static_cast<int>(final.length())) - 1;
+  i = static_cast<int>(final.length()) - 1;
   while(i >= 0 && static_cast<int>(final.operator[](i)) <= static_cast<int>(' ')) {
     i--;
   }

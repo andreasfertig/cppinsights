@@ -1129,10 +1129,16 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 {
     const Expr* subExpr  = stmt->getSubExpr();
     const auto  castKind = stmt->getCastKind();
+    const bool  hideImplicitCasts{not GetInsightsOptions().ShowAllImplicitCasts};
 
     if(!clang::ast_matchers::IsMatchingCast(castKind)) {
         InsertArg(subExpr);
-    } else if(isa<IntegerLiteral>(subExpr) && not GetInsightsOptions().ShowAllImplicitCasts) {
+    } else if(isa<IntegerLiteral>(subExpr) && hideImplicitCasts) {
+        InsertArg(stmt->IgnoreCasts());
+
+        // If this is part of an explicit cast, for example a CStyleCast ignore it, if ShowAllImplicitCasts is not
+        // selected
+    } else if(stmt->isPartOfExplicitCast() && hideImplicitCasts) {
         InsertArg(stmt->IgnoreCasts());
 
     } else {

@@ -5,7 +5,7 @@ template<class T>
 constexpr T pi = T(3.1415926535897932385L);
 
 template<>
-constexpr const int pi<int> = int(static_cast<int>(3.14159265358979323851L));
+constexpr const int pi<int> = int(3.14159265358979323851L);
 
  
 template<class T>

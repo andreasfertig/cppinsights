@@ -1,6 +1,6 @@
 int main()
 {
   int x;
-  x = int(static_cast<int>(0.5));
+  x = int(0.5);
 }
 

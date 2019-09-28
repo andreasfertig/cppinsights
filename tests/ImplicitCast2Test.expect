@@ -30,6 +30,6 @@ int main()
   FloatingCast(static_cast<double>(f));
   int i = 1;
   IntegralToBoolean(static_cast<bool>(i));
-  int ii = int(static_cast<int>(A().operator int()));
+  int ii = int(A().operator int());
 }
 
