@@ -65,11 +65,11 @@ int main()
   const char * pp = p;
   const char * cp = p;
   const volatile char * vcp = p;
-  float f = 1.0f;
+  float f = 1.0F;
   char c = 'c';
-  unsigned int u = 0u;
+  unsigned int u = 0U;
   decltype(u) uu = u;
-  unsigned int mu = 0u;
+  unsigned int mu = 0U;
   decltype(u) muu = u;
 }
 

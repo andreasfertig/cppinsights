@@ -13,8 +13,8 @@ int main()
     for(; operator!=(__begin1, __end1); __begin1.operator++()) 
     {
       std::pair<const std::basic_string<char>, std::basic_string<char> > & __operator9 = __begin1.operator*();
-      const std::basic_string<char>& key = std::get<0ul>(__operator9);
-      std::basic_string<char>& value = std::get<1ul>(__operator9);
+      const std::basic_string<char>& key = std::get<0UL>(__operator9);
+      std::basic_string<char>& value = std::get<1UL>(__operator9);
     }
     
   }

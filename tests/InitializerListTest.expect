@@ -105,7 +105,7 @@ void foo()
   takes_y({1, 2});
   bar(std::initializer_list<int>{1, 2});
   something(std::initializer_list<int>{1, 2});
-  something(std::initializer_list<float>{1.0f, 2.0f});
+  something(std::initializer_list<float>{1.0F, 2.0F});
   V v = V{std::initializer_list<int>{1}};
   V vv = V{std::initializer_list<int>{1, 2}};
 }

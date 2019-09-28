@@ -51,7 +51,7 @@ int main()
   {
     char (&__range1)[5] = data;
     char * __begin1 = __range1;
-    char * __end1 = __range1 + 5l;
+    char * __end1 = __range1 + 5L;
     {
       while(__begin1 != __end1) {
         char & x = *__begin1;

@@ -99,11 +99,11 @@ class Test
     data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(u8'\n');
     data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(u'\n'));
     data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(U'\n'));
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3u);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ul);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ull);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ll);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3l);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3U);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3UL);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ULL);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3LL);
+    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3L);
   }
   
   inline Foo<int> GetLength() const

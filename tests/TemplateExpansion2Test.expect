@@ -43,9 +43,9 @@ struct remove_reference<T &&>
   template<>
   struct extent<int [16], 0>
   {
-    inline static constexpr const size_t value = 16ul;
+    inline static constexpr const size_t value = 16UL;
     
-    /* PASSED: static_assert(16ul != 0, "Arrays only"); */
+    /* PASSED: static_assert(16UL != 0, "Arrays only"); */
   };
   
   #endif
