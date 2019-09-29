@@ -1,0 +1,17 @@
+struct S
+{
+  // inline constexpr S & operator=(const S &) = default;
+  // inline constexpr S & operator=(S &&) = default;
+  // inline ~S() = default;
+};
+
+
+class T : private virtual S
+{
+  public: 
+  // inline T & operator=(const T &) = default;
+  // inline T & operator=(T &&) = default;
+  // inline ~T() = default;
+};
+
+

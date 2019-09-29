@@ -2370,7 +2370,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         mOutputFormatHelper.Append(" : ");
 
         ForEachArg(stmt->bases(), [&](const auto& base) {
-            mOutputFormatHelper.Append(AccessToString(base.getAccessSpecifier()), " ", GetName(base.getType()));
+            const std::string virtualKw{base.isVirtual() ? kwVirtualSpace : ""};
+
+            mOutputFormatHelper.Append(
+                AccessToString(base.getAccessSpecifier()), " ", virtualKw, GetName(base.getType()));
         });
     }
 
