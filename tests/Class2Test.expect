@@ -62,7 +62,7 @@ struct S
 {
   Test count;
   // inline S(S &) = default;
-  // inline constexpr S(S &&) = default;
+  // inline constexpr S(S &&) = delete;
   // inline S & operator=(S &&) = default;
   // inline S() noexcept(false) = default;
 };

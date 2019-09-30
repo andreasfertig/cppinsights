@@ -22,7 +22,7 @@ class Bar : public Foo
   
   public: 
   int mX;
-  // inline Bar() = default;
+  // inline Bar() = delete;
   // inline constexpr Bar(const Bar &) = default;
   // inline constexpr Bar(Bar &&) = default;
   public: inline Bar(double amount) noexcept(false)
@@ -45,7 +45,7 @@ class Bla : public Foo
   private: 
   int mX;
   public: 
-  // inline Bla() = default;
+  // inline Bla() = delete;
   // inline constexpr Bla(const Bla &) = default;
   // inline constexpr Bla(Bla &&) = default;
   public: inline Bla(int x, int y) noexcept(false)

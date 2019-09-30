@@ -1,0 +1,16 @@
+struct C
+{
+  int & i;
+  inline C() = delete;
+  inline constexpr C(const C &) = default;
+};
+
+
+
+int main()
+{
+  int i;
+  C c = {i};
+}
+
+

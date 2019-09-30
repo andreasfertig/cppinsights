@@ -36,7 +36,7 @@ int main()
     {
     }
     
-    // inline __lambda_20_16(const __lambda_20_16 &) = default;
+    // inline __lambda_20_16(const __lambda_20_16 &) = delete;
     // inline __lambda_20_16(__lambda_20_16 &&) = default;
     public: __lambda_20_16(Movable _x, int _c)
     : x{_x}
