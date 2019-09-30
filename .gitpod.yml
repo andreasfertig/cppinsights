@@ -1,8 +1,5 @@
 # The Docker image to run your workspace in. Defaults to gitpod/workspace-full
-image:
-  file: .gitpod/Dockerfile
-  # Context is optional, defaults to an empty context
-  context: docker
+image: andreasfertig/cppinsights-builder-gitpod:latest
 workspaceLocation: "."
 
 tasks:
