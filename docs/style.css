@@ -5,7 +5,10 @@
  */
 
 body, table, div, p, dl {
-  font: 400 13px/1.3 Verdana,DejaVu Sans,Geneva,sans-serif;
+  font-family: Verdana,DejaVu Sans,Geneva,sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+/*  font: 400 13px/1.3 Verdana,DejaVu Sans,Geneva,sans-serif;*/
 }
 
 /* @group Heading Levels */
@@ -15,8 +18,38 @@ h1.groupheader {
 }
 
 .title {
-  font: 700 18px Verdana,DejaVu Sans,Geneva,sans-serif;
+  font: 700 1.5rem Verdana,DejaVu Sans,Geneva,sans-serif;
   margin: 10px 2px;
+}
+
+.sm-dox a, .sm-dox a:focus, .sm-dox a:hover, .sm-dox a:active {
+    font-size: 0.9rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+  clear: both;
+  margin-top: 2.5rem;
+}
+
+h2 {
+  font-size: 1.3rem
+}
+
+h3 {
+  font-size: 1.2rem
+}
+
+h4 {
+  font-size: 1.2rem
+}
+
+h5 {
+  font-size: 1.1rem
 }
 
 h2.groupheader {
@@ -27,15 +60,7 @@ h2.groupheader {
 }
 
 h3.groupheader {
-  font-size: 13px;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  -webkit-transition: none;
-  -moz-transition: none;
-  -ms-transition: none;
-  -o-transition: none;
-  transition: none;
+  font-size: inherit;
 }
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
@@ -145,6 +170,7 @@ div.line {
   -ms-transition-duration: 0;
   -o-transition-duration: 0;
   transition-duration: 0;
+  font-size: inherit;
 }
 
 div.line.glow {
@@ -299,7 +325,7 @@ hr.footer {
 /* @group Member Descriptions */
 
 table.memberdecls {
-  font-size: 13px;
+  font-size: inherit;
 }
 
 /* addition */
@@ -420,7 +446,7 @@ table.memberdecls tr:nth-last-child(2) .memItemRight {
 }
 
 .memname {
-  font-size: 13px;
+  font-size: inherit;
 }
 
 .memname td {
@@ -515,10 +541,14 @@ span.mlabel {
   color: #66666E;
   padding: 4px 5px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 0.8rem;
 }
 
 /* @end */
+
+.directory .levels {
+  font-size: 0.8rem;
+}
 
 /* these are for tree view when not used as main index */
 
@@ -566,6 +596,14 @@ div.dynheader {
 address {
 }
 
+small {
+    font-size: 0.6rem;
+}
+
+table.directory {
+  font-size: inherit;
+}
+
 table.doxtable {
 }
 
@@ -576,7 +614,7 @@ table.doxtable td, table.doxtable th {
 table.doxtable th {
   background-color: #F6F6F6;
   color: #66666E;
-  font-size: 13px;
+  font-size: inherit;
 }
 
 table.fieldtable {
@@ -599,7 +637,7 @@ table.fieldtable {
 }
 
 .fieldtable td.fieldname {
-  font-size: 13px;
+  font-size: inherit;
 }
 
 /* additional */
@@ -610,12 +648,12 @@ table.fieldtable {
 
 .fieldtable td.fielddoc {
   border: 0;
-  font-size: 13px;
+  font-size: inherit;
 }
 
 /* additional */
 .fieldtable td.fielddoc * {
-  font-size: 13px;
+  font-size: inherit;
 }
 /* --- */
 
@@ -633,7 +671,7 @@ table.fieldtable {
 .fieldtable th {
   background: none;
   background-color: #E6E6E6;
-  font-size: 13px;
+  font-size: inherit;
   font-weight: normal;
   color: #363534;
   border-radius: 0;
@@ -650,7 +688,7 @@ table.fieldtable {
   background-color: #E6E6E6;
   color: #363534;
   border: 0;
-  font-size: 13px;
+  font-size: 0.8rem;
 }
 
 .navpath li {
@@ -667,7 +705,7 @@ table.fieldtable {
 
 .navpath li.footer {
   color: #363534;
-  font-size: 13px;
+  font-size: inherit;
 }
 
 div.summary {
@@ -683,7 +721,7 @@ div.summary {
   border-radius: 7px;
   -moz-border-radius: 7px;
   -webkit-border-radius: 7px;
-  font-size: 13px;
+  font-size: inherit;
 }
 
 div.summary a {
@@ -946,10 +984,10 @@ tr.heading h2 {
 }
 
 .tabs2 {
-  font-size: 13px;
+  font-size: inherit;
 }
 .tabs3 {
-  font-size: 13px;
+  font-size: inherit;
 }
 
 .tablist {
