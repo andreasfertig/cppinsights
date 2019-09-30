@@ -13,6 +13,7 @@ code can be found on [GitHub](https://github.com) at [github.com/andreasfertig/c
 * [C++ Insights Command Line Options](@ref command_line_options)
 * [ToDo](@ref todo)
 * [Tests](@ref tests)
+* [Examples](@ref examples)
 
 ##Readme's
 
