@@ -132,7 +132,7 @@ Then build clang as you normally do.
 
 ### cmake options
 
-There are a couple of options which can be enable with [!cmake](https://cmake.org):
+There are a couple of options which can be enable with [cmake](https://cmake.org):
 
 | Option            | Description                | Default |
 |-------------------|:---------------------------| --------|
@@ -181,7 +181,7 @@ insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
 ```
 
 
-There is also another github project which sets up a docker container with the latest C++ Insights version in it: [C++
+There is also another GitHub project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
 
@@ -191,11 +191,11 @@ Currently, the most recent stable version of clang is supported as well as the c
 
 ## ToDo's
 
-See [TODO.md](TODO.md).
+See [TODO](TODO.md).
 
 
 ## Get Involved
-+ Report bugs/issues by submitting a [Github issue](https://github.com/andreasfertig/cppinsights/issues).
++ Report bugs/issues by submitting a [GitHub issue](https://github.com/andreasfertig/cppinsights/issues).
 + Submit contributions using [pull requests](https://github.com/andreasfertig/cppinsights/pulls). See [Contributing](CONTRIBUTING.md)
 
 ## Support
