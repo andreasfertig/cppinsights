@@ -1,0 +1,99 @@
+// dummy to have a range-based for ready container link thing
+template<class T>
+class MyArrayWrapper {
+   T* data;
+   int size;
+
+public:
+   int* begin() { return size>0 ? &data[0] : nullptr; }
+   int* end()   { return size>0 ? &data[size-1] : nullptr; }
+};
+
+/* First instantiated from: Issue238_2.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class MyArrayWrapper<int>
+{
+  int * data;
+  int size;
+  
+  public: 
+  inline int * begin()
+  {
+    return this->size > 0 ? &this->data[0] : nullptr;
+  }
+  
+  inline int * end()
+  {
+    return this->size > 0 ? &this->data[this->size - 1] : nullptr;
+  }
+  
+  // inline MyArrayWrapper() noexcept = default;
+  // inline constexpr MyArrayWrapper(const MyArrayWrapper<int> &) noexcept = default;
+  // inline constexpr MyArrayWrapper(MyArrayWrapper<int> &&) = default;
+  // inline ~MyArrayWrapper() noexcept = default;
+};
+
+#endif
+
+
+
+
+void f()
+{
+    
+  class __lambda_15_17
+  {
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 container) const
+    {
+      {
+        auto && __range1 = container;
+        for(; ; ) 
+        {
+          auto test;
+        }
+        
+      }
+    }
+    
+    /* First instantiated from: Issue238_2.cpp:20 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ void operator()(MyArrayWrapper<int> container) const
+    {
+      {
+        MyArrayWrapper<int> & __range1 = container;
+        int * __begin0 = __range1.begin();
+        int * __end0 = __range1.end();
+        for(; __begin0 != __end0; ++__begin0) 
+        {
+          int test = *__begin0;
+        }
+        
+      }
+    }
+    #endif
+    
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(type_parameter_0_0 container)
+    {
+      {
+        auto && __range1 = container;
+        for(; ; ) 
+        {
+          auto test;
+        }
+        
+      }
+    }
+    
+  };
+  
+  __lambda_15_17 lambda = __lambda_15_17{};
+  MyArrayWrapper<int> vec = MyArrayWrapper<int>{};
+  lambda.operator()(MyArrayWrapper<int>(vec));
+}
+
