@@ -206,7 +206,7 @@ EXCLUDE                = @CMAKE_CURRENT_SOURCE_DIR@/docker_buildenv @CMAKE_CURRE
 EXCLUDE_PATTERNS       = @CMAKE_CURRENT_SOURCE_DIR@/tests/*.cpp \
                          @CMAKE_CURRENT_SOURCE_DIR@/tests/*.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/tests/*/* \
-                         @CMAKE_CURRENT_SOURCE_DIR@/docs/examples/*.cpp \
+                         @CMAKE_CURRENT_SOURCE_DIR@/docs/examples/*.cpp 
 
 # The IMAGE_PATH tag can be used to specify one or more files or directories
 # that contain images that are to be included in the documentation (see the
