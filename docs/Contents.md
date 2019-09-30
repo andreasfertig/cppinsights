@@ -11,6 +11,7 @@ code can be found on [GitHub](https://github.com) at [github.com/andreasfertig/c
 * [Code of Conduct](@ref code_of_conduct)
 * [Contributing to C++ Insights ](@ref contributing)
 * [C++ Insights Command Line Options](@ref command_line_options)
+* [External Information Sources](@ref external_information_sources)
 * [ToDo](@ref todo)
 * [Tests](@ref tests)
 * [Examples](@ref examples)
