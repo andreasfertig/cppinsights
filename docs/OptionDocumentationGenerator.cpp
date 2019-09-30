@@ -17,9 +17,9 @@ using namespace std;
 static bool CreateFile(const std::string& optionName, bool optionDefault, const char* description)
 {
     const std::string mdFileName{"opt-" + optionName + ".md"};
-    ofstream          myfile{mdFileName};
+    ofstream          mdFile{mdFileName};
 
-    if(not myfile.is_open()) {
+    if(not mdFile.is_open()) {
         return false;
     }
 
@@ -27,18 +27,18 @@ static bool CreateFile(const std::string& optionName, bool optionDefault, const 
     std::string linkName{optionName};
     std::replace(linkName.begin(), linkName.end(), '-', '_');
 
-    myfile << "# " << optionName << " {#" << linkName << "}\n";
-    myfile << description << "\n\n";
-    myfile << "__Default:__ " << (optionDefault ? "On" : "Off") << "\n\n";
-    myfile << "__Examples:__\n\n";
-    myfile << "```.cpp\n";
-    myfile << optionName << "-source\n";
-    myfile << "```\n\n";
-    myfile << "transforms into this:\n\n";
-    myfile << "```.cpp\n";
-    myfile << optionName << "-transformed\n";
-    myfile << "```\n";
-    myfile.close();
+    mdFile << "# " << optionName << " {#" << linkName << "}\n";
+    mdFile << description << "\n\n";
+    mdFile << "__Default:__ " << (optionDefault ? "On" : "Off") << "\n\n";
+    mdFile << "__Examples:__\n\n";
+    mdFile << "```.cpp\n";
+    mdFile << optionName << "-source\n";
+    mdFile << "```\n\n";
+    mdFile << "transforms into this:\n\n";
+    mdFile << "```.cpp\n";
+    mdFile << optionName << "-transformed\n";
+    mdFile << "```\n";
+    mdFile.close();
 
     return true;
 }
@@ -50,13 +50,13 @@ int main()
 
 #undef INSIGHTS_OPT
 
-    ofstream myfile{"CommandLineOptions.md"};
+    ofstream mdFile{"CommandLineOptions.md"};
 
-    if(not myfile.is_open()) {
+    if(not mdFile.is_open()) {
         return -1;
     }
 
-    myfile << "# C++ Insights command line options {#command_line_options}\n\n";
+    mdFile << "# C++ Insights command line options {#command_line_options}\n\n";
 
     std::vector<std::string> options{};
 
@@ -70,6 +70,6 @@ int main()
         std::replace(linkName.begin(), linkName.end(), '-', '_');
 
         //* [alt-syntax-for](@ref alt_syntax_for)
-        myfile << "* [" << opt << "](@ref " << linkName << ")\n";
+        mdFile << "* [" << opt << "](@ref " << linkName << ")\n";
     }
 }

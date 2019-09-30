@@ -178,6 +178,7 @@ script:
     mkdir ${TRAVIS_BUILD_DIR}/build/html
     docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cmake --build /home/builder/build --target doc"
     echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
+    echo "google-site-verification: google7bcf3ef9a4f62ff2.html" > ${TRAVIS_BUILD_DIR}/build/html/google7bcf3ef9a4f62ff2.html 
   elif [[ "${TIDY}" == "Yes" ]]; then
     $TRAVIS_BUILD_DIR/scripts/travis-run-make-tidy.sh
   elif [[ "${CFORMAT}" == "Yes" ]]; then
