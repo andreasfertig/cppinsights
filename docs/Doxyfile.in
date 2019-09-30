@@ -212,7 +212,7 @@ EXCLUDE_PATTERNS       = @CMAKE_CURRENT_SOURCE_DIR@/tests/*.cpp \
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = @abs_top_srcdir@/img
+IMAGE_PATH             = @CMAKE_CURRENT_SOURCE_DIR@/artwork
 
 # If the USE_MDFILE_AS_MAINPAGE tag refers to the name of a markdown file that
 # is part of the input, its contents will be placed on the main page
