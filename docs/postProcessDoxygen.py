@@ -27,13 +27,15 @@ def main():
 
     htmlFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.html') and not f.endswith('source.html'))]
 
-    xmlData = '<urlset xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n'
+    xmlData  = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 
     now = datetime.datetime.now()
     time = now.strftime("%Y-%m-%dT%H:%M:%S+00:00")
 
+    xmlData += '  <url><loc>https://docs.cppinsights.io/%s</loc><lastmod>%s</lastmod><priority>1.00</priority></url>\n'  %('', time)
+
     for f in htmlFiles:
-        xmlData += '  <url><loc>https://docs.cppinsights.io/%s</loc><lastmod>%s</lastmod><priority>1.00</priority></url>\n' %(f, time)
+        xmlData += '  <url><loc>https://docs.cppinsights.io/%s</loc><lastmod>%s</lastmod><priority>0.80</priority></url>\n' %(f, time)
 
     xmlData += '</urlset>\n'
 
