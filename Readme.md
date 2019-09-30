@@ -4,6 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://github.com/andreasfertig/cppinsights/releases) [![Build Status](https://api.travis-ci.org/andreasfertig/cppinsights.svg?branch=master)](https://travis-ci.org/andreasfertig/cppinsights) [![Build status](https://ci.appveyor.com/api/projects/status/github/andreasfertig/cppinsights?branch=master&svg=true)](https://ci.appveyor.com/project/andreasfertig/cppinsights)
 [![codecov](https://codecov.io/gh/andreasfertig/cppinsights/branch/master/graph/badge.svg)](https://codecov.io/gh/andreasfertig/cppinsights)
 [![Try online](https://img.shields.io/badge/try-online-blue.svg)](https://cppinsights.io)
+[![Documentation](https://img.shields.io/badge/view-documentation-blue)](https://docs.cppinsights.io)
 [![patreon](https://img.shields.io/badge/patreon-support-orange.svg)](https://www.patreon.com/cppinsights)
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/andreasfertig/cppinsights)
@@ -26,7 +27,7 @@ It's about the magic the compiler does for us to make things work.
 
 Take this piece of code for example:
 
-```C++
+```.cpp
 class Base {
 };
 
@@ -41,7 +42,7 @@ int main() {
 
 Nothing special and of course it compiles. This is the compilers view on it:
 
-```C++
+```.cpp
 class Base {
 /* public: inline constexpr Base() noexcept; */
 /* public: inline ~Base(); */
@@ -131,7 +132,7 @@ Then build clang as you normally do.
 
 ### cmake options
 
-There are a couple of options which can be enable with [!cmake](https://cmake.org):
+There are a couple of options which can be enable with [cmake](https://cmake.org):
 
 | Option            | Description                | Default |
 |-------------------|:---------------------------| --------|
@@ -180,7 +181,7 @@ insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
 ```
 
 
-There is also another github project which sets up a docker container with the latest C++ Insights version in it: [C++
+There is also another GitHub project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
 
@@ -188,14 +189,13 @@ Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
 Currently, the most recent stable version of clang is supported as well as the current development branch. 
 
-
 ## ToDo's
 
-See [TODO.md](TODO.md).
+See [TODO](TODO.md).
 
 
 ## Get Involved
-+ Report bugs/issues by submitting a [Github issue](https://github.com/andreasfertig/cppinsights/issues).
++ Report bugs/issues by submitting a [GitHub issue](https://github.com/andreasfertig/cppinsights/issues).
 + Submit contributions using [pull requests](https://github.com/andreasfertig/cppinsights/pulls). See [Contributing](CONTRIBUTING.md)
 
 ## Support

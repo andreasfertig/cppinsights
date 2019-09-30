@@ -1,4 +1,4 @@
-## Building on Windows
+## Building on Windows {#building_on_windows}
 
 ### Tested with (supported compilers)
 

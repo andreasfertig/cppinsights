@@ -481,7 +481,12 @@ if (NOT WIN32)
             ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMENT "Generating API documentation with Doxygen" VERBATIM
+            COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docs/postProcessDoxygen.py ${CMAKE_CURRENT_BINARY_DIR}/html
         )
+
+        if(NOT WIN32)
+            add_dependencies(doc gen-options)
+        endif()
     endif()
 
     # XXX: hack to allow coverage build to run tests which fail
@@ -571,6 +576,10 @@ if (NOT WIN32)
         )
     endif()
 endif ()
+
+if(NOT WIN32)
+    add_subdirectory(docs)
+endif()
 
 message(STATUS "")
 message(STATUS "[ Build summary ]")
