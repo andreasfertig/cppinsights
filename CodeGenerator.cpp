@@ -258,8 +258,13 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
     AddBodyStmts(bodyStmts, rwStmt->getBody());
 
     const auto& ctx = rangeForStmt->getLoopVariable()->getASTContext();
-    Decl*       decls[2]{rwStmt->getBeginStmt()->getSingleDecl(), rwStmt->getEndStmt()->getSingleDecl()};
-    auto        dgRef = DeclGroupRef::Create(const_cast<ASTContext&>(ctx), decls, 2);
+
+    // In case of a range-based for-loop inside an unevaluated template the begin and end statements are not present. In
+    // this case just add a nullptr.
+    Decl* decls[2]{rwStmt->getBeginStmt() ? rwStmt->getBeginStmt()->getSingleDecl() : nullptr,
+                   rwStmt->getEndStmt() ? rwStmt->getEndStmt()->getSingleDecl() : nullptr};
+
+    auto dgRef = DeclGroupRef::Create(const_cast<ASTContext&>(ctx), decls, 2);
 
     auto* declStmt = [&]() -> DeclStmt* {
         if(onlyCpp11) {

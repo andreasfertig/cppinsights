@@ -1,0 +1,40 @@
+// cmdline:-std=c++2a
+void f()
+{
+    
+  class __lambda_2_26
+  {
+    public: 
+    template<class type_parameter_0_0, class type_parameter_0_1>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 init, type_parameter_0_1 container) const
+    {
+      {
+        auto i = init;
+        auto && __range1 = container;
+        for(; ; ) 
+        {
+          auto test;
+        }
+        
+      }
+    }
+    private: 
+    template<class type_parameter_0_0, class type_parameter_0_1>
+    static inline auto __invoke(type_parameter_0_0 init, type_parameter_0_1 container)
+    {
+      {
+        auto i = init;
+        auto && __range1 = container;
+        for(; ; ) 
+        {
+          auto test;
+        }
+        
+      }
+    }
+    
+  };
+  
+  __lambda_2_26 lambda = __lambda_2_26{};
+}
+
