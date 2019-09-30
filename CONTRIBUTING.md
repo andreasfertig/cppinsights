@@ -1,4 +1,4 @@
-# Contributing to C++ Insights
+# Contributing to C++ Insights {#contributing}
 
 Thanks for considering contributing to **C++ Insights**.
 
