@@ -18,7 +18,7 @@ class EventContainer
       std::cout.operator<<(__this->val);
     }
     
-    // inline /*constexpr */ __lambda_6_43 & operator=(const __lambda_6_43 &) = default;
+    // inline /*constexpr */ __lambda_6_43 & operator=(const __lambda_6_43 &) = delete;
     // inline /*constexpr */ __lambda_6_43(const __lambda_6_43 &) noexcept = default;
     // inline /*constexpr */ __lambda_6_43(__lambda_6_43 &&) noexcept = default;
     public: __lambda_6_43(EventContainer * _this)

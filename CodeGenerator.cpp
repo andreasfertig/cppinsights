@@ -1875,10 +1875,11 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
     InsertTemplateGuardBegin(stmt);
     InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes, cxxInheritedCtorDecl);
 
-    if(stmt->isDefaulted()) {
-        mOutputFormatHelper.AppendNewLine(" = default;");
-    } else if(stmt->isDeleted()) {
+    if(stmt->isDeleted()) {
         mOutputFormatHelper.AppendNewLine(" = delete;");
+
+    } else if(stmt->isDefaulted()) {
+        mOutputFormatHelper.AppendNewLine(" = default;");
     }
 }
 //-----------------------------------------------------------------------------
