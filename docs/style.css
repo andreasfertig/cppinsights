@@ -805,7 +805,13 @@ dl.section dd {
   padding: 10px;
 }
 
+.title-and-logo {
+    float: left;
+}
+
 .image {
+    text-align: left;
+    float: left;
 }
 
 .dotgraph {
@@ -818,6 +824,7 @@ dl.section dd {
 }
 
 .caption {
+    display: none;
 }
 
 div.zoom {
@@ -1138,5 +1145,51 @@ tr.heading h2 {
 
 .permalink {
     font-size: 0%;
-    visibility: hidden;
+    display: none;
+}
+
+.PageDoc .header {
+    /*display: none;*/
+}
+
+
+/* Markdown Table */
+
+th.markdownTableHeadLeft, th.markdownTableHeadRight, th.markdownTableHeadCenter, th.markdownTableHeadNone {
+    background-color: #2980b9;
+    color: #FFFFFF;
+}
+
+table.markdownTable td {
+    border: 1px solid #2980b9;
+}
+
+table.markdownTable th {
+    border: 1px solid white;
+}
+
+
+
+
+/* Code Highlighting */
+
+span.keyword,
+span.keywordflow {
+    color: #d73a49;
+}
+
+span.comment {
+    color: #6a737d;
+}
+
+span.keywordtype {
+    color: #d73a49;
+}
+
+span.preprocessor {
+    color: #d73a49;;
+}
+
+span.stringliteral {
+   color: #032f62;
 }
