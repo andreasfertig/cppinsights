@@ -797,12 +797,19 @@ dl.section dd {
   display: inline;
 }
 
+#main-nav {
+  display: inline-block;
+}
+
 #titlearea {
   border: 0;
   float: left;
   width: auto;
-  margin-right: 10px;
   padding: 10px;
+}
+
+#titlearea a {
+    display: inline-block;
 }
 
 .title-and-logo {
@@ -1112,7 +1119,6 @@ tr.heading h2 {
 
 #logo {
   float: left;
-  margin-right: 10px;
 }
 
 .sm-dox {
@@ -1152,6 +1158,16 @@ tr.heading h2 {
     /*display: none;*/
 }
 
+#nav-path
+{
+    clear:both;
+}
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 
 /* Markdown Table */
 
