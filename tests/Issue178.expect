@@ -1,0 +1,24 @@
+struct X
+{
+  int f();
+  
+  int f(int);
+  
+  int f(double);
+  
+};
+
+
+
+struct Y : public X
+{
+  int f(float);
+  
+  using X::f;
+  // int X::f(double);
+  // int X::f(int);
+  // int X::f();
+  
+};
+
+

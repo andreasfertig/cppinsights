@@ -1,0 +1,8 @@
+#include <cstdio>
+
+int main()
+{
+  float f = static_cast<float>((3.0));
+  return static_cast<int>(f);
+}
+
