@@ -554,8 +554,16 @@ if (NOT WIN32)
         else()
             message(STATUS "Target coverage available")
 
+            set(GCOV_TOOL "")
+            if(IS_GNU)
+                # Find the major version of the CXX compiler to use the corresponding gcov with it
+                string(REPLACE "." ";" CXX_VERSION_LIST "${CMAKE_CXX_COMPILER_VERSION}")
+                list(GET CXX_VERSION_LIST 0 CXX_MAJOR_VERSION)
+                set(GCOV_TOOL --gcov-tool /usr/bin/gcov-${CXX_MAJOR_VERSION})
+            endif()
+
             add_custom_target(coverage
-                COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
+                COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir ${GCOV_TOOL} --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
                 COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
                 COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.info --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
