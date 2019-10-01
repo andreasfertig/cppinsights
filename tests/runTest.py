@@ -34,12 +34,14 @@ def testCompare(tmpFileName, stdout, expectFile, f, args, time):
 #------------------------------------------------------------------------------
 
 def testCompile(tmpFileName, f, args, fileName, cppStd):
-    alignAs = ''
+    cmd = [args['cxx'], cppStd, '-m64', '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)']
 
+    # GCC seems to dislike empty ''
     if '-std=c++98' == cppStd:
-        alignAs = '-Dalignas(x)='
+        cmd += ['-Dalignas(x)=']
 
-    cmd = [args['cxx'], cppStd, '-m64', '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)', alignAs, '-c', tmpFileName]
+    cmd += ['-c', tmpFileName]
+
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
