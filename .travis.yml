@@ -39,7 +39,7 @@ jobs:
         packages: 
         - clang-9
         - *all_llvm_current_packages
-        - libstdc++-7-dev
+        - libstdc++-8-dev
     env: COMPILER='clang++-9' COMPILER_CC='clang-9' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang stable deployment
@@ -101,17 +101,17 @@ jobs:
       apt:
         sources: *all_sources
         packages:
-        - g++-7
-        - libstdc++-6-dev
+        - g++-8
+        - libstdc++-8-dev
         - *all_llvm_current_packages
         - lcov
-    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
 
     # Linux Clang Coverage Build
   - os: linux
     compiler: gcc
     addons: *covcurrent
-    env: COMPILER='g++-7' COMPILER_CC='gcc-7' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
+    env: COMPILER='g++-8' COMPILER_CC='gcc-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
 
   - stage: "Deploy Docker"
     install: true
