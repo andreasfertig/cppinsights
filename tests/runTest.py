@@ -16,9 +16,6 @@ mypath = '.'
 def testCompare(tmpFileName, stdout, expectFile, f, args, time):
     expect = open(expectFile, 'r').read()
 
-    if args['docker']:
-        expect = re.sub( r'instantiated from: .*?.cpp:', r'instantiated from: x.cpp:', expect)
-
     if stdout != expect:
         print '[FAILED] %s - %s' %(f, time)
         cmd = ['/usr/bin/diff', expectFile, tmpFileName]
@@ -34,12 +31,14 @@ def testCompare(tmpFileName, stdout, expectFile, f, args, time):
 #------------------------------------------------------------------------------
 
 def testCompile(tmpFileName, f, args, fileName, cppStd):
-    alignAs = ''
+    cmd = [args['cxx'], cppStd, '-m64', '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)']
 
+    # GCC seems to dislike empty ''
     if '-std=c++98' == cppStd:
-        alignAs = '-Dalignas(x)='
+        cmd += ['-Dalignas(x)=']
 
-    cmd = [args['cxx'], cppStd, '-m64', '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)', alignAs, '-c', tmpFileName]
+    cmd += ['-c', tmpFileName]
+
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
@@ -100,8 +99,6 @@ def main():
     parser = argparse.ArgumentParser(description='Description of your program')
     parser.add_argument('--insights',       help='C++ Insights binary',  required=True)
     parser.add_argument('--cxx',            help='C++ compiler to used', default='/usr/local/clang-current/bin/clang++')
-    parser.add_argument('--docker',         help='Run tests in docker container', action='store_true')
-    parser.add_argument('--docker-image',   help='Docker image name', default='cppinsights-runtime')
     parser.add_argument('--failure-is-ok',  help='Failing tests are ok', default=False, action='store_true')
     parser.add_argument('--update-tests',   help='Update failing tests', default=False, action='store_true')
     parser.add_argument('--std',            help='C++ Standard to used', default='c++17')
@@ -118,9 +115,6 @@ def main():
         cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp'))]
     else:
         cppFiles = remainingArgs
-
-    if args['docker']:
-        print 'Running tests in docker'
 
     filesPassed     = 0
     missingExpected = 0
@@ -151,22 +145,16 @@ def main():
             missingExpected += 1
             continue
 
-        if args['docker']:
-                data = open(f, 'r').read()
-                cmd = ['docker', 'run', '-i', args['docker_image'], insightsPath, '-stdin', 'x.cpp', '--', '-std=c++1z', '-isystem/usr/include/c++/v1/']
-                p   = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = p.communicate(input=data)
+#             cmd   = [insightsPath, f, '-for2while', '--', cppStd, '-m64'] + defaultIncludeDirs
+        if '' == insightsOpts:
+            cmd   = [insightsPath, f, '--', cppStd, '-m64'] + defaultIncludeDirs
         else:
-#                cmd   = [insightsPath, f, '-for2while', '--', cppStd, '-m64'] + defaultIncludeDirs
-                if '' == insightsOpts:
-                    cmd   = [insightsPath, f, '--', cppStd, '-m64'] + defaultIncludeDirs
-                else:
-                    cmd   = [insightsPath, f, insightsOpts, '--', cppStd, '-m64'] + defaultIncludeDirs
+            cmd   = [insightsPath, f, insightsOpts, '--', cppStd, '-m64'] + defaultIncludeDirs
 
-                begin = datetime.datetime.now()
-                p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                end   = datetime.datetime.now()
-                stdout, stderr = p.communicate()
+        begin = datetime.datetime.now()
+        p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        end   = datetime.datetime.now()
+        stdout, stderr = p.communicate()
 
         if 0 != p.returncode:
             compileErrorFile = os.path.join(mypath, fileName + '.cerr')

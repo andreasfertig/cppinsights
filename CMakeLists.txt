@@ -514,31 +514,35 @@ if (NOT WIN32)
 
 
     # run tests in a docker container
-    add_custom_target(tests-docker
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights /usr/bin/insights --cxx ${CMAKE_CXX_COMPILER} --docker
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+    add_custom_target(docker-tests
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=${INSIGHTS_COVERAGE} -DDEBUG=${DEBUG}" tests
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
+        COMMENT "Running tests in docker" VERBATIM
+    )
+
+    # run code coverage in docker container
+    add_custom_target(docker-coverage
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=Yes -DDEBUG=${DEBUG}" coverage
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMENT "Running tests in docker" VERBATIM
     )
 
     # run tests in a docker container
-    add_custom_target(docker-build-container
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
-        COMMENT "Bulding insights in docker" VERBATIM
-    )
-
     add_custom_target(docker-build
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
-        DEPENDS docker-build-container ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=${INSIGHTS_COVERAGE} -DDEBUG=${DEBUG}"
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMENT "Bulding insights in docker" VERBATIM
     )
 
+    # open a shell in the docker container
     add_custom_target(docker-build-run
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/run.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv
-        DEPENDS docker-build-container ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/build.sh ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/Dockerfile ${CMAKE_CURRENT_SOURCE_DIR}/docker_buildenv/compile.sh
-        COMMENT "Bulding insights in docker" VERBATIM
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build shell
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
+        COMMENT "Open shell in docker" VERBATIM
     )
 
     # code coverage
@@ -554,8 +558,16 @@ if (NOT WIN32)
         else()
             message(STATUS "Target coverage available")
 
+            set(GCOV_TOOL "")
+            if(IS_GNU)
+                # Find the major version of the CXX compiler to use the corresponding gcov with it
+                string(REPLACE "." ";" CXX_VERSION_LIST "${CMAKE_CXX_COMPILER_VERSION}")
+                list(GET CXX_VERSION_LIST 0 CXX_MAJOR_VERSION)
+                set(GCOV_TOOL --gcov-tool /usr/bin/gcov-${CXX_MAJOR_VERSION})
+            endif()
+
             add_custom_target(coverage
-                COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
+                COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir ${GCOV_TOOL} --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
                 COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
                 COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.info --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py

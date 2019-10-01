@@ -50,7 +50,7 @@ jobs:
     addons:
       ssh_known_hosts: cppinsights.io
     before_install:
-    - cd docker_travis && docker pull andreasfertig/cppinsights-builder
+    - docker pull andreasfertig/cppinsights-builder
     env: COMPILER='clang++-8' COMPILER_CC='clang-8' LLVM_CONFIG=/usr/bin/llvm-config-8  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
     
   # Linux g++ Build
