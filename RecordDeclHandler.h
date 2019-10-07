@@ -17,14 +17,15 @@ class Rewriter;
 
 namespace clang::insights {
 
-/// \brief Show which special members the compiler generates for a certain class.
+/// \brief Show a struct or class with the special members the compiler generates.
 ///
 /// Conveniently the compiler generates special member for us. Like the default constructor, copy or move operators.
-/// Under certain circumstances it stops generating. This matches makes it visible.
-class CompilerGeneratedHandler final : public ast_matchers::MatchFinder::MatchCallback, public InsightsBase
+/// Under certain circumstances it stops generating. This handler rewrites an entire class and shows all the pieces the
+/// compiler adds for us.
+class RecordDeclHandler final : public ast_matchers::MatchFinder::MatchCallback, public InsightsBase
 {
 public:
-    CompilerGeneratedHandler(Rewriter& rewrite, ast_matchers::MatchFinder& Matcher);
+    RecordDeclHandler(Rewriter& rewrite, ast_matchers::MatchFinder& Matcher);
     void run(const ast_matchers::MatchFinder::MatchResult& result) override;
 };
 //-----------------------------------------------------------------------------

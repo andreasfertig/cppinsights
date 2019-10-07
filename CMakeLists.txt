@@ -411,7 +411,6 @@ endif()
 # name the executable and all source files
 add_clang_tool(insights
     CodeGenerator.cpp
-    CompilerGeneratedHandler.cpp
     DPrint.cpp
     FunctionDeclHandler.cpp
     GlobalVariableHandler.cpp
@@ -419,6 +418,7 @@ add_clang_tool(insights
     InsightsBase.cpp
     InsightsHelpers.cpp
     OutputFormatHelper.cpp
+    RecordDeclHandler.cpp
     StaticAssertHandler.cpp
     TemplateHandler.cpp
 )

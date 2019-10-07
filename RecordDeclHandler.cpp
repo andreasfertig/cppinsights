@@ -5,7 +5,7 @@
  *
  ****************************************************************************/
 
-#include "CompilerGeneratedHandler.h"
+#include "RecordDeclHandler.h"
 #include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
@@ -19,7 +19,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::insights {
 
-CompilerGeneratedHandler::CompilerGeneratedHandler(Rewriter& rewrite, MatchFinder& matcher)
+RecordDeclHandler::RecordDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
     matcher.addMatcher(cxxRecordDecl(hasDefinition(),
@@ -34,7 +34,7 @@ CompilerGeneratedHandler::CompilerGeneratedHandler(Rewriter& rewrite, MatchFinde
 }
 //-----------------------------------------------------------------------------
 
-void CompilerGeneratedHandler::run(const MatchFinder::MatchResult& result)
+void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* cxxRecordDecl = result.Nodes.getNodeAs<CXXRecordDecl>("cxxRecordDecl")) {
         OutputFormatHelper outputFormatHelper{};

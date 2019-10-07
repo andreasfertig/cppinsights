@@ -24,11 +24,11 @@
 #include "DPrint.h"
 
 #include "CodeGenerator.h"
-#include "CompilerGeneratedHandler.h"
 #include "DPrint.h"
 #include "FunctionDeclHandler.h"
 #include "GlobalVariableHandler.h"
 #include "Insights.h"
+#include "RecordDeclHandler.h"
 #include "StaticAssertHandler.h"
 #include "TemplateHandler.h"
 #include "version.h"
@@ -88,7 +88,7 @@ public:
     explicit CppInsightASTConsumer(Rewriter& rewriter)
     : ASTConsumer()
     , mMatcher{}
-    , mCompilerGeneratedHandler{rewriter, mMatcher}
+    , mRecordDeclHandler{rewriter, mMatcher}
     , mStaticAssertHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
     , mGlobalVariableHandler{rewriter, mMatcher}
@@ -114,13 +114,13 @@ public:
     }
 
 private:
-    MatchFinder              mMatcher;
-    CompilerGeneratedHandler mCompilerGeneratedHandler;
-    StaticAssertHandler      mStaticAssertHandler;
-    TemplateHandler          mTemplateHandler;
-    GlobalVariableHandler    mGlobalVariableHandler;
-    FunctionDeclHandler      mFunctionDeclHandler;
-    Rewriter&                mRewriter;
+    MatchFinder           mMatcher;
+    RecordDeclHandler     mRecordDeclHandler;
+    StaticAssertHandler   mStaticAssertHandler;
+    TemplateHandler       mTemplateHandler;
+    GlobalVariableHandler mGlobalVariableHandler;
+    FunctionDeclHandler   mFunctionDeclHandler;
+    Rewriter&             mRewriter;
 };
 //-----------------------------------------------------------------------------
 
