@@ -145,7 +145,10 @@ install:
     wget -q --continue --directory-prefix=$HOME/Library/Caches/Homebrew https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz
 
     mkdir current
-    tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1
+    tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1    
+    # Temporary fix for image: xcode11 to use GCC.
+    # Source: https://github.com/Farwaykorse/fwkSudoku/commit/9dff745e37390abcfacd6e4f8da650e7db54444e
+    sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /  
   fi
 - |
   if [[ "${UPLOAD}" = "Yes" ]]; then
