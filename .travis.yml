@@ -142,7 +142,7 @@ install:
 
     mkdir ${TRAVIS_BUILD_DIR}/clang
     cd ${TRAVIS_BUILD_DIR}/clang
-    wget -q --continue --directory-prefix=$HOME/Library/Caches/Homebrew https://releases.llvm.org/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz
+    wget -q --continue --directory-prefix=$HOME/Library/Caches/Homebrew https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz
 
     mkdir current
     tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1

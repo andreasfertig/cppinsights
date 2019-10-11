@@ -8,7 +8,7 @@ install:
   - cmd: if not exist C:\llvm-bin\downloaded ( 
             mkdir C:\llvm-bin &&
             cd C:\llvm-bin &&
-            (powershell Start-FileDownload "https://ziglang.org/deps/llvm+clang-8.0.0-win64-msvc-release.tar.xz" -FileName llvm.tar.xz) &&
+            (powershell Start-FileDownload "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/8.0.0/llvm+clang-8.0.0-win64-msvc-release.tar.xz" -FileName llvm.tar.xz) &&
             7z x C:\llvm-bin\llvm.tar.xz &&
             7z x C:\llvm-bin\llvm.tar &&
             del llvm.tar &&
