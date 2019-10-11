@@ -19,15 +19,15 @@ llvm_current_packages: &all_llvm_current_packages
 jobs:
   include:
 
-    # OSX clang 8 build
-  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+    # OSX clang 9 build
+  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='9.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
-    osx_image: xcode9.3
+    osx_image: xcode11.2
     compiler: clang
 
   - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
-    osx_image: xcode9.3
+    osx_image: xcode11.2
     compiler: clang
 
     # Linux Clang Build
