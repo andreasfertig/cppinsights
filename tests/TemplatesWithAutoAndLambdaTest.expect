@@ -32,7 +32,6 @@ void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3]
       std::operator<<(std::cout, ' ') << arg;
     }
     
-    /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:16 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline /*constexpr */ void operator()(const double & arg) const
@@ -42,7 +41,6 @@ void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3]
     #endif
     
     
-    /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:16 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline /*constexpr */ void operator()(const std::basic_string<char> & arg) const

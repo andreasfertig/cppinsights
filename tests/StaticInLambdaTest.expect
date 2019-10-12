@@ -104,7 +104,7 @@ int main()
     }
     
     using retType_52_14 = Bingleton (*)(bool);
-    inline /*constexpr */ operator retType_52_14 () const
+    inline /*constexpr */ operator retType_52_14 () const noexcept
     {
       return __invoke;
     };
@@ -161,7 +161,7 @@ int main()
     }
     
     using retType_62_14 = Bingleton *(*)(bool);
-    inline /*constexpr */ operator retType_62_14 () const
+    inline /*constexpr */ operator retType_62_14 () const noexcept
     {
       return __invoke;
     };

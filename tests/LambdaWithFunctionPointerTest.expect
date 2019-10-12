@@ -10,7 +10,6 @@ class __lambda_3_12
     return fp(a);
   }
   
-  /* First instantiated from: LambdaWithFunctionPointerTest.cpp:7 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline /*constexpr */ int operator()(int (*fp)(int), int a) const
@@ -41,7 +40,6 @@ class __lambda_5_10
     return a;
   }
   
-  /* First instantiated from: LambdaWithFunctionPointerTest.cpp:7 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline /*constexpr */ int operator()(int a) const
@@ -55,7 +53,7 @@ class __lambda_5_10
   #ifdef INSIGHTS_USE_TEMPLATE
   using retType_5_10 = int (*)(int);
   template<>
-  inline /*constexpr */ operator retType_5_10 () const
+  inline /*constexpr */ operator retType_5_10 () const noexcept
   {
     return __invoke;
   }

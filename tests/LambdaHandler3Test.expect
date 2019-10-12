@@ -20,13 +20,14 @@ int main()
       
   class __lambda_10_13
   {
-    int & y;
     public: 
     inline /*constexpr */ int operator()(int x) const
     {
       return x + y;
     }
     
+    private: 
+    int & y;
     public: __lambda_10_13(int & _y)
     : y{_y}
     {}

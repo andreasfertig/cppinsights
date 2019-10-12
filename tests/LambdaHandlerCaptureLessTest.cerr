@@ -1,10 +1,10 @@
 .tmp.cpp:9:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0, class type_parameter_0_1>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:36:5: error: templates cannot be declared inside of a local class
+.tmp.cpp:35:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0, class type_parameter_0_1>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:54:88: error: no type named 'retType_4_28' in '__lambda_4_28'
+.tmp.cpp:53:88: error: no type named 'retType_4_28' in '__lambda_4_28'
   FuncPtr_4 fp = static_cast<int (*)(int, char)>(__lambda_4_28.operator __lambda_4_28::retType_4_28());
                                                                         ~~~~~~~~~~~~~~~^
 3 errors generated.

@@ -15,13 +15,14 @@ int main()
     
   class __lambda_15_14
   {
-    D & d;
     public: 
     inline /*constexpr */ void operator()() const
     {
       d(3);
     }
     
+    private: 
+    D & d;
     public: __lambda_15_14(D & _d)
     : d{_d}
     {}

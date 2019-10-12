@@ -10,13 +10,14 @@ struct A
         
     class __lambda_10_38
     {
-      int & i;
       public: 
       inline /*constexpr */ int operator()() const
       {
         return ++i;
       }
       
+      private: 
+      int & i;
       public: __lambda_10_38(int & _i)
       : i{_i}
       {}
@@ -42,13 +43,14 @@ struct B
         
     class __lambda_22_38
     {
-      int & i;
       public: 
       inline /*constexpr */ int operator()() const
       {
         return ++i;
       }
       
+      private: 
+      int & i;
       public: __lambda_22_38(int & _i)
       : i{_i}
       {}

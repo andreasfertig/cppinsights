@@ -19,7 +19,7 @@ class C2
   
   public: 
   const int i{2};
-  inline constexpr C2() = default;
+  inline constexpr C2() noexcept = default;
 };
 
 

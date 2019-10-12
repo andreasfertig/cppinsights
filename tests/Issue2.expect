@@ -29,13 +29,15 @@ int main()
     
   class __lambda_20_16
   {
-    Movable x;
-    int c;
     public: 
     inline /*constexpr */ void operator()() const
     {
     }
     
+    private: 
+    Movable x;
+    int c;
+    public: 
     // inline __lambda_20_16(const __lambda_20_16 &) = delete;
     // inline __lambda_20_16(__lambda_20_16 &&) = default;
     public: __lambda_20_16(Movable _x, int _c)
@@ -50,12 +52,13 @@ int main()
     
   class __lambda_24_16
   {
-    int c;
     public: 
     inline /*constexpr */ void operator()() const
     {
     }
     
+    private: 
+    int c;
     public: __lambda_24_16(int _c)
     : c{_c}
     {}

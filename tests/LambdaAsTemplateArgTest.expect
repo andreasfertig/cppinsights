@@ -29,13 +29,14 @@ int main()
     
   class __lambda_12_14
   {
-    int & y;
     public: 
     inline /*constexpr */ int operator()(int x, int b) const
     {
       return x + y + b;
     }
     
+    private: 
+    int & y;
     public: __lambda_12_14(int & _y)
     : y{_y}
     {}

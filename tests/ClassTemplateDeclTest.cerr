@@ -1,7 +1,6 @@
-.tmp.cpp:33:23: error: no template named 'Tmpl'; did you mean 'Test::Tmpl'?
+.tmp.cpp:33:23: error: use of undeclared identifier 'Tmpl'; did you mean 'Test::Tmpl'?
   Test::Tmpl<int> x = Tmpl<int>();
-                      ^~~~
-                      Test::Tmpl
+                      ^
 .tmp.cpp:9:9: note: 'Test::Tmpl' declared here
   class Tmpl
         ^

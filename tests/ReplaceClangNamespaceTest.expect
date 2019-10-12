@@ -19,7 +19,7 @@ int main()
     }
     
     using retType_11_5 = void (*)();
-    inline /*constexpr */ operator retType_11_5 () const
+    inline /*constexpr */ operator retType_11_5 () const noexcept
     {
       return __invoke;
     };

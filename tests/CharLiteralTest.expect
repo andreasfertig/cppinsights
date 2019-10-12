@@ -69,7 +69,7 @@ struct Foo<char>
   
   inline void operator=(char v) volatile;
   
-  // inline ~Foo() = default;
+  // inline ~Foo() noexcept = default;
 };
 
 #endif

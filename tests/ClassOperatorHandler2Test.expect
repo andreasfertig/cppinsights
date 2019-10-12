@@ -105,7 +105,7 @@ int main()
     }
     
     using retType_60_5 = void (*)();
-    inline /*constexpr */ operator retType_60_5 () const
+    inline /*constexpr */ operator retType_60_5 () const noexcept
     {
       return __invoke;
     };

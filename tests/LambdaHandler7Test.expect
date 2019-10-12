@@ -14,7 +14,7 @@ int main()
     }
     
     using retType_8_57 = int (*)(int, int);
-    inline /*constexpr */ operator retType_8_57 () const
+    inline /*constexpr */ operator retType_8_57 () const noexcept
     {
       return __invoke;
     };

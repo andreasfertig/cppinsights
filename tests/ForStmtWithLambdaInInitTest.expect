@@ -6,13 +6,14 @@ int main()
       
   class __lambda_7_17
   {
-    int & x;
     public: 
     inline /*constexpr */ int operator()() const
     {
       return x * 2;
     }
     
+    private: 
+    int & x;
     public: __lambda_7_17(int & _x)
     : x{_x}
     {}
@@ -27,13 +28,14 @@ int main()
       
   class __lambda_11_17
   {
-    int & x;
     public: 
     inline /*constexpr */ int operator()() const
     {
       return x * 2;
     }
     
+    private: 
+    int & x;
     public: __lambda_11_17(int & _x)
     : x{_x}
     {}
@@ -43,13 +45,14 @@ int main()
     
   class __lambda_11_43
   {
-    int & x;
     public: 
     inline /*constexpr */ int operator()() const
     {
       return x * 2;
     }
     
+    private: 
+    int & x;
     public: __lambda_11_43(int & _x)
     : x{_x}
     {}
@@ -71,7 +74,7 @@ int main()
     }
     
     using retType_15_9 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_15_9 () const
+    inline /*constexpr */ operator retType_15_9 () const noexcept
     {
       return __invoke;
     };
@@ -88,13 +91,14 @@ int main()
     
   class __lambda_15_37
   {
-    int & x;
     public: 
     inline /*constexpr */ int operator()() const
     {
       return --x;
     }
     
+    private: 
+    int & x;
     public: __lambda_15_37(int & _x)
     : x{_x}
     {}
@@ -111,7 +115,7 @@ int main()
     }
     
     using retType_15_59 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_15_59 () const
+    inline /*constexpr */ operator retType_15_59 () const noexcept
     {
       return __invoke;
     };
@@ -139,7 +143,7 @@ int main()
     }
     
     using retType_19_9 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_19_9 () const
+    inline /*constexpr */ operator retType_19_9 () const noexcept
     {
       return __invoke;
     };
@@ -163,7 +167,7 @@ int main()
     }
     
     using retType_20_9 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_20_9 () const
+    inline /*constexpr */ operator retType_20_9 () const noexcept
     {
       return __invoke;
     };
@@ -180,13 +184,14 @@ int main()
     
   class __lambda_20_37
   {
-    int & x;
     public: 
     inline /*constexpr */ int operator()() const
     {
       return --x;
     }
     
+    private: 
+    int & x;
     public: __lambda_20_37(int & _x)
     : x{_x}
     {}
@@ -203,7 +208,7 @@ int main()
     }
     
     using retType_20_59 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_20_59 () const
+    inline /*constexpr */ operator retType_20_59 () const noexcept
     {
       return __invoke;
     };

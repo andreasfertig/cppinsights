@@ -10,7 +10,7 @@ int main()
     }
     
     using retType_8_26 = int (*)(int, char);
-    inline /*constexpr */ operator retType_8_26 () const
+    inline /*constexpr */ operator retType_8_26 () const noexcept
     {
       return __invoke;
     }
