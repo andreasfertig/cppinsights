@@ -26,8 +26,9 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
     matcher.addMatcher(functionDecl(unless(anyOf(cxxMethodDecl(),
                                                  isExpansionInSystemHeader(),
                                                  isTemplate,
-                                                 hasAncestor(friendDecl()),    // friendDecl has functionDecl as child
-                                                 hasAncestor(functionDecl()),  // prevent forward declarations
+                                                 hasParent(linkageSpecDecl()),  // filter this out for coroutines
+                                                 hasAncestor(friendDecl()),     // friendDecl has functionDecl as child
+                                                 hasAncestor(functionDecl()),   // prevent forward declarations
                                                  isInvalidLocation())))
                            .bind("funcDecl"),
                        this);

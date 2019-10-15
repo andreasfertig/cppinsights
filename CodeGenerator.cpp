@@ -795,6 +795,43 @@ void CodeGenerator::InsertTemplateGuardEnd(const FunctionDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
+{
+    InsertArg(stmt->getBody());
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
+{
+    //	co_await or co_yield
+    if(isa<CoyieldExpr>(stmt)) {
+        mOutputFormatHelper.Append("co_yield ");
+    } else {
+        mOutputFormatHelper.Append("co_await ");
+    }
+
+    // peal of __promise.yield_value
+    if(const auto* matTemp = dyn_cast_or_null<MaterializeTemporaryExpr>(stmt->getCommonExpr())) {
+        const auto* temporary = matTemp->getTemporary();
+
+        if(const auto* memExpr = dyn_cast_or_null<CXXMemberCallExpr>(temporary)) {
+            ForEachArg(memExpr->arguments(), [&](const auto& arg) { InsertArg(arg); });
+
+            // Seems to be the path for a co_await expr
+        } else {
+            InsertArg(temporary);
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CoreturnStmt* stmt)
+{
+    mOutputFormatHelper.Append("co_return ");
+    InsertArg(stmt->getOperand());
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 {
     //    LAMBDA_SCOPE_HELPER(VarDecl);
