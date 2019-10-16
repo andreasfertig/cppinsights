@@ -98,50 +98,48 @@ class Fest
 
 
 
-namespace Hello {
-    namespace Bello {
-class Hello::Bello::Fest
+namespace Hello
 {
-  
-  public: 
-  inline Hello::Bello::Fest(int x)
-  : mX{x}
+  namespace Bello
   {
+    class Fest
+    {
+      
+      public: 
+      inline Fest(int x)
+      : mX{x}
+      {
+      }
+      
+      inline int Get() const
+      {
+        return this->mX;
+      }
+      
+      inline int & Get()
+      {
+        return this->mX;
+      }
+      
+      inline Fest & operator<<(const Fest & rhs)
+      {
+        this->mX += rhs.mX;
+        return *this;
+      }
+      
+      
+      private: 
+      int mX;
+      public: 
+    };
+    
+    inline bool operator<(const Fest & LHS, const Fest & RHS)
+    {
+      return LHS.Get() < RHS.Get();
+    }
+    static Fest sF = Fest{3};
+    
   }
-  
-  inline int Get() const
-  {
-    return this->mX;
-  }
-  
-  inline int & Get()
-  {
-    return this->mX;
-  }
-  
-  inline Hello::Bello::Fest & operator<<(const Hello::Bello::Fest & rhs)
-  {
-    this->mX += rhs.mX;
-    return *this;
-  }
-  
-  
-  private: 
-  int mX;
-  public: 
-};
-
-
-
-inline bool operator<(const Hello::Bello::Fest & LHS, const Hello::Bello::Fest & RHS)
-{
-  return LHS.Get() < RHS.Get();
-}
-
-
-static Hello::Bello::Fest sF = Hello::Bello::Fest{3};
-
-}
 }
 
 inline bool operator<(const Fest & LHS, const Fest & RHS)

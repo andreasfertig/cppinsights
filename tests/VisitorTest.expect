@@ -21,7 +21,7 @@ template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
 
 /* First instantiated from: VisitorTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE
-template<class ... Ts>
+template<>
 visitor(__lambda_8_7 __0, __lambda_9_7 __1) -> visitor<__lambda_8_7, __lambda_9_7>;
 #endif
 

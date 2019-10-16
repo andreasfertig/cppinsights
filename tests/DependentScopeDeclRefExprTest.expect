@@ -1,0 +1,118 @@
+namespace Test
+{
+  template<typename T>
+  struct Base
+  {
+    inline static constexpr const bool value = {true};
+  };
+  
+  template<typename T, typename type_parameter_0_1 = void>
+  struct has
+  {
+    inline static constexpr const bool value = false;
+    using type = T;
+  };
+  
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:16 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct has<int, void>
+  {
+    inline static constexpr const bool value = false;
+    using type = int;
+  };
+  
+  #endif
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:33 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct has<int, char>
+  {
+    inline static constexpr const bool value = false;
+    using type = int;
+  };
+  
+  #endif
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:40 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct has<bool, void>
+  {
+    inline static constexpr const bool value = false;
+    using type = bool;
+  };
+  
+  #endif
+  template<typename T, bool  = static_cast<bool>(has<T>::value)>
+  struct dependentScope
+  {
+    inline static constexpr const bool result = true;
+  };
+  
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:47 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct dependentScope<int, false>
+  {
+    inline static constexpr const bool result = true;
+  };
+  
+  #endif
+  template<typename T>
+  struct dependentScope2
+  {
+    inline static constexpr const bool result = has<T>::value;
+  };
+  
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:48 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct dependentScope2<int>
+  {
+    inline static constexpr const bool result = has<int, void>::value;
+  };
+  
+  #endif
+  template<typename T>
+  struct dependentScope3
+  {
+    template<typename U>
+    inline static constexpr const bool result = has<T, U>::value;
+  };
+  
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:49 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct dependentScope3<int>
+  {
+    template<>
+    inline static constexpr const bool result<char> = has<int, char>::value;
+  };
+  
+  #endif
+  template<typename T>
+  struct dependentScope4
+  {
+    inline static constexpr const typename has<T>::type result = has<T>::value;
+  };
+  
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:50 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct dependentScope4<bool>
+  {
+    inline static constexpr const typename has<bool>::type result = has<bool, void>::value;
+  };
+  
+  #endif
+  
+}
+
+int main()
+{
+  bool a = Test::dependentScope<int, false>::result;
+  bool b = Test::dependentScope2<int>::result;
+  bool c = Test::dependentScope3<int>::result<char>;
+  bool d = Test::dependentScope4<bool>::result;
+}
+

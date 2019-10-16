@@ -1,0 +1,176 @@
+#include <cstddef>
+#include <tuple>
+#include <vector>
+
+struct Iterable
+{
+  using Widget = std::tuple<int, float>;
+  template<typename access_type>
+  struct Iterator
+  {
+    Iterable * m_iterable;
+    std::size_t m_pos;
+    inline bool operator==(const Iterator<access_type> & other)
+    {
+      return (this->m_iterable == other.m_iterable) && (this->m_pos == other.m_pos);
+    }
+    
+    inline bool operator!=(const Iterator<access_type> & other)
+    {
+      return !(this->operator==(other));
+    }
+    
+    inline access_type operator*()
+    {
+      Widget tmp = this->m_iterable->m_storage[this->m_pos];
+      return std::get<access_type>(tmp);
+    }
+    
+    inline Iterator<access_type> operator++()
+    {
+      this->m_pos++;
+      return *this;
+    }
+    
+  };
+  
+  /* First instantiated from: Issue255.cpp:35 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct Iterator<int>
+  {
+    Iterable * m_iterable;
+    std::size_t m_pos;
+    inline bool operator==(const Iterator<int> & other)
+    {
+      return (this->m_iterable == other.m_iterable) && (this->m_pos == other.m_pos);
+    }
+    
+    inline bool operator!=(const Iterator<int> & other)
+    {
+      return !(this->operator==(other));
+    }
+    
+    inline int operator*()
+    {
+      Widget tmp = std::tuple<int, float>(this->m_iterable->m_storage.operator[](this->m_pos));
+      return std::get<int>(tmp);
+    }
+    
+    inline Iterator<int> operator++()
+    {
+      this->m_pos++;
+      return Iterator<int>(*this);
+    }
+    
+    // inline constexpr Iterator(const Iterator<int> &) noexcept = default;
+  };
+  
+  #endif
+  /* First instantiated from: Issue255.cpp:36 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct Iterator<float>
+  {
+    Iterable * m_iterable;
+    std::size_t m_pos;
+    inline bool operator==(const Iterator<float> & other)
+    {
+      return (this->m_iterable == other.m_iterable) && (this->m_pos == other.m_pos);
+    }
+    
+    inline bool operator!=(const Iterator<float> & other)
+    {
+      return !(this->operator==(other));
+    }
+    
+    inline float operator*();
+    
+    inline Iterator<float> operator++()
+    {
+      this->m_pos++;
+      return Iterator<float>(*this);
+    }
+    
+    // inline constexpr Iterator(const Iterator<float> &) noexcept = default;
+  };
+  
+  #endif
+  template<typename access_type = int>
+  inline Iterator<access_type> begin()
+  {
+    return {this, 0};
+  }
+  
+  /* First instantiated from: Issue255.cpp:35 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<int> begin<int>()
+  {
+    return {this, 0};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue255.cpp:36 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<float> begin<float>()
+  {
+    return {this, 0};
+  }
+  #endif
+  
+  template<typename access_type = int>
+  inline Iterator<access_type> end()
+  {
+    return {this, this->m_storage.size()};
+  }
+  
+  /* First instantiated from: Issue255.cpp:35 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<int> end<int>()
+  {
+    return {this, this->m_storage.size()};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue255.cpp:36 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<float> end<float>()
+  {
+    return {this, this->m_storage.size()};
+  }
+  #endif
+  
+  std::vector<std::tuple<int, float>, std::allocator<std::tuple<int, float> > > m_storage;
+  // inline ~Iterable() noexcept = default;
+  // inline Iterable() noexcept = default;
+};
+
+
+
+void test()
+{
+  Iterable container = Iterable();
+  {
+    Iterable & __range1 = container;
+    Iterable::Iterator<int> __begin1 = __range1.begin<int>();
+    Iterable::Iterator<int> __end1 = __range1.end<int>();
+    for(; __begin1.operator!=(__end1); __begin1.operator++()) 
+    {
+      int element = __begin1.operator*();
+      /* PASSED: static_assert(std::is_same_v<decltype(element), int>); */
+    }
+    
+  }
+  for(Iterable::Iterator<float> iter = container.begin<float>(); iter.operator!=(container.end<float>()); iter.operator++()) 
+  {
+    /* PASSED: static_assert(std::is_same_v<float, float>); */
+  }
+  
+}
+

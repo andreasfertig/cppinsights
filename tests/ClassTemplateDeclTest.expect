@@ -28,6 +28,6 @@ class Test
 
 int main()
 {
-  Test::Tmpl<int> x = Tmpl<int>();
+  Test::Tmpl<int> x = Test::Tmpl<int>();
 }
 

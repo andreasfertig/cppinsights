@@ -1,7 +1,0 @@
-.tmp.cpp:31:23: error: use of undeclared identifier 'Tmpl'; did you mean 'Test::Tmpl'?
-  Test::Tmpl<int> x = Tmpl<int>();
-                      ^
-.tmp.cpp:9:9: note: 'Test::Tmpl' declared here
-  class Tmpl
-        ^
-1 error generated.

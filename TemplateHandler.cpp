@@ -22,27 +22,19 @@ using namespace clang::ast_matchers;
 
 namespace clang::ast_matchers {
 const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;  // NOLINT
-}
+}  // namespace clang::ast_matchers
 
 namespace clang::insights {
 
 /// \brief Insert the instantiated template with the resulting code.
-template<typename T>
-static OutputFormatHelper InsertInstantiatedTemplate(const T& decl)
+static OutputFormatHelper InsertInstantiatedTemplate(const Decl* decl)
 {
     OutputFormatHelper outputFormatHelper{};
     outputFormatHelper.AppendNewLine();
     outputFormatHelper.AppendNewLine();
 
     CodeGenerator codeGenerator{outputFormatHelper};
-
-    if constexpr(is_same_v<VarTemplateDecl, T>) {
-        for(const auto& spec : decl.specializations()) {
-            codeGenerator.InsertArg(spec);
-        }
-    } else {
-        codeGenerator.InsertArg(&decl);
-    }
+    codeGenerator.InsertArg(decl);
 
     return outputFormatHelper;
 }
@@ -54,6 +46,7 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
     matcher.addMatcher(
         functionDecl(allOf(unless(isExpansionInSystemHeader()),
                            unless(isMacroOrInvalidLocation()),
+                           unless(hasAncestor(namespaceDecl())),
                            hasParent(functionTemplateDecl(unless(hasParent(classTemplateSpecializationDecl())),
                                                           unless(hasAncestor(cxxRecordDecl())))),
                            isTemplateInstantiationPlain()))
@@ -62,20 +55,32 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
 
     // match typical use where a class template is defined and it is used later.
     matcher.addMatcher(
-        classTemplateSpecializationDecl(unless(anyOf(isExpansionInSystemHeader(), hasAncestor(cxxRecordDecl()))),
-                                        hasParent(classTemplateDecl().bind("decl")))
+        classTemplateSpecializationDecl(
+            unless(anyOf(isExpansionInSystemHeader(), hasAncestor(namespaceDecl()), hasAncestor(cxxRecordDecl()))),
+            hasParent(classTemplateDecl().bind("decl")))
             .bind("class"),
         this);
 
     // special case, where a class template is defined and somewhere else we request an explicit instantiation
     matcher.addMatcher(classTemplateSpecializationDecl(unless(anyOf(isExpansionInSystemHeader(),
+                                                                    hasAncestor(namespaceDecl()),
                                                                     hasParent(classTemplateDecl()),
                                                                     isExplicitTemplateSpecialization())))
                            .bind("class"),
                        this);
 
     matcher.addMatcher(
-        varTemplateDecl(unless(isExpansionInSystemHeader()), unless(hasParent(classTemplateDecl()))).bind("vd"), this);
+        varTemplateDecl(
+            unless(anyOf(isExpansionInSystemHeader(), hasAncestor(namespaceDecl()), hasParent(classTemplateDecl()))))
+            .bind("vd"),
+        this);
+
+    matcher.addMatcher(classTemplateSpecializationDecl(unless(anyOf(isExpansionInSystemHeader(),
+                                                                    hasAncestor(namespaceDecl()),
+                                                                    hasParent(classTemplateDecl()),
+                                                                    isExplicitTemplateSpecialization())))
+                           .bind("class"),
+                       this);
 }
 //-----------------------------------------------------------------------------
 
@@ -86,8 +91,8 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
             return;
         }
 
-        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*functionDecl);
-        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(*functionDecl), result);
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(functionDecl);
+        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(functionDecl), result);
 
         InsertIndentedText(endOfCond.getLocWithOffset(1), outputFormatHelper);
 
@@ -97,7 +102,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
             return;
         }
 
-        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*clsTmplSpecDecl);
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(clsTmplSpecDecl);
 
         if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl")) {
             const auto endOfCond = FindLocationAfterSemi(GetEndLoc(clsTmplDecl), result);
@@ -108,10 +113,11 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         }
 
     } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
-        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(*vd);
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(vd);
+        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(vd), result);
 
-        const auto endOfCond = FindLocationAfterSemi(GetEndLoc(vd), result);
-        InsertIndentedText(endOfCond, outputFormatHelper);
+        mRewrite.ReplaceText({vd->getSourceRange().getBegin(), endOfCond.getLocWithOffset(1)},
+                             outputFormatHelper.GetString());
     }
 }
 //-----------------------------------------------------------------------------

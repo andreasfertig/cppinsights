@@ -35,6 +35,7 @@ GlobalVariableHandler::GlobalVariableHandler(Rewriter& rewrite, MatchFinder& mat
                     hasAncestor(varTemplateDecl()),
                     hasAncestor(functionDecl()),
                     hasAncestor(cxxRecordDecl()),
+                    hasAncestor(namespaceDecl()),
                     hasAncestor(typeAliasDecl()),
                     hasAncestor(cxxMethodDecl()),
                     parmVarDecl(),

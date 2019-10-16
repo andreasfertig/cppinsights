@@ -3,9 +3,13 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace details {
+namespace details
+{
   template<class T>
-  struct remove_reference      { typedef T type; };
+  struct remove_reference
+  {
+    using type = T;
+  };
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -15,28 +19,24 @@ namespace details {
   };
   
   #endif
+  template<class T>
+  struct remove_reference<T &>
+  {
+    using type = T;
+  };
   
   template<class T>
-struct remove_reference<T &>
-{
-  using type = T;
-};
-
-
-  template<class T>
-struct remove_reference<T &&>
-{
-  using type = T;
-};
-
-
-
+  struct remove_reference<T &&>
+  {
+    using type = T;
+  };
+  
   template<class T, size_t N = 0>
   struct extent
   {
-    static constexpr size_t value = N;
-
-    static_assert(N != 0, "Arrays only");
+    inline static constexpr const size_t value = N;
+    
+    /* PASSED: static_assert(N != 0, "Arrays only"); */
   };
   
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -49,18 +49,15 @@ struct remove_reference<T &&>
   };
   
   #endif
-  
-
   template<class T, size_t I>
-struct extent<T [I], 0>
-{
-  inline static constexpr const size_t value = I;
+  struct extent<T [I], 0>
+  {
+    inline static constexpr const size_t value = I;
+    
+    /* PASSED: static_assert(I != 0, "Arrays only"); */
+  };
   
-  /* PASSED: static_assert(I != 0, "Arrays only"); */
-};
-
-
-
+  
 }  // namespace details
 
 #define ARRAY_SIZE(var_x)                             \

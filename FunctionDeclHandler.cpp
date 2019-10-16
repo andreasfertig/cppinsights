@@ -29,6 +29,7 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
                                                  hasParent(linkageSpecDecl()),  // filter this out for coroutines
                                                  hasAncestor(friendDecl()),     // friendDecl has functionDecl as child
                                                  hasAncestor(functionDecl()),   // prevent forward declarations
+                                                 hasAncestor(namespaceDecl()),
                                                  isInvalidLocation())))
                            .bind("funcDecl"),
                        this);
@@ -39,6 +40,7 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
 
     matcher.addMatcher(friendDecl(unless(anyOf(cxxMethodDecl(),
                                                hasAncestor(cxxRecordDecl()),
+                                               hasAncestor(namespaceDecl()),
                                                isExpansionInSystemHeader(),
                                                isTemplate,
                                                hasTemplateDescendant,
