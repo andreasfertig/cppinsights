@@ -8,13 +8,14 @@ class Bar
         
     class __lambda_8_18
     {
-      Bar * __this;
       public: 
       inline /*constexpr */ void operator()() const
       {
         printf("%d\n", __this->a);
       }
       
+      private: 
+      Bar * __this;
       public: __lambda_8_18(Bar * _this)
       : __this{_this}
 
@@ -37,13 +38,14 @@ int main()
     
   class __lambda_20_19
   {
-    int & foo;
     public: 
     inline /*constexpr */ void operator()() const
     {
       printf("%d\n", foo);
     }
     
+    private: 
+    int & foo;
     public: __lambda_20_19(int & _foo)
     : foo{_foo}
     {}
@@ -62,7 +64,7 @@ int main()
     }
     
     using retType_24_20 = void (*)();
-    inline /*constexpr */ operator retType_24_20 () const
+    inline /*constexpr */ operator retType_24_20 () const noexcept
     {
       return __invoke;
     };
@@ -81,7 +83,6 @@ int main()
     
   class __lambda_28_20
   {
-    int & foo;
     public: 
     inline /*constexpr */ int operator()()
     {
@@ -89,6 +90,8 @@ int main()
       return foo;
     }
     
+    private: 
+    int & foo;
     public: __lambda_28_20(int & _foo)
     : foo{_foo}
     {}
@@ -100,7 +103,6 @@ int main()
     
   class __lambda_32_20
   {
-    int & foo;
     public: 
     inline /*constexpr */ int operator()(int x) const
     {
@@ -108,6 +110,8 @@ int main()
       return foo + x;
     }
     
+    private: 
+    int & foo;
     public: __lambda_32_20(int & _foo)
     : foo{_foo}
     {}
@@ -118,7 +122,6 @@ int main()
     
   class __lambda_34_20
   {
-    int & foo;
     public: 
     inline /*constexpr */ int operator()(const int x) const
     {
@@ -126,6 +129,8 @@ int main()
       return foo + x;
     }
     
+    private: 
+    int & foo;
     public: __lambda_34_20(int & _foo)
     : foo{_foo}
     {}
@@ -136,7 +141,6 @@ int main()
     
   class __lambda_36_20
   {
-    int & foo;
     public: 
     inline /*constexpr */ int operator()(int & x, int b) const
     {
@@ -144,6 +148,8 @@ int main()
       return foo + x + b;
     }
     
+    private: 
+    int & foo;
     public: __lambda_36_20(int & _foo)
     : foo{_foo}
     {}
@@ -154,7 +160,6 @@ int main()
     
   class __lambda_38_20
   {
-    int & foo;
     public: 
     template<class type_parameter_0_0>
     inline /*constexpr */ auto operator()(int & x, type_parameter_0_0 b) const
@@ -163,7 +168,6 @@ int main()
       return foo + x + b;
     }
     
-    /* First instantiated from: LambdaHandlerTest.cpp:39 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline /*constexpr */ int operator()(int & x, int b) const
@@ -173,6 +177,8 @@ int main()
     }
     #endif
     
+    private: 
+    int & foo;
     public: __lambda_38_20(int & _foo)
     : foo{_foo}
     {}
@@ -184,7 +190,6 @@ int main()
     
   class __lambda_41_21
   {
-    int & foo;
     public: 
     template<class type_parameter_0_0>
     inline /*constexpr */ auto operator()(int & x, const type_parameter_0_0 & b) const
@@ -192,6 +197,8 @@ int main()
       printf("%d\n", foo + x);
       return foo + x + b;
     }
+    private: 
+    int & foo;
     public: __lambda_41_21(int & _foo)
     : foo{_foo}
     {}
@@ -202,7 +209,6 @@ int main()
     
   class __lambda_43_21
   {
-    int & foo;
     public: 
     template<class type_parameter_0_0, class type_parameter_0_1>
     inline /*constexpr */ auto operator()(int & x, const type_parameter_0_0 & b, const type_parameter_0_1 c) const
@@ -211,7 +217,6 @@ int main()
       return foo + x + b + c;
     }
     
-    /* First instantiated from: LambdaHandlerTest.cpp:44 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline /*constexpr */ int operator()(int & x, const int & b, const int c) const
@@ -221,6 +226,8 @@ int main()
     }
     #endif
     
+    private: 
+    int & foo;
     public: __lambda_43_21(int & _foo)
     : foo{_foo}
     {}
@@ -232,8 +239,6 @@ int main()
     
   class __lambda_46_20
   {
-    int foo;
-    int b;
     public: 
     inline /*constexpr */ int operator()(int & x, int bb) const
     {
@@ -241,6 +246,9 @@ int main()
       return foo + x + bb;
     }
     
+    private: 
+    int foo;
+    int b;
     public: __lambda_46_20(int _foo, int _b)
     : foo{_foo}
 , b{_b}
@@ -252,8 +260,6 @@ int main()
     
   class __lambda_48_20
   {
-    int foo;
-    int b;
     public: 
     inline /*constexpr */ int operator()(int & x, int bb) const noexcept
     {
@@ -261,6 +267,9 @@ int main()
       return foo + x + bb;
     }
     
+    private: 
+    int foo;
+    int b;
     public: __lambda_48_20(int _foo, int _b)
     : foo{_foo}
 , b{_b}

@@ -38,14 +38,15 @@ struct SA<2>
         
     class __lambda_40_8
     {
-      unsigned long;
-      float (&e)[this->nt];
       public: 
       inline /*constexpr */ bool operator()(int i, int j) const
       {
         return e[i] < e[j];
       }
       
+      private: 
+      unsigned long;
+      float (&e)[this->nt];
       public: __lambda_40_8(float (&_e)[this->nt])
       : e{_e}
       {}

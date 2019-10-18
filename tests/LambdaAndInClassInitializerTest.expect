@@ -65,13 +65,14 @@ class EventContainer
     
   class __lambda_17_38
   {
-    EventContainer * __this;
     public: 
     inline /*constexpr */ void operator()() const
     {
       __this->val;
     }
     
+    private: 
+    EventContainer * __this;
     public: __lambda_17_38(EventContainer * _this)
     : __this{_this}
 

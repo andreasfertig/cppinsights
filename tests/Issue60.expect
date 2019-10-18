@@ -49,8 +49,8 @@ struct Index<&Person::age>
   // inline Index(const Index<&Person::age> &) = default;
   // inline Index(Index<&Person::age> &&) = default;
   // inline Index<&Person::age> & operator=(Index<&Person::age> &&) = default;
-  // inline Index() noexcept = default;
   // inline ~Index() noexcept = default;
+  // inline Index() noexcept = default;
 };
 
 #endif

@@ -11,13 +11,14 @@ int main()
                   
       class __lambda_6_17
       {
-        char & c;
         public: 
         inline /*constexpr */ char operator()() const
         {
           return c;
         }
         
+        private: 
+        char & c;
         public: __lambda_6_17(char & _c)
         : c{_c}
         {}

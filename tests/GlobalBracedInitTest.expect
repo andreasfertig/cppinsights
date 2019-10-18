@@ -1,8 +1,8 @@
-int x0 = 27;
+int x0 = {27};
 
-int x1 = 27;
+int x1 = {27};
 
-int x2 = 27;
+int x2 = {27};
 
 int x3 = 27;
 

@@ -9,7 +9,7 @@ void foo()
     }
     
     using retType_2_1 = void (*)();
-    inline /*constexpr */ operator retType_2_1 () const
+    inline /*constexpr */ operator retType_2_1 () const noexcept
     {
       return __invoke;
     };

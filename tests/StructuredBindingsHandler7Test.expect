@@ -4,7 +4,6 @@ int main()
     
   class __lambda_4_5
   {
-    char (&buffer)[2];
     public: 
     inline /*constexpr */ void operator()() const
     {
@@ -13,6 +12,8 @@ int main()
       char& b = __buffer5[1];
     }
     
+    private: 
+    char (&buffer)[2];
     public: __lambda_4_5(char (&_buffer)[2])
     : buffer{_buffer}
     {}

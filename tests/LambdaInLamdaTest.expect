@@ -4,20 +4,20 @@ int main()
     
   class __lambda_4_5
   {
-    char & buffer;
     public: 
     inline /*constexpr */ void operator()() const
     {
             
       class __lambda_6_9
       {
-        char & buffer;
         public: 
         inline /*constexpr */ void operator()() const
         {
           buffer = 2;
         }
         
+        private: 
+        char & buffer;
         public: __lambda_6_9(char & _buffer)
         : buffer{_buffer}
         {}
@@ -27,6 +27,8 @@ int main()
       __lambda_6_9.operator()();
     }
     
+    private: 
+    char & buffer;
     public: __lambda_4_5(char & _buffer)
     : buffer{_buffer}
     {}

@@ -58,7 +58,6 @@ void f()
       }
     }
     
-    /* First instantiated from: Issue238_2.cpp:20 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline /*constexpr */ void operator()(MyArrayWrapper<int> container) const

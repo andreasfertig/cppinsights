@@ -19,19 +19,22 @@ llvm_current_packages: &all_llvm_current_packages
 jobs:
   include:
 
-    # OSX clang 8 build
-  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+    # OSX clang 9 build
+  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='9.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
-    osx_image: xcode9.3
+    name: "Clang 9 @ macOS Release"
+    osx_image: xcode11.2
     compiler: clang
 
-  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
-    os: osx
-    osx_image: xcode9.3
-    compiler: clang
+    #  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='9.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+    #    os: osx
+    #    name: "Clang 9 @ macOS Code Coverage & Debug"
+    #    osx_image: xcode11.2
+    #    compiler: clang
 
     # Linux Clang Build
   - os: linux
+    name: "Clang unstable @ Ubuntu"
     compiler: clang
     addons:
       apt:
@@ -44,6 +47,7 @@ jobs:
 
   # Clang stable deployment
   - os: linux
+    name: "Clang stable @ Ubuntu Release"
     sudo: required
     services:
     - docker
@@ -51,10 +55,11 @@ jobs:
       ssh_known_hosts: cppinsights.io
     before_install:
     - docker pull andreasfertig/cppinsights-builder
-    env: COMPILER='clang++-8' LLVM_CONFIG=/usr/bin/llvm-config-8  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
+    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
     
   # Linux g++ Build
   - os: linux
+    name: "GCC 8 / LLVM unstable @ Ubuntu"
     compiler: gcc
     addons:
       apt:
@@ -64,38 +69,42 @@ jobs:
         - *all_llvm_current_packages
     env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
-  # Linux g++ clang 8 build
+  # Linux g++ clang 9 build
   - os: linux
+    name: "GCC 8 / LLVM 9 @ Ubuntu"
     compiler: gcc
-    addons: &clang80
+    addons: &clang90
       apt:
         packages:
         - g++-8
-        - llvm-8-dev
-        - libclang-8-dev
-        - clang-format-8
-        - clang-tidy-8
+        - llvm-9-dev
+        - libclang-9-dev
+        - clang-format-9
+        - clang-tidy-9
         sources:
         - ubuntu-toolchain-r-test
-        - llvm-toolchain-xenial-8
-        - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main'
+        - llvm-toolchain-xenial-9
+        - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang-tidy analysis
   - os: linux
+    name: "GCC 8 / LLVM 9 @ Ubuntu clang-tidy check"
     compiler: gcc
-    addons: *clang80
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
+    addons: *clang90
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
 
   # Clang-format check
   - os: linux
+    name: "GCC 8 / LLVM 9 @ Ubuntu clang-format check"
     compiler: gcc
-    addons: *clang80
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-8'
+    addons: *clang90
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-9'
 
   # Debug build with coverage
   - os: linux
+    name: "GCC 8 / LLVM unstable @ Ubuntu Code Coverage & Debug"
     compiler: gcc
     addons: &covcurrent
       apt:
@@ -107,8 +116,8 @@ jobs:
         - lcov
     env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
 
-    # Linux Clang Coverage Build
   - os: linux
+    name: "GCC 8 / LLVM unstable @ Ubuntu Code Coverage"
     compiler: gcc
     addons: *covcurrent
     env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
@@ -125,8 +134,9 @@ jobs:
       fi  
     after_success: true
     before_deploy: true
-    env: COMPILER='clang++-8' LLVM_CONFIG=/usr/bin/llvm-config-8  COVERAGE='No' DEPLOY='No' STATIC='No' DEBUG='No' UPLOAD='No' TIDY='No' SHACMD='sha256sum' DOCKER_UPLOAD='Yes'
+    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='No' STATIC='No' DEBUG='No' UPLOAD='No' TIDY='No' SHACMD='sha256sum' DOCKER_UPLOAD='Yes'
     os: linux
+    name: "Final deploy to DockerHub"
     
 install:
 - |   
@@ -145,7 +155,10 @@ install:
     wget -q --continue --directory-prefix=$HOME/Library/Caches/Homebrew https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz
 
     mkdir current
-    tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1
+    tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1    
+    # Temporary fix for image: xcode11 to use GCC.
+    # Source: https://github.com/Farwaykorse/fwkSudoku/commit/9dff745e37390abcfacd6e4f8da650e7db54444e
+    sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /  
   fi
 - |
   if [[ "${UPLOAD}" = "Yes" ]]; then

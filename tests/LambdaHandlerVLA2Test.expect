@@ -4,14 +4,15 @@ void Test(int n)
     
   class __lambda_6_5
   {
-    unsigned long;
-    char (&buffer)[n];
     public: 
     inline /*constexpr */ bool operator()(int i, int x) const
     {
       return static_cast<int>(buffer[i]) > static_cast<int>(buffer[x]);
     }
     
+    private: 
+    unsigned long;
+    char (&buffer)[n];
     public: __lambda_6_5(char (&_buffer)[n])
     : buffer{_buffer}
     {}

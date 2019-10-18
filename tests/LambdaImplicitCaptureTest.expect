@@ -6,7 +6,6 @@ int main()
       
   class __lambda_7_14
   {
-    int x;
     public: 
     inline /*constexpr */ int operator()()
     {
@@ -14,6 +13,8 @@ int main()
       return x;
     }
     
+    private: 
+    int x;
     public: __lambda_7_14(int _x)
     : x{_x}
     {}

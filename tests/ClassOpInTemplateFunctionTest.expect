@@ -38,7 +38,6 @@ class Foo
     
   }
   
-  /* First instantiated from: ClassOpInTemplateFunctionTest.cpp:37 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline constexpr int get<1>() const noexcept

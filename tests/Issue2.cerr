@@ -1,4 +1,4 @@
-.tmp.cpp:42:7: error: call to implicitly-deleted copy constructor of 'Movable'
+.tmp.cpp:44:7: error: call to implicitly-deleted copy constructor of 'Movable'
     : x{_x}
       ^~~~~
 .tmp.cpp:9:10: note: copy constructor is implicitly deleted because 'Movable' has a user-declared move constructor

@@ -80,7 +80,6 @@ class Point
     
   }
   
-  /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline constexpr double get<0>() const noexcept
@@ -98,7 +97,6 @@ class Point
   #endif
   
   
-  /* First instantiated from: StructuredBindingsHandler6Test.cpp:58 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline constexpr double get<1>() const noexcept

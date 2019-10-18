@@ -11,7 +11,7 @@ int main()
       }
       
       using retType_3_14 = auto (*)() -> int;
-      inline /*constexpr */ operator retType_3_14 () const
+      inline /*constexpr */ operator retType_3_14 () const noexcept
       {
         return __invoke;
       };
@@ -36,7 +36,7 @@ int main()
       }
       
       using retType_3_34 = auto (*)() -> int;
-      inline /*constexpr */ operator retType_3_34 () const
+      inline /*constexpr */ operator retType_3_34 () const noexcept
       {
         return __invoke;
       };
@@ -61,7 +61,7 @@ int main()
       }
       
       using retType_3_53 = auto (*)() -> int;
-      inline /*constexpr */ operator retType_3_53 () const
+      inline /*constexpr */ operator retType_3_53 () const noexcept
       {
         return __invoke;
       };

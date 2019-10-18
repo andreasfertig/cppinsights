@@ -14,7 +14,6 @@ class __lambda_5_23
     return double(x);
   }
   
-  /* First instantiated from: VarTemplateWithLambdaTest.cpp:12 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline /*constexpr */ double operator()(int x) const
@@ -49,7 +48,6 @@ class __lambda_8_29
     return int{{x}};
   }
   
-  /* First instantiated from: VarTemplateWithLambdaTest.cpp:17 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   inline /*constexpr */ int operator()(int x) const

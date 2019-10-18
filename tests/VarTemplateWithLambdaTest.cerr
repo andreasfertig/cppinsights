@@ -1,19 +1,19 @@
-.tmp.cpp:20:32: error: no function template matches function template specialization 'operator()'
+.tmp.cpp:19:32: error: no function template matches function template specialization 'operator()'
   inline /*constexpr */ double operator()(int x) const
                                ^
 .tmp.cpp:12:30: note: candidate template ignored: failed template argument deduction
   inline /*constexpr */ auto operator()(type_parameter_0_0 x) const
                              ^
-.tmp.cpp:55:29: error: no function template matches function template specialization 'operator()'
+.tmp.cpp:53:29: error: no function template matches function template specialization 'operator()'
   inline /*constexpr */ int operator()(int x) const
                             ^
-.tmp.cpp:47:30: note: candidate template ignored: failed template argument deduction
+.tmp.cpp:46:30: note: candidate template ignored: failed template argument deduction
   inline /*constexpr */ auto operator()(type_parameter_0_0 x) const
                              ^
-.tmp.cpp:49:16: warning: too many braces around scalar initializer [-Wmany-braces-around-scalar-init]
+.tmp.cpp:48:16: warning: too many braces around scalar initializer [-Wmany-braces-around-scalar-init]
     return int{{x}};
                ^~~
-.tmp.cpp:82:46: note: in instantiation of function template specialization '__lambda_8_29::operator()<int>' requested here
+.tmp.cpp:80:46: note: in instantiation of function template specialization '__lambda_8_29::operator()<int>' requested here
   return static_cast<double>(funcBraced<int>.operator()(x));
                                              ^
 1 warning and 2 errors generated.
