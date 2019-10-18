@@ -22,15 +22,15 @@ jobs:
     # OSX clang 9 build
   - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='9.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
-    name: "Clang 8 @ macOS Release"
+    name: "Clang 9 @ macOS Release"
     osx_image: xcode11.2
     compiler: clang
 
-  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='8.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
-    os: osx
-    name: "Clang 8 @ macOS Code Coverage & Debug"
-    osx_image: xcode11.2
-    compiler: clang
+    #  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='9.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+    #    os: osx
+    #    name: "Clang 9 @ macOS Code Coverage & Debug"
+    #    osx_image: xcode11.2
+    #    compiler: clang
 
     # Linux Clang Build
   - os: linux
@@ -55,7 +55,7 @@ jobs:
       ssh_known_hosts: cppinsights.io
     before_install:
     - docker pull andreasfertig/cppinsights-builder
-    env: COMPILER='clang++-8' LLVM_CONFIG=/usr/bin/llvm-config-8  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
+    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
     
   # Linux g++ Build
   - os: linux
@@ -69,38 +69,38 @@ jobs:
         - *all_llvm_current_packages
     env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
-  # Linux g++ clang 8 build
+  # Linux g++ clang 9 build
   - os: linux
-    name: "GCC 8 / LLVM 8 @ Ubuntu"
+    name: "GCC 8 / LLVM 9 @ Ubuntu"
     compiler: gcc
-    addons: &clang80
+    addons: &clang90
       apt:
         packages:
         - g++-8
-        - llvm-8-dev
-        - libclang-8-dev
-        - clang-format-8
-        - clang-tidy-8
+        - llvm-9-dev
+        - libclang-9-dev
+        - clang-format-9
+        - clang-tidy-9
         sources:
         - ubuntu-toolchain-r-test
-        - llvm-toolchain-xenial-8
-        - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main'
+        - llvm-toolchain-xenial-9
+        - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang-tidy analysis
   - os: linux
-    name: "GCC 8 / LLVM 8 @ Ubuntu clang-tidy check"
+    name: "GCC 8 / LLVM 9 @ Ubuntu clang-tidy check"
     compiler: gcc
-    addons: *clang80
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
+    addons: *clang90
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
 
   # Clang-format check
   - os: linux
-    name: "GCC 8 / LLVM 8 @ Ubuntu clang-format check"
+    name: "GCC 8 / LLVM 9 @ Ubuntu clang-format check"
     compiler: gcc
-    addons: *clang80
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-8' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-8'
+    addons: *clang90
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-9'
 
   # Debug build with coverage
   - os: linux
@@ -134,7 +134,7 @@ jobs:
       fi  
     after_success: true
     before_deploy: true
-    env: COMPILER='clang++-8' LLVM_CONFIG=/usr/bin/llvm-config-8  COVERAGE='No' DEPLOY='No' STATIC='No' DEBUG='No' UPLOAD='No' TIDY='No' SHACMD='sha256sum' DOCKER_UPLOAD='Yes'
+    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='No' STATIC='No' DEBUG='No' UPLOAD='No' TIDY='No' SHACMD='sha256sum' DOCKER_UPLOAD='Yes'
     os: linux
     name: "Final deploy to DockerHub"
     
