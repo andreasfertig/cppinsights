@@ -1,6 +1,6 @@
 language: cpp
 sudo: false
-dist: xenial
+dist: bionic
 
 cache:
   ccache: true
@@ -9,7 +9,7 @@ cache:
 
 common_sources: &all_sources
 - sourceline: 'ppa:ubuntu-toolchain-r/test'
-- sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main'
+- sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main'
   key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
 llvm_current_packages: &all_llvm_current_packages
@@ -60,6 +60,7 @@ jobs:
   # Linux g++ Build
   - os: linux
     name: "GCC 8 / LLVM unstable @ Ubuntu"
+    sudo: required
     compiler: gcc
     addons:
       apt:
@@ -72,6 +73,7 @@ jobs:
   # Linux g++ clang 9 build
   - os: linux
     name: "GCC 8 / LLVM 9 @ Ubuntu"
+    sudo: required
     compiler: gcc
     addons: &clang90
       apt:
@@ -83,14 +85,15 @@ jobs:
         - clang-tidy-9
         sources:
         - ubuntu-toolchain-r-test
-        - llvm-toolchain-xenial-9
-        - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+        - llvm-toolchain-bionic-9
+        - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang-tidy analysis
   - os: linux
     name: "GCC 8 / LLVM 9 @ Ubuntu clang-tidy check"
+    sudo: required
     compiler: gcc
     addons: *clang90
     env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
@@ -98,6 +101,7 @@ jobs:
   # Clang-format check
   - os: linux
     name: "GCC 8 / LLVM 9 @ Ubuntu clang-format check"
+    sudo: required
     compiler: gcc
     addons: *clang90
     env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-9'
@@ -105,6 +109,7 @@ jobs:
   # Debug build with coverage
   - os: linux
     name: "GCC 8 / LLVM unstable @ Ubuntu Code Coverage & Debug"
+    sudo: required
     compiler: gcc
     addons: &covcurrent
       apt:
@@ -118,6 +123,7 @@ jobs:
 
   - os: linux
     name: "GCC 8 / LLVM unstable @ Ubuntu Code Coverage"
+    sudo: required
     compiler: gcc
     addons: *covcurrent
     env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
