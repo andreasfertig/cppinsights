@@ -1,0 +1,37 @@
+// cmdline:-std=c++2a
+
+
+class __lambda_3_10
+{
+  public: 
+  template<class T>
+  inline /*constexpr */ auto operator()(T t, int i) const
+  {
+    return i;
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()(int t, int i) const
+  {
+    return i;
+  }
+  #endif
+  
+  private: 
+  template<class T>
+  static inline auto __invoke(T t, int i)
+  {
+    return i;
+  }
+  
+};
+
+__lambda_3_10 l = __lambda_3_10{};
+
+
+int main()
+{
+  return static_cast<int>(l.operator()(3, 4) == 4);
+}
+
