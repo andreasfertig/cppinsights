@@ -14,9 +14,10 @@ class Foo
       
       private: 
       Foo * __this;
-      public: __lambda_6_18(Foo * _this)
+      
+      public:
+      __lambda_6_18(Foo * _this)
       : __this{_this}
-
       {}
       
     };
@@ -33,9 +34,10 @@ class Foo
       
       private: 
       Foo * __this;
-      public: __lambda_10_18(Foo * _this)
+      
+      public:
+      __lambda_10_18(Foo * _this)
       : __this{_this}
-
       {}
       
     };
@@ -52,9 +54,10 @@ class Foo
       
       private: 
       Foo __this;
-      public: __lambda_14_18(Foo _this)
+      
+      public:
+      __lambda_14_18(Foo _this)
       : __this{_this}
-
       {}
       
     };
@@ -99,9 +102,10 @@ struct X
       
       private: 
       X * __this;
-      public: __lambda_35_9(X * _this)
+      
+      public:
+      __lambda_35_9(X * _this)
       : __this{_this}
-
       {}
       
     } __lambda_35_9{this};

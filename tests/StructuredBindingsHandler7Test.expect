@@ -14,7 +14,9 @@ int main()
     
     private: 
     char (&buffer)[2];
-    public: __lambda_4_5(char (&_buffer)[2])
+    
+    public:
+    __lambda_4_5(char (&_buffer)[2])
     : buffer{_buffer}
     {}
     

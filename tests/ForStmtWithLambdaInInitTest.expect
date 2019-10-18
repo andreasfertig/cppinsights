@@ -14,7 +14,9 @@ int main()
     
     private: 
     int & x;
-    public: __lambda_7_17(int & _x)
+    
+    public:
+    __lambda_7_17(int & _x)
     : x{_x}
     {}
     
@@ -36,7 +38,9 @@ int main()
     
     private: 
     int & x;
-    public: __lambda_11_17(int & _x)
+    
+    public:
+    __lambda_11_17(int & _x)
     : x{_x}
     {}
     
@@ -53,7 +57,9 @@ int main()
     
     private: 
     int & x;
-    public: __lambda_11_43(int & _x)
+    
+    public:
+    __lambda_11_43(int & _x)
     : x{_x}
     {}
     
@@ -99,7 +105,9 @@ int main()
     
     private: 
     int & x;
-    public: __lambda_15_37(int & _x)
+    
+    public:
+    __lambda_15_37(int & _x)
     : x{_x}
     {}
     
@@ -192,7 +200,9 @@ int main()
     
     private: 
     int & x;
-    public: __lambda_20_37(int & _x)
+    
+    public:
+    __lambda_20_37(int & _x)
     : x{_x}
     {}
     

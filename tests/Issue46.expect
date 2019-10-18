@@ -36,7 +36,9 @@ class __lambda_5_11
   
   private: 
   int a;
-  public: __lambda_5_11(int _a)
+  
+  public:
+  __lambda_5_11(int _a)
   : a{_a}
   {}
   

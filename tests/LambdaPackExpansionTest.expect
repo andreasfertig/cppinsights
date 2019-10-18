@@ -50,12 +50,14 @@ void f2<int, int, int, int, int>(int __args0, int __args1, int __args2, int __ar
     int __args2;
     int __args3;
     int __args4;
-    public: __lambda_19_15(int ___args0, int ___args1, int ___args2, int ___args3, int ___args4)
+    
+    public:
+    __lambda_19_15(int ___args0, int ___args1, int ___args2, int ___args3, int ___args4)
     : __args0{___args0}
-, __args1{___args1}
-, __args2{___args2}
-, __args3{___args3}
-, __args4{___args4}
+    , __args1{___args1}
+    , __args2{___args2}
+    , __args3{___args3}
+    , __args4{___args4}
     {}
     
   };

@@ -47,7 +47,9 @@ struct SA<2>
       private: 
       unsigned long;
       float (&e)[this->nt];
-      public: __lambda_40_8(float (&_e)[this->nt])
+      
+      public:
+      __lambda_40_8(float (&_e)[this->nt])
       : e{_e}
       {}
       

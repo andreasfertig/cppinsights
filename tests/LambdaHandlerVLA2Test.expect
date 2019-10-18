@@ -13,7 +13,9 @@ void Test(int n)
     private: 
     unsigned long;
     char (&buffer)[n];
-    public: __lambda_6_5(char (&_buffer)[n])
+    
+    public:
+    __lambda_6_5(char (&_buffer)[n])
     : buffer{_buffer}
     {}
     

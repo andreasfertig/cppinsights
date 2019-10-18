@@ -18,7 +18,9 @@ struct A
       
       private: 
       int & i;
-      public: __lambda_10_38(int & _i)
+      
+      public:
+      __lambda_10_38(int & _i)
       : i{_i}
       {}
       
@@ -51,7 +53,9 @@ struct B
       
       private: 
       int & i;
-      public: __lambda_22_38(int & _i)
+      
+      public:
+      __lambda_22_38(int & _i)
       : i{_i}
       {}
       

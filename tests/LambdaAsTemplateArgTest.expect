@@ -37,7 +37,9 @@ int main()
     
     private: 
     int & y;
-    public: __lambda_12_14(int & _y)
+    
+    public:
+    __lambda_12_14(int & _y)
     : y{_y}
     {}
     

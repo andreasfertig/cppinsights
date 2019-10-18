@@ -28,6 +28,9 @@ class __lambda_6_12
     return 1;
   }
   
+  public:
+  // /*constexpr */ __lambda_6_12() = default;
+  
 };
 
 __lambda_6_12 foo = __lambda_6_12{};

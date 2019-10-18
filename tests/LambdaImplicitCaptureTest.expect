@@ -15,7 +15,9 @@ int main()
     
     private: 
     int x;
-    public: __lambda_7_14(int _x)
+    
+    public:
+    __lambda_7_14(int _x)
     : x{_x}
     {}
     

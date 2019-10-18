@@ -16,9 +16,10 @@ class Bar
       
       private: 
       Bar * __this;
-      public: __lambda_8_18(Bar * _this)
+      
+      public:
+      __lambda_8_18(Bar * _this)
       : __this{_this}
-
       {}
       
     };
@@ -46,7 +47,9 @@ int main()
     
     private: 
     int & foo;
-    public: __lambda_20_19(int & _foo)
+    
+    public:
+    __lambda_20_19(int & _foo)
     : foo{_foo}
     {}
     
@@ -92,7 +95,9 @@ int main()
     
     private: 
     int & foo;
-    public: __lambda_28_20(int & _foo)
+    
+    public:
+    __lambda_28_20(int & _foo)
     : foo{_foo}
     {}
     
@@ -112,7 +117,9 @@ int main()
     
     private: 
     int & foo;
-    public: __lambda_32_20(int & _foo)
+    
+    public:
+    __lambda_32_20(int & _foo)
     : foo{_foo}
     {}
     
@@ -131,7 +138,9 @@ int main()
     
     private: 
     int & foo;
-    public: __lambda_34_20(int & _foo)
+    
+    public:
+    __lambda_34_20(int & _foo)
     : foo{_foo}
     {}
     
@@ -150,7 +159,9 @@ int main()
     
     private: 
     int & foo;
-    public: __lambda_36_20(int & _foo)
+    
+    public:
+    __lambda_36_20(int & _foo)
     : foo{_foo}
     {}
     
@@ -179,7 +190,9 @@ int main()
     
     private: 
     int & foo;
-    public: __lambda_38_20(int & _foo)
+    
+    public:
+    __lambda_38_20(int & _foo)
     : foo{_foo}
     {}
     
@@ -199,7 +212,9 @@ int main()
     }
     private: 
     int & foo;
-    public: __lambda_41_21(int & _foo)
+    
+    public:
+    __lambda_41_21(int & _foo)
     : foo{_foo}
     {}
     
@@ -228,7 +243,9 @@ int main()
     
     private: 
     int & foo;
-    public: __lambda_43_21(int & _foo)
+    
+    public:
+    __lambda_43_21(int & _foo)
     : foo{_foo}
     {}
     
@@ -249,9 +266,11 @@ int main()
     private: 
     int foo;
     int b;
-    public: __lambda_46_20(int _foo, int _b)
+    
+    public:
+    __lambda_46_20(int _foo, int _b)
     : foo{_foo}
-, b{_b}
+    , b{_b}
     {}
     
   };
@@ -270,9 +289,11 @@ int main()
     private: 
     int foo;
     int b;
-    public: __lambda_48_20(int _foo, int _b)
+    
+    public:
+    __lambda_48_20(int _foo, int _b)
     : foo{_foo}
-, b{_b}
+    , b{_b}
     {}
     
   };
