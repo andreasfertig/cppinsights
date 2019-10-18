@@ -363,6 +363,10 @@ else()
   set(GIT_COMMIT_HASH "")
 endif()
 
+# Get the include dir
+llvm_config(LLVM_INCLUDE_DIR "--includedir")
+
+
 message(STATUS "Generating version.h")
 
 configure_file(
@@ -602,6 +606,7 @@ message(STATUS "Compiler path         : ${CMAKE_CXX_COMPILER}")
 message(STATUS "llvm-config           : ${LLVM_CONFIG_PATH}")
 message(STATUS "Min LLVM major version: ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}")
 message(STATUS "Install path          : ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "Clang resource dir    : ${INSIGHTS_CLANG_RESOURCE_DIR}")
 message(STATUS "CMAKE_SOURCE_DIR      : ${CMAKE_SOURCE_DIR}")
 message(STATUS "CMAKE_BINARY_DIR      : ${CMAKE_BINARY_DIR}")
 message(STATUS "Git repo url          : ${GIT_REPO_URL}")

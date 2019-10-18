@@ -63,6 +63,10 @@ static llvm::cl::opt<bool> gStdinMode("stdin",
                                       llvm::cl::cat(gInsightCategory));
 //-----------------------------------------------------------------------------
 
+static llvm::cl::opt<bool>
+    gUseLibCpp("use-libc++", llvm::cl::desc("Use libc++."), llvm::cl::init(false), llvm::cl::cat(gInsightCategory));
+//-----------------------------------------------------------------------------
+
 #define INSIGHTS_OPT(option, name, deflt, description)                                                                 \
     static llvm::cl::opt<bool, true> g##name(option,                                                                   \
                                              llvm::cl::desc(description),                                              \
@@ -198,6 +202,25 @@ int main(int argc, const char** argv)
 
         tool.mapVirtualFile(sourceFilePath, inMemoryCode->getBuffer());
     }
+
+    auto prependArgument = [&](auto arg) {
+        tool.appendArgumentsAdjuster(getInsertArgumentAdjuster(arg, ArgumentInsertPosition::BEGIN));
+    };
+
+    // Special handling to spare users to figure out what include paths to add.
+
+    // For some reason, Clang on Apple seems to require an additional hint for the C++ headers.
+#ifdef __APPLE__
+    gUseLibCpp = true;
+#endif /* __APPLE__ */
+
+    if(gUseLibCpp) {
+        prependArgument(INSIGHTS_LLVM_INCLUDE_DIR);
+        prependArgument("-stdlib=libc++");
+    }
+
+    prependArgument(INSIGHTS_CLANG_RESOURCE_INCLUDE_DIR);
+    prependArgument(INSIGHTS_CLANG_RESOURCE_DIR);
 
     return tool.run(newFrontendActionFactory<CppInsightFrontendAction>().get());
 }
