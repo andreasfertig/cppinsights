@@ -7,4 +7,10 @@
 
 #define INSIGHTS_MIN_LLVM_MAJOR_VERSION @INSIGHTS_MIN_LLVM_MAJOR_VERSION@
 
+// Build Clang's resource dir and include dir by hand. This is necessary, as we do not always have Clang installed. 
+// See: https://github.com/MaskRay/ccls/wiki/Install#clang-resource-directory
+#define INSIGHTS_CLANG_RESOURCE_DIR "-resource-dir=@LLVM_LIBDIR@/clang/@LLVM_PACKAGE_VERSION@"
+#define INSIGHTS_CLANG_RESOURCE_INCLUDE_DIR "-I @LLVM_LIBDIR@/clang/@LLVM_PACKAGE_VERSION@/include"
+#define INSIGHTS_LLVM_INCLUDE_DIR "-isystem@LLVM_INCLUDE_DIR@/c++/v1"
+
 #endif /* INSIGHTS_VERSION_H */

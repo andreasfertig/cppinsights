@@ -76,24 +76,6 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
     return False, stderr
 #------------------------------------------------------------------------------
 
-def getDefaultIncludeDirs(cxx):
-    cmd = [cxx, '-E', '-x', 'c++', '-v', '/dev/null']
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = p.communicate()
-
-    m = re.findall('\n (/.*)', stderr)
-
-    includes = []
-
-    for x in m:
-        if -1 != x.find('(framework directory)'):
-            continue
-
-        includes.append('-isystem%s' %(x))
-
-    return includes
-#------------------------------------------------------------------------------
-
 
 def main():
     parser = argparse.ArgumentParser(description='Description of your program')
@@ -120,8 +102,6 @@ def main():
     missingExpected = 0
     ret             = 0
 
-    defaultIncludeDirs = getDefaultIncludeDirs(args['cxx'])
-
     regEx         = re.compile('.*cmdline:(.*)')
     regExInsights = re.compile('.*cmdlineinsights:(.*)')
 
@@ -145,11 +125,10 @@ def main():
             missingExpected += 1
             continue
 
-#             cmd   = [insightsPath, f, '-for2while', '--', cppStd, '-m64'] + defaultIncludeDirs
         if '' == insightsOpts:
-            cmd   = [insightsPath, f, '--', cppStd, '-m64'] + defaultIncludeDirs
+            cmd   = [insightsPath, f, '--', cppStd, '-m64']
         else:
-            cmd   = [insightsPath, f, insightsOpts, '--', cppStd, '-m64'] + defaultIncludeDirs
+            cmd   = [insightsPath, f, insightsOpts, '--', cppStd, '-m64']
 
         begin = datetime.datetime.now()
         p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
