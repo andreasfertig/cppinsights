@@ -217,8 +217,6 @@ script:
   if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
       export BIN_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-ubuntu-14.04
   fi
-  
-after_success:
 - |
   if [[ "${COVERAGE}" == "Yes" ]]; then
     # Creating report
@@ -226,9 +224,21 @@ after_success:
 
     make coverage -j 2
 
+    if [ ! -f ${TRAVIS_BUILD_DIR}/build/filtered.info ]; then
+      echo -e "\033[1;31mlcov did not create filtered.info!\033[0m"
+      exit 1;
+    fi
+
+    if [ ! -s ${TRAVIS_BUILD_DIR}/build/filtered.info ]; then
+      echo -e "\033[1;31mlcov did create an empty filtered.info!\033[0m"
+      exit 1;
+    fi
+
     # Uploading report to CodeCov
     bash <(curl -s https://codecov.io/bash) -f ${TRAVIS_BUILD_DIR}/build/filtered.info || echo "Codecov did not collect coverage reports"
-  fi
+  fi  
+
+after_success:
 - |
   if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] && [[ "${UPLOAD}" = "Yes" ]]; then
       cd ${TRAVIS_BUILD_DIR}/build/
