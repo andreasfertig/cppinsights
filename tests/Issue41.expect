@@ -1,0 +1,39 @@
+#include <vector>
+#include <algorithm>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+  vector<std::string> v = std::vector<std::basic_string<char>, std::allocator<std::basic_string<char> > >{std::initializer_list<std::basic_string<char> >{std::basic_string<char>("aaa"), std::basic_string<char>("bbb"), std::basic_string<char>("ccc")}};
+      
+  class __lambda_12_26
+  {
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(const type_parameter_0_0 & str) const
+    {
+      return operator==(str, "bbb");
+    }
+    
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ bool operator()(const std::basic_string<char> & str) const
+    {
+      return std::operator==(str, "bbb");
+    }
+    #endif
+    
+    private: 
+    template<class type_parameter_0_0>
+    static inline auto __invoke(const type_parameter_0_0 & str)
+    {
+      return operator==(str, "bbb");
+    }
+    
+  };
+  
+  std::__wrap_iter<std::basic_string<char> *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
+}
+

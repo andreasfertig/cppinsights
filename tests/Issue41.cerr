@@ -1,16 +1,16 @@
 .tmp.cpp:14:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:30:5: error: templates cannot be declared inside of a local class
+.tmp.cpp:29:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from .tmp.cpp:1:
-In file included from /usr/local/clang-8/bin/../include/c++/v1/vector:270:
-In file included from /usr/local/clang-8/bin/../include/c++/v1/__bit_reference:16:
-/usr/local/clang-8/bin/../include/c++/v1/algorithm:877:13: error: no matching function for call to object of type '__lambda_12_26'
+In file included from /usr/local/clang+llvm-9.0.0-x86_64-apple-darwin/bin/../include/c++/v1/vector:274:
+In file included from /usr/local/clang+llvm-9.0.0-x86_64-apple-darwin/bin/../include/c++/v1/__bit_reference:15:
+/usr/local/clang+llvm-9.0.0-x86_64-apple-darwin/bin/../include/c++/v1/algorithm:933:13: error: no matching function for call to object of type '__lambda_12_26'
         if (__pred(*__first))
             ^~~~~~
-.tmp.cpp:38:57: note: in instantiation of function template specialization 'std::__1::find_if<std::__1::__wrap_iter<std::__1::basic_string<char> *>, __lambda_12_26>' requested here
+.tmp.cpp:37:57: note: in instantiation of function template specialization 'std::__1::find_if<std::__1::__wrap_iter<std::__1::basic_string<char> *>, __lambda_12_26>' requested here
   std::__wrap_iter<std::basic_string<char> *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
                                                         ^
 3 errors generated.

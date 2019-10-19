@@ -1,0 +1,71 @@
+int main()
+{
+    
+  class __lambda_4_5
+  {
+    public: 
+    inline /*constexpr */ S operator()()
+    {
+      ++s.v;
+      return S(s);
+    }
+    
+    private: 
+    S s;
+    public: 
+    // inline /*constexpr */ __lambda_4_5(const __lambda_4_5 &) noexcept = default;
+    // inline /*constexpr */ __lambda_4_5(__lambda_4_5 &&) = default;
+    __lambda_4_5(    
+    class __lambda_5_7
+    {
+      public: 
+      inline /*constexpr */ S operator()() const
+      {
+        struct S
+        {
+          int v{676};
+          // inline ~S() noexcept = default;
+          // inline constexpr S() = default;
+          // inline constexpr S(const S &) noexcept = default;
+          // inline constexpr S(S &&) = default;
+        };
+        
+        return S{{676}};
+      }
+      
+      using retType_5_7 = S (*)();
+      inline /*constexpr */ operator retType_5_7 () const noexcept
+      {
+        return __invoke;
+      };
+      
+      private: 
+      static inline S __invoke()
+      {
+        struct S
+        {
+          int v{676};
+          // inline ~S() noexcept = default;
+          // inline constexpr S() = default;
+          // inline constexpr S(const S &) noexcept = default;
+          // inline constexpr S(S &&) = default;
+        };
+        
+        return S{{676}};
+      }
+      
+      
+    } __lambda_5_7{};
+    
+    S _s)
+    : s{_s}
+    {}
+    
+  };
+  
+  __lambda_4_5 l = __lambda_4_5{__lambda_5_7.operator()()};
+  __lambda_4_5 l2 = __lambda_4_5(l);
+}
+
+
+

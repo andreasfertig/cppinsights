@@ -1,0 +1,8 @@
+.tmp:4:27: error: 'decltype(auto)' can only be used as a return type in a function declaration
+decltype(auto) (Foo::*bar)();
+                          ^
+.tmp:4:23: error: declaration of variable 'bar' with deduced type 'decltype(auto) (Foo::*)()' requires an initializer
+decltype(auto) (Foo::*bar)();
+                      ^
+2 errors generated.
+
