@@ -1,0 +1,25 @@
+#include <array>
+#include <vector>
+
+class StdArray
+{
+  
+  public: 
+  std::array<int, 5> arr{{1, 2, 3, 4, 5}};
+};
+
+
+
+class StdVector
+{
+  
+  public: 
+  std::vector<int, std::allocator<int> > v = std::vector<int, std::allocator<int> >{std::initializer_list<int>{1, 2, 3, 4, 5}};
+  // inline StdVector(const StdVector &) = default;
+  // inline StdVector(StdVector &&) = default;
+  // inline StdVector & operator=(StdVector &&) = default;
+  // inline ~StdVector() = default;
+};
+
+
+

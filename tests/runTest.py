@@ -47,6 +47,8 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
         if os.path.isfile(compileErrorFile):
             ce = open(compileErrorFile, 'r').read()
             stderr = stderr.replace(tmpFileName, '.tmp.cpp')
+            # Replace paths, as for example, the STL path differs from a local build to Travis-CI at least for macOS
+            stderr = re.sub('/(.*)/(.*?:[0-9]+):', '... \\2:', stderr)
 
             if ce == stderr:
                 print '[PASSED] Compile: %s' %(f)
@@ -108,6 +110,7 @@ def main():
     for f in sorted(cppFiles):
         fileName     = os.path.splitext(f)[0]
         expectFile   = os.path.join(mypath, fileName + '.expect')
+        ignoreFile   = os.path.join(mypath, fileName + '.ignore')
         cppStd       = defaultCppStd
         insightsOpts = ''
 
@@ -120,8 +123,8 @@ def main():
         if None != m:
             insightsOpts = m.group(1)
 
-        if not os.path.isfile(expectFile):
-            print 'Missing expect for: %s' %(f)
+        if not os.path.isfile(expectFile) and not os.path.isfile(ignoreFile):
+            print 'Missing expect/ignore for: %s' %(f)
             missingExpected += 1
             continue
 
@@ -143,8 +146,14 @@ def main():
                 # Linker errors name the tmp file and not the .tmp.cpp, replace the name here to be able to suppress
                 # these errors.
                 ce = re.sub('(.*).cpp:', '.tmp:', ce)
+                ce = re.sub('(.*).cpp.', '.tmp:', ce)
+                stderr = re.sub('(.*).cpp:', '.tmp:', stderr)
+                stderr = re.sub('(Error while processing.*.cpp.)', '', stderr)
+                # Replace paths, as for example, the STL path differs from a local build to Travis-CI at least for macOS
+                stderr = re.sub('/(.*)/(.*?:[0-9]+):', '... \\2:', stderr)
 
-                if ce == stderr:
+                # The cerr output matches and the return code says that we hit a compile error, accept it as passed
+                if (ce == stderr) and (1 == p.returncode):
                     print '[PASSED] Compile: %s' %(f)
                     filesPassed += 1
                     continue
@@ -156,7 +165,8 @@ def main():
             print 'Insight crashed for: %s with: %d' %(f, p.returncode)
             print stderr
 
-            continue
+            if not bUpdateTests:
+                continue
 
         fd, tmpFileName = tempfile.mkstemp('.cpp')
         try:
@@ -207,7 +217,12 @@ def main():
     if bFailureIsOk:
         return 0
 
-    return expectedToPass != filesPassed # note bash expects 0 for ok
+    if missingExpected:
+        print('Missing expected files: %d' %(missingExpected))
+
+    passed = (0 == missingExpected) and (expectedToPass == filesPassed)
+
+    return (False == passed)  # note bash expects 0 for ok
 #------------------------------------------------------------------------------
 
 
