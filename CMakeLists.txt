@@ -527,7 +527,7 @@ if (NOT WIN32)
 
     # run code coverage in docker container
     add_custom_target(docker-coverage
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=Yes -DDEBUG=${DEBUG}" coverage
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=Yes -DDEBUG=${DEBUG}" coverage-html
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMENT "Running tests in docker" VERBATIM
@@ -573,12 +573,17 @@ if (NOT WIN32)
             add_custom_target(coverage
                 COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir ${GCOV_TOOL} --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
                 COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
-                COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.info --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
                 COMMENT "Running code coverage analysis" VERBATIM
             )
 
+            add_custom_target(coverage-html
+                COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.info --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out
+                COMMENT "Generating code coverage HTML" VERBATIM
+            )
+
             add_dependencies(coverage tests)
+            add_dependencies(coverage-html coverage)
 
         endif()
     endif()

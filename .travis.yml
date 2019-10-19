@@ -55,7 +55,7 @@ jobs:
       ssh_known_hosts: cppinsights.io
     before_install:
     - docker pull andreasfertig/cppinsights-builder
-    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum'
+    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum' USE_DOCKER='Yes'
     
   # Linux g++ Build
   - os: linux
@@ -109,24 +109,36 @@ jobs:
   # Debug build with coverage
   - os: linux
     name: "GCC 8 / LLVM unstable @ Ubuntu Code Coverage & Debug"
+    # sudo: required
+    # compiler: gcc
+    # addons: &covcurrent
+    #   apt:
+    #     sources: *all_sources
+    #     packages:
+    #     - g++-8
+    #     - libstdc++-8-dev
+    #     - *all_llvm_current_packages
+    #     - lcov
+    # env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
     sudo: required
-    compiler: gcc
-    addons: &covcurrent
-      apt:
-        sources: *all_sources
-        packages:
-        - g++-8
-        - libstdc++-8-dev
-        - *all_llvm_current_packages
-        - lcov
-    env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
+    services:
+    - docker
+    before_install:
+    - docker pull andreasfertig/cppinsights-builder
+    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No' USE_DOCKER='Yes'
 
   - os: linux
     name: "GCC 8 / LLVM unstable @ Ubuntu Code Coverage"
+    # sudo: required
+    # compiler: gcc
+    # addons: *covcurrent
+    # env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
     sudo: required
-    compiler: gcc
-    addons: *covcurrent
-    env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
+    services:
+    - docker
+    before_install:
+    - docker pull andreasfertig/cppinsights-builder
+    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes'
 
   - stage: "Deploy Docker"
     install: true
@@ -177,13 +189,12 @@ before_script:
         export PATH=${TRAVIS_BUILD_DIR}/clang/current/bin:$PATH
     fi
   - export CXX=${COMPILER}
-  - export CC=${COMPILER_CC}
   - cd "${TRAVIS_BUILD_DIR}"
   - mkdir build
   - cd build
   - |
-    if [[ "${DEPLOY}" == "Yes" ]]; then
-      docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=Yes .."
+    if [[ "${USE_DOCKER}" == "Yes" ]]; then
+      docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG} -DINSIGHTS_COVERAGE=${COVERAGE} .."
     elif [[ "${CFORMAT}" == "Yes" ]]; then
       echo "Nothing to do here for the clang-format check run."
     else
@@ -192,12 +203,15 @@ before_script:
 
 script:
 - |
-  if [[ "${DEPLOY}" == "Yes" ]]; then
+  if [[ "${USE_DOCKER}" == "Yes" ]]; then
     docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cmake --build /home/builder/build"
-    mkdir ${TRAVIS_BUILD_DIR}/build/html
-    docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cmake --build /home/builder/build --target doc"
-    echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
-    echo "google-site-verification: google7bcf3ef9a4f62ff2.html" > ${TRAVIS_BUILD_DIR}/build/html/google7bcf3ef9a4f62ff2.html 
+
+    if [[ "${DEPLOY}" == "Yes" ]]; then
+      mkdir ${TRAVIS_BUILD_DIR}/build/html
+      docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cmake --build /home/builder/build --target doc"
+      echo "docs.cppinsights.io" > ${TRAVIS_BUILD_DIR}/build/html/CNAME
+      echo "google-site-verification: google7bcf3ef9a4f62ff2.html" > ${TRAVIS_BUILD_DIR}/build/html/google7bcf3ef9a4f62ff2.html 
+    fi
   elif [[ "${TIDY}" == "Yes" ]]; then
     $TRAVIS_BUILD_DIR/scripts/travis-run-make-tidy.sh
   elif [[ "${CFORMAT}" == "Yes" ]]; then
@@ -222,7 +236,11 @@ script:
     # Creating report
     cd ${TRAVIS_BUILD_DIR}/build
 
-    make coverage -j 2
+    if [[ "${USE_DOCKER}" == "Yes" ]]; then
+        docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cmake --build /home/builder/build --target coverage"
+    else
+        make coverage -j 2
+    fi
 
     if [ ! -f ${TRAVIS_BUILD_DIR}/build/filtered.info ]; then
       echo -e "\033[1;31mlcov did not create filtered.info!\033[0m"
