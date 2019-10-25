@@ -991,6 +991,48 @@ void CodeGenerator::InsertArg(const PackExpansionExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXFoldExpr* stmt)
+{
+    const char* operatorStr = [&]() {
+        switch(stmt->getOperator()) {
+#define BINARY_OPERATION(Name, Spelling)                                                                               \
+    case BO_##Name:                                                                                                    \
+        return Spelling;
+
+#include "clang/AST/OperationKinds.def"
+#undef BINARY_OPERATION
+        }
+
+        return "";
+    }();
+
+    WrapInParens([&] {
+        // We have a binary NNN fold. If init is nullptr, then it is a unary NNN fold.
+        const auto* init = stmt->getInit();
+
+        if(stmt->isLeftFold()) {
+            if(init) {
+                InsertArg(init);
+                mOutputFormatHelper.Append(" ", operatorStr, " ");
+            }
+
+            mOutputFormatHelper.Append("... ", operatorStr, " ");
+        }
+
+        InsertArg(stmt->getPattern());
+
+        if(stmt->isRightFold()) {
+            mOutputFormatHelper.Append(" ", operatorStr, " ...");
+
+            if(init) {
+                mOutputFormatHelper.Append(" ", operatorStr, " ");
+                InsertArg(init);
+            }
+        }
+    });
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
 {
     const auto& constructorDecl = *stmt->getConstructor();
