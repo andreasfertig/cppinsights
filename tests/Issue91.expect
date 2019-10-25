@@ -58,7 +58,7 @@ int i = fold_minus<0>();
 
 /* PASSED: static_assert(fold_minus<0>() == 5); */
 
-/* PASSED: static_assert(0 - 0 - 5 == -5); */
+/* PASSED: static_assert(((0 - 0) - 5) == -5); */
 
 
 //print_int<fold_minus<0>()> p;

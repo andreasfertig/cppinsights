@@ -1,0 +1,66 @@
+// Move it outside of main to get compiling code. As user is not allowed to declare a template inside a local class.
+
+class __lambda_2_10
+{
+  public: 
+  template<class ... type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0... i) const
+  {
+    return (... / i);
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()(int __i0, int __i1, int __i2) const
+  {
+    return (__i0 / __i1) / __i2;
+  }
+  #endif
+  
+  private: 
+  template<class ... type_parameter_0_0>
+  static inline auto __invoke(type_parameter_0_0... i)
+  {
+    return (... / i);
+  }
+  
+};
+
+__lambda_2_10 f = __lambda_2_10{};
+
+
+class __lambda_3_10
+{
+  public: 
+  template<class ... type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0... i) const
+  {
+    return (i / ...);
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()(int __i0, int __i1, int __i2) const
+  {
+    return __i0 / (__i1 / __i2);
+  }
+  #endif
+  
+  private: 
+  template<class ... type_parameter_0_0>
+  static inline auto __invoke(type_parameter_0_0... i)
+  {
+    return (i / ...);
+  }
+  
+};
+
+__lambda_3_10 g = __lambda_3_10{};
+
+
+int main()
+{
+  f.operator()(1, 2, 3);
+  g.operator()(1, 2, 3);
+}
+

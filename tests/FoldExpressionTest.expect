@@ -1,0 +1,184 @@
+// + - * / % ^ & | = < > << >> += -= *= /= %= ^= &= |= <<= >>= == != <= >= && || , .* ->*
+
+// Tests for some of the 32 operators
+
+template<typename... Args>
+constexpr auto plus(Args... args) { return (... + args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int plus<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 + __args1) + __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto minus(Args... args) { return (... - args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int minus<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 - __args1) - __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto times(Args... args) { return (... * args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int times<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 * __args1) * __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto div(Args... args) { return (... / args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int div<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 / __args1) / __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto mod(Args... args) { return (... % args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int mod<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 % __args1) % __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto bitwiseXOr(Args... args) { return (... ^ args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int bitwiseXOr<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 ^ __args1) ^ __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto bitwiseAnd(Args... args) { return (... & args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int bitwiseAnd<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 & __args1) & __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto bitwiseOr(Args... args) { return (... | args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int bitwiseOr<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (__args0 | __args1) | __args2;
+}
+#endif
+
+
+
+// = 
+
+template<typename... Args>
+constexpr auto lt(Args... args) { return (... < args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr bool lt<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (static_cast<int>(__args0 < __args1)) < __args2;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto gt(Args... args) { return (... > args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr bool gt<int, int, int>(int __args0, int __args1, int __args2)
+{
+  return (static_cast<int>(__args0 > __args1)) > __args2;
+}
+#endif
+
+
+
+template<typename... Args>
+constexpr auto logicalAnd(Args... args) { return (... && args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr bool logicalAnd<bool, bool, bool, bool>(bool __args0, bool __args1, bool __args2, bool __args3)
+{
+  return ((__args0 && __args1) && __args2) && __args3;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto logicalOr(Args... args) { return (... ||args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr bool logicalOr<bool, bool, bool, bool>(bool __args0, bool __args1, bool __args2, bool __args3)
+{
+  return ((__args0 || __args1) || __args2) || __args3;
+}
+#endif
+
+
+template<typename... Args>
+constexpr auto comma(Args... args) { return (... , args); }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int comma<int, int, int, int>(int __args0, int __args1, int __args2, int __args3)
+{
+  return ((__args0 , __args1) , __args2) , __args3;
+}
+#endif
+
+
+int main()
+{
+  /* PASSED: static_assert(6 == plus(1, 2, 3)); */
+  /* PASSED: static_assert(1 == minus(6, 2, 3)); */
+  /* PASSED: static_assert(18 == times(3, 2, 3)); */
+  /* PASSED: static_assert(3 == div(18, 2, 3)); */
+  /* PASSED: static_assert(0 == mod(18, 4, 2)); */
+  /* PASSED: static_assert(3 == bitwiseXOr(29, 26, 4)); */
+  /* PASSED: static_assert(2 == bitwiseAnd(26, 26, 2)); */
+  /* PASSED: static_assert(31 == bitwiseOr(25, 26, 4)); */
+  /* PASSED: static_assert(static_cast<int>(false) == static_cast<int>(lt(1, 2, 0))); */
+  /* PASSED: static_assert(static_cast<int>(false) == static_cast<int>(gt(1, 2, 1))); */
+  /* PASSED: static_assert(static_cast<int>(false) == static_cast<int>(logicalAnd(true, true, true, false))); */
+  /* PASSED: static_assert(static_cast<int>(true) == static_cast<int>(logicalOr(true, true, true, false))); */
+  /* PASSED: static_assert(4 == comma(1, 2, 3, 4)); */
+  int x = 4;
+  x /= 2;
+}
+
+

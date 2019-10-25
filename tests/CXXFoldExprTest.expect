@@ -13,7 +13,7 @@ class CXXFoldExprTest
   template<>
   inline int UnaryRightFold<int, int, int, int>(const int & __ts0, const int & __ts1, const int & __ts2, const int & __ts3)
   {
-    return __ts0 / __ts1 / __ts2 / __ts3;
+    return __ts0 / (__ts1 / (__ts2 / __ts3));
   }
   #endif
   
@@ -27,7 +27,7 @@ class CXXFoldExprTest
   template<>
   inline int UnaryLeftFold<int, int, int, int>(const int & __ts0, const int & __ts1, const int & __ts2, const int & __ts3)
   {
-    return __ts0 / __ts1 / __ts2 / __ts3;
+    return ((__ts0 / __ts1) / __ts2) / __ts3;
   }
   #endif
   
@@ -41,7 +41,7 @@ class CXXFoldExprTest
   template<>
   inline int BinaryRightFold<int, int, int, int>(const int & __ts0, const int & __ts1, const int & __ts2, const int & __ts3)
   {
-    return __ts0 / __ts1 / __ts2 / __ts3 / 2;
+    return __ts0 / (__ts1 / (__ts2 / (__ts3 / 2)));
   }
   #endif
   
@@ -55,7 +55,7 @@ class CXXFoldExprTest
   template<>
   inline int BinaryLeftFold<int, int, int, int>(const int & __ts0, const int & __ts1, const int & __ts2, const int & __ts3)
   {
-    return 2 / __ts0 / __ts1 / __ts2 / __ts3;
+    return (((2 / __ts0) / __ts1) / __ts2) / __ts3;
   }
   #endif
   

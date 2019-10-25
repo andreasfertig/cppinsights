@@ -32,7 +32,7 @@ int main()
     public: 
     inline /*constexpr */ int operator()(int x, int b) const
     {
-      return x + y + b;
+      return (x + y) + b;
     }
     
     private: 

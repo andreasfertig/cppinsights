@@ -20,7 +20,7 @@ inline constexpr int fold_minus_impl_rf<0>()
 template<>
 inline constexpr int fold_minus_impl_rf<0, 1>()
 {
-  return 5 - 0 - 1;
+  return (5 - 0) - 1;
 }
 #endif
 
@@ -50,7 +50,7 @@ inline constexpr int fold_negative_minus_impl_rf<0>()
 template<>
 inline constexpr int fold_negative_minus_impl_rf<0, 1>()
 {
-  return -5 - 0 - 1;
+  return (-5 - 0) - 1;
 }
 #endif
 
