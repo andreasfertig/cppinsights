@@ -33,17 +33,17 @@ jobs:
     #    compiler: clang
 
     # Linux Clang Build
-  - os: linux
-    name: "Clang unstable @ Ubuntu"
-    compiler: clang
-    addons:
-      apt:
-        sources: *all_sources
-        packages: 
-        - clang-10
-        - *all_llvm_current_packages
-        - libstdc++-8-dev
-    env: COMPILER='clang++-10' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
+  # - os: linux
+  #   name: "Clang unstable @ Ubuntu"
+  #   compiler: clang
+  #   addons:
+  #     apt:
+  #       sources: *all_sources
+  #       packages: 
+  #       - clang-10
+  #       - *all_llvm_current_packages
+  #       - libstdc++-8-dev
+  #   env: COMPILER='clang++-10' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang stable deployment
   - os: linux
@@ -58,17 +58,17 @@ jobs:
     env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum' USE_DOCKER='Yes'
     
   # Linux g++ Build
-  - os: linux
-    name: "GCC 8 / LLVM unstable @ Ubuntu"
-    sudo: required
-    compiler: gcc
-    addons:
-      apt:
-        sources: *all_sources
-        packages:
-        - g++-8
-        - *all_llvm_current_packages
-    env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
+  # - os: linux
+  #   name: "GCC 8 / LLVM unstable @ Ubuntu"
+  #   sudo: required
+  #   compiler: gcc
+  #   addons:
+  #     apt:
+  #       sources: *all_sources
+  #       packages:
+  #       - g++-8
+  #       - *all_llvm_current_packages
+  #   env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Linux g++ clang 9 build
   - os: linux
