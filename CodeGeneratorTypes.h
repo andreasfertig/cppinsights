@@ -113,6 +113,7 @@ SUPPORTED_STMT(ConstantExpr)
 SUPPORTED_STMT(CXXUnresolvedConstructExpr)
 SUPPORTED_STMT(UnresolvedMemberExpr)
 SUPPORTED_STMT(PackExpansionExpr)
+SUPPORTED_STMT(CXXFoldExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT
