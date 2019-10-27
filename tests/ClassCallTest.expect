@@ -25,9 +25,6 @@ class Foo
   private: 
   int mFoo;
   public: 
-  // inline constexpr Foo(const Foo &) = default;
-  // inline constexpr Foo(Foo &&) = default;
-  // inline ~Foo() = default;
 };
 
 
@@ -51,8 +48,6 @@ class Bar : public Foo
   private: 
   int mBar;
   public: 
-  // inline constexpr Bar(const Bar &) = default;
-  // inline constexpr Bar(Bar &&) = default;
 };
 
 

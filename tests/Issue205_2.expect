@@ -35,9 +35,6 @@ class EventContainer
   {
   }
   
-  // inline EventContainer(const EventContainer &) = default;
-  // inline EventContainer(EventContainer &&) = default;
-  // inline EventContainer & operator=(EventContainer &&) = default;
   // inline ~EventContainer() noexcept = default;
   
 };

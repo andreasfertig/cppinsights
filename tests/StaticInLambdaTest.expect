@@ -28,7 +28,6 @@ class Singleton
   
   int mX;
   public: 
-  // inline constexpr Singleton(const Singleton &) = default;
 };
 
 

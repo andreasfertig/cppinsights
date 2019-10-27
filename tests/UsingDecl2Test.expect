@@ -12,12 +12,7 @@ struct B
   {
   }
   
-  // inline constexpr B & operator=(const B &) = default;
-  // inline constexpr B & operator=(B &&) = default;
-  // inline ~B() = default;
   // inline constexpr B() noexcept = default;
-  // inline constexpr B(const B &) = default;
-  // inline constexpr B(B &&) = default;
 };
 
 
@@ -41,12 +36,7 @@ struct D : public B
   {
   }
   
-  // inline constexpr D & operator=(const D &) = default;
-  // inline constexpr D & operator=(D &&) = default;
-  // inline ~D() = default;
   // inline constexpr D() noexcept = default;
-  // inline constexpr D(const D &) = default;
-  // inline constexpr D(D &&) = default;
 };
 
 
@@ -59,9 +49,6 @@ struct ProtectedMember
   using value_type = int;
   public: 
   // inline ProtectedMember() noexcept = default;
-  // inline ~ProtectedMember() = default;
-  // inline constexpr ProtectedMember(const ProtectedMember &) = default;
-  // inline constexpr ProtectedMember(ProtectedMember &&) = default;
 };
 
 
@@ -73,8 +60,6 @@ struct UsingProtectedToPublicMember : public ProtectedMember
   
   using ProtectedMember::value_type;
   // inline UsingProtectedToPublicMember() noexcept = default;
-  // inline constexpr UsingProtectedToPublicMember(const UsingProtectedToPublicMember &) = default;
-  // inline constexpr UsingProtectedToPublicMember(UsingProtectedToPublicMember &&) = default;
 };
 
 

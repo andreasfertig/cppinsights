@@ -15,10 +15,6 @@ class StdVector
   
   public: 
   std::vector<int, std::allocator<int> > v = std::vector<int, std::allocator<int> >{std::initializer_list<int>{1, 2, 3, 4, 5}};
-  // inline StdVector(const StdVector &) = default;
-  // inline StdVector(StdVector &&) = default;
-  // inline StdVector & operator=(StdVector &&) = default;
-  // inline ~StdVector() = default;
 };
 
 

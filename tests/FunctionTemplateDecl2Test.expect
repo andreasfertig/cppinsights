@@ -28,10 +28,6 @@ class Test
   }
   #endif
   
-  // inline constexpr Test(const Test &) = default;
-  // inline constexpr Test(Test &&) = default;
-  // inline constexpr Test & operator=(const Test &) = default;
-  // inline constexpr Test & operator=(Test &&) = default;
 };
 
 

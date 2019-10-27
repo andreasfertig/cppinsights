@@ -12,9 +12,6 @@ class C
   private: 
   mutable int mX;
   public: 
-  // inline constexpr C(const C &) = default;
-  // inline C & operator=(const C &) = default;
-  // inline constexpr C(C &&) = default;
 };
 
 

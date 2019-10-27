@@ -67,7 +67,6 @@ class Foo
   public: 
   // inline constexpr Foo(const Foo &) noexcept = default;
   // inline constexpr Foo(Foo &&) noexcept = default;
-  // inline ~Foo() noexcept = default;
 };
 
 

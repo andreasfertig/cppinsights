@@ -30,8 +30,6 @@ struct A
   }
   
   int v[10];
-  // inline constexpr A(const A &) = default;
-  // inline constexpr A(A &&) = default;
 };
 
 
@@ -80,8 +78,6 @@ struct B
   }
   
   int v[10];
-  // inline constexpr B(const B &) = default;
-  // inline constexpr B(B &&) = default;
 };
 
 

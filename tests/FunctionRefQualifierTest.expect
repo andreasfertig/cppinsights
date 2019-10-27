@@ -14,9 +14,6 @@ struct Foo
   }
   
   // inline constexpr Foo() noexcept = default;
-  // inline constexpr Foo(const Foo &) = default;
-  // inline constexpr Foo(Foo &&) = default;
-  // inline ~Foo() noexcept = default;
 };
 
 

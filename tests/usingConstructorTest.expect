@@ -10,9 +10,6 @@ class Foo
   {
   }
   
-  // inline constexpr Foo(const Foo &) = default;
-  // inline constexpr Foo(Foo &&) = default;
-  // inline ~Foo() = default;
 };
 
 
@@ -23,8 +20,6 @@ class Bar : public Foo
   public: 
   int mX;
   // inline Bar() = delete;
-  // inline constexpr Bar(const Bar &) = default;
-  // inline constexpr Bar(Bar &&) = default;
   public: inline Bar(double amount) noexcept(false)
   : Foo(amount)
   {
@@ -46,8 +41,6 @@ class Bla : public Foo
   int mX;
   public: 
   // inline Bla() = delete;
-  // inline constexpr Bla(const Bla &) = default;
-  // inline constexpr Bla(Bla &&) = default;
   public: inline Bla(int x, int y) noexcept(false)
   : Foo(x, y)
   {

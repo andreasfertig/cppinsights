@@ -31,7 +31,6 @@ class X
     return *this;
   }
   
-  // inline constexpr X(const X &) = default;
 };
 
 
@@ -46,8 +45,6 @@ struct V
   {
   }
   
-  // inline constexpr V(const V &) = default;
-  // inline constexpr V(V &&) = default;
 };
 
 
@@ -56,7 +53,6 @@ struct Y
 {
   int x;
   int y;
-  // inline ~Y() noexcept = default;
 };
 
 

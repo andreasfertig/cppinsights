@@ -16,8 +16,6 @@ class MyArrayWrapper
   }
   
   // inline MyArrayWrapper() noexcept = default;
-  // inline constexpr MyArrayWrapper(const MyArrayWrapper &) = default;
-  // inline constexpr MyArrayWrapper(MyArrayWrapper &&) = default;
 };
 
 

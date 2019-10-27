@@ -16,10 +16,6 @@ struct A
     return 2;
   }
   
-  // inline constexpr A() noexcept = default;
-  // inline constexpr A(const A &) = default;
-  // inline constexpr A(A &&) = default;
-  // inline ~A() noexcept = default;
 };
 
  

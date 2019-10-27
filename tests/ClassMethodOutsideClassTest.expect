@@ -7,8 +7,6 @@ class X
   
   void modify();
   
-  // inline constexpr X(const X &) = default;
-  // inline constexpr X(X &&) = default;
 };
 
 

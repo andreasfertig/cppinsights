@@ -15,7 +15,6 @@ class Sing
     X();
   }
   
-  // inline Sing(const Sing &) = default;
 };
 
 

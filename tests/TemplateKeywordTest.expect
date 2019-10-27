@@ -19,8 +19,6 @@ namespace detail
     struct detail::to<int>::result<int, char>
     {
       // inline constexpr detail::to<int>::result() noexcept = default;
-      // inline constexpr detail::to<int>::result(const result<int, char> &) = default;
-      // inline constexpr detail::to<int>::result(result<int, char> &&) = default;
     };
     
     #endif

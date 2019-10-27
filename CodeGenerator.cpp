@@ -2002,6 +2002,14 @@ void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skip
 
 void CodeGenerator::InsertArg(const CXXMethodDecl* stmt)
 {
+    // As per [special]/1: "Programs shall not define implicitly-declared special member functions." hide special
+    // members which are not used and with that not fully evaluated. This also hopefully removes confusion about the
+    // noexcept, which is not evaluated, if the special member is not used.
+    if(not stmt->hasBody() && not stmt->isUserProvided() && not stmt->isExplicitlyDefaulted() &&
+       not stmt->isDeleted()) {
+        return;
+    }
+
     InsertCXXMethodDecl(stmt, SkipBody::No);
 }
 //-----------------------------------------------------------------------------

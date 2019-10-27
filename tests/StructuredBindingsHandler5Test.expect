@@ -147,9 +147,6 @@ class Point
   double mX;
   double mY;
   public: 
-  // inline constexpr Point(const Point &) = default;
-  // inline constexpr Point(Point &&) = default;
-  // inline ~Point() noexcept = default;
 };
 
 

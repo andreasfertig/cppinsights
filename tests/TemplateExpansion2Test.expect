@@ -71,9 +71,6 @@ class B
 {
   public: 
   // inline constexpr B() noexcept = default;
-  // inline ~B() = default;
-  // inline constexpr B(const B &) = default;
-  // inline constexpr B(B &&) = default;
 };
 
 
@@ -82,9 +79,6 @@ class E
 {
   public: 
   // inline constexpr E() noexcept = default;
-  // inline ~E() = default;
-  // inline constexpr E(const E &) = default;
-  // inline constexpr E(E &&) = default;
 };
 
 
@@ -101,8 +95,6 @@ class S<int> : public B
 {
   public: 
   // inline constexpr S() noexcept = default;
-  // inline constexpr S(const S<int> &) = default;
-  // inline constexpr S(S<int> &&) = default;
 };
 
 #endif
@@ -115,9 +107,6 @@ class S<double> : public B
 {
   public: 
   // inline constexpr S() noexcept = default;
-  // inline ~S() = default;
-  // inline constexpr S(const S<double> &) = default;
-  // inline constexpr S(S<double> &&) = default;
 };
 
 #endif
@@ -135,8 +124,6 @@ class Y<double> : public S<double>, public E
 {
   public: 
   // inline constexpr Y() noexcept = default;
-  // inline constexpr Y(const Y<double> &) = default;
-  // inline constexpr Y(Y<double> &&) = default;
 };
 
 #endif

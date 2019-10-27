@@ -47,7 +47,6 @@ class Test
   private: 
   int mV;
   public: 
-  // inline ~Test() noexcept = default;
 };
 
 

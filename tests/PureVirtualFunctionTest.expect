@@ -4,12 +4,7 @@ class Test
   public: 
   virtual void Pure() = 0;
   
-  // inline constexpr Test & operator=(const Test &) = default;
-  // inline constexpr Test & operator=(Test &&) = default;
-  // inline ~Test() = default;
   // inline constexpr Test() noexcept = default;
-  // inline constexpr Test(const Test &) = default;
-  // inline constexpr Test(Test &&) = default;
 };
 
 
@@ -22,12 +17,7 @@ class West : public Test
   {
   }
   
-  // inline constexpr West & operator=(const West &) = default;
-  // inline constexpr West & operator=(West &&) = default;
-  // inline ~West() = default;
   // inline constexpr West() noexcept = default;
-  // inline constexpr West(const West &) = default;
-  // inline constexpr West(West &&) = default;
 };
 
 

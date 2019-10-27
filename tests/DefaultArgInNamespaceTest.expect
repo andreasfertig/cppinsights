@@ -22,8 +22,6 @@ class West
     return 2;
   }
   
-  // inline constexpr West(const Test::West &) = default;
-  // inline constexpr West(Test::West &&) = default;
 };
 
 

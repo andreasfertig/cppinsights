@@ -7,7 +7,6 @@ class C
   public: 
   int i;
   inline virtual ~C() noexcept = default;
-  // inline C & operator=(const C &) = default;
   // inline constexpr C(const C &) noexcept = default;
   // inline C() noexcept = default;
 };
@@ -30,11 +29,6 @@ class D : public C
   
   public: 
   int x;
-  // inline constexpr D(const D &) = default;
-  // inline constexpr D(D &&) = default;
-  // inline D & operator=(const D &) = default;
-  // inline D & operator=(D &&) = default;
-  // inline virtual ~D() noexcept = default;
 };
 
 

@@ -42,10 +42,6 @@ class Test<int>
   }
   #endif
   
-  // inline constexpr Test(const Test<int> &) = default;
-  // inline constexpr Test(Test<int> &&) = default;
-  // inline constexpr Test<int> & operator=(const Test<int> &) = default;
-  // inline constexpr Test<int> & operator=(Test<int> &&) = default;
 };
 
 #endif
@@ -71,10 +67,6 @@ class Test<char>
   }
   #endif
   
-  // inline constexpr Test(const Test<char> &) = default;
-  // inline constexpr Test(Test<char> &&) = default;
-  // inline constexpr Test<char> & operator=(const Test<char> &) = default;
-  // inline constexpr Test<char> & operator=(Test<char> &&) = default;
 };
 
 #endif
@@ -90,8 +82,6 @@ class Test<float>
   inline constexpr Test() noexcept = default;
   template<typename T2>
   inline Test<float> & operator=(const Test<T2> & other);
-  // inline constexpr Test(const Test<float> &) = default;
-  // inline constexpr Test(Test<float> &&) = default;
 };
 
 #endif

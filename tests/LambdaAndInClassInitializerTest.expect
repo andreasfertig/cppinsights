@@ -45,9 +45,6 @@ class function<void ()>
   #endif
   
   
-  // inline constexpr function(const function<void ()> &) = default;
-  // inline constexpr function(function<void ()> &&) = default;
-  // inline ~function() noexcept = default;
 };
 
 #endif
@@ -82,8 +79,6 @@ class EventContainer
   } __lambda_17_38{this};
   
   // inline constexpr EventContainer() noexcept(false) = default;
-  // inline constexpr EventContainer(const EventContainer &) = default;
-  // inline constexpr EventContainer(EventContainer &&) = default;
 };
 
 

@@ -22,8 +22,6 @@ class Test<int>
     const char * f = "Test";
   }
   
-  // inline constexpr Test(const Test<int> &) = default;
-  // inline constexpr Test(Test<int> &&) = default;
 };
 
 #endif

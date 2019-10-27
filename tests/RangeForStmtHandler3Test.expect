@@ -55,10 +55,7 @@
   {
     return false;
   }
-  // inline ~null_sentinal_t() noexcept = default;
-  // inline constexpr null_sentinal_t() = default;
   // inline constexpr null_sentinal_t(const null_sentinal_t &) noexcept = default;
-  // inline constexpr null_sentinal_t(null_sentinal_t &&) = default;
 };
 
 
@@ -86,7 +83,6 @@ struct str_view<char>
     return {};
   }
   
-  // inline ~str_view() noexcept = default;
 };
 
 #endif

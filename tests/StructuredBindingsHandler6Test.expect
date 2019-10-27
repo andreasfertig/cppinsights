@@ -109,8 +109,6 @@ class Point
   #endif
   
   // inline constexpr Point(const Point &) noexcept = default;
-  // inline constexpr Point(Point &&) = default;
-  // inline ~Point() noexcept = default;
 };
 
 

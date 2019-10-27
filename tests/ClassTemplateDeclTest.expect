@@ -19,8 +19,6 @@ class Test
     int m;
     public: 
     // inline Tmpl() noexcept = default;
-    // inline constexpr Tmpl(const Tmpl<int> &) = default;
-    // inline constexpr Tmpl(Tmpl<int> &&) = default;
   };
   
   #endif

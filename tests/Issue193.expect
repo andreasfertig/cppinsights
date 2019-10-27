@@ -12,10 +12,6 @@ template<>
 class rule_t<int, cppcmb_rule_tag16>
 {
   public: 
-  // inline constexpr rule_t() noexcept = default;
-  // inline constexpr rule_t(const rule_t<int, cppcmb_rule_tag16> &) = default;
-  // inline constexpr rule_t(rule_t<int, cppcmb_rule_tag16> &&) = default;
-  // inline ~rule_t() noexcept = default;
 };
 
 #endif

@@ -9,11 +9,6 @@ class Bar
 {
   public: 
   // inline constexpr Bar() noexcept = default;
-  // inline constexpr Bar(const Bar &) = default;
-  // inline constexpr Bar(Bar &&) = default;
-  // inline constexpr Bar & operator=(const Bar &) = default;
-  // inline constexpr Bar & operator=(Bar &&) = default;
-  // inline ~Bar() = default;
 };
 
 
@@ -28,9 +23,6 @@ class Woo
   }
   
   int mX;
-  // inline constexpr Woo(const Woo &) = default;
-  // inline constexpr Woo(Woo &&) = default;
-  // inline ~Woo() noexcept = default;
 };
 
 
@@ -101,10 +93,6 @@ class Foo : public Bar
   }
   
   int mX;
-  // inline Foo & operator=(const Foo &) = default;
-  // inline Foo & operator=(Foo &&) = default;
-  // inline constexpr Foo(const Foo &) = default;
-  // inline constexpr Foo(Foo &&) = default;
 };
 
 

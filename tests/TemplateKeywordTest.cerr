@@ -1,4 +1,4 @@
-.tmp.cpp:65:42: error: use of undeclared identifier 'result'
+.tmp.cpp:63:42: error: use of undeclared identifier 'result'
   compose<>::to<>::result<int, char> a = result<int, char>();
                                          ^
 1 error generated.

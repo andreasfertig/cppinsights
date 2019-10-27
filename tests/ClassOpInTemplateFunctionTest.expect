@@ -50,11 +50,7 @@ class Foo
   #endif
   
   int mX;
-  // inline Foo & operator=(const Foo &) = default;
   // inline Foo & operator=(Foo &&) noexcept = default;
-  // inline constexpr Foo(const Foo &) = default;
-  // inline constexpr Foo(Foo &&) = default;
-  // inline ~Foo() noexcept = default;
 };
 
 

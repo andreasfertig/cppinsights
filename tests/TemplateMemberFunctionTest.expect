@@ -50,8 +50,6 @@ class Foo
   }
   #endif
   
-  // inline constexpr Foo(const Foo &) = default;
-  // inline constexpr Foo(Foo &&) = default;
 };
 
 

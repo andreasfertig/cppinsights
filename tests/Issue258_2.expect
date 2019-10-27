@@ -19,7 +19,6 @@ class NonMoveable
     return this->mX;
   }
   
-  // inline ~NonMoveable() noexcept = default;
 };
 
 
@@ -40,7 +39,6 @@ int main()
     NonMoveable x;
     public: 
     // inline __lambda_22_19(const __lambda_22_19 &) = delete;
-    // inline /*constexpr */ __lambda_22_19(__lambda_22_19 &&) = default;
     __lambda_22_19(NonMoveable && _x)
     : x{static_cast<NonMoveable &&>(_x)}
     {}
