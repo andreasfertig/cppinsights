@@ -506,6 +506,20 @@ private:
         return ret;
     }
 
+    bool HandleType(const PackExpansionType* type)
+    {
+        type->dump();
+        const auto qt = type->getPattern();
+
+        const bool ret = HandleType(qt.getTypePtrOrNull());
+
+        if(ret) {
+            mData.Append("...");
+        }
+
+        return ret;
+    }
+
     bool HandleType(const Type* type)
     {
 #define HANDLE_TYPE(t)                                                                                                 \
@@ -533,6 +547,7 @@ private:
         HANDLE_TYPE(ConstantArrayType);
         HANDLE_TYPE(InjectedClassNameType);
         HANDLE_TYPE(DependentTemplateSpecializationType);
+        HANDLE_TYPE(PackExpansionType);
 
 #undef HANDLE_TYPE
         return false;

@@ -568,15 +568,13 @@ void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 {
     LAMBDA_SCOPE_HELPER(BinaryOperator);
 
-    InsertArg(stmt->getLHS());
+    const bool needLHSParens{isa<BinaryOperator>(stmt->getLHS()->IgnoreImpCasts())};
+    WrapInParensIfNeeded(needLHSParens, [&] { InsertArg(stmt->getLHS()); });
+
     mOutputFormatHelper.Append(" ", stmt->getOpcodeStr(), " ");
 
-    // For + and - add the parentheses, if not already supplied. It looks like fold-expression to not carry them.
-    const bool needParens{
-        isa<BinaryOperator>(stmt->getRHS()->IgnoreImpCasts()) &&
-        ((BinaryOperatorKind::BO_Add == stmt->getOpcode()) || (BinaryOperatorKind::BO_Sub == stmt->getOpcode()))};
-
-    WrapInParensIfNeeded(needParens, [&] { InsertArg(stmt->getRHS()); });
+    const bool needRHSParens{isa<BinaryOperator>(stmt->getRHS()->IgnoreImpCasts())};
+    WrapInParensIfNeeded(needRHSParens, [&] { InsertArg(stmt->getRHS()); });
 }
 //-----------------------------------------------------------------------------
 

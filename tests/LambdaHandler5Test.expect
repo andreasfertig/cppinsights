@@ -56,7 +56,7 @@ int main()
     public: 
     inline /*constexpr */ void operator()(int & x, int & y) const
     {
-      x = x + y;
+      x = (x + y);
     }
     
     using retType_13_5 = void (*)(int &, int &);
@@ -68,7 +68,7 @@ int main()
     private: 
     static inline void __invoke(int & x, int & y)
     {
-      x = x + y;
+      x = (x + y);
     }
     
     

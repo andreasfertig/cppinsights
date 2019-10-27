@@ -19,7 +19,7 @@ T circular_area(T r)
 template<>
 int circular_area<int>(int r)
 {
-  return pi<int> * r * r;
+  return (pi<int> * r) * r;
 }
 #endif
 

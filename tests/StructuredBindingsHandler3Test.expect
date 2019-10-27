@@ -111,7 +111,7 @@ q17);
     std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(__q19);
     std::tuple_element<1, constant::Q>::type b = constant::get<1UL>(__q19);
     std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(__q19);
-    return a == 0 && b == 1 && c == 4;
+    return ((a == 0) && (b == 1)) && (c == 4);
   }
   
 

@@ -154,7 +154,7 @@ int main()
     inline /*constexpr */ int operator()(int & x, int b) const
     {
       printf("%d\n", foo + x);
-      return foo + x + b;
+      return (foo + x) + b;
     }
     
     private: 
@@ -176,7 +176,7 @@ int main()
     inline /*constexpr */ auto operator()(int & x, type_parameter_0_0 b) const
     {
       printf("%d\n", foo + x);
-      return foo + x + b;
+      return (foo + x) + b;
     }
     
     #ifdef INSIGHTS_USE_TEMPLATE
@@ -184,7 +184,7 @@ int main()
     inline /*constexpr */ int operator()(int & x, int b) const
     {
       printf("%d\n", foo + x);
-      return foo + x + b;
+      return (foo + x) + b;
     }
     #endif
     
@@ -208,7 +208,7 @@ int main()
     inline /*constexpr */ auto operator()(int & x, const type_parameter_0_0 & b) const
     {
       printf("%d\n", foo + x);
-      return foo + x + b;
+      return (foo + x) + b;
     }
     private: 
     int & foo;
@@ -229,7 +229,7 @@ int main()
     inline /*constexpr */ auto operator()(int & x, const type_parameter_0_0 & b, const type_parameter_0_1 c) const
     {
       printf("%d\n", foo + x);
-      return foo + x + b + c;
+      return ((foo + x) + b) + c;
     }
     
     #ifdef INSIGHTS_USE_TEMPLATE
@@ -237,7 +237,7 @@ int main()
     inline /*constexpr */ int operator()(int & x, const int & b, const int c) const
     {
       printf("%d\n", foo + x);
-      return foo + x + b + c;
+      return ((foo + x) + b) + c;
     }
     #endif
     
@@ -260,7 +260,7 @@ int main()
     inline /*constexpr */ int operator()(int & x, int bb) const
     {
       printf("%d\n", foo + x);
-      return foo + x + bb;
+      return (foo + x) + bb;
     }
     
     private: 
@@ -283,7 +283,7 @@ int main()
     inline /*constexpr */ int operator()(int & x, int bb) const noexcept
     {
       printf("%d\n", foo + x);
-      return foo + x + bb;
+      return (foo + x) + bb;
     }
     
     private: 
