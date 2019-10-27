@@ -3,7 +3,6 @@
 struct S
 {
   int i;
-  // inline S() = default;
   // inline constexpr S(const S &) noexcept = default;
   // inline constexpr S(S &&) noexcept = default;
 };
@@ -17,7 +16,6 @@ struct SS
   // inline constexpr SS(const SS &) noexcept = default;
   // inline constexpr SS(SS &&) noexcept = default;
   // inline constexpr SS & operator=(const SS &) noexcept = default;
-  // inline constexpr SS & operator=(SS &&) = default;
 };
 
 
@@ -28,7 +26,6 @@ class C
   
   public: 
   int i;
-  // inline C() = default;
   // inline constexpr C(const C &) noexcept = default;
   // inline constexpr C(C &&) noexcept = default;
 };
@@ -44,8 +41,6 @@ class D
   // inline constexpr D(const D &) noexcept = default;
   // inline constexpr D(D &&) noexcept = default;
   // inline constexpr D & operator=(const D &) noexcept = default;
-  // inline constexpr D & operator=(D &&) = default;
-  // inline ~D() = default;
 };
 
 
@@ -63,8 +58,6 @@ class E
   private: 
   int i;
   public: 
-  // inline constexpr E(const E &) = default;
-  // inline constexpr E(E &&) = default;
 };
 
 

@@ -4,29 +4,29 @@
 .tmp.cpp:14:5: error: unknown type name 'S'
     S s;
     ^
-.tmp.cpp:19:11: error: '__lambda_5_7' cannot be defined in a parameter type
+.tmp.cpp:18:11: error: '__lambda_5_7' cannot be defined in a parameter type
     class __lambda_5_7
           ^
-.tmp.cpp:58:7: error: redefinition of parameter '__lambda_5_7'
+.tmp.cpp:51:7: error: redefinition of parameter '__lambda_5_7'
     } __lambda_5_7{};
       ^
-.tmp.cpp:19:11: note: previous declaration is here
+.tmp.cpp:18:11: note: previous declaration is here
     class __lambda_5_7
           ^
-.tmp.cpp:58:19: error: expected ')'
+.tmp.cpp:51:19: error: expected ')'
     } __lambda_5_7{};
                   ^
-.tmp.cpp:18:17: note: to match this '('
+.tmp.cpp:17:17: note: to match this '('
     __lambda_4_5(    
                 ^
-.tmp.cpp:60:5: error: unknown type name 'S'
+.tmp.cpp:53:5: error: unknown type name 'S'
     S _s)
     ^
-.tmp.cpp:60:9: error: expected ';' at end of declaration list
+.tmp.cpp:53:9: error: expected ';' at end of declaration list
     S _s)
         ^
         ;
-.tmp.cpp:66:33: error: use of undeclared identifier '__lambda_5_7'
+.tmp.cpp:59:33: error: use of undeclared identifier '__lambda_5_7'
   __lambda_4_5 l = __lambda_4_5{__lambda_5_7.operator()()};
                                 ^
 8 errors generated.

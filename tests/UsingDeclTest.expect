@@ -23,12 +23,7 @@ struct B
   int m;
   using value_type = int;
   public: 
-  // inline B & operator=(const B &) = default;
-  // inline B & operator=(B &&) = default;
-  // inline ~B() = default;
   // inline B() noexcept = default;
-  // inline constexpr B(const B &) = default;
-  // inline constexpr B(B &&) = default;
 };
 
 
@@ -70,12 +65,7 @@ struct D<int> : public B
   using B::h;
   inline void h(int);
   
-  // inline D<int> & operator=(const D<int> &) = default;
-  // inline D<int> & operator=(D<int> &&) = default;
-  // inline ~D() = default;
   // inline D() noexcept = default;
-  // inline constexpr D(const D<int> &) = default;
-  // inline constexpr D(D<int> &&) = default;
 };
 
 #endif
@@ -88,8 +78,6 @@ namespace Test
     struct Alloc
 {
   // inline constexpr Alloc() noexcept = default;
-  // inline constexpr Alloc(const Test::Alloc &) = default;
-  // inline constexpr Alloc(Test::Alloc &&) = default;
 };
 
 

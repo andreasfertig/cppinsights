@@ -23,8 +23,6 @@ struct _Head_base<2, long, 0>
   
   inline constexpr _Head_base(const mstd::_Head_base<2, long, 0> &) = default;
   long _M_head_impl;
-  // inline ~_Head_base() = default;
-  // inline constexpr mstd::_Head_base<2, long, 0> & operator=(const mstd::_Head_base<2, long, 0> &) = default;
 };
 
 #endif
@@ -44,8 +42,6 @@ struct _Head_base<1, short, 0>
   
   inline constexpr _Head_base(const mstd::_Head_base<1, short, 0> &) = default;
   short _M_head_impl;
-  // inline ~_Head_base() = default;
-  // inline constexpr mstd::_Head_base<1, short, 0> & operator=(const mstd::_Head_base<1, short, 0> &) = default;
 };
 
 #endif
@@ -109,9 +105,6 @@ struct _Tuple_impl<1, short, long> : public mstd::_Tuple_impl<2, long>, private 
   template<typename ... _UElements>
   inline constexpr _Tuple_impl(const _Tuple_impl<1UL, _UElements...> & __in);
   
-  // inline constexpr _Tuple_impl(const mstd::_Tuple_impl<1, short, long> &) = default;
-  // inline constexpr _Tuple_impl(mstd::_Tuple_impl<1, short, long> &&) = default;
-  // inline constexpr mstd::_Tuple_impl<1, short, long> & operator=(mstd::_Tuple_impl<1, short, long> &&) = default;
 };
 
 #endif
@@ -142,11 +135,6 @@ struct _Tuple_impl<2, long> : public mstd::_Tuple_impl<3>, private mstd::_Head_b
   #endif
   
   
-  // inline constexpr _Tuple_impl(const mstd::_Tuple_impl<2, long> &) = default;
-  // inline constexpr _Tuple_impl(mstd::_Tuple_impl<2, long> &&) = default;
-  // inline constexpr mstd::_Tuple_impl<2, long> & operator=(mstd::_Tuple_impl<2, long> &&) = default;
-  // inline ~_Tuple_impl() = default;
-  // inline constexpr mstd::_Tuple_impl<2, long> & operator=(const mstd::_Tuple_impl<2, long> &) = default;
 };
 
 #endif
@@ -160,11 +148,6 @@ struct _Tuple_impl<3>
   template<std::size_t , typename ... type_parameter_0_1>
   friend class _Tuple_impl;
   inline constexpr _Tuple_impl() noexcept = default;
-  // inline constexpr _Tuple_impl(const mstd::_Tuple_impl<3> &) = default;
-  // inline constexpr _Tuple_impl(mstd::_Tuple_impl<3> &&) = default;
-  // inline ~_Tuple_impl() = default;
-  // inline constexpr mstd::_Tuple_impl<3> & operator=(const mstd::_Tuple_impl<3> &) = default;
-  // inline constexpr mstd::_Tuple_impl<3> & operator=(mstd::_Tuple_impl<3> &&) = default;
 };
 
 #endif

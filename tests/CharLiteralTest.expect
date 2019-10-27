@@ -41,7 +41,6 @@ struct Foo<int>
   
   inline void operator=(int v) volatile;
   
-  // inline ~Foo() noexcept = default;
 };
 
 #endif
@@ -69,7 +68,6 @@ struct Foo<char>
   
   inline void operator=(char v) volatile;
   
-  // inline ~Foo() noexcept = default;
 };
 
 #endif
@@ -116,9 +114,6 @@ class Test
   Foo<char> mData[1024];
   Foo<int> mLength;
   public: 
-  // inline constexpr Test(const Test &) = default;
-  // inline constexpr Test(Test &&) = default;
-  // inline constexpr Test & operator=(Test &&) = default;
   // inline Test() noexcept = default;
 };
 

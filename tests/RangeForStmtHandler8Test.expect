@@ -25,7 +25,6 @@ struct A
   
   int v[10]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   // inline constexpr A(const A &) noexcept = default;
-  // inline constexpr A(A &&) = default;
 };
 
 

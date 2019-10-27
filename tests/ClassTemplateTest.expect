@@ -25,9 +25,6 @@ class Foo<int>
   }
   
   public: 
-  // inline ~Foo() = default;
-  // inline constexpr Foo(const Foo<int> &) = default;
-  // inline constexpr Foo(Foo<int> &&) = default;
 };
 
 #endif
@@ -43,8 +40,6 @@ class Bar : public Foo<int>
   }
   
   // inline constexpr Bar() noexcept = default;
-  // inline constexpr Bar(const Bar &) = default;
-  // inline constexpr Bar(Bar &&) = default;
 };
 
 

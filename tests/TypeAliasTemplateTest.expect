@@ -34,8 +34,6 @@ struct F<int>
   #endif
   
   
-  // inline constexpr F(const F<int> &) = default;
-  // inline constexpr F(F<int> &&) = default;
 };
 
 #endif

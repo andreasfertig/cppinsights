@@ -34,8 +34,6 @@ struct Person<int>
   }
   
   // inline Person() noexcept = default;
-  // inline constexpr Person(const Person<int> &) = default;
-  // inline constexpr Person(Person<int> &&) = default;
 };
 
 

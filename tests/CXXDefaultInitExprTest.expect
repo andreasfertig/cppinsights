@@ -30,8 +30,6 @@ class Alloc<int, 0>
   {
   }
   
-  // inline constexpr Alloc(const Alloc<int, 0> &) = default;
-  // inline constexpr Alloc(Alloc<int, 0> &&) = default;
 };
 
 #endif
@@ -54,8 +52,6 @@ class Alloc<char, 1>
   {
   }
   
-  // inline constexpr Alloc(const Alloc<char, 1> &) = default;
-  // inline constexpr Alloc(Alloc<char, 1> &&) = default;
 };
 
 #endif

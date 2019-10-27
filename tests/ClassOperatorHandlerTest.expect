@@ -66,7 +66,6 @@ class Test
   public: 
   // inline constexpr Test(const Test &) noexcept = default;
   // inline constexpr Test(Test &&) noexcept = default;
-  // inline ~Test() noexcept = default;
 };
 
 
@@ -94,8 +93,6 @@ class Fest
   private: 
   int mX;
   public: 
-  // inline constexpr Fest(const Fest &) = default;
-  // inline constexpr Fest(Fest &&) = default;
 };
 
 
@@ -132,8 +129,6 @@ class Hello::Bello::Fest
   private: 
   int mX;
   public: 
-  // inline constexpr Hello::Bello::Fest(const Hello::Bello::Fest &) = default;
-  // inline constexpr Hello::Bello::Fest(Hello::Bello::Fest &&) = default;
 };
 
 

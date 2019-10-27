@@ -14,8 +14,6 @@ class Foo<int>
   struct Far;
   public: 
   // inline constexpr Foo() noexcept = default;
-  // inline constexpr Foo(const Foo<int> &) = default;
-  // inline constexpr Foo(Foo<int> &&) = default;
 };
 
 #endif

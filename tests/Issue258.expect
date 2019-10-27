@@ -17,7 +17,6 @@ int main()
     std::unique_ptr<int, std::default_delete<int> > x;
     public: 
     // inline /*constexpr */ __lambda_7_19(const __lambda_7_19 &) = delete;
-    // inline __lambda_7_19(__lambda_7_19 &&) = default;
     __lambda_7_19(std::unique_ptr<int, std::default_delete<int> > && _x)
     : x{std::move(_x)}
     {}

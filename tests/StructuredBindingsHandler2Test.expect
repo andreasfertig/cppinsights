@@ -6,9 +6,7 @@ int main()
   {
     int x;
     int y;
-    // inline SP() = default;
     // inline constexpr SP(const SP &) noexcept = default;
-    // inline constexpr SP(SP &&) = default;
   };
   
   SP sp = {1, 2};
@@ -21,9 +19,7 @@ int main()
     public: 
     int x;
     int y;
-    // inline CP() = default;
     // inline constexpr CP(const CP &) noexcept = default;
-    // inline constexpr CP(CP &&) = default;
   };
   
   CP cp = {1, 2};

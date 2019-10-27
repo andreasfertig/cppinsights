@@ -1,0 +1,19 @@
+#include <utility>
+
+class Foo
+{
+  public: 
+  // inline constexpr Foo() noexcept = default;
+};
+
+
+/* PASSED: static_assert(noexcept(true) , ""); */
+
+/* PASSED: static_assert(!noexcept(false) , ""); */
+
+
+int main()
+{
+  Foo f = Foo();
+}
+

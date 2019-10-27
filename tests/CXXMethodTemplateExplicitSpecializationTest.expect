@@ -15,8 +15,6 @@ class Foo<int>
   void Func();
   
   // inline constexpr Foo() noexcept = default;
-  // inline constexpr Foo(const Foo<int> &) = default;
-  // inline constexpr Foo(Foo<int> &&) = default;
 };
 
 #endif
@@ -32,8 +30,6 @@ class Foo<char>
   void Func();
   
   // inline constexpr Foo() noexcept = default;
-  // inline constexpr Foo(const Foo<char> &) = default;
-  // inline constexpr Foo(Foo<char> &&) = default;
 };
 
 #endif

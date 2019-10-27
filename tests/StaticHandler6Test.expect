@@ -11,8 +11,6 @@ class Sing
     X();
   }
   
-  // inline constexpr Sing(const Sing &) = default;
-  // inline constexpr Sing(Sing &&) = default;
 };
 
 

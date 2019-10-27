@@ -2,13 +2,11 @@ struct S
 {
   void f();
   
-  // inline ~S() noexcept = default;
 };
 
 
 struct T
 {
-  // inline ~T() noexcept = default;
 };
 
 

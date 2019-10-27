@@ -4,7 +4,6 @@ struct Point
 {
   double x;
   double y;
-  // inline ~Point() noexcept = default;
 };
 
 
@@ -53,7 +52,6 @@ struct Complex
 {
   _Complex float fc;
   _Complex int ic;
-  // inline ~Complex() noexcept = default;
 };
 
 

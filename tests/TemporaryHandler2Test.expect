@@ -10,10 +10,6 @@ class X
   
   void modify();
   
-  // inline constexpr X(const X &) = default;
-  // inline constexpr X(X &&) = default;
-  // inline ~X() noexcept = default;
-  // inline X & operator=(const X &) = default;
   // inline X & operator=(X &&) noexcept = default;
 };
 
@@ -78,7 +74,6 @@ class Base
     std::operator<<(std::cout, "Base dtor").operator<<(std::endl);
   }
   
-  // inline constexpr Base(const Base &) = default;
 };
 
 
@@ -92,7 +87,6 @@ class Foo : public Base
     std::operator<<(std::cout, "Foo dtor").operator<<(std::endl);
   }
   
-  // inline constexpr Foo(const Foo &) = default;
 };
 
 
@@ -125,7 +119,6 @@ struct S
   {
   }
   
-  // inline constexpr S(const S &) = default;
 };
 
 

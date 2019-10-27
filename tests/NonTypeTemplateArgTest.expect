@@ -21,8 +21,6 @@ struct SC<&c>
   }
   
   // inline constexpr SC() noexcept = default;
-  // inline constexpr SC(const SC<&c> &) = default;
-  // inline constexpr SC(SC<&c> &&) = default;
 };
 
 #endif

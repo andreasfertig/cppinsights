@@ -43,7 +43,6 @@ namespace constant {
 {
   // inline constexpr Q() noexcept = default;
   // inline constexpr Q(const constant::Q &) noexcept = default;
-  // inline constexpr Q(constant::Q &&) = default;
 };
 
 

@@ -12,7 +12,6 @@ struct visitor<__lambda_8_7, __lambda_9_7> : public __lambda_8_7, public __lambd
   // inline /*constexpr */ void ::operator()(const char * value) const;
   
   // inline constexpr visitor<__lambda_8_7, __lambda_9_7> & operator=(visitor<__lambda_8_7, __lambda_9_7> &&) = delete;
-  // inline ~visitor() noexcept = default;
 };
 
 #endif
@@ -38,7 +37,6 @@ int main()
     }
     
     // inline /*constexpr */ __lambda_8_7 & operator=(const __lambda_8_7 &) = delete;
-    // inline /*constexpr */ __lambda_8_7(const __lambda_8_7 &) = default;
     // inline /*constexpr */ __lambda_8_7(__lambda_8_7 &&) noexcept = default;
     
   };
@@ -52,7 +50,6 @@ int main()
     }
     
     // inline /*constexpr */ __lambda_9_7 & operator=(const __lambda_9_7 &) = delete;
-    // inline /*constexpr */ __lambda_9_7(const __lambda_9_7 &) = default;
     // inline /*constexpr */ __lambda_9_7(__lambda_9_7 &&) noexcept = default;
     
   };

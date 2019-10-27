@@ -65,7 +65,6 @@ struct SA<2>
   bool Test();
   
   int nt;
-  // inline constexpr SA(const SA<2> &) = default;
 };
 
 #endif

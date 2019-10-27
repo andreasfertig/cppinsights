@@ -7,8 +7,6 @@ template<>
 struct FunctionArgs<int (__lambda_12_14::*)(int, int) const>
 {
   // inline constexpr FunctionArgs() noexcept = default;
-  // inline constexpr FunctionArgs(const FunctionArgs<int (__lambda_12_14::*)(int, int) const> &) = default;
-  // inline constexpr FunctionArgs(FunctionArgs<int (__lambda_12_14::*)(int, int) const> &&) = default;
 };
 
 #endif

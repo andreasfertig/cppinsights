@@ -16,9 +16,6 @@ class Customer
     return std::basic_string<char>(this->name);
   }
   
-  // inline Customer(const Customer &) = default;
-  // inline Customer(Customer &&) = default;
-  // inline Customer & operator=(Customer &&) = default;
   // inline ~Customer() noexcept = default;
 };
 
@@ -31,10 +28,6 @@ struct CustomerEq
     return std::operator==(c0.getName(), c1.getName());
   }
   
-  // inline constexpr CustomerEq() noexcept = default;
-  // inline ~CustomerEq() noexcept = default;
-  // inline constexpr CustomerEq(const CustomerEq &) noexcept = default;
-  // inline constexpr CustomerEq(CustomerEq &&) noexcept = default;
 };
 
 
@@ -46,10 +39,6 @@ struct CustomerHash
     return std::hash<std::basic_string<char> >().operator()(c.getName());
   }
   
-  // inline constexpr CustomerHash() noexcept = default;
-  // inline ~CustomerHash() noexcept = default;
-  // inline constexpr CustomerHash(const CustomerHash &) noexcept = default;
-  // inline constexpr CustomerHash(CustomerHash &&) noexcept = default;
 };
 
 
@@ -70,10 +59,6 @@ struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, 
   using CustomerEq::operator();
   // inline bool CustomerEq::operator()(const Customer & c0, const Customer & c1) const;
   
-  // inline constexpr ManyParentsWithOperator() noexcept = default;
-  // inline ~ManyParentsWithOperator() noexcept = default;
-  // inline constexpr ManyParentsWithOperator(const ManyParentsWithOperator<CustomerHash, CustomerEq> &) noexcept = default;
-  // inline constexpr ManyParentsWithOperator(ManyParentsWithOperator<CustomerHash, CustomerEq> &&) noexcept = default;
 };
 
 #endif
@@ -90,10 +75,6 @@ struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, pu
   using CustomerHash::operator();
   // inline std::size_t CustomerHash::operator()(const Customer & c) const;
   
-  // inline constexpr ManyParentsWithOperator() noexcept = default;
-  // inline ~ManyParentsWithOperator() noexcept = default;
-  // inline constexpr ManyParentsWithOperator(const ManyParentsWithOperator<CustomerEq, CustomerHash> &) noexcept = default;
-  // inline constexpr ManyParentsWithOperator(ManyParentsWithOperator<CustomerEq, CustomerHash> &&) noexcept = default;
 };
 
 #endif

@@ -52,7 +52,6 @@ class Test
   private: 
   int mV;
   public: 
-  // inline ~Test() noexcept = default;
 };
 
 
@@ -61,9 +60,7 @@ class Test
 struct S
 {
   Test count;
-  // inline S(S &) = default;
   // inline constexpr S(S &&) = delete;
-  // inline S & operator=(S &&) = default;
   // inline S() noexcept(false) = default;
 };
 

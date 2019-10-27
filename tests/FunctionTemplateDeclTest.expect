@@ -32,10 +32,6 @@ class Test<int>
   }
   #endif
   
-  // inline constexpr Test(const Test<int> &) = default;
-  // inline constexpr Test(Test<int> &&) = default;
-  // inline constexpr Test<int> & operator=(const Test<int> &) = default;
-  // inline constexpr Test<int> & operator=(Test<int> &&) = default;
 };
 
 #endif
@@ -61,10 +57,6 @@ class Test<char>
   }
   #endif
   
-  // inline constexpr Test(const Test<char> &) = default;
-  // inline constexpr Test(Test<char> &&) = default;
-  // inline constexpr Test<char> & operator=(const Test<char> &) = default;
-  // inline constexpr Test<char> & operator=(Test<char> &&) = default;
 };
 
 #endif
