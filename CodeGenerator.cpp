@@ -139,6 +139,39 @@ protected:
 };
 //-----------------------------------------------------------------------------
 
+/// \brief A special code generator for Lambda init captures which use \c std::move
+class LambdaInitCaptureCodeGenerator final : public CodeGenerator
+{
+public:
+    explicit LambdaInitCaptureCodeGenerator(OutputFormatHelper& outputFormatHelper,
+                                            LambdaStackType&    lambdaStack,
+                                            std::string&        varName)
+    : CodeGenerator{outputFormatHelper, lambdaStack}
+    , mVarName{varName}
+    {
+    }
+
+    using CodeGenerator::InsertArg;
+
+    /// Replace every \c VarDecl with the given variable name. This cover init captures which introduce a new name.
+    /// However, it means that _all_ VarDecl's will be changed.
+    /// TODO: Check if it is really good to replace all VarDecl's
+    void InsertArg(const DeclRefExpr* stmt) override
+    {
+        if(isa<VarDecl>(stmt->getDecl())) {
+            mOutputFormatHelper.Append("_", mVarName);
+
+        } else {
+
+            CodeGenerator::InsertArg(stmt);
+        }
+    }
+
+private:
+    std::string& mVarName;  ///< The name of the variable that needs to be prefixed with _.
+};
+//-----------------------------------------------------------------------------
+
 CodeGenerator::LambdaScopeHandler::LambdaScopeHandler(LambdaStackType&       stack,
                                                       OutputFormatHelper&    outputFormatHelper,
                                                       const LambdaCallerType lambdaCallerType)
@@ -2494,13 +2527,30 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     ctorArguments.append(", ");
                 }
 
+                std::string refRef{};
+
                 const auto& fieldName{StrCat(isThis ? "__" : "", name)};
 
-                /*if(useBraces) {*/
-                ctorInitializerList.push_back(StrCat(fieldName, "{", "_", name, "}"));
-                /*} else {
-                    ctorInitializerList.push_back(StrCat(fieldName, "(", "_", name, ")"));
-                }*/
+                // Special handling for lambdas with init caputures which contain a move. In such a case, copy the
+                // initial move statement and make the variable a &&.
+                if(const auto* cxxConstructExpr = dyn_cast_or_null<CXXConstructExpr>(expr);
+                   cxxConstructExpr && cxxConstructExpr->getConstructor()->isMoveConstructor()) {
+
+                    OutputFormatHelper             ofm{};
+                    LambdaInitCaptureCodeGenerator codeGenerator{ofm, mLambdaStack, name};
+
+                    if(cxxConstructExpr->getNumArgs()) {
+                        ForEachArg(cxxConstructExpr->arguments(),
+                                   [&](const auto& arg) { codeGenerator.InsertArg(arg); });
+                    }
+
+                    refRef = "&& ";
+
+                    ctorInitializerList.push_back(StrCat(fieldName, "{", ofm.GetString(), "}"));
+                } else {
+
+                    ctorInitializerList.push_back(StrCat(fieldName, "{", "_", name, "}"));
+                }
 
                 if(not isThis && expr) {
                     OutputFormatHelper ofm{};
@@ -2515,7 +2565,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     ctorArguments.append(name);
                 }
 
-                mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat("_", name)));
+                mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat(refRef, "_", name)));
             };
 
         llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};

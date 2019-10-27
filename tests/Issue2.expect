@@ -40,8 +40,8 @@ int main()
     public: 
     // inline __lambda_20_16(const __lambda_20_16 &) = delete;
     // inline __lambda_20_16(__lambda_20_16 &&) = default;
-    __lambda_20_16(Movable _x, int _c)
-    : x{_x}
+    __lambda_20_16(Movable && _x, int _c)
+    : x{std::move(_x)}
     , c{_c}
     {}
     

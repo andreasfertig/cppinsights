@@ -1,0 +1,53 @@
+#include <cstdio>
+
+class NonMoveable
+{
+  int mX;
+  
+  public: 
+  inline NonMoveable(int x)
+  : mX{x}
+  {
+  }
+  
+  // inline NonMoveable(const NonMoveable &) = delete;
+  // inline NonMoveable & operator=(const NonMoveable &) = delete;
+  inline constexpr NonMoveable(NonMoveable &&) noexcept = default;
+  inline NonMoveable & operator=(NonMoveable &&) = default;
+  inline int Get() const
+  {
+    return this->mX;
+  }
+  
+  // inline ~NonMoveable() noexcept = default;
+};
+
+
+
+int main()
+{
+  NonMoveable x = NonMoveable(42);
+    
+  class __lambda_22_19
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+      printf("%d\n", x.Get());
+    }
+    
+    private: 
+    NonMoveable x;
+    public: 
+    // inline __lambda_22_19(const __lambda_22_19 &) = delete;
+    // inline /*constexpr */ __lambda_22_19(__lambda_22_19 &&) = default;
+    __lambda_22_19(NonMoveable && _x)
+    : x{static_cast<NonMoveable &&>(_x)}
+    {}
+    
+  };
+  
+  __lambda_22_19 lambda = __lambda_22_19{NonMoveable(static_cast<NonMoveable &&>(x))};
+}
+
+
