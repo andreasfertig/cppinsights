@@ -86,6 +86,7 @@ def main():
     parser.add_argument('--failure-is-ok',  help='Failing tests are ok', default=False, action='store_true')
     parser.add_argument('--update-tests',   help='Update failing tests', default=False, action='store_true')
     parser.add_argument('--std',            help='C++ Standard to used', default='c++17')
+    parser.add_argument('--use-libcpp',     help='Use libst++',          default=False, action='store_true')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = vars(parser.parse_args())
 
@@ -128,10 +129,16 @@ def main():
             missingExpected += 1
             continue
 
-        if '' == insightsOpts:
-            cmd   = [insightsPath, f, '--', cppStd, '-m64']
-        else:
-            cmd   = [insightsPath, f, insightsOpts, '--', cppStd, '-m64']
+        cmd = [insightsPath, f]
+
+        if args['use_libcpp']:
+            cmd.append('-use-libc++')
+
+
+        if '' != insightsOpts:
+            cmd.append(insightsOpts)
+
+        cmd.extend(['--', cppStd, '-m64'])
 
         begin = datetime.datetime.now()
         p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
