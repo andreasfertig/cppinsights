@@ -140,6 +140,15 @@ jobs:
     - docker pull andreasfertig/cppinsights-builder
     env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes'
 
+  - os: linux
+    name: "GCC 8 / LLVM 9 @ Ubuntu Code Coverage (libc++)"
+    sudo: required
+    services:
+    - docker
+    before_install:
+    - docker pull andreasfertig/cppinsights-builder
+    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes' USE_LIBCPP='Yes'
+
   - stage: "Deploy Docker"
     install: true
     before_script: true
@@ -196,7 +205,7 @@ before_script:
   - cd build
   - |
     if [[ "${USE_DOCKER}" == "Yes" ]]; then
-      docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG} -DINSIGHTS_COVERAGE=${COVERAGE} .."
+      docker run -v ${TRAVIS_BUILD_DIR}:/home/builder --rm andreasfertig/cppinsights-builder /bin/bash -c "cd /home/builder/build && cmake -G Ninja -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_USE_LIBCPP=${USE_LIBCPP} .."
     elif [[ "${CFORMAT}" == "Yes" ]]; then
       echo "Nothing to do here for the clang-format check run."
     else

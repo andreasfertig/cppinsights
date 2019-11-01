@@ -8,12 +8,13 @@ include(CMakePrintHelpers)
 
 # TODO: enable those options on Windows once tested
 if(NOT WIN32)
-    option(DEBUG             "Enable debug"              Off)
-    option(INSIGHTS_STRIP    "Strip insight after build" On )
-    option(INSIGHTS_TIDY     "Run clang-tidy"            Off)
-    option(INSIGHTS_IWYU     "Run include-what-you-use"  Off)
-    option(INSIGHTS_STATIC   "Use static linking"        Off)
-    option(INSIGHTS_COVERAGE "Enable code coverage"      Off)
+    option(DEBUG               "Enable debug"              Off)
+    option(INSIGHTS_STRIP      "Strip insight after build" On )
+    option(INSIGHTS_TIDY       "Run clang-tidy"            Off)
+    option(INSIGHTS_IWYU       "Run include-what-you-use"  Off)
+    option(INSIGHTS_STATIC     "Use static linking"        Off)
+    option(INSIGHTS_COVERAGE   "Enable code coverage"      Off)
+    option(INSIGHTS_USE_LIBCPP "Enable code coverage"      Off)
 endif()
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
@@ -499,9 +500,14 @@ if (NOT WIN32)
         set(TEST_FAILURE_IS_OK "--failure-is-ok")
     endif()
 
+    set(TEST_USE_LIBCPP "")
+    if(INSIGHTS_USE_LIBCPP)
+        set(TEST_USE_LIBCPP "--use-libcpp")
+    endif()
+
     # add a target to generate run tests
     add_custom_target(tests
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK} ${TEST_USE_LIBCPP}
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
@@ -519,7 +525,7 @@ if (NOT WIN32)
 
     # run tests in a docker container
     add_custom_target(docker-tests
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=${INSIGHTS_COVERAGE} -DDEBUG=${DEBUG}" tests
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=${INSIGHTS_COVERAGE} -DDEBUG=${DEBUG} -DINSIGHTS_USE_LIBCPP=${INSIGHTS_USE_LIBCPP}" tests
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMENT "Running tests in docker" VERBATIM
@@ -527,7 +533,7 @@ if (NOT WIN32)
 
     # run code coverage in docker container
     add_custom_target(docker-coverage
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=Yes -DDEBUG=${DEBUG}" coverage-html
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=Yes -DDEBUG=${DEBUG} -DINSIGHTS_USE_LIBCPP=${INSIGHTS_USE_LIBCPP}" coverage-html
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMENT "Running tests in docker" VERBATIM
@@ -535,7 +541,7 @@ if (NOT WIN32)
 
     # run tests in a docker container
     add_custom_target(docker-build
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=${INSIGHTS_COVERAGE} -DDEBUG=${DEBUG}"
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=${INSIGHTS_COVERAGE} -DDEBUG=${DEBUG} -DINSIGHTS_USE_LIBCPP=${INSIGHTS_USE_LIBCPP}"
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMENT "Bulding insights in docker" VERBATIM

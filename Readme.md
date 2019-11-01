@@ -134,12 +134,13 @@ Then build clang as you normally do.
 
 There are a couple of options which can be enable with [cmake](https://cmake.org):
 
-| Option            | Description                | Default |
-|-------------------|:---------------------------| --------|
-| INSIGHTS_STRIP    | Strip insight after build  | ON      |
-| INSIGHTS_STATIC   | Use static linking         | OFF     |
-| INSIGHTS_COVERAGE | Enable code coverage       | OFF     |
-| DEBUG             | Enable debug               | OFF     |
+| Option              | Description                | Default |
+|---------------------|:---------------------------| --------|
+| INSIGHTS_STRIP      | Strip insight after build  | ON      |
+| INSIGHTS_STATIC     | Use static linking         | OFF     |
+| INSIGHTS_COVERAGE   | Enable code coverage       | OFF     |
+| INSIGHTS_USE_LIBCPP | Use libc++ for tests       | OFF     |
+| DEBUG               | Enable debug               | OFF     |
 
 
 ### Use it with [Cevelop](https://www.cevelop.com)
