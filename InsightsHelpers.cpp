@@ -574,7 +574,7 @@ private:
                      type->getIdentifier()->getName().str());
 
         CodeGenerator codeGenerator{mData};
-        codeGenerator.InsertTemplateArgs(type->template_arguments());
+        codeGenerator.InsertTemplateArgs(*type);
 
         return true;
     }

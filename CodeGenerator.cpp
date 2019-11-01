@@ -350,7 +350,7 @@ void CodeGenerator::InsertArg(const UnresolvedLookupExpr* stmt)
     InsertQualifierAndName(stmt->getName(), stmt->getQualifier(), mOutputFormatHelper);
 
     if(stmt->getNumTemplateArgs()) {
-        InsertTemplateArgs(stmt->template_arguments());
+        InsertTemplateArgs(*stmt);
     }
 }
 //-----------------------------------------------------------------------------
@@ -601,8 +601,8 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
                 if(haveArg) {
                     mOutputFormatHelper.Append(ofm.GetString(), ">");
 
-                } else if(cxxMethod->getAsFunction()->isFunctionTemplateSpecialization()) {
-                    InsertTemplateArgs(tmplArgs->asArray());
+                } else {
+                    InsertTemplateArgs(*tmplArgs);
                 }
             }
         }
@@ -719,7 +719,7 @@ static std::string FormatVarTemplateSpecializationDecl(const Decl* decl, std::st
         OutputFormatHelper outputFormatHelper{};
         CodeGenerator      codeGenerator{outputFormatHelper};
 
-        codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
+        codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs());
 
         name += outputFormatHelper.GetString();
     }
@@ -1116,7 +1116,7 @@ void CodeGenerator::InsertArg(const UnresolvedMemberExpr* stmt)
     mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getAsString());
 
     if(stmt->getNumTemplateArgs()) {
-        InsertTemplateArgs(stmt->template_arguments());
+        InsertTemplateArgs(*stmt);
     }
 }
 //-----------------------------------------------------------------------------
@@ -1279,7 +1279,7 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
             if(const TemplateArgumentList* args =
                    cast<FunctionDecl>(declRefExpr->getDecl())->getTemplateSpecializationArgs()) {
                 if(1 != args->size()) {
-                    InsertTemplateArgs(args->asArray());
+                    InsertTemplateArgs(*args);
                 } else {
                     mOutputFormatHelper.Append('<');
 
@@ -1949,17 +1949,9 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         StringStream stream{};
         templateSpecializationType->getTemplateName().dump(stream);
 
-        mOutputFormatHelper.Append(stream.str(), "<");
+        mOutputFormatHelper.Append(stream.str());
 
-        ForEachArg(templateSpecializationType->template_arguments(), [&](const auto& arg) {
-            if(arg.getKind() == TemplateArgument::Expression) {
-                InsertArg(arg.getAsExpr());
-            } else {
-                InsertTemplateArg(arg);
-            }
-        });
-
-        mOutputFormatHelper.Append(">");
+        InsertTemplateArgs(*templateSpecializationType);
     } else if(auto* dependentTemplateSpecializationType =
                   underlyingType->getAs<DependentTemplateSpecializationType>()) {
 
@@ -1967,17 +1959,9 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 
         InsertNamespace(dependentTemplateSpecializationType->getQualifier());
 
-        mOutputFormatHelper.Append("template ", dependentTemplateSpecializationType->getIdentifier()->getName(), "<");
+        mOutputFormatHelper.Append("template ", dependentTemplateSpecializationType->getIdentifier()->getName());
 
-        ForEachArg(dependentTemplateSpecializationType->template_arguments(), [&](const auto& arg) {
-            if(arg.getKind() == TemplateArgument::Expression) {
-                InsertArg(arg.getAsExpr());
-            } else {
-                InsertTemplateArg(arg);
-            }
-        });
-
-        mOutputFormatHelper.Append('>');
+        InsertTemplateArgs(*dependentTemplateSpecializationType);
 
     } else {
         mOutputFormatHelper.Append(GetName(underlyingType));
@@ -2847,56 +2831,10 @@ void CodeGenerator::InsertTemplateArgs(const ClassTemplateSpecializationDecl& cl
 {
     if(const TypeSourceInfo* typeAsWritten = clsTemplateSpe.getTypeAsWritten()) {
         const TemplateSpecializationType* tmplSpecType = cast<TemplateSpecializationType>(typeAsWritten->getType());
-        InsertTemplateArgs(tmplSpecType->template_arguments());
+        InsertTemplateArgs(*tmplSpecType);
     } else {
-        InsertTemplateArgs(clsTemplateSpe.getTemplateArgs().asArray());
+        InsertTemplateArgs(clsTemplateSpe.getTemplateArgs());
     }
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertTemplateArgs(const DeclRefExpr& stmt)
-{
-    if(stmt.getNumTemplateArgs()) {
-        mOutputFormatHelper.Append('<');
-
-        ForEachArg(stmt.template_arguments(), [&](const auto& arg) {
-            const auto& targ = arg.getArgument();
-
-            InsertTemplateArg(targ);
-        });
-
-        mOutputFormatHelper.Append('>');
-    }
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertTemplateArgs(const ArrayRef<TemplateArgument>& array)
-{
-    mOutputFormatHelper.Append('<');
-
-    ForEachArg(array, [&](const auto& arg) { InsertTemplateArg(arg); });
-
-    /* put as space between to closing brackets: >> -> > > */
-    if(mOutputFormatHelper.GetString().back() == '>') {
-        mOutputFormatHelper.Append(' ');
-    }
-
-    mOutputFormatHelper.Append('>');
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertTemplateArgs(const ArrayRef<TemplateArgumentLoc>& array)
-{
-    mOutputFormatHelper.Append('<');
-
-    ForEachArg(array, [&](const auto& arg) { InsertTemplateArg(arg.getArgument()); });
-
-    /* put as space between to closing brackets: >> -> > > */
-    if(mOutputFormatHelper.GetString().back() == '>') {
-        mOutputFormatHelper.Append(' ');
-    }
-
-    mOutputFormatHelper.Append('>');
 }
 //-----------------------------------------------------------------------------
 
