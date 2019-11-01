@@ -1275,23 +1275,9 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
     InsertArg(stmt->getCallee());
 
     if(isa<UserDefinedLiteral>(stmt)) {
-        if(const auto* declRefExpr = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
-            if(const TemplateArgumentList* args =
-                   cast<FunctionDecl>(declRefExpr->getDecl())->getTemplateSpecializationArgs()) {
-                if(1 != args->size()) {
-                    InsertTemplateArgs(*args);
-                } else {
-                    mOutputFormatHelper.Append('<');
-
-                    const TemplateArgument& pack = args->get(0);
-
-                    ForEachArg(pack.pack_elements(), [&](const auto& arg) {
-                        const char c{static_cast<char>(arg.getAsIntegral().getZExtValue())};
-                        mOutputFormatHelper.Append("'", std::string{c}, "'");
-                    });
-
-                    mOutputFormatHelper.Append('>');
-                }
+        if(const auto* declRefExpr = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
+            if(const auto* fd = dyn_cast_or_null<FunctionDecl>(declRefExpr->getDecl())) {
+                InsertTemplateArgs(*fd);
             }
         }
     }
@@ -2853,7 +2839,16 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             mOutputFormatHelper.Append("&", arg.getAsDecl()->getQualifiedNameAsString());
             break;
         case TemplateArgument::NullPtr: mOutputFormatHelper.Append(GetName(arg.getNullPtrType())); break;
-        case TemplateArgument::Integral: mOutputFormatHelper.Append(arg.getAsIntegral()); break;
+        case TemplateArgument::Integral:
+
+            if(const auto& integral = arg.getAsIntegral(); arg.getIntegralType()->isCharType()) {
+                const char c{static_cast<char>(integral.getZExtValue())};
+                mOutputFormatHelper.Append("'", std::string{c}, "'");
+            } else {
+                mOutputFormatHelper.Append(integral);
+            }
+
+            break;
         case TemplateArgument::Expression: InsertArg(arg.getAsExpr()); break;
         case TemplateArgument::Pack: HandleTemplateParameterPack(arg.pack_elements()); break;
         case TemplateArgument::Template:

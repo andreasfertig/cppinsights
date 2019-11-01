@@ -19,7 +19,7 @@ void print(const T1& arg1, const Types&... args)
 /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void print<32, char [3], double, std::basic_string<char> >(char const (&arg1)[3], const double & __args1, const std::basic_string<char> & __args2)
+void print<' ', char [3], double, std::basic_string<char> >(char const (&arg1)[3], const double & __args1, const std::basic_string<char> & __args2)
 {
   std::operator<<(std::cout, arg1);
     
