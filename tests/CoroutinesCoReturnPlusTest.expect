@@ -1,0 +1,124 @@
+// cmdline:-std=c++2a
+#include <experimental/coroutine>
+
+namespace stdx = std::experimental;
+ 
+struct generator
+{
+  struct promise_type
+  {
+    int current_value;
+    inline stdx::suspend_always yield_value(int value)
+    {
+      this->current_value = value;
+      return {};
+    }
+    
+    inline stdx::suspend_always initial_suspend()
+    {
+      return {};
+    }
+    
+    inline stdx::suspend_always final_suspend()
+    {
+      return {};
+    }
+    
+    inline generator get_return_object()
+    {
+      return generator{this};
+    }
+    
+    inline void unhandled_exception()
+    {
+      std::terminate();
+    }
+    
+    inline void return_value(int value)
+    {
+    }
+    
+    static inline generator get_return_object_on_allocation_failure()
+    {
+      throw std::bad_alloc();
+    }
+    
+    // inline promise_type() noexcept = default;
+  };
+  
+  using coro_handle = stdx::coroutine_handle<generator::promise_type>;
+  inline bool await_ready()
+  {
+    return false;
+  }
+  
+  inline void await_suspend(std::experimental::coroutine_handle<generator::promise_type> waiter)
+  {
+    static_cast<std::experimental::coroutine_handle<void>&>(waiter).resume();
+  }
+  
+  inline int await_resume()
+  {
+    return this->p.promise().current_value;
+  }
+  
+  // inline generator(const generator &) = delete;
+  inline generator(generator && rhs)
+  : p{std::experimental::coroutine_handle<generator::promise_type>(rhs.p)}
+  {
+    rhs.p.operator=(nullptr);
+  }
+  
+  inline ~generator() noexcept
+  {
+    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    
+    
+  }
+  
+  
+  private: 
+  inline explicit generator(generator::promise_type * p)
+  : p{std::experimental::coroutine_handle<generator::promise_type>::from_promise(*p)}
+  {
+  }
+  
+  std::experimental::coroutine_handle<generator::promise_type> p;
+};
+
+
+
+generator simpleReturn(int v)
+{
+  co_return v;
+}
+
+
+
+
+generator additionAwaitReturn(int v)
+{
+  co_return (co_await simpleReturn(v) + co_await simpleReturn(v)) + co_await simpleReturn(v + 1);
+}
+
+
+generator awaitReturn(int v)
+{
+  co_return co_await simpleReturn(v + 41);
+}
+
+
+generator bracedReturn(int v)
+{
+  co_return {v};
+}
+
+
+int main()
+{
+  generator sr = simpleReturn(3);
+  generator aar = additionAwaitReturn(2);
+  generator ar = awaitReturn(44);
+  generator br = bracedReturn(5);
+}
+

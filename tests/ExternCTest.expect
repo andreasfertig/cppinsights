@@ -1,5 +1,4 @@
 extern "C" void Foo();
-           
 
 int main()
 {
@@ -8,8 +7,5 @@ int main()
 
 
 extern "C" {
-    void Foo()
-    {
-    }
-    
+    void Foo() {}
 }

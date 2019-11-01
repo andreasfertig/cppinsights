@@ -114,6 +114,9 @@ SUPPORTED_STMT(CXXUnresolvedConstructExpr)
 SUPPORTED_STMT(UnresolvedMemberExpr)
 SUPPORTED_STMT(PackExpansionExpr)
 SUPPORTED_STMT(CXXFoldExpr)
+SUPPORTED_STMT(CoroutineBodyStmt)
+SUPPORTED_STMT(CoroutineSuspendExpr)
+SUPPORTED_STMT(CoreturnStmt)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT
