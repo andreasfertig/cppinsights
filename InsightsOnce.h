@@ -3,7 +3,7 @@
 
 namespace clang::insights {
 
-/// \brief A helper object which returns a boolen value just once and toggles it after the first query.
+/// \brief A helper object which returns a boolean value just once and toggles it after the first query.
 ///
 /// This allows to simplify code like this:
 /// \code

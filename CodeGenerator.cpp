@@ -1014,6 +1014,26 @@ void CodeGenerator::InsertArg(const ParenListExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+/// Fill the values of a constant array.
+///
+/// This is either called by \c InitListExpr (which may contain an offset, as the user already provided certain values)
+/// or by \c GetValueOfValueInit.
+std::string
+CodeGenerator::FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt)
+{
+    const auto         size{std::clamp(ct->getSize().getZExtValue(), uint64_t{0}, MAX_FILL_VALUES_FOR_ARRAYS)};
+    OutputFormatHelper ret{};
+
+    OnceFalse needsComma{uint64_t{0} != startAt};
+    for_each(startAt, size, [&](auto) {
+        ret.AppendComma(needsComma);
+        ret.Append(value);
+    });
+
+    return ret.GetString();
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
     WrapInCurlys([&]() {
@@ -1023,24 +1043,15 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
 
         // If we have a filler, fill the rest of the array with the filler expr.
         if(const auto* filler = stmt->getArrayFiller()) {
-            const auto fullWidth = [&]() -> uint64_t {
-                if(const auto* ct = dyn_cast_or_null<ConstantArrayType>(stmt->getType().getTypePtrOrNull())) {
-                    const auto v = ct->getSize().getZExtValue();
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm};
+            codeGenerator.InsertArg(filler);
 
-                    // clamp here to survive large arrays.
-                    return std::clamp(v, uint64_t(0), uint64_t(100));
-                }
+            const auto ret = FillConstantArray(dyn_cast_or_null<ConstantArrayType>(stmt->getType().getTypePtrOrNull()),
+                                               ofm.GetString(),
+                                               stmt->getNumInits());
 
-                return 0;
-            }();
-
-            // now fill the remaining array slots.
-            OnceFalse needsComma{0 != stmt->getNumInits()};
-            for_each(static_cast<uint64_t>(stmt->getNumInits()), fullWidth, [&](auto) {
-                mOutputFormatHelper.AppendComma(needsComma);
-
-                InsertArg(filler);
-            });
+            mOutputFormatHelper.Append(ret);
         }
     });
 
@@ -1795,7 +1806,7 @@ void CodeGenerator::InsertArg(const ExprWithCleanups* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetValueOfValueInit(const QualType& t)
+std::string CodeGenerator::GetValueOfValueInit(const QualType& t)
 {
     const QualType& type = t.getCanonicalType();
 
@@ -1844,19 +1855,8 @@ static std::string GetValueOfValueInit(const QualType& t)
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
         const auto&       elementType{tt->getElementType()};
         const std::string elementTypeInitValue{GetValueOfValueInit(elementType)};
-        const auto        size{std::clamp(tt->getSize().getZExtValue(), uint64_t(0), uint64_t(100))};
-        std::string       ret{};
 
-        OnceFalse needsComma{};
-        for_each(static_cast<uint64_t>(0), size, [&](auto) {
-            if(needsComma) {
-                ret.append(", ");
-            }
-
-            ret.append(elementTypeInitValue);
-        });
-
-        return ret;
+        return FillConstantArray(tt, elementTypeInitValue, uint64_t{0});
     }
 
     return "0";

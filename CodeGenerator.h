@@ -279,7 +279,9 @@ protected:
         OutputFormatHelper& GetBuffer(OutputFormatHelper& outputFormatHelper) const;
     };
 
-    void HandleLambdaExpr(const LambdaExpr* stmt, LambdaHelper& lambdaHelper);
+    void               HandleLambdaExpr(const LambdaExpr* stmt, LambdaHelper& lambdaHelper);
+    static std::string FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt);
+    static std::string GetValueOfValueInit(const QualType& t);
 
     LambdaStackType  mLambdaStackThis;
     LambdaStackType& mLambdaStack;
@@ -290,8 +292,12 @@ protected:
     SkipVarDecl           mSkipVarDecl;
     UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
     const LambdaExpr*     mLambdaExpr;
-    static inline bool
-        mHaveLocalStatic;  // Track whether there was a thread-safe in the code. This requires adding the <new> header.
+    static inline bool    mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code. This
+                                             //!< requires adding the \c <new> header.
+
+    static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
+        uint64_t{100}};  //!< This is the upper limit of elements which will be shown for an array when filled by \c
+                         //!< FillConstantArray.
 };
 //-----------------------------------------------------------------------------
 
