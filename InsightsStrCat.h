@@ -11,6 +11,7 @@
 #include "clang/AST/AST.h"
 
 #include <string>
+#include <type_traits>
 #include <utility>
 //-----------------------------------------------------------------------------
 
@@ -48,66 +49,52 @@ static inline uint64_t Normalize(const llvm::APInt& arg)
 }
 //-----------------------------------------------------------------------------
 
-static inline const std::string Normalize(const llvm::APSInt& arg)
+static inline std::string Normalize(const llvm::APSInt& arg)
 {
     return ToString(arg);
 }
 //-----------------------------------------------------------------------------
 
-static inline const std::string Normalize(StringRef&& arg)
+static inline std::string Normalize(StringRef&& arg)
 {
     return arg.str();
 }
 //-----------------------------------------------------------------------------
 
-static inline const std::string Normalize(const int& arg)
+template<class T>
+struct remove_cvref
 {
-    return std::to_string(arg);
-}
-//-----------------------------------------------------------------------------
+    using type = std::remove_cv_t<std::remove_reference_t<T>>;
+};
 
-static inline const std::string Normalize(const unsigned int& arg)
-{
-    return std::to_string(arg);
-}
-//-----------------------------------------------------------------------------
-
-static inline const std::string Normalize(const unsigned long& arg)
-{
-    return std::to_string(arg);
-}
-//-----------------------------------------------------------------------------
-
-static inline const std::string Normalize(const unsigned long long& arg)
-{
-    return std::to_string(arg);
-}
+template<class T>
+using remove_cvref_t = typename remove_cvref<T>::type;
 //-----------------------------------------------------------------------------
 
 template<class T>
-static inline const T& Normalize(const T& arg)
+static inline decltype(auto) Normalize(const T& arg)
 {
-    return arg;
+    if constexpr(std::is_integral_v<T> && not std::is_same_v<remove_cvref_t<T>, bool>) {
+        return std::to_string(arg);
+    } else {
+        return (arg);
+    }
 }
 //-----------------------------------------------------------------------------
 
 namespace details {
-template<typename T, typename... Args>
-void StrCat(std::string& ret, T&& t, Args&&... args)
+template<typename... Args>
+void StrCat(std::string& ret, Args&&... args)
 {
-    ret.append(::clang::insights::Normalize(std::forward<T>(t)));
-
-    if constexpr(0 < sizeof...(args)) {
-        StrCat(ret, std::forward<Args>(args)...);
-    }
+    (ret += ... += ::clang::insights::Normalize(std::forward<Args>(args)));
 }
 //-----------------------------------------------------------------------------
 }  // namespace details
 
-template<typename T, typename... Args>
-std::string StrCat(const T& first, Args&&... args)
+template<typename... Args>
+std::string StrCat(Args&&... args)
 {
-    std::string ret{first};
+    std::string ret{};
     details::StrCat(ret, std::forward<Args>(args)...);
 
     return ret;
