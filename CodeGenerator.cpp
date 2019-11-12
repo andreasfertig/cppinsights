@@ -521,7 +521,7 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
 
     if(!skipTemplateArgs) {
         if(const auto cxxMethod = dyn_cast_or_null<CXXMethodDecl>(meDecl)) {
-            if(const auto* tmplArgs = cxxMethod->getAsFunction()->getTemplateSpecializationArgs()) {
+            if(const auto* tmplArgs = cxxMethod->getTemplateSpecializationArgs()) {
                 OutputFormatHelper ofm{};
 
                 ofm.Append('<');
@@ -543,6 +543,9 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
 
                 if(haveArg) {
                     mOutputFormatHelper.Append(ofm.GetString(), ">");
+
+                } else if(cxxMethod->getAsFunction()->isFunctionTemplateSpecialization()) {
+                    InsertTemplateArgs(tmplArgs->asArray());
                 }
             }
         }

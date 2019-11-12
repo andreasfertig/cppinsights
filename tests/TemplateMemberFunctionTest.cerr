@@ -1,0 +1,7 @@
+.tmp.cpp:84:5: error: no matching member function for call to 'Do'
+  f.Do<__lambda_33_10>(__lambda_33_10);
+  ~~^~~~~~~~~~~~~~~~~~
+.tmp.cpp:9:15: note: candidate template ignored: invalid explicitly-specified argument for template parameter 'T'
+  inline void Do(T && t)
+              ^
+1 error generated.

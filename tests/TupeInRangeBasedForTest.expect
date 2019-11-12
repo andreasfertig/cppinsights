@@ -13,7 +13,7 @@ void fillTuples(std::vector<Tuple_t> tuples) {
 template<>
 void fillTuples<std::tuple<std::basic_string<char>, int> >(std::vector<std::tuple<std::basic_string<char>, int>, std::allocator<std::tuple<std::basic_string<char>, int> > > tuples)
 {
-  tuples.emplace_back("hello", 1);
+  tuples.emplace_back<char const (&)[6], int>("hello", 1);
 }
 #endif
 

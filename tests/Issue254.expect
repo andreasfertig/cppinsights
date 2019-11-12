@@ -1,0 +1,52 @@
+struct demonstrator
+{
+  template<typename return_type = double>
+  inline return_type templated_function()
+  {
+    return return_type{{}};
+  }
+  
+  /* First instantiated from: Issue254.cpp:10 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline bool templated_function<bool>()
+  {
+    return bool{};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue254.cpp:11 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline float templated_function<float>()
+  {
+    return float{};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue254.cpp:12 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline double templated_function<double>()
+  {
+    return double{};
+  }
+  #endif
+  
+  // inline constexpr demonstrator() noexcept = default;
+};
+
+
+
+int demonstrate()
+{
+  demonstrator D = demonstrator();
+  D.templated_function<bool>();
+  D.templated_function<float>();
+  D.templated_function<double>();
+  return 42;
+}
+
+  
