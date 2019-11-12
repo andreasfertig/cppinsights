@@ -85,9 +85,9 @@ int main()
   std::unordered_set<Customer, CustomerHash, CustomerEq> set1 = std::unordered_set<Customer, CustomerHash, CustomerEq, std::allocator<Customer> >();
   std::unordered_set<Customer, ManyParentsWithOperator<CustomerHash, CustomerEq>, ManyParentsWithOperator<CustomerHash, CustomerEq> > set2 = std::unordered_set<Customer, ManyParentsWithOperator<CustomerHash, CustomerEq>, ManyParentsWithOperator<CustomerHash, CustomerEq>, std::allocator<Customer> >();
   std::unordered_set<Customer, ManyParentsWithOperator<CustomerEq, CustomerHash>, ManyParentsWithOperator<CustomerEq, CustomerHash> > set3 = std::unordered_set<Customer, ManyParentsWithOperator<CustomerEq, CustomerHash>, ManyParentsWithOperator<CustomerEq, CustomerHash>, std::allocator<Customer> >();
-  set1.emplace("Test");
-  set2.emplace("Test");
-  set3.emplace("Test");
+  set1.emplace<char const (&)[5]>("Test");
+  set2.emplace<char const (&)[5]>("Test");
+  set3.emplace<char const (&)[5]>("Test");
   return 0;
 }
 

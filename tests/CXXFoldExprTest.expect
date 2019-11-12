@@ -66,10 +66,10 @@ class CXXFoldExprTest
 int main()
 {
   CXXFoldExprTest cxxFoldExprTest = {};
-  cxxFoldExprTest.UnaryRightFold(2, 3, 4, 5);
-  cxxFoldExprTest.UnaryLeftFold(2, 3, 4, 5);
-  cxxFoldExprTest.BinaryRightFold(2, 3, 4, 5);
-  cxxFoldExprTest.BinaryLeftFold(2, 3, 4, 5);
+  cxxFoldExprTest.UnaryRightFold<int, int, int, int>(2, 3, 4, 5);
+  cxxFoldExprTest.UnaryLeftFold<int, int, int, int>(2, 3, 4, 5);
+  cxxFoldExprTest.BinaryRightFold<int, int, int, int>(2, 3, 4, 5);
+  cxxFoldExprTest.BinaryLeftFold<int, int, int, int>(2, 3, 4, 5);
 }
 
 

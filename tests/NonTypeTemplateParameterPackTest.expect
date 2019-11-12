@@ -69,7 +69,7 @@ class Test
   inline int summ<int, int, int>(int && i, int && __rest1, int && __rest2)
   {
     if constexpr(2 > 0) {
-      return i + this->summ(__rest1, __rest2);
+      return i + this->summ<int &, int &>(__rest1, __rest2);
     }
     
   }
@@ -82,7 +82,7 @@ class Test
   inline int summ<int &, int &>(int & i, int & rest)
   {
     if constexpr(1 > 0) {
-      return i + this->summ(rest);
+      return i + this->summ<int &>(rest);
     }
     
   }
@@ -145,7 +145,7 @@ class Test
 int main()
 {
   Test t = Test();
-  t.summ(1, 2, 3);
+  t.summ<int, int, int>(1, 2, 3);
   Test::Map<int, int> a = Map<int, int, my_array>();
   return t.sum<1>();
 }

@@ -33,8 +33,8 @@
       public: 
       inline /*constexpr */ void operator()() const
       {
-        x.f(17);
-        x.ff(17, 2, 55.5);
+        x.f<int>(17);
+        x.ff<int, int, double>(17, 2, 55.5);
       }
       
       private: 

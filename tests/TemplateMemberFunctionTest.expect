@@ -81,7 +81,7 @@ int main()
     
   } __lambda_33_10{};
   
-  f.Do(__lambda_33_10);
+  f.Do<__lambda_33_10>(__lambda_33_10);
     
   class __lambda_35_18
   {
