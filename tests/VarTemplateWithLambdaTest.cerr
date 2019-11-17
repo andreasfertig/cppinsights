@@ -1,19 +1,42 @@
-.tmp.cpp:19:32: error: no function template matches function template specialization 'operator()'
-  inline /*constexpr */ double operator()(int x) const
-                               ^
-.tmp.cpp:12:30: note: candidate template ignored: failed template argument deduction
-  inline /*constexpr */ auto operator()(type_parameter_0_0 x) const
-                             ^
-.tmp.cpp:53:29: error: no function template matches function template specialization 'operator()'
-  inline /*constexpr */ int operator()(int x) const
-                            ^
-.tmp.cpp:46:30: note: candidate template ignored: failed template argument deduction
-  inline /*constexpr */ auto operator()(type_parameter_0_0 x) const
-                             ^
-.tmp.cpp:48:16: warning: too many braces around scalar initializer [-Wmany-braces-around-scalar-init]
-    return int{{x}};
-               ^~~
-.tmp.cpp:80:46: note: in instantiation of function template specialization '__lambda_8_29::operator()<int>' requested here
+.tmp.cpp:28:7: error: redefinition of '__lambda_8_23'
+class __lambda_8_23
+      ^
+.tmp.cpp:10:7: note: previous definition is here
+class __lambda_8_23
+      ^
+.tmp.cpp:69:12: error: use of undeclared identifier 'T'
+    return T{{x}};
+           ^
+.tmp.cpp:69:16: error: expected ';' after expression
+    return T{{x}};
+               ^
+               ;
+.tmp.cpp:75:12: error: use of undeclared identifier 'T'
+    return T{{x}};
+           ^
+.tmp.cpp:75:16: error: expected ';' after expression
+    return T{{x}};
+               ^
+               ;
+.tmp.cpp:81:7: error: redefinition of '__lambda_11_29'
+class __lambda_11_29
+      ^
+.tmp.cpp:63:7: note: previous definition is here
+class __lambda_11_29
+      ^
+.tmp.cpp:16:12: error: use of undeclared identifier 'T'
+    return T(x);
+           ^
+.tmp.cpp:115:23: note: in instantiation of function template specialization '__lambda_8_23::operator()<int>' requested here
+  return func<double>.operator()(x);
+                      ^
+.tmp.cpp:69:15: warning: expression result unused [-Wunused-value]
+    return T{{x}};
+              ^
+.tmp.cpp:121:46: note: in instantiation of function template specialization '__lambda_11_29::operator()<int>' requested here
   return static_cast<double>(funcBraced<int>.operator()(x));
                                              ^
-1 warning and 2 errors generated.
+.tmp.cpp:121:10: error: static_cast from 'void' to 'double' is not allowed
+  return static_cast<double>(funcBraced<int>.operator()(x));
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning and 8 errors generated.

@@ -1,9 +1,13 @@
 namespace detail
 {
   template<typename T>
-  struct to{
-    template<typename... Ts>
-    struct result { };
+  struct to
+  {
+    template<typename ... Ts>
+    struct result
+    {
+    };
+    
   };
   
   /* First instantiated from: TemplateKeywordTest.cpp:24 */
@@ -35,7 +39,7 @@ template<>
 struct compose<>
 {
   using continuation = int;
-  template<typename C = compose<>::continuation>
+  template<typename C = continuation>
   struct to
   {
     using T = detail::to<C>;
@@ -60,6 +64,6 @@ struct compose<>
 
 int main()
 {
-  compose<>::to<>::result<int, char> a = result<int, char>();
+  compose<>::to<>::result<int, char> a = compose<>::to<int>::result<int, char>();
 }
 

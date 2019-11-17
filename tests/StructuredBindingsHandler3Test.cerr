@@ -1,91 +1,97 @@
-.tmp.cpp:82:8: error: no template named 'tuple_size'; did you mean 'std::tuple_size'?
-struct tuple_size<constant::Q>
-       ^~~~~~~~~~
-       std::tuple_size
-.tmp.cpp:4:45: note: 'std::tuple_size' declared here
-namespace std { template<typename T> struct tuple_size; }
-                                            ^
-.tmp.cpp:89:8: error: no template named 'tuple_element'; did you mean 'std::tuple_element'?
-struct tuple_element<N, constant::Q>
-       ^~~~~~~~~~~~~
-       std::tuple_element
-.tmp.cpp:5:51: note: 'std::tuple_element' declared here
-namespace std { template<size_t, typename> struct tuple_element;
-                                                  ^
-.tmp.cpp:100:46: error: no matching function for call to 'get'
-std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(constant::__q17);
-                                             ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-.tmp.cpp:101:46: error: no matching function for call to 'get'
-std::tuple_element<1, constant::Q>::type b = constant::get<1UL>(constant::__q17);
-                                             ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-.tmp.cpp:102:65: error: use of undeclared identifier 'conststd'
-std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(conststd::tuple_element<0, constant::Q>::type && a = constant::get<0UL>(constant::);
-                                                                ^
-.tmp.cpp:102:147: error: expected unqualified-id
-std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(conststd::tuple_element<0, constant::Q>::type && a = constant::get<0UL>(constant::);
-                                                                                                                                                  ^
-.tmp.cpp:103:36: error: expected '(' for function-style cast or type construction
-ntstd::tuple_element<1, constant::Q>::type && b = constant::get<1UL>(constant::);
-                        ~~~~~~~~~~~^
-.tmp.cpp:103:39: error: no member named 'type' in the global namespace
-ntstd::tuple_element<1, constant::Q>::type && b = constant::get<1UL>(constant::);
-                                    ~~^
-.tmp.cpp:103:80: error: expected unqualified-id
-ntstd::tuple_element<1, constant::Q>::type && b = constant::get<1UL>(constant::);
-                                                                               ^
-.tmp.cpp:104:36: error: expected '(' for function-style cast or type construction
-:_std::tuple_element<2, constant::Q>::type && c = constant::get<2UL>(constant::);
-                        ~~~~~~~~~~~^
-.tmp.cpp:104:39: error: no member named 'type' in the global namespace
-:_std::tuple_element<2, constant::Q>::type && c = constant::get<2UL>(constant::);
-                                    ~~^
-.tmp.cpp:104:80: error: expected unqualified-id
-:_std::tuple_element<2, constant::Q>::type && c = constant::get<2UL>(constant::);
-                                                                               ^
-.tmp.cpp:110:50: error: no matching function for call to 'get'
-    std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(__q19);
-                                                 ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-.tmp.cpp:111:50: error: no matching function for call to 'get'
-    std::tuple_element<1, constant::Q>::type b = constant::get<1UL>(__q19);
-                                                 ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-.tmp.cpp:112:50: error: no matching function for call to 'get'
-    std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(__q19);
-                                                 ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-.tmp.cpp:110:46: error: variables defined in a constexpr function must be initialized
-    std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(__q19);
-                                             ^
-.tmp.cpp:122:52: error: no matching function for call to 'get'
-      std::tuple_element<0, constant::Q>::type a = constant::get<0UL>(__q26);
-                                                   ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-.tmp.cpp:123:52: error: no matching function for call to 'get'
-      std::tuple_element<1, constant::Q>::type b = constant::get<1UL>(__q26);
-                                                   ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-.tmp.cpp:124:52: error: no matching function for call to 'get'
-      std::tuple_element<2, constant::Q>::type c = constant::get<2UL>(__q26);
-                                                   ^~~~~~~~~~~~~~~~~~
-.tmp.cpp:49:33: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
-  template<int N> constexpr int get(Q &&) { return N * N; }
-                                ^
-fatal error: too many errors emitted, stopping now [-ferror-limit=]
-20 errors generated.
+.tmp.cpp:108:38: error: no matching function for call to 'get'
+  std::tuple_element<0, Q>::type a = get<0UL>(__q17);
+                                     ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:109:38: error: no matching function for call to 'get'
+  std::tuple_element<1, Q>::type b = get<1UL>(__q17);
+                                     ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:110:38: error: no matching function for call to 'get'
+  std::tuple_element<2, Q>::type c = get<2UL>(__q17);
+                                     ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:111:37: error: redefinition of 'a' with a different type: 'std::tuple_element<0, Q>::type &&' (aka 'int &&') vs 'std::tuple_element<0, Q>::type' (aka 'int')
+  std::tuple_element<0, Q>::type && a = get<0UL>();
+                                    ^
+.tmp.cpp:108:34: note: previous definition is here
+  std::tuple_element<0, Q>::type a = get<0UL>(__q17);
+                                 ^
+.tmp.cpp:111:41: error: no matching function for call to 'get'
+  std::tuple_element<0, Q>::type && a = get<0UL>();
+                                        ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: requires 1 argument, but 0 were provided
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:112:37: error: redefinition of 'b' with a different type: 'std::tuple_element<1, Q>::type &&' (aka 'int &&') vs 'std::tuple_element<1, Q>::type' (aka 'int')
+  std::tuple_element<1, Q>::type && b = get<1UL>();
+                                    ^
+.tmp.cpp:109:34: note: previous definition is here
+  std::tuple_element<1, Q>::type b = get<1UL>(__q17);
+                                 ^
+.tmp.cpp:112:41: error: no matching function for call to 'get'
+  std::tuple_element<1, Q>::type && b = get<1UL>();
+                                        ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: requires 1 argument, but 0 were provided
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:113:37: error: redefinition of 'c' with a different type: 'std::tuple_element<2, Q>::type &&' (aka 'int &&') vs 'std::tuple_element<2, Q>::type' (aka 'int')
+  std::tuple_element<2, Q>::type && c = get<2UL>();
+                                    ^
+.tmp.cpp:110:34: note: previous definition is here
+  std::tuple_element<2, Q>::type c = get<2UL>(__q17);
+                                 ^
+.tmp.cpp:113:41: error: no matching function for call to 'get'
+  std::tuple_element<2, Q>::type && c = get<2UL>();
+                                        ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: requires 1 argument, but 0 were provided
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:117:40: error: no matching function for call to 'get'
+    std::tuple_element<0, Q>::type a = get<0UL>(__q19);
+                                       ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:118:40: error: no matching function for call to 'get'
+    std::tuple_element<1, Q>::type b = get<1UL>(__q19);
+                                       ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:119:40: error: no matching function for call to 'get'
+    std::tuple_element<2, Q>::type c = get<2UL>(__q19);
+                                       ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:117:36: error: variables defined in a constexpr function must be initialized
+    std::tuple_element<0, Q>::type a = get<0UL>(__q19);
+                                   ^
+.tmp.cpp:127:42: error: no matching function for call to 'get'
+      std::tuple_element<0, Q>::type a = get<0UL>(__q26);
+                                         ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:128:42: error: no matching function for call to 'get'
+      std::tuple_element<1, Q>::type b = get<1UL>(__q26);
+                                         ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:129:42: error: no matching function for call to 'get'
+      std::tuple_element<2, Q>::type c = get<2UL>(__q26);
+                                         ^~~~~~~~
+.tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
+  inline constexpr int get(Q &&)
+                       ^
+.tmp.cpp:127:38: error: variables defined in a constexpr function must be initialized
+      std::tuple_element<0, Q>::type a = get<0UL>(__q26);
+                                     ^
+17 errors generated.

@@ -29,7 +29,7 @@ public:
 /* First instantiated from: CXXDestructorTest.cpp:31 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-class Alloc<int, 0>
+class Alloc<int, false>
 {
   int * data;
   
@@ -65,7 +65,7 @@ class Alloc<int, 0>
 /* First instantiated from: CXXDestructorTest.cpp:32 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-class Alloc<char, 1>
+class Alloc<char, true>
 {
   char * data;
   
@@ -100,7 +100,7 @@ class Alloc<char, 1>
 
 int main()
 {
-  Alloc<int, false> a = Alloc<int, 0>();
-  Alloc<char, true> b = Alloc<char, 1>();
+  Alloc<int, false> a = Alloc<int, false>();
+  Alloc<char, true> b = Alloc<char, true>();
 }
 

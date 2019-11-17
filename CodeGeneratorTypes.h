@@ -19,6 +19,7 @@ IGNORED_STMT(OMPParallelForDirective)
 
 IGNORED_DECL(UsingShadowDecl)
 IGNORED_DECL(UsingPackDecl)
+IGNORED_DECL(BindingDecl)
 
 SUPPORTED_DECL(CXXDeductionGuideDecl)
 SUPPORTED_DECL(VarDecl)
@@ -40,6 +41,8 @@ SUPPORTED_DECL(FunctionTemplateDecl)
 SUPPORTED_DECL(TypeAliasTemplateDecl)
 SUPPORTED_DECL(LabelDecl)
 SUPPORTED_DECL(ClassTemplateDecl)
+SUPPORTED_DECL(NamespaceDecl)
+SUPPORTED_DECL(VarTemplateDecl)
 
 SUPPORTED_STMT(CXXDeleteExpr)
 SUPPORTED_STMT(CXXDefaultInitExpr)
@@ -117,6 +120,7 @@ SUPPORTED_STMT(CXXFoldExpr)
 SUPPORTED_STMT(CoroutineBodyStmt)
 SUPPORTED_STMT(CoroutineSuspendExpr)
 SUPPORTED_STMT(CoreturnStmt)
+SUPPORTED_STMT(DependentScopeDeclRefExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

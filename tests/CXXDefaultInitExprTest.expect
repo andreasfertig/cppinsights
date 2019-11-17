@@ -16,7 +16,7 @@ public:
 /* First instantiated from: CXXDefaultInitExprTest.cpp:18 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-class Alloc<int, 0>
+class Alloc<int, false>
 {
   const int z;
   int * data;
@@ -38,7 +38,7 @@ class Alloc<int, 0>
 /* First instantiated from: CXXDefaultInitExprTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-class Alloc<char, 1>
+class Alloc<char, true>
 {
   const int z;
   char * data;
@@ -59,7 +59,7 @@ class Alloc<char, 1>
 
 int main()
 {
-  Alloc<int, false> a = Alloc<int, 0>();
-  Alloc<char, true> b = Alloc<char, 1>();
+  Alloc<int, false> a = Alloc<int, false>();
+  Alloc<char, true> b = Alloc<char, true>();
 }
 

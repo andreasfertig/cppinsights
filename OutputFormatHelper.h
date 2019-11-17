@@ -77,10 +77,10 @@ public:
     /// \brief Append a variable number of data
     ///
     /// The \c StrCat function which is used ensures, that a \c StringRef or a char are converted appropriately.
-    template<typename T, typename... Args>
-    void Append(const T& first, Args&&... args)
+    template<typename... Args>
+    void Append(Args&&... args)
     {
-        details::StrCat(mOutput, first, std::forward<Args>(args)...);
+        details::StrCat(mOutput, std::forward<Args>(args)...);
     }
 
     /// \brief Same as \ref Append but adds a newline after the last argument.

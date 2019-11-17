@@ -17,28 +17,21 @@
 
 namespace clang::insights {
 
-static inline bool EndsWith(const std::string& src, const std::string& ending)
+namespace details {
+/// \brief Convert a boolean value to a string representation of "true" or "false"
+static inline std::string ConvertToBoolString(bool b)
 {
-    if(ending.size() > src.size()) {
-        return false;
-    }
-
-    return std::equal(ending.rbegin(), ending.rend(), src.rbegin());
+    return b ? std::string{"true"} : std::string{"false"};
 }
-//-----------------------------------------------------------------------------
 
-static inline bool BeginsWith(const std::string& src, const std::string& beginning)
-{
-    if(beginning.size() > src.size()) {
-        return false;
-    }
-
-    return std::equal(beginning.begin(), beginning.end(), src.begin());
-}
-//-----------------------------------------------------------------------------
+}  // namespace details
 
 static inline std::string ToString(const llvm::APSInt& val)
 {
+    if(1 == val.getBitWidth()) {
+        return details::ConvertToBoolString(val.getExtValue());
+    }
+
     return val.toString(10);
 }
 //-----------------------------------------------------------------------------
@@ -74,8 +67,13 @@ using remove_cvref_t = typename remove_cvref<T>::type;
 template<class T>
 static inline decltype(auto) Normalize(const T& arg)
 {
-    if constexpr(std::is_integral_v<T> && not std::is_same_v<remove_cvref_t<T>, bool>) {
+    // Handle bool's first, we like their string representation.
+    if constexpr(std::is_same_v<remove_cvref_t<T>, bool>) {
+        return details::ConvertToBoolString(arg);
+
+    } else if constexpr(std::is_integral_v<T>) {
         return std::to_string(arg);
+
     } else {
         return (arg);
     }

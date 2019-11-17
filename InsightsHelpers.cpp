@@ -15,13 +15,87 @@
 
 namespace clang::insights {
 
-STRONG_BOOL(SupressScope);
+ScopeHandler::ScopeStackType ScopeHandler::mGlobalStack{};  // NOLINT
+std::string                  ScopeHandler::mScope{};        // NOLINT
+//-----------------------------------------------------------------------------
+
+ScopeHandler::ScopeHandler(const Decl* d)
+: mStack{mGlobalStack}
+, mHelper{mScope.length()}
+{
+    mStack.push(mHelper);
+
+    if(const auto* recordDecl = dyn_cast_or_null<CXXRecordDecl>(d)) {
+        mScope.append(GetName(*recordDecl));
+
+        const bool isClassTemplateSpecialization{isa<ClassTemplatePartialSpecializationDecl>(recordDecl) ||
+                                                 isa<ClassTemplateSpecializationDecl>(recordDecl)};
+
+        if(isClassTemplateSpecialization) {
+            mScope.append("<>");
+        }
+
+    } else if(const auto* namespaceDecl = dyn_cast_or_null<NamespaceDecl>(d)) {
+        mScope.append(namespaceDecl->getNameAsString());
+    }
+
+    if(not mScope.empty()) {
+        mScope.append("::");
+    }
+}
+//-----------------------------------------------------------------------------
+
+ScopeHandler::~ScopeHandler()
+{
+    const auto length = mStack.pop()->mLength;
+    mScope.resize(length);
+}
+//-----------------------------------------------------------------------------
+
+std::string ScopeHandler::RemoveCurrentScope(std::string name)
+{
+    auto findAndReplace = [&name](const std::string& scope) {
+        if(const auto startPos = name.find(scope, 0); std::string::npos != startPos) {
+            name.replace(startPos, scope.length(), "");
+            return true;
+        }
+
+        return false;
+    };
+
+    // The default is that we can replace the entire scope. Suppose we are currently in N::X and having a symbol N::X::y
+    // then N::X:: is removed.
+    if(not findAndReplace(mScope)) {
+
+        // A special case where we need to remove the scope without the last item.
+        std::string tmp{mScope};
+        tmp.resize(mGlobalStack.back().mLength);
+
+        findAndReplace(tmp);
+    }
+
+    return name;
+}
+//-----------------------------------------------------------------------------
+
+std::string GetPlainName(const DeclRefExpr& DRE)
+{
+    return ScopeHandler::RemoveCurrentScope(DRE.getNameInfo().getAsString());
+}
+//-----------------------------------------------------------------------------
+
+STRONG_BOOL(InsightsSuppressScope);
+//-----------------------------------------------------------------------------
+
+static std::string GetUnqualifiedScopelessName(const Type* type, const InsightsSuppressScope supressScope);
+//-----------------------------------------------------------------------------
 
 struct CppInsightsPrintingPolicy : PrintingPolicy
 {
-    unsigned CppInsightsUnqualified : 1;  // NOLINT
+    unsigned              CppInsightsUnqualified : 1;  // NOLINT
+    InsightsSuppressScope CppInsightsSuppressScope;    // NOLINT
 
-    CppInsightsPrintingPolicy(const Unqualified unqualified, const SupressScope supressScope)
+    CppInsightsPrintingPolicy(const Unqualified unqualified, const InsightsSuppressScope supressScope)
     : PrintingPolicy{LangOptions{}}
     {
         adjustForCPlusPlus();
@@ -30,15 +104,66 @@ struct CppInsightsPrintingPolicy : PrintingPolicy
         ConstantsAsWritten     = true;
         AnonymousTagLocations  = false;  // does remove filename and line for from lambdas in parameters
 
-        CppInsightsUnqualified = (Unqualified::Yes == unqualified);
-        SuppressScope          = (SupressScope::Yes == supressScope);
+        CppInsightsUnqualified   = (Unqualified::Yes == unqualified);
+        CppInsightsSuppressScope = supressScope;
     }
 
     CppInsightsPrintingPolicy()
-    : CppInsightsPrintingPolicy{Unqualified::No, SupressScope::No}
+    : CppInsightsPrintingPolicy{Unqualified::No, InsightsSuppressScope::No}
     {
     }
 };
+//-----------------------------------------------------------------------------
+
+namespace details {
+static void BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt)
+{
+    if(!stmt) {
+        return;
+    }
+
+    if(const auto* prefix = stmt->getPrefix()) {
+        BuildNamespace(fullNamespace, prefix);
+    }
+
+    switch(stmt->getKind()) {
+        case NestedNameSpecifier::Identifier: fullNamespace.append(stmt->getAsIdentifier()->getName()); break;
+
+        case NestedNameSpecifier::Namespace:
+            if(stmt->getAsNamespace()->isAnonymousNamespace()) {
+                return;
+            }
+
+            fullNamespace.append(stmt->getAsNamespace()->getName());
+            break;
+
+        case NestedNameSpecifier::NamespaceAlias: fullNamespace.append(stmt->getAsNamespaceAlias()->getName()); break;
+
+        case NestedNameSpecifier::TypeSpecWithTemplate: fullNamespace.append("template "); [[fallthrough]];
+
+        case NestedNameSpecifier::TypeSpec:
+            fullNamespace.append(GetUnqualifiedScopelessName(stmt->getAsType(), InsightsSuppressScope::Yes));
+            // The template parameters are already contained in the type we inserted above.
+            break;
+
+        default: break;
+    }
+
+    fullNamespace.append("::");
+}
+//-----------------------------------------------------------------------------
+}  // namespace details
+
+std::string GetNestedName(const NestedNameSpecifier* nns)
+{
+    std::string ret{};
+
+    if(nns) {
+        details::BuildNamespace(ret, nns);
+    }
+
+    return ret;
+}
 //-----------------------------------------------------------------------------
 
 static std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
@@ -53,9 +178,9 @@ static std::string ReplaceAll(std::string str, const std::string& from, const st
 }
 //-----------------------------------------------------------------------------
 
-std::string ReplaceDash(std::string&& str)
+static std::string ReplaceDash(std::string&& str)
 {
-    return ReplaceAll(str, "-", "_");
+    return ReplaceAll(std::move(str), "-", "_");
 }
 //-----------------------------------------------------------------------------
 
@@ -71,7 +196,7 @@ std::string BuildInternalVarName(const std::string& varName)
 }
 //-----------------------------------------------------------------------------
 
-std::string BuildInternalVarName(const std::string& varName, const SourceLocation& loc, const SourceManager& sm)
+static std::string BuildInternalVarName(const std::string& varName, const SourceLocation& loc, const SourceManager& sm)
 {
     const auto lineNo = sm.getSpellingLineNumber(loc);
 
@@ -230,22 +355,88 @@ std::string GetNameAsWritten(const QualType& t)
 {
     SplitQualType splitted = t.split();
 
-    return QualType::getAsString(splitted, CppInsightsPrintingPolicy{});
+    return ScopeHandler::RemoveCurrentScope(QualType::getAsString(splitted, CppInsightsPrintingPolicy{}));
+}
+//-----------------------------------------------------------------------------
+
+// own implementation due to lambdas
+std::string GetDeclContext(const DeclContext* ctx)
+{
+    OutputFormatHelper                 mOutputFormatHelper{};
+    SmallVector<const DeclContext*, 8> contexts{};
+
+    while(ctx) {
+        if(isa<NamedDecl>(ctx)) {
+            contexts.push_back(ctx);
+        }
+        ctx = ctx->getParent();
+    }
+
+    for(const auto* declContext : llvm::reverse(contexts)) {
+        if(const auto* classTmplSpec = dyn_cast<ClassTemplateSpecializationDecl>(declContext)) {
+            mOutputFormatHelper.Append(classTmplSpec->getName());
+
+            CodeGenerator codeGenerator{mOutputFormatHelper};
+            codeGenerator.InsertTemplateArgs(*classTmplSpec);
+
+        } else if(const auto* nd = dyn_cast<NamespaceDecl>(declContext)) {
+            if(nd->isAnonymousNamespace() || nd->isInline()) {
+                continue;
+            }
+
+            mOutputFormatHelper.Append(nd->getNameAsString());
+
+        } else if(const auto* rd = dyn_cast<RecordDecl>(declContext)) {
+            if(!rd->getIdentifier()) {
+                continue;
+            }
+
+            mOutputFormatHelper.Append(rd->getNameAsString());
+
+        } else if(dyn_cast<FunctionDecl>(declContext)) {
+            continue;
+
+        } else if(const auto* ed = dyn_cast<EnumDecl>(declContext)) {
+            if(!ed->isScoped()) {
+                continue;
+            }
+
+            mOutputFormatHelper.Append(ed->getNameAsString());
+
+        } else {
+            mOutputFormatHelper.Append(cast<NamedDecl>(declContext)->getNameAsString());
+        }
+
+        mOutputFormatHelper.Append("::");
+    }
+
+    return mOutputFormatHelper.GetString();
 }
 //-----------------------------------------------------------------------------
 
 namespace details {
 
-static std::string GetQualifiedName(const NamedDecl& decl)
-{
-    StringStream stream{};
-    decl.printQualifiedName(stream, CppInsightsPrintingPolicy{});
+STRONG_BOOL(RemoveCurrentScope);  ///!< In some cases we need to keep the scope for a while, so don't remove the scope
+                                  /// we are in right now.
+//-----------------------------------------------------------------------------
 
-    return stream.str();
+static std::string GetQualifiedName(const NamedDecl&         decl,
+                                    const RemoveCurrentScope removeCurrentScope = RemoveCurrentScope::Yes)
+{
+    std::string scope{GetDeclContext(decl.getDeclContext())};
+
+    scope += decl.getName().str();
+
+    if(RemoveCurrentScope::Yes == removeCurrentScope) {
+        return ScopeHandler::RemoveCurrentScope(scope);
+    }
+
+    return scope;
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetScope(const DeclContext* declCtx)
+static std::string GetScope(const DeclContext*       declCtx,
+                            const RemoveCurrentScope removeCurrentScope = RemoveCurrentScope::Yes)
 {
     std::string name{};
 
@@ -256,8 +447,8 @@ static std::string GetScope(const DeclContext* declCtx)
         }
 
         if(declCtx->isNamespace() || declCtx->getParent()->isTranslationUnit()) {
-            if(const auto* namespaceDecl = dyn_cast_or_null<NamespaceDecl>(declCtx)) {
-                name = GetQualifiedName(*namespaceDecl);
+            if(const auto* namedDecl = dyn_cast_or_null<NamedDecl>(declCtx)) {
+                name = GetQualifiedName(*namedDecl, removeCurrentScope);
                 name.append("::");
             }
         }
@@ -285,6 +476,8 @@ private:
     std::string                      mDataAfter{};
     bool                             mHasData{false};
     bool                             mSkipSpace{false};
+    std::string                      mScope{};  //!< A scope coming from an ElaboratedType which is used for a
+                                                //!< ClassTemplateSpecializationDecl if there is no other scope
 
     bool HandleType(const TemplateTypeParmType* type)
     {
@@ -324,8 +517,17 @@ private:
     {
         /// In case one of the template parameters is a lambda we need to insert the made up name.
         if(const auto* tt = dyn_cast_or_null<ClassTemplateSpecializationDecl>(type->getDecl())) {
-            if(const auto* x = mType.getBaseTypeIdentifier()) {
-                mData.Append(GetScope(type->getDecl()->getDeclContext()), x->getName());
+            if(const auto* identifierName = mType.getBaseTypeIdentifier()) {
+                const auto& scope = GetScope(type->getDecl()->getDeclContext());
+
+                // If we don't have a scope with GetScope use a possible one from ElaboratedType
+                if((InsightsSuppressScope::Yes == mPrintingPolicy.CppInsightsSuppressScope) || scope.empty()) {
+                    mData.Append(mScope);
+                } else {
+                    mData.Append(scope);
+                }
+
+                mData.Append(identifierName->getName());
                 CodeGenerator codeGenerator{mData};
                 codeGenerator.InsertTemplateArgs(*tt);
 
@@ -342,37 +544,34 @@ private:
         return false;
     }
 
-    bool HandleType(const AutoType* type)
-    {
-        if(not type->getDeducedType().isNull()) {
-            return HandleType(type->getDeducedType().getTypePtrOrNull());
-        }
-
-        return false;
-    }
+    bool HandleType(const AutoType* type) { return HandleType(type->getDeducedType().getTypePtrOrNull()); }
 
     bool HandleType(const SubstTemplateTypeParmType* type)
     {
-        // At least when coming from a TypedefType there can be a `const` attached to the actual type. To get it to
+        // At least when coming from a TypedefType there can be a `const` attached to the actual type. To get it do
         // another round of `AddCVQulifiers` here.
         AddCVQualifiers(QualType(type, 0).getQualifiers());
 
         return HandleType(type->getReplacementType().getTypePtrOrNull());
     }
 
-    bool HandleType(const ElaboratedType* type) { return HandleType(type->getNamedType().getTypePtrOrNull()); }
+    bool HandleType(const ElaboratedType* type)
+    {
+        mScope = GetNestedName(type->getQualifier());
+
+        const bool ret = HandleType(type->getNamedType().getTypePtrOrNull());
+
+        mScope.clear();
+
+        return ret;
+    }
 
     bool HandleType(const DependentTemplateSpecializationType* type)
     {
-        mData.Append(GetElaboratedTypeKeyword(type->getKeyword()));
-
-        if(type->getQualifier()) {
-            StringStream sstream{};
-            type->getQualifier()->print(sstream, mPrintingPolicy);
-            mData.Append(sstream.str());
-        }
-
-        mData.Append("template ", type->getIdentifier()->getName().str());
+        mData.Append(GetElaboratedTypeKeyword(type->getKeyword()),
+                     GetNestedName(type->getQualifier()),
+                     "template ",
+                     type->getIdentifier()->getName().str());
 
         CodeGenerator codeGenerator{mData};
         codeGenerator.InsertTemplateArgs(type->template_arguments());
@@ -508,10 +707,7 @@ private:
 
     bool HandleType(const PackExpansionType* type)
     {
-        type->dump();
-        const auto qt = type->getPattern();
-
-        const bool ret = HandleType(qt.getTypePtrOrNull());
+        const bool ret = HandleType(type->getPattern().getTypePtrOrNull());
 
         if(ret) {
             mData.Append("...");
@@ -606,13 +802,13 @@ public:
 static std::string GetNameInternal(const QualType& t, const CppInsightsPrintingPolicy& printingPolicy)
 {
     if(SimpleTypePrinter st{t, printingPolicy}; st.GetTypeString()) {
-        return st.GetString();
+        return ScopeHandler::RemoveCurrentScope(st.GetString());
 
     } else if(true == printingPolicy.CppInsightsUnqualified) {
-        return GetAsCPPStyleString(t.getUnqualifiedType(), printingPolicy);
+        return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(t.getUnqualifiedType(), printingPolicy));
     }
 
-    return GetAsCPPStyleString(t, printingPolicy);
+    return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(t, printingPolicy));
 }
 //-----------------------------------------------------------------------------
 
@@ -628,9 +824,9 @@ static bool IsDecltypeType(const QualType& t)
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetName(const QualType&    t,
-                           const Unqualified  unqualified  = Unqualified::No,
-                           const SupressScope supressScope = SupressScope::No)
+static std::string GetName(const QualType&             t,
+                           const Unqualified           unqualified  = Unqualified::No,
+                           const InsightsSuppressScope supressScope = InsightsSuppressScope::No)
 {
     const auto                      desugaredType = GetDesugarType(t);
     const auto*                     autoType      = desugaredType->getContainedAutoType();
@@ -647,35 +843,79 @@ static std::string GetName(const QualType&    t,
 }  // namespace details
 //-----------------------------------------------------------------------------
 
+STRONG_BOOL(UseLexicalParent);
+//-----------------------------------------------------------------------------
+
+static bool NeedsNamespace(const Decl& decl, UseLexicalParent useLexicalParent)
+{
+    const auto* declCtx = decl.getDeclContext();
+    if(UseLexicalParent::Yes == useLexicalParent) {
+        declCtx = declCtx->getLexicalParent();
+    }
+
+    if(nullptr == declCtx) {
+        return false;
+    }
+
+    const bool isFriend{(decl.getFriendObjectKind() != Decl::FOK_None)};
+    const bool neitherTransparentNorFriend{not declCtx->isTransparentContext() && not isFriend};
+
+    if(UseLexicalParent::Yes == useLexicalParent) {
+        return (declCtx->isNamespace() && not declCtx->isInlineNamespace()) && neitherTransparentNorFriend;
+    }
+
+    return (declCtx->isNamespace() || declCtx->isInlineNamespace()) && neitherTransparentNorFriend;
+}
+//-----------------------------------------------------------------------------
+
+std::string GetName(const NamedDecl& nd)
+{
+    std::string name{};
+
+    if(NeedsNamespace(nd, UseLexicalParent::No)) {
+        name = details::GetScope(nd.getDeclContext(), details::RemoveCurrentScope::No);
+    }
+
+    name += ReplaceDash(nd.getNameAsString());
+
+    return ScopeHandler::RemoveCurrentScope(name);
+}
+//-----------------------------------------------------------------------------
+
 std::string GetName(const CXXRecordDecl& RD)
 {
     if(RD.isLambda()) {
         return GetLambdaName(RD);
     }
 
-    const auto* declCtx = RD.getDeclContext()->getLexicalParent();
-    const bool  isFriend{(RD.getFriendObjectKind() != Decl::FOK_None)};
-    const bool  hasNamespace{(declCtx && (declCtx->isNamespace() && not declCtx->isInlineNamespace()) &&
-                             !declCtx->isTransparentContext() && !isFriend)};
-
     // get the namespace as well
-    if(hasNamespace) {
+    if(NeedsNamespace(RD, UseLexicalParent::Yes)) {
         return ReplaceDash(details::GetQualifiedName(RD));
     }
 
-    return ReplaceDash(RD.getNameAsString());
+    std::string ret{GetNestedName(RD.getQualifier())};
+
+    ret += ReplaceDash(RD.getNameAsString());
+
+    return ScopeHandler::RemoveCurrentScope(ret);
 }
 //-----------------------------------------------------------------------------
 
 std::string GetName(const QualType& t, const Unqualified unqualified)
 {
-    return details::GetName(t, unqualified, SupressScope::No);
+    return details::GetName(t, unqualified);
+}
+//-----------------------------------------------------------------------------
+
+static std::string GetUnqualifiedScopelessName(const Type* type, const InsightsSuppressScope supressScope)
+{
+    return details::GetName(QualType(type, 0), Unqualified::Yes, supressScope);
 }
 //-----------------------------------------------------------------------------
 
 std::string GetUnqualifiedScopelessName(const Type* type)
 {
-    return details::GetName(QualType(type, 0), Unqualified::Yes, SupressScope::Yes);
+    return GetUnqualifiedScopelessName(type, InsightsSuppressScope::No);
 }
 //-----------------------------------------------------------------------------
 
@@ -848,18 +1088,16 @@ std::string GetName(const DeclRefExpr& declRefExpr)
     std::string name{};
     const auto* declRefDecl = declRefExpr.getDecl();
     const auto* declCtx     = declRefDecl->getDeclContext();
-    const bool  isFriend{(declRefDecl->getFriendObjectKind() != Decl::FOK_None)};
-    const bool  hasNamespace{(declCtx && (declCtx->isNamespace() || declCtx->isInlineNamespace()) &&
-                             !declCtx->isTransparentContext() && !isFriend)};
+    const bool  needsNamespace{NeedsNamespace(*declRefDecl, UseLexicalParent::No)};
 
     // get the namespace as well
-    if(hasNamespace) {
+    if(needsNamespace) {
         name = details::GetScope(declCtx);
     } else if(declRefExpr.hasQualifier()) {
         name = details::GetQualifiedName(*declRefDecl);
     }
 
-    if(hasNamespace || !declRefExpr.hasQualifier()) {
+    if(needsNamespace || not declRefExpr.hasQualifier()) {
         std::string plainName{GetPlainName(declRefExpr)};
 
         // try to handle the special case of a function local static with class type and non trivial destructor. In
@@ -877,7 +1115,7 @@ std::string GetName(const DeclRefExpr& declRefExpr)
         name.append(plainName);
     }
 
-    return GetTemplateParameterPackArgumentName(name, declRefDecl);
+    return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, declRefDecl));
 }
 //-----------------------------------------------------------------------------
 
@@ -936,7 +1174,7 @@ std::string GetName(const VarDecl& VD)
 
     std::string name{VD.getNameAsString()};
 
-    return GetTemplateParameterPackArgumentName(name, &VD);
+    return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, &VD));
 }
 //-----------------------------------------------------------------------------
 

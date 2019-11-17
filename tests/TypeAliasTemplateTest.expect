@@ -28,7 +28,7 @@ struct F<int>
   /* First instantiated from: TypeAliasTemplateTest.cpp:19 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline F<int, bool_constant<1> >(int __0)
+  inline F<int, bool_constant<true> >(int __0)
   {
   }
   #endif

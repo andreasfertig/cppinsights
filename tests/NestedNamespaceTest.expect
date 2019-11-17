@@ -1,0 +1,30 @@
+struct One
+{
+  static const int o = {};
+  struct Two
+  {
+    struct Three
+    {
+      static const int c = 4;
+      // inline constexpr Three() noexcept = default;
+    };
+    
+    static const int b = Three::c;
+    static const int d = o;
+    // inline constexpr Two() noexcept = default;
+  };
+  
+  static const int a = Two::d;
+  static const int x = Two::Three::c;
+  // inline constexpr One() noexcept = default;
+};
+
+
+
+int main()
+{
+  One one = One();
+  One::Two two = One::Two();
+  One::Two::Three three = One::Two::Three();
+}
+

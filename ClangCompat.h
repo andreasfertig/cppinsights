@@ -44,13 +44,6 @@ auto inline GetBeginLoc(const T* decl)
 //-----------------------------------------------------------------------------
 
 template<typename T>
-auto inline GetEndLoc(const T& decl)
-{
-    return decl.getEndLoc();
-}
-//-----------------------------------------------------------------------------
-
-template<typename T>
 auto inline GetEndLoc(const T* decl)
 {
     return decl->getEndLoc();

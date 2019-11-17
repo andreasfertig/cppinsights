@@ -1,12 +1,13 @@
 #define INSIGHTS_USE_TEMPLATE
 // source: https://en.cppreference.com/w/cpp/language/variable_template
 
+
+
 template<class T>
-constexpr T pi = T(3.1415926535897932385L);
+constexpr const T pi = T(3.14159265358979323851L);
 
 template<>
 constexpr const int pi<int> = int(3.14159265358979323851L);
-
  
 template<class T>
 T circular_area(T r)

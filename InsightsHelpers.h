@@ -18,6 +18,7 @@
 #include <string>
 
 #include "InsightsStrongTypes.h"
+#include "StackList.h"
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
@@ -28,10 +29,8 @@ static inline bool IsNewLine(const char c)
 }
 //-----------------------------------------------------------------------------
 
-std::string ReplaceDash(std::string&& str);
-
 std::string BuildInternalVarName(const std::string& varName);
-std::string BuildInternalVarName(const std::string& varName, const SourceLocation& loc, const SourceManager& SM);
+//-----------------------------------------------------------------------------
 
 STRONG_BOOL(RequireSemi);
 //-----------------------------------------------------------------------------
@@ -95,7 +94,7 @@ std::string BuildRetTypeName(const Decl& decl);
     }
 //-----------------------------------------------------------------------------
 
-static inline bool Contains(const std::string& source, const std::string search)
+static inline bool Contains(const std::string& source, const std::string& search)
 {
     return std::string::npos != source.find(search, 0);
 }
@@ -130,20 +129,13 @@ bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl);
 /*
  * Get the name of a DeclRefExpr without the namespace
  */
-static inline std::string GetPlainName(const DeclRefExpr& DRE)
-{
-    return DRE.getNameInfo().getAsString();
-}
-//-----------------------------------------------------------------------------
+std::string GetPlainName(const DeclRefExpr& DRE);
 
 std::string GetName(const DeclRefExpr& DRE);
 std::string GetName(const VarDecl& VD);
 //-----------------------------------------------------------------------------
 
-static inline std::string GetName(const NamedDecl& ND)
-{
-    return ReplaceDash(ND.getNameAsString());
-}
+std::string GetName(const NamedDecl& ND);
 //-----------------------------------------------------------------------------
 
 std::string GetNameAsFunctionPointer(const QualType& t);
@@ -158,16 +150,6 @@ static inline std::string GetLambdaName(const LambdaExpr& lambda)
 //-----------------------------------------------------------------------------
 
 std::string GetName(const CXXRecordDecl& RD);
-//-----------------------------------------------------------------------------
-
-static inline std::string GetName(const CXXMethodDecl& RD)
-{
-    if(RD.getParent()->isLambda()) {
-        return GetLambdaName(*RD.getParent());
-    }
-
-    return RD.getNameAsString();
-}
 //-----------------------------------------------------------------------------
 
 /// \brief Remove decltype from a QualType, if possible.
@@ -192,6 +174,10 @@ std::string
 GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified = Unqualified::No);
 //-----------------------------------------------------------------------------
 
+std::string GetNestedName(const NestedNameSpecifier* nns);
+std::string GetDeclContext(const DeclContext* ctx);
+//-----------------------------------------------------------------------------
+
 const std::string EvaluateAsFloat(const FloatingLiteral& expr);
 const std::string GetNoExcept(const FunctionDecl& decl);
 const char*       GetConst(const FunctionDecl& decl);
@@ -207,6 +193,73 @@ void for_each(T start, T end, TFunc&& func)
         func(start);
     }
 }
+//-----------------------------------------------------------------------------
+
+/// \brief Track the scope we are currently in to build a properly scoped variable.
+///
+/// The AST only knows about absolute scopes (namespace, struct, class), as once a declaration is parsed it is either in
+/// a scope or not. Each request to give me the namespace automatically leads to the entire scope the item is in. This
+/// makes it hard to have constructs like this: \code struct One
+/// {
+///    static const int o{};
+///
+///    struct Two
+///    {
+///        static const int d = o;
+///    };
+///
+///    static const int a = Two::d;
+///};
+/// \endcode
+///
+/// Here the initializer of \c a is in the scope \c One::Two::d. At this point the qualification \c Two::d is enought.
+///
+/// \c ScopeHelper tracks whether we are currently in a class or namespace and simply remove the path we already in from
+/// the scope.
+struct ScopeHelper : public StackListEntry<ScopeHelper>
+{
+    ScopeHelper(const size_t len)
+    : mLength{len}
+    {
+    }
+
+    const size_t mLength;  //!< Length of the scope as it was _before_ this declaration was appended.
+};
+//-----------------------------------------------------------------------------
+
+/// \brief The ScopeHandler tracks the current scope.
+///
+/// The \c ScopeHandler tracks the current scope, knows about all the parts and is able to remove the current scope part
+/// from a name.
+class ScopeHandler
+{
+public:
+    ScopeHandler(const Decl* d);
+
+    ~ScopeHandler();
+
+    /// \brief Remove the current scope from a string.
+    ///
+    /// The default is that the entire scope is replaced. Suppose we are
+    /// currently in N::X and having a symbol N::X::y then N::X:: is removed. However, there is a special case, where
+    /// the last item is skipped.
+    static std::string RemoveCurrentScope(std::string name);
+
+private:
+    using ScopeStackType = StackList<ScopeHelper>;
+
+    ScopeStackType& mStack;   //!< Access to the global \c ScopeHelper stack.
+    ScopeHelper     mHelper;  //!< The \c ScopeHelper this item refers to.
+
+    static ScopeStackType mGlobalStack;  //!< Global stack to keep track of the scope elements.
+    static std::string    mScope;        //!< The entire scope we are already in.
+};
+//-----------------------------------------------------------------------------
+
+/// \brief Helper to create a \c ScopeHandler on the stack which adds the current \c Decl to it and removes it once the
+/// scope is left.
+#define SCOPE_HELPER(d)                                                                                                \
+    ScopeHandler _scopeHandler { d }
 //-----------------------------------------------------------------------------
 
 /// \brief Specialization for \c ::llvm::raw_string_ostream with an internal \c std::string buffer.

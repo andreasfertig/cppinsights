@@ -1,0 +1,150 @@
+#include <cstddef>
+
+struct Iterable
+{
+  template<typename access_type>
+  struct Iterator
+  {
+    Iterable * m_iterable;
+    int dummy;
+    inline bool operator!=(const Iterator<access_type> & other)
+    {
+      return this->m_iterable != other.m_iterable;
+    }
+    
+    inline access_type operator*()
+    {
+      return this->dummy;
+    }
+    
+    inline Iterator<access_type> operator++()
+    {
+      return *this;
+    }
+    
+  };
+  
+  /* First instantiated from: Issue255_2.cpp:31 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct Iterator<int>
+  {
+    Iterable * m_iterable;
+    int dummy;
+    inline bool operator!=(const Iterator<int> & other)
+    {
+      return this->m_iterable != other.m_iterable;
+    }
+    
+    inline int operator*()
+    {
+      return this->dummy;
+    }
+    
+    inline Iterator<int> operator++()
+    {
+      return Iterator<int>(*this);
+    }
+    
+    // inline constexpr Iterator(const Iterator<int> &) noexcept = default;
+  };
+  
+  #endif
+  /* First instantiated from: Issue255_2.cpp:32 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct Iterator<float>
+  {
+    Iterable * m_iterable;
+    int dummy;
+    inline bool operator!=(const Iterator<float> & other)
+    {
+      return this->m_iterable != other.m_iterable;
+    }
+    
+    inline float operator*();
+    
+    inline Iterator<float> operator++()
+    {
+      return Iterator<float>(*this);
+    }
+    
+    // inline constexpr Iterator(const Iterator<float> &) noexcept = default;
+  };
+  
+  #endif
+  template<typename access_type = int>
+  inline Iterator<access_type> begin()
+  {
+    return {this, 2};
+  }
+  
+  /* First instantiated from: Issue255_2.cpp:31 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<int> begin<int>()
+  {
+    return {this, 2};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue255_2.cpp:32 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<float> begin<float>()
+  {
+    return {this, 2};
+  }
+  #endif
+  
+  template<typename access_type = int>
+  inline Iterator<access_type> end()
+  {
+    return {this, 2};
+  }
+  
+  /* First instantiated from: Issue255_2.cpp:31 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<int> end<int>()
+  {
+    return {this, 2};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue255_2.cpp:32 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline Iterator<float> end<float>()
+  {
+    return {this, 2};
+  }
+  #endif
+  
+  // inline constexpr Iterable() noexcept = default;
+};
+
+
+
+void test()
+{
+  Iterable container = Iterable();
+  {
+    Iterable & __range1 = container;
+    Iterable::Iterator<int> __begin1 = __range1.begin<int>();
+    Iterable::Iterator<int> __end1 = __range1.end<int>();
+    for(; __begin1.operator!=(__end1); __begin1.operator++()) 
+    {
+      int element = __begin1.operator*();
+    }
+    
+  }
+  for(Iterable::Iterator<float> iter = container.begin<float>(); iter.operator!=(container.end<float>()); iter.operator++()) 
+  {
+  }
+  
+}
+
+

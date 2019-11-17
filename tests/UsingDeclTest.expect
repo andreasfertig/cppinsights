@@ -75,33 +75,42 @@ struct D<int> : public B
 
 namespace Test
 {
-    struct Alloc
-{
-  // inline constexpr Alloc() noexcept = default;
-};
-
-
-
-    enum class West { north };
-    enum struct Best { north };
-    enum  Fest { cheer };
-
-    namespace Inner
+  struct Alloc
+  {
+    // inline constexpr Alloc() noexcept = default;
+  };
+  
+  enum class West : int
+  {
+    north
+  };
+  
+  enum struct Best : int
+  {
+    north
+  };
+  
+  enum Fest
+  {
+    cheer
+  };
+  
+  namespace Inner
+  {
+    inline namespace v1
     {
-        inline namespace v1 /*inline namespace*/ {
-            static const int zz = 0;
-
-            using type = int;
-
-            namespace /*anonymous namespace*/ {
-                class Void
-{
-};
-
-
-            }
-        }
+      static const int zz = 0;
+      using type = int;
+      namespace
+      {
+        class Void
+        {
+        };
+        
+        
+      }
     }
+  }
 }
 
 int main()

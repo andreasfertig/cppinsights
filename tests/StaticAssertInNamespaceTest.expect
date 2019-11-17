@@ -1,0 +1,10 @@
+namespace StaticAssertInNamespaceTest
+{
+  struct S
+  {
+    int x;
+  };
+  
+  /* PASSED: static_assert(sizeof(S) == sizeof(int)); */
+  
+}

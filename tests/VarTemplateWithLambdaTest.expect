@@ -1,11 +1,31 @@
 // Source: https://twitter.com/bjorn_fahller/status/1039778723791335424
 #define INSIGHTS_USE_TEMPLATE
 
-template <typename T>
-constexpr auto func = [](auto x){ return T(x);};
+// XXX: This does not compile after transformation, as T inside of the generated lambda has no meaning. And the closure
+// type is infact no template. Instantiations of func on the other hand will compile as there T is replace with a
+// concrete type. One solution could be to not expand the lambda here and only do it for the instantiations.
 
 
-class __lambda_5_23
+
+class __lambda_8_23
+{
+  public: 
+  template<class type_parameter_1_0>
+  inline /*constexpr */ auto operator()(type_parameter_1_0 x) const
+  {
+    return T(x);
+  }
+  private: 
+  template<class type_parameter_1_0>
+  static inline auto __invoke(type_parameter_1_0 x)
+  {
+    return T(x);
+  }
+  
+};
+
+
+class __lambda_8_23
 {
   public: 
   template<class type_parameter_0_0>
@@ -31,15 +51,34 @@ class __lambda_5_23
   
 };
 
+template<typename T>
+constexpr const auto func = __lambda_8_23{};
+
 template<>
-constexpr const __lambda_5_23 func<double> = __lambda_5_23{};
+constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
 
 
-template <typename T>
-constexpr auto funcBraced = [](auto x){ return T{x};};
 
 
-class __lambda_8_29
+class __lambda_11_29
+{
+  public: 
+  template<class type_parameter_1_0>
+  inline /*constexpr */ auto operator()(type_parameter_1_0 x) const
+  {
+    return T{{x}};
+  }
+  private: 
+  template<class type_parameter_1_0>
+  static inline auto __invoke(type_parameter_1_0 x)
+  {
+    return T{{x}};
+  }
+  
+};
+
+
+class __lambda_11_29
 {
   public: 
   template<class type_parameter_0_0>
@@ -65,9 +104,11 @@ class __lambda_8_29
   
 };
 
-template<>
-constexpr const __lambda_8_29 funcBraced<int> = __lambda_8_29{};
+template<typename T>
+constexpr const auto funcBraced = __lambda_11_29{};
 
+template<>
+constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
 
 double f(int x)
 {

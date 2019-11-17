@@ -192,7 +192,10 @@ protected:
     void InsertTemplateGuardBegin(const FunctionDecl* stmt);
     void InsertTemplateGuardEnd(const FunctionDecl* stmt);
 
-    void PrintNamespace(const NestedNameSpecifier* namespaceSpecifier);
+    /// \brief Insert \c template<> to introduce a template specialization.
+    void InsertTemplateSpecializationHeader() { mOutputFormatHelper.AppendNewLine("template<>"); }
+
+    void InsertNamespace(const NestedNameSpecifier* namespaceSpecifier);
     void ParseDeclContext(const DeclContext* Ctx);
 
     STRONG_BOOL(SkipBody);

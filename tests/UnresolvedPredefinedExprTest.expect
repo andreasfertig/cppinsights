@@ -1,35 +1,41 @@
 #define INSIGHTS_USE_TEMPLATE
 
-template<typename T>
-class Test
+// Put the namespace here to force rewriting of the primary template
+namespace UnresolvedLookupExprTest
 {
-public:
-    Test()
-    {
-        const char* f = __func__; // UnresolvedLookupExpr
-    }
-};
-
-/* First instantiated from: UnresolvedPredefinedExprTest.cpp:17 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-class Test<int>
-{
-  
-  public: 
-  inline Test()
+  template<typename T>
+  class Test
   {
-    const char * f = "Test";
-  }
+    
+    public: 
+    inline Test()
+    {
+      const char * f = __func__;
+    }
+    
+  };
   
-};
-
-#endif
-
+  /* First instantiated from: UnresolvedPredefinedExprTest.cpp:20 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  class Test<int>
+  {
+    
+    public: 
+    inline Test()
+    {
+      const char * f = "Test";
+    }
+    
+  };
+  
+  #endif
+  
+}
 
 int main()
 {
   const char * f = "main";
-  Test<int> t = Test<int>();
+  UnresolvedLookupExprTest::Test<int> t = UnresolvedLookupExprTest::Test<int>();
 }
 
