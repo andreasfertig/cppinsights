@@ -1,0 +1,80 @@
+// Source: https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
+
+#include <iterator>
+#include <vector>
+
+namespace Test
+{
+  template<class T>
+  struct container
+  {
+    inline container(T t)
+    {
+    }
+    
+    template<class Iter>
+    container(Iter beg, Iter end);
+    
+  };
+  
+  /* First instantiated from: DeductionGuideTest.cpp:16 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct container<int>
+  {
+    inline container(int t)
+    {
+    }
+    
+    template<class Iter>
+    container(Iter beg, Iter end);
+    
+  };
+  
+  #endif
+  /* First instantiated from: DeductionGuideTest.cpp:18 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct container<double>
+  {
+    inline container(double t);
+    
+    template<class Iter>
+    container(Iter beg, Iter end);
+    
+    
+    /* First instantiated from: DeductionGuideTest.cpp:18 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    container<std::__wrap_iter<double *> >(std::__wrap_iter<double *> beg, std::__wrap_iter<double *> end);
+    #endif
+    
+    
+  };
+  
+  #endif
+  template<class T>
+  container(T t) -> container<T>;
+  
+  /* First instantiated from: DeductionGuideTest.cpp:16 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  container(int t) -> container<int>;
+  #endif
+  
+  template<class T>
+  container(type_parameter_0_1 beg, type_parameter_0_1 end) -> container<T>;
+  template<class T>
+  container(Iter b, Iter e) -> container<typename std::iterator_traits<Iter>::value_type>;
+  
+  /* First instantiated from: DeductionGuideTest.cpp:18 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  container(std::__wrap_iter<double *> b, std::__wrap_iter<double *> e) -> container<double>;
+  #endif
+  
+  container<int> c = container<int>(7);
+  std::vector<double> v = std::vector<double, std::allocator<double> >{};
+  container<double> d = container<double>(v.begin(), v.end());
+  
+}
