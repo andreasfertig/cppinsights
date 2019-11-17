@@ -66,6 +66,19 @@ static const char* GetCastName(const CastKind castKind)
 }
 //-----------------------------------------------------------------------------
 
+static const char* GetClassOrStructTagName(const TagDecl& decl)
+{
+    const bool isClass{decl.isClass()};
+
+    if(isClass) {
+        return kwClassSpace;
+
+    } else {
+        return "struct ";
+    }
+}
+//-----------------------------------------------------------------------------
+
 class ArrayInitCodeGenerator final : public CodeGenerator
 {
     const uint64_t mIndex;
@@ -2309,12 +2322,7 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
             if(const auto* ctd = dyn_cast_or_null<ClassTemplateDecl>(stmt->getFriendDecl())) {
                 InsertTemplateParameters(*ctd->getTemplateParameters());
 
-                if(ctd->getTemplatedDecl()->isClass()) {
-                    cls = kwClassSpace;
-
-                } else {
-                    cls = "struct ";
-                }
+                cls = GetClassOrStructTagName(*ctd->getTemplatedDecl());
             }
 
             mOutputFormatHelper.AppendNewLine("friend ", cls, GetName(*stmt->getFriendDecl()), ";");
@@ -2436,16 +2444,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         }
     }
 
-    const bool isClass{stmt->isClass()};
-
-    if(isClass) {
-        mOutputFormatHelper.Append(kwClassSpace);
-
-    } else {
-        mOutputFormatHelper.Append("struct ");
-    }
-
-    mOutputFormatHelper.Append(GetName(*stmt));
+    mOutputFormatHelper.Append(GetClassOrStructTagName(*stmt), GetName(*stmt));
 
     // skip classes/struct's without a definition
     if(not stmt->hasDefinition() || not stmt->isCompleteDefinition()) {
@@ -2474,7 +2473,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     OnceTrue        firstRecordDecl{};
     OnceTrue        firstDecl{};
     Decl::Kind      formerKind{};
-    AccessSpecifier lastAccess{isClass ? AS_private : AS_public};
+    AccessSpecifier lastAccess{stmt->isClass() ? AS_private : AS_public};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) && firstRecordDecl) {
             continue;
