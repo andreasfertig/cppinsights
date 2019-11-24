@@ -24,7 +24,7 @@ constexpr int operator""_cs()
 /* First instantiated from: Issue15.cpp:38 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline constexpr int operator""_cs<52, 53, 54, 55>()
+inline constexpr int operator""_cs<'4', '5', '6', '7'>()
 {
   return 0;
 }
@@ -40,7 +40,7 @@ constexpr int operator""_x()
 /* First instantiated from: Issue15.cpp:33 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline constexpr int operator""_x<char, 49, 50, 51, 52, 53>()
+inline constexpr int operator""_x<char, '1', '2', '3', '4', '5'>()
 {
   return 0;
 }
@@ -51,7 +51,7 @@ int main()
 {
   using namespace std::literals;
   std::chrono::seconds t = std::operator""s(98291919ULL);
-  int t4 = operator""_x<char, 49, 50, 51, 52, 53>();
+  int t4 = operator""_x<char, '1', '2', '3', '4', '5'>();
   std::basic_string<char> str = operator""_str("abcd", 4UL);
   std::chrono::duration<long long, std::ratio<1, 1> > sec = operator""_s(4ULL);
   int cookedTemplateLiteral = operator""_cs<'4', '5', '6', '7'>();

@@ -66,6 +66,19 @@ static const char* GetCastName(const CastKind castKind)
 }
 //-----------------------------------------------------------------------------
 
+static const char* GetClassOrStructTagName(const TagDecl& decl)
+{
+    const bool isClass{decl.isClass()};
+
+    if(isClass) {
+        return kwClassSpace;
+
+    } else {
+        return "struct ";
+    }
+}
+//-----------------------------------------------------------------------------
+
 class ArrayInitCodeGenerator final : public CodeGenerator
 {
     const uint64_t mIndex;
@@ -350,7 +363,7 @@ void CodeGenerator::InsertArg(const UnresolvedLookupExpr* stmt)
     InsertQualifierAndName(stmt->getName(), stmt->getQualifier(), mOutputFormatHelper);
 
     if(stmt->getNumTemplateArgs()) {
-        InsertTemplateArgs(stmt->template_arguments());
+        InsertTemplateArgs(*stmt);
     }
 }
 //-----------------------------------------------------------------------------
@@ -601,8 +614,8 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
                 if(haveArg) {
                     mOutputFormatHelper.Append(ofm.GetString(), ">");
 
-                } else if(cxxMethod->getAsFunction()->isFunctionTemplateSpecialization()) {
-                    InsertTemplateArgs(tmplArgs->asArray());
+                } else {
+                    InsertTemplateArgs(*tmplArgs);
                 }
             }
         }
@@ -719,7 +732,7 @@ static std::string FormatVarTemplateSpecializationDecl(const Decl* decl, std::st
         OutputFormatHelper outputFormatHelper{};
         CodeGenerator      codeGenerator{outputFormatHelper};
 
-        codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs().asArray());
+        codeGenerator.InsertTemplateArgs(tvd->getTemplateArgs());
 
         name += outputFormatHelper.GetString();
     }
@@ -1014,6 +1027,26 @@ void CodeGenerator::InsertArg(const ParenListExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+/// Fill the values of a constant array.
+///
+/// This is either called by \c InitListExpr (which may contain an offset, as the user already provided certain values)
+/// or by \c GetValueOfValueInit.
+std::string
+CodeGenerator::FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt)
+{
+    const auto         size{std::clamp(ct->getSize().getZExtValue(), uint64_t{0}, MAX_FILL_VALUES_FOR_ARRAYS)};
+    OutputFormatHelper ret{};
+
+    OnceFalse needsComma{uint64_t{0} != startAt};
+    for_each(startAt, size, [&](auto) {
+        ret.AppendComma(needsComma);
+        ret.Append(value);
+    });
+
+    return ret.GetString();
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
     WrapInCurlys([&]() {
@@ -1023,24 +1056,15 @@ void CodeGenerator::InsertArg(const InitListExpr* stmt)
 
         // If we have a filler, fill the rest of the array with the filler expr.
         if(const auto* filler = stmt->getArrayFiller()) {
-            const auto fullWidth = [&]() -> uint64_t {
-                if(const auto* ct = dyn_cast_or_null<ConstantArrayType>(stmt->getType().getTypePtrOrNull())) {
-                    const auto v = ct->getSize().getZExtValue();
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm};
+            codeGenerator.InsertArg(filler);
 
-                    // clamp here to survive large arrays.
-                    return std::clamp(v, uint64_t(0), uint64_t(100));
-                }
+            const auto ret = FillConstantArray(dyn_cast_or_null<ConstantArrayType>(stmt->getType().getTypePtrOrNull()),
+                                               ofm.GetString(),
+                                               stmt->getNumInits());
 
-                return 0;
-            }();
-
-            // now fill the remaining array slots.
-            OnceFalse needsComma{0 != stmt->getNumInits()};
-            for_each(static_cast<uint64_t>(stmt->getNumInits()), fullWidth, [&](auto) {
-                mOutputFormatHelper.AppendComma(needsComma);
-
-                InsertArg(filler);
-            });
+            mOutputFormatHelper.Append(ret);
         }
     });
 
@@ -1116,7 +1140,7 @@ void CodeGenerator::InsertArg(const UnresolvedMemberExpr* stmt)
     mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getAsString());
 
     if(stmt->getNumTemplateArgs()) {
-        InsertTemplateArgs(stmt->template_arguments());
+        InsertTemplateArgs(*stmt);
     }
 }
 //-----------------------------------------------------------------------------
@@ -1275,23 +1299,9 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
     InsertArg(stmt->getCallee());
 
     if(isa<UserDefinedLiteral>(stmt)) {
-        if(const auto* declRefExpr = cast<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
-            if(const TemplateArgumentList* args =
-                   cast<FunctionDecl>(declRefExpr->getDecl())->getTemplateSpecializationArgs()) {
-                if(1 != args->size()) {
-                    InsertTemplateArgs(args->asArray());
-                } else {
-                    mOutputFormatHelper.Append('<');
-
-                    const TemplateArgument& pack = args->get(0);
-
-                    ForEachArg(pack.pack_elements(), [&](const auto& arg) {
-                        const char c{static_cast<char>(arg.getAsIntegral().getZExtValue())};
-                        mOutputFormatHelper.Append("'", std::string{c}, "'");
-                    });
-
-                    mOutputFormatHelper.Append('>');
-                }
+        if(const auto* declRefExpr = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
+            if(const auto* fd = dyn_cast_or_null<FunctionDecl>(declRefExpr->getDecl())) {
+                InsertTemplateArgs(*fd);
             }
         }
     }
@@ -1809,7 +1819,7 @@ void CodeGenerator::InsertArg(const ExprWithCleanups* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static std::string GetValueOfValueInit(const QualType& t)
+std::string CodeGenerator::GetValueOfValueInit(const QualType& t)
 {
     const QualType& type = t.getCanonicalType();
 
@@ -1858,19 +1868,8 @@ static std::string GetValueOfValueInit(const QualType& t)
     } else if(const auto* tt = dyn_cast_or_null<ConstantArrayType>(t.getTypePtrOrNull())) {
         const auto&       elementType{tt->getElementType()};
         const std::string elementTypeInitValue{GetValueOfValueInit(elementType)};
-        const auto        size{std::clamp(tt->getSize().getZExtValue(), uint64_t(0), uint64_t(100))};
-        std::string       ret{};
 
-        OnceFalse needsComma{};
-        for_each(static_cast<uint64_t>(0), size, [&](auto) {
-            if(needsComma) {
-                ret.append(", ");
-            }
-
-            ret.append(elementTypeInitValue);
-        });
-
-        return ret;
+        return FillConstantArray(tt, elementTypeInitValue, uint64_t{0});
     }
 
     return "0";
@@ -1949,17 +1948,9 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         StringStream stream{};
         templateSpecializationType->getTemplateName().dump(stream);
 
-        mOutputFormatHelper.Append(stream.str(), "<");
+        mOutputFormatHelper.Append(stream.str());
 
-        ForEachArg(templateSpecializationType->template_arguments(), [&](const auto& arg) {
-            if(arg.getKind() == TemplateArgument::Expression) {
-                InsertArg(arg.getAsExpr());
-            } else {
-                InsertTemplateArg(arg);
-            }
-        });
-
-        mOutputFormatHelper.Append(">");
+        InsertTemplateArgs(*templateSpecializationType);
     } else if(auto* dependentTemplateSpecializationType =
                   underlyingType->getAs<DependentTemplateSpecializationType>()) {
 
@@ -1967,17 +1958,9 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 
         InsertNamespace(dependentTemplateSpecializationType->getQualifier());
 
-        mOutputFormatHelper.Append("template ", dependentTemplateSpecializationType->getIdentifier()->getName(), "<");
+        mOutputFormatHelper.Append("template ", dependentTemplateSpecializationType->getIdentifier()->getName());
 
-        ForEachArg(dependentTemplateSpecializationType->template_arguments(), [&](const auto& arg) {
-            if(arg.getKind() == TemplateArgument::Expression) {
-                InsertArg(arg.getAsExpr());
-            } else {
-                InsertTemplateArg(arg);
-            }
-        });
-
-        mOutputFormatHelper.Append('>');
+        InsertTemplateArgs(*dependentTemplateSpecializationType);
 
     } else {
         mOutputFormatHelper.Append(GetName(underlyingType));
@@ -2339,12 +2322,7 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
             if(const auto* ctd = dyn_cast_or_null<ClassTemplateDecl>(stmt->getFriendDecl())) {
                 InsertTemplateParameters(*ctd->getTemplateParameters());
 
-                if(ctd->getTemplatedDecl()->isClass()) {
-                    cls = kwClassSpace;
-
-                } else {
-                    cls = "struct ";
-                }
+                cls = GetClassOrStructTagName(*ctd->getTemplatedDecl());
             }
 
             mOutputFormatHelper.AppendNewLine("friend ", cls, GetName(*stmt->getFriendDecl()), ";");
@@ -2466,16 +2444,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         }
     }
 
-    const bool isClass{stmt->isClass()};
-
-    if(isClass) {
-        mOutputFormatHelper.Append(kwClassSpace);
-
-    } else {
-        mOutputFormatHelper.Append("struct ");
-    }
-
-    mOutputFormatHelper.Append(GetName(*stmt));
+    mOutputFormatHelper.Append(GetClassOrStructTagName(*stmt), GetName(*stmt));
 
     // skip classes/struct's without a definition
     if(not stmt->hasDefinition() || not stmt->isCompleteDefinition()) {
@@ -2504,7 +2473,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     OnceTrue        firstRecordDecl{};
     OnceTrue        firstDecl{};
     Decl::Kind      formerKind{};
-    AccessSpecifier lastAccess{isClass ? AS_private : AS_public};
+    AccessSpecifier lastAccess{stmt->isClass() ? AS_private : AS_public};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) && firstRecordDecl) {
             continue;
@@ -2847,56 +2816,10 @@ void CodeGenerator::InsertTemplateArgs(const ClassTemplateSpecializationDecl& cl
 {
     if(const TypeSourceInfo* typeAsWritten = clsTemplateSpe.getTypeAsWritten()) {
         const TemplateSpecializationType* tmplSpecType = cast<TemplateSpecializationType>(typeAsWritten->getType());
-        InsertTemplateArgs(tmplSpecType->template_arguments());
+        InsertTemplateArgs(*tmplSpecType);
     } else {
-        InsertTemplateArgs(clsTemplateSpe.getTemplateArgs().asArray());
+        InsertTemplateArgs(clsTemplateSpe.getTemplateArgs());
     }
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertTemplateArgs(const DeclRefExpr& stmt)
-{
-    if(stmt.getNumTemplateArgs()) {
-        mOutputFormatHelper.Append('<');
-
-        ForEachArg(stmt.template_arguments(), [&](const auto& arg) {
-            const auto& targ = arg.getArgument();
-
-            InsertTemplateArg(targ);
-        });
-
-        mOutputFormatHelper.Append('>');
-    }
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertTemplateArgs(const ArrayRef<TemplateArgument>& array)
-{
-    mOutputFormatHelper.Append('<');
-
-    ForEachArg(array, [&](const auto& arg) { InsertTemplateArg(arg); });
-
-    /* put as space between to closing brackets: >> -> > > */
-    if(mOutputFormatHelper.GetString().back() == '>') {
-        mOutputFormatHelper.Append(' ');
-    }
-
-    mOutputFormatHelper.Append('>');
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertTemplateArgs(const ArrayRef<TemplateArgumentLoc>& array)
-{
-    mOutputFormatHelper.Append('<');
-
-    ForEachArg(array, [&](const auto& arg) { InsertTemplateArg(arg.getArgument()); });
-
-    /* put as space between to closing brackets: >> -> > > */
-    if(mOutputFormatHelper.GetString().back() == '>') {
-        mOutputFormatHelper.Append(' ');
-    }
-
-    mOutputFormatHelper.Append('>');
 }
 //-----------------------------------------------------------------------------
 
@@ -2915,7 +2838,16 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             mOutputFormatHelper.Append("&", arg.getAsDecl()->getQualifiedNameAsString());
             break;
         case TemplateArgument::NullPtr: mOutputFormatHelper.Append(GetName(arg.getNullPtrType())); break;
-        case TemplateArgument::Integral: mOutputFormatHelper.Append(arg.getAsIntegral()); break;
+        case TemplateArgument::Integral:
+
+            if(const auto& integral = arg.getAsIntegral(); arg.getIntegralType()->isCharType()) {
+                const char c{static_cast<char>(integral.getZExtValue())};
+                mOutputFormatHelper.Append("'", std::string{c}, "'");
+            } else {
+                mOutputFormatHelper.Append(integral);
+            }
+
+            break;
         case TemplateArgument::Expression: InsertArg(arg.getAsExpr()); break;
         case TemplateArgument::Pack: HandleTemplateParameterPack(arg.pack_elements()); break;
         case TemplateArgument::Template:

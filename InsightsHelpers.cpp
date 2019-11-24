@@ -574,7 +574,7 @@ private:
                      type->getIdentifier()->getName().str());
 
         CodeGenerator codeGenerator{mData};
-        codeGenerator.InsertTemplateArgs(type->template_arguments());
+        codeGenerator.InsertTemplateArgs(*type);
 
         return true;
     }
@@ -756,11 +756,9 @@ private:
         HandleTypeAfter(dyn_cast_or_null<t>(type));                                                                    \
     }
 
-        if(nullptr == type) {
-            return;
+        if(nullptr != type) {
+            HANDLE_TYPE(FunctionProtoType);
         }
-
-        HANDLE_TYPE(FunctionProtoType);
     }
 
     void AddCVQualifiers(const Qualifiers& quals)
@@ -988,8 +986,6 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
         } else if(Contains(typeName, "*")) {
             InsertBefore(typeName, "*", "(");
             InsertAfter(typeName, "*", StrCat(varName, ")"));
-        } else {
-            typeName += StrCat(" ", varName);
         }
     } else if(t->isFunctionPointerType()) {
         if(Contains(typeName, "(*")) {

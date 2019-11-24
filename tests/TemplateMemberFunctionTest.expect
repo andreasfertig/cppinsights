@@ -44,7 +44,7 @@ class Foo
   /* First instantiated from: TemplateMemberFunctionTest.cpp:37 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline void DoBar<1, 116, __lambda_37_21>(__lambda_37_21 && t)
+  inline void DoBar<1, 't', __lambda_37_21>(__lambda_37_21 && t)
   {
     t.operator()();
   }

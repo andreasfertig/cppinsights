@@ -387,7 +387,7 @@ struct compose<>
   template<>
   struct to<add_pointer::to<identity> >
   {
-    using T = detail::to<add_pointer::to<identity>>;
+    using T = detail::to<add_pointer::to<identity> >;
     template<typename ... Ts>
     using result = detail::to<identity>::result<Ts...>;
   };
@@ -398,7 +398,7 @@ struct compose<>
   template<>
   struct to<add_const::to<add_pointer::to<identity> > >
   {
-    using T = detail::to<add_const::to<add_pointer::to<identity> >>;
+    using T = detail::to<add_const::to<add_pointer::to<identity> > >;
     template<typename ... Ts>
     using result = detail::to<add_pointer::to<identity> >::result<Ts...>;
   };
@@ -409,7 +409,7 @@ struct compose<>
   template<>
   struct to<add_pointer::to<add_const::to<identity> > >
   {
-    using T = detail::to<add_pointer::to<add_const::to<identity> >>;
+    using T = detail::to<add_pointer::to<add_const::to<identity> > >;
     template<typename ... Ts>
     using result = detail::to<add_const::to<identity> >::result<Ts...>;
   };
@@ -420,7 +420,7 @@ struct compose<>
   template<>
   struct to<add_pointer::to<wrap> >
   {
-    using T = detail::to<add_pointer::to<wrap>>;
+    using T = detail::to<add_pointer::to<wrap> >;
     template<typename ... Ts>
     using result = detail::to<wrap>::result<Ts...>;
   };
@@ -431,7 +431,7 @@ struct compose<>
   template<>
   struct to<add_const::to<add_pointer::to<wrap> > >
   {
-    using T = detail::to<add_const::to<add_pointer::to<wrap> >>;
+    using T = detail::to<add_const::to<add_pointer::to<wrap> > >;
     template<typename ... Ts>
     using result = detail::to<add_pointer::to<wrap> >::result<Ts...>;
   };
@@ -662,8 +662,8 @@ using apply_to = typename F::template to<C>::template result<Ts...>;
 
 /* PASSED: static_assert(std::is_same_v<apply<compose<add_const, add_pointer>, int>, int *const>); */
 
-/* PASSED: static_assert(std::is_same_v<wrapped<int *>, wrapped<int *>>); */
+/* PASSED: static_assert(std::is_same_v<wrapped<int *>, wrapped<int *> >); */
 
-/* PASSED: static_assert(std::is_same_v<wrapped<const int *>, wrapped<const int *>>); */
+/* PASSED: static_assert(std::is_same_v<wrapped<const int *>, wrapped<const int *> >); */
 
 
