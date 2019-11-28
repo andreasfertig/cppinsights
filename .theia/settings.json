@@ -1,0 +1,13 @@
+{
+   "cpp.buildConfigurations": [
+      {
+         "name": "Release",
+         "directory": "/workspace/build"
+      }
+   ],
+   "cpp.clangdArgs": "--background-index",
+   "cpp.clangdExecutable": "/usr/bin/clangd",
+   "cpp.clangTidy": true,
+   "cpp.clangTidyChecks": "*",
+   "cpp.trace.server": "verbose"
+}
