@@ -784,7 +784,7 @@ public:
     bool GetTypeString()
     {
         if(const SplitQualType splitted{mType.split()}; splitted.Quals.empty()) {
-            AddCVQualifiers(mType->getPointeeType().getLocalQualifiers());
+            AddCVQualifiers(mType.getCanonicalType()->getPointeeType().getLocalQualifiers());
         } else {
             AddCVQualifiers(splitted.Quals);
         }
@@ -1103,7 +1103,7 @@ std::string GetName(const DeclRefExpr& declRefExpr)
             if(const VarDecl* vd = GetVarDeclFromDeclRefExpr(declRefExpr)) {
                 if(const auto* cxxRecordDecl = vd->getType()->getAsCXXRecordDecl()) {
                     plainName = StrCat(
-                        "*reinterpret_cast<", GetName(*cxxRecordDecl), "*>(", BuildInternalVarName(plainName), ")");
+                        "*reinterpret_cast<", GetName(vd->getType()), "*>(", BuildInternalVarName(plainName), ")");
                 }
             }
         }

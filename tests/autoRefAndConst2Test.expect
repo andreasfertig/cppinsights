@@ -1,0 +1,12 @@
+const int & getTheData()
+{
+  static int theData;
+  return theData;
+}
+
+
+int main()
+{
+  const int & x = getTheData();
+}
+
