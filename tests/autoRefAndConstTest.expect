@@ -1,0 +1,26 @@
+#include <new> // for thread-safe static's placement new
+#include <vector>
+
+const std::vector<int, std::allocator<int> > & getTheData()
+{
+  static uint64_t __theDataGuard;
+  alignas(std::vector<int, std::allocator<int> >) static char __theData[sizeof(std::vector<int, std::allocator<int> >)];
+  
+  if( ! __theDataGuard )
+  {
+    if( __cxa_guard_acquire(&__theDataGuard) )
+    {
+      new (&__theData) std::vector<int, std::allocator<int> >();
+      __theDataGuard = true;
+      __cxa_guard_release(&__theDataGuard);
+    }
+  }
+  return *reinterpret_cast<std::vector<int, std::allocator<int> >*>(__theData);
+}
+
+
+int main()
+{
+  const std::vector<int, std::allocator<int> > & x = getTheData();
+}
+

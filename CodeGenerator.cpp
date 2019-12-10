@@ -2872,7 +2872,7 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
 
     const std::string internalVarName{BuildInternalVarName(GetName(*stmt))};
     const std::string compilerBoolVarName{StrCat(internalVarName, "Guard")};
-    const std::string typeName{GetName(*cxxRecordDecl)};
+    const std::string typeName{GetName(stmt->getType())};
 
     // insert compiler bool to track init state
     const std::string stateTrackingVarName{threadSafe ? "uint64_t" : "bool"};
