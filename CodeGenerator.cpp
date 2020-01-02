@@ -760,12 +760,14 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         if(InsertVarDecl()) {
             mOutputFormatHelper.Append(GetQualifiers(*stmt));
 
-            if(const auto type = stmt->getType(); type->isFunctionPointerType()) {
+            if(const auto type = GetDesugarType(stmt->getType());
+               type->isFunctionPointerType() || isa<MemberPointerType>(type.getTypePtrOrNull())) {
                 const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
                 const std::string funcPtrName{StrCat("FuncPtr_", lineNo, " ")};
 
                 mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
                 mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
+
             } else {
                 const auto varName = FormatVarTemplateSpecializationDecl(stmt, GetName(*stmt));
 
@@ -919,8 +921,8 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
     } else if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         InsertArg(ctor);
     } else {
-        // skip a case at least in lambdas with a templated conversion operator which is not used and has auto return
-        // type. This is hard to build wih using.
+        // skip a case at least in lambdas with a templated conversion operator which is not used and has auto
+        // return type. This is hard to build wih using.
         if(isa<CXXConversionDecl>(stmt) && not stmt->hasBody()) {
             return;
         }
@@ -1006,8 +1008,8 @@ void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
     InsertArg(stmt->getTemplatedDecl());
 
     for(const auto* spec : stmt->specializations()) {
-        // Explicit specializations will appear later in the AST as dedicated node. Don't generate code for them now,
-        // otherwise they are there twice.
+        // Explicit specializations will appear later in the AST as dedicated node. Don't generate code for them
+        // now, otherwise they are there twice.
         if(TSK_ExplicitSpecialization != spec->getSpecializationKind()) {
             InsertArg(spec);
         }
@@ -1029,8 +1031,8 @@ void CodeGenerator::InsertArg(const ParenListExpr* stmt)
 
 /// Fill the values of a constant array.
 ///
-/// This is either called by \c InitListExpr (which may contain an offset, as the user already provided certain values)
-/// or by \c GetValueOfValueInit.
+/// This is either called by \c InitListExpr (which may contain an offset, as the user already provided certain
+/// values) or by \c GetValueOfValueInit.
 std::string
 CodeGenerator::FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt)
 {
@@ -2271,9 +2273,9 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
     OutputFormatHelper ofm{};
     ofm.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
 
-    // Skip UsingDecl's which have ConstructorUsingShadowDecl attached. This means that we will create the associated
-    // constructors from the base class later. Having this \c using still in the code prevents compiling the transformed
-    // code.
+    // Skip UsingDecl's which have ConstructorUsingShadowDecl attached. This means that we will create the
+    // associated constructors from the base class later. Having this \c using still in the code prevents compiling
+    // the transformed code.
     if(stmt->shadow_size()) {
         for(const auto* shadow : stmt->shadows()) {
             if(isa<ConstructorUsingShadowDecl>(shadow)) {
