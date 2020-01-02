@@ -1,0 +1,14 @@
+struct S
+{
+  void f();
+  
+};
+
+
+
+int main()
+{
+  using FuncPtr_5 = void (S::*)();
+  FuncPtr_5 p = &S::f;
+}
+
