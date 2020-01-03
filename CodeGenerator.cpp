@@ -922,7 +922,7 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
         InsertArg(ctor);
     } else {
         // skip a case at least in lambdas with a templated conversion operator which is not used and has auto
-        // return type. This is hard to build wih using.
+        // return type. This is hard to build with using.
         if(isa<CXXConversionDecl>(stmt) && not stmt->hasBody()) {
             return;
         }
