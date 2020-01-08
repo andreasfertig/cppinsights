@@ -12,6 +12,7 @@
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Rewrite/Core/Rewriter.h"
+#include "llvm/ADT/APInt.h"
 
 #include "ClangCompat.h"
 #include "InsightsStaticStrings.h"
@@ -260,6 +261,8 @@ protected:
                               T&&                    lambda,
                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
+    void UpdateCurrentPos() { mCurrentPos = mOutputFormatHelper.CurrentPos(); }
+
     static const char* GetKind(const UnaryExprOrTypeTraitExpr& uk);
     static const char* GetBuiltinTypeSuffix(const BuiltinType::Kind& kind);
 
@@ -294,10 +297,15 @@ protected:
     const LambdaExpr*     mLambdaExpr;
     static inline bool    mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code. This
                                              //!< requires adding the \c <new> header.
-
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
         uint64_t{100}};  //!< This is the upper limit of elements which will be shown for an array when filled by \c
                          //!< FillConstantArray.
+    llvm::Optional<size_t> mCurrentPos{};       //!< The position in mOutputFormatHelper where a potential
+                                                //!< std::initializer_list expansion must be inserted.
+    llvm::Optional<size_t> mCurrentFieldPos{};  //!< The position in mOutputFormatHelper in a class where where a
+                                                //!< potential std::initializer_list expansion must be inserted.
+    OutputFormatHelper* mOutputFormatHelperOutside{
+        nullptr};  //!< Helper output buffer for std::initializer_list expansion.
 };
 //-----------------------------------------------------------------------------
 

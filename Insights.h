@@ -17,7 +17,7 @@ class ASTContext;
 /// \brief Global C++ Insights command line options.
 struct InsightsOptions
 {
-#define INSIGHTS_OPT(opt, name, deflt, description) bool name;
+#define INSIGHTS_OPT(opt, name, deflt, description, category) bool name;
 #include "InsightsOptions.def"
 };
 //-----------------------------------------------------------------------------

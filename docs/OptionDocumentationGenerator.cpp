@@ -45,7 +45,7 @@ static bool CreateFile(const std::string& optionName, bool optionDefault, const 
 
 int main()
 {
-#define INSIGHTS_OPT(opt, name, deflt, description) CreateFile(opt, deflt, description);
+#define INSIGHTS_OPT(opt, name, deflt, description, category) CreateFile(opt, deflt, description);
 #include "../InsightsOptions.def"
 
 #undef INSIGHTS_OPT
@@ -60,7 +60,7 @@ int main()
 
     std::vector<std::string> options{};
 
-#define INSIGHTS_OPT(opt, name, deflt, description) options.emplace_back(opt);
+#define INSIGHTS_OPT(opt, name, deflt, description, category) options.emplace_back(opt);
 #include "../InsightsOptions.def"
 
     sort(options.begin(), options.end());
