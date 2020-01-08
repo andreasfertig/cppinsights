@@ -300,10 +300,12 @@ protected:
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
         uint64_t{100}};  //!< This is the upper limit of elements which will be shown for an array when filled by \c
                          //!< FillConstantArray.
-    llvm::Optional<size_t> mCurrentPos{};       //!< The position in mOutputFormatHelper where a potential
-                                                //!< std::initializer_list expansion must be inserted.
-    llvm::Optional<size_t> mCurrentFieldPos{};  //!< The position in mOutputFormatHelper in a class where where a
-                                                //!< potential std::initializer_list expansion must be inserted.
+    llvm::Optional<size_t> mCurrentPos{};        //!< The position in mOutputFormatHelper where a potential
+                                                 //!< std::initializer_list expansion must be inserted.
+    llvm::Optional<size_t> mCurrentReturnPos{};  //!< The position in mOutputFormatHelper from a return where a
+                                                 //!< potential std::initializer_list expansion must be inserted.
+    llvm::Optional<size_t> mCurrentFieldPos{};   //!< The position in mOutputFormatHelper in a class where where a
+                                                 //!< potential std::initializer_list expansion must be inserted.
     OutputFormatHelper* mOutputFormatHelperOutside{
         nullptr};  //!< Helper output buffer for std::initializer_list expansion.
 };
