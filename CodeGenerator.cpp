@@ -2695,7 +2695,7 @@ void CodeGenerator::InsertArg(const SizeOfPackExpr* stmt)
 void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 {
     LAMBDA_SCOPE_HELPER(ReturnStmt);
-    UpdateCurrentPos();
+    mCurrentReturnPos = mOutputFormatHelper.CurrentPos();
 
     mOutputFormatHelper.Append("return");
 
@@ -2703,6 +2703,8 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
         mOutputFormatHelper.Append(' ');
         InsertArg(retVal);
     }
+
+    mCurrentReturnPos.reset();
 }
 //-----------------------------------------------------------------------------
 
@@ -2721,19 +2723,16 @@ void CodeGenerator::InsertArg(const CXXDefaultArgExpr* stmt)
 void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 {
     if(GetInsightsOptions().UseShowInitializerList) {
-        if(not mCurrentPos.hasValue() && not mCurrentFieldPos.hasValue()) {
+        if(not mCurrentPos.hasValue() && not mCurrentFieldPos.hasValue() && not mCurrentReturnPos.hasValue()) {
             return;
         }
 
         std::string modifiers{};
-
-        size_t variableInsertPos = mCurrentPos.getValueOr(0);
-        size_t argumentInsertPos = mCurrentPos.getValueOr(0);
+        size_t      variableInsertPos = mCurrentReturnPos.getValueOr(mCurrentPos.getValueOr(0));
 
         auto& ofmToInsert = [&]() -> decltype(auto) {
-            if(not mCurrentPos.hasValue()) {
+            if(not mCurrentPos.hasValue() && not mCurrentReturnPos.hasValue()) {
                 variableInsertPos = mCurrentFieldPos.getValueOr(0);
-                argumentInsertPos = mCurrentPos.getValueOr(0);
                 mCurrentPos       = variableInsertPos;
                 modifiers         = kwStaticSpace;
                 modifiers += kwInlineSpace;
@@ -2768,7 +2767,12 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
         // are not allowed there.
         mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes), "{", internalListName, ", ", size, "}");
 
-        mCurrentPos = mCurrentPos.getValue() + ofm.GetString().size();
+        if(mCurrentReturnPos.hasValue()) {
+            mCurrentReturnPos = mCurrentReturnPos.getValue() + ofm.GetString().size();
+        } else {
+            mCurrentPos = mCurrentPos.getValue() + ofm.GetString().size();
+        }
+
     } else {
         // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's
         // are not allowed there.
