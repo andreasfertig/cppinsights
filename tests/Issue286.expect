@@ -1,0 +1,13 @@
+#include <vector>
+struct S
+{
+  std::vector<int, std::allocator<int> > v = std::vector<int, std::allocator<int> >{};
+  inline std::vector<int, std::allocator<int> > & getV()
+  {
+    return this->v;
+  }
+  
+};
+
+
+
