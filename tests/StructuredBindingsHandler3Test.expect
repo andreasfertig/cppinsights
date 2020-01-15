@@ -9,7 +9,7 @@ namespace std
 }
 namespace std
 {
-  template<size_t , typename type_parameter_0_1>
+  template<unsigned long , typename type_parameter_0_1>
   struct tuple_element;
   /* First instantiated from: StructuredBindingsHandler3Test.cpp:17 */
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -94,7 +94,7 @@ struct std::tuple_size<constant::Q>
 };
 
 
-template<size_t N>
+template<unsigned long N>
 struct std::tuple_element<N, constant::Q>
 {
   using type = int;

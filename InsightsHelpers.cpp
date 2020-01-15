@@ -716,6 +716,20 @@ private:
         return ret;
     }
 
+    bool HandleType(const DecltypeType* type)
+    {
+        const bool skipSpace{mSkipSpace};
+        mSkipSpace = true;
+
+        HandleType(type->desugar().getTypePtrOrNull());
+
+        mSkipSpace = skipSpace;
+
+        // if we hit a DecltypeType always use the expanded version to support things like a DecltypeType wrapped in an
+        // LValueReferenceType
+        return true;
+    }
+
     bool HandleType(const Type* type)
     {
 #define HANDLE_TYPE(t)                                                                                                 \
@@ -744,6 +758,7 @@ private:
         HANDLE_TYPE(InjectedClassNameType);
         HANDLE_TYPE(DependentTemplateSpecializationType);
         HANDLE_TYPE(PackExpansionType);
+        HANDLE_TYPE(DecltypeType);
 
 #undef HANDLE_TYPE
         return false;
@@ -789,16 +804,29 @@ public:
             AddCVQualifiers(splitted.Quals);
         }
 
-        mHasData = HandleType(mType.getTypePtrOrNull());
+        const auto* typePtr = mType.getTypePtrOrNull();
+        mHasData            = HandleType(typePtr);
         mData.Append(mDataAfter);
+
+        // Take care of 'char* const'
+        if(mType.getQualifiers().hasFastQualifiers()) {
+            const QualType fastQualifierType{typePtr, mType.getQualifiers().getFastQualifiers()};
+
+            mSkipSpace = true;
+            AddCVQualifiers(fastQualifierType.getCanonicalType()->getPointeeType().getLocalQualifiers());
+        }
 
         return mHasData;
     }
 };
 //-----------------------------------------------------------------------------
 
-static std::string GetNameInternal(const QualType& t, const CppInsightsPrintingPolicy& printingPolicy)
+static std::string GetName(const QualType&             t,
+                           const Unqualified           unqualified  = Unqualified::No,
+                           const InsightsSuppressScope supressScope = InsightsSuppressScope::No)
 {
+    const CppInsightsPrintingPolicy printingPolicy{unqualified, supressScope};
+
     if(SimpleTypePrinter st{t, printingPolicy}; st.GetTypeString()) {
         return ScopeHandler::RemoveCurrentScope(st.GetString());
 
@@ -807,36 +835,6 @@ static std::string GetNameInternal(const QualType& t, const CppInsightsPrintingP
     }
 
     return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(t, printingPolicy));
-}
-//-----------------------------------------------------------------------------
-
-static bool IsDecltypeType(const QualType& t)
-{
-    if(t.getTypePtrOrNull()) {
-        if(isa<clang::DecltypeType>(t)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-//-----------------------------------------------------------------------------
-
-static std::string GetName(const QualType&             t,
-                           const Unqualified           unqualified  = Unqualified::No,
-                           const InsightsSuppressScope supressScope = InsightsSuppressScope::No)
-{
-    const auto                      desugaredType = GetDesugarType(t);
-    const auto*                     autoType      = desugaredType->getContainedAutoType();
-    const bool                      isAutoType{autoType && autoType->isSugared()};
-    const CppInsightsPrintingPolicy printingPolicy{unqualified, supressScope};
-
-    // Handle decltype(var)
-    if(not isAutoType && IsDecltypeType(t)) {
-        return GetNameInternal(desugaredType, printingPolicy);
-    }
-
-    return GetNameInternal(t, printingPolicy);
 }
 }  // namespace details
 //-----------------------------------------------------------------------------

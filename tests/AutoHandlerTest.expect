@@ -68,9 +68,9 @@ int main()
   float f = 1.0F;
   char c = 'c';
   unsigned int u = 0U;
-  decltype(u) uu = u;
+  unsigned int uu = u;
   unsigned int mu = 0U;
-  decltype(u) muu = u;
+  unsigned int muu = u;
 }
 
 
