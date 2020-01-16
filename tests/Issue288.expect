@@ -1,0 +1,160 @@
+#include <iostream>
+#include <utility>
+
+namespace expressions
+{
+  template<class Expr1, class Expr2>
+  auto operator||(Expr1 && ex1, Expr2 && ex2)
+  {
+        
+    class __lambda_10_10
+    {
+      public: 
+      template<class type_parameter_1_0>
+      inline auto operator()(type_parameter_1_0 && val) const
+      {
+        return (operator||(ex1(std::forward<decltype(val)>(val)), ex2(std::forward<decltype(val)>(val))));
+      }
+      private: 
+      auto ex1;
+      auto ex2;
+      
+      public:
+      __lambda_10_10(auto _ex1, auto _ex2)
+      : ex1{_ex1}
+      , ex2{_ex2}
+      {}
+      
+    } __lambda_10_10{std::move(ex1), std::move(ex2)};
+    
+    return __lambda_10_10;
+  }
+  template<class Expr1, class Expr2>
+  auto operator&&(Expr1 && ex1, Expr2 && ex2)
+  {
+        
+    class __lambda_20_10
+    {
+      public: 
+      template<class type_parameter_1_0>
+      inline auto operator()(type_parameter_1_0 val) const
+      {
+        return (operator&&(ex1(std::forward<decltype(val)>(val)), ex2(std::forward<decltype(val)>(val))));
+      }
+      private: 
+      auto ex1;
+      auto ex2;
+      
+      public:
+      __lambda_20_10(auto _ex1, auto _ex2)
+      : ex1{_ex1}
+      , ex2{_ex2}
+      {}
+      
+    } __lambda_20_10{std::move(ex1), std::move(ex2)};
+    
+    return __lambda_20_10;
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  __lambda_20_10 operator&&<__lambda_27_16 &, __lambda_32_16 &>(__lambda_27_16 & ex1, __lambda_32_16 & ex2)
+  {
+        
+    class __lambda_20_10
+    {
+      public: 
+      template<class type_parameter_0_0>
+      inline /*constexpr */ auto operator()(type_parameter_0_0 val) const
+      {
+        return (operator&&(ex1(std::forward<decltype(val)>(val)), ex2(std::forward<decltype(val)>(val))));
+      }
+      
+      #ifdef INSIGHTS_USE_TEMPLATE
+      template<>
+      inline /*constexpr */ bool operator()(int val) const
+      {
+        return (ex1.operator()(std::forward<int>(val)) && ex2.operator()(std::forward<int>(val)));
+      }
+      #endif
+      
+      private: 
+      __lambda_27_16 ex1;
+      __lambda_32_16 ex2;
+      
+      public:
+      __lambda_20_10(__lambda_27_16 && _ex1, __lambda_32_16 && _ex2)
+      : ex1{std::move(_ex1)}
+      , ex2{std::move(_ex2)}
+      {}
+      
+    } __lambda_20_10{__lambda_27_16(std::move(ex1)), __lambda_32_16(std::move(ex2))};
+    
+    return __lambda_20_10;
+  }
+  #endif
+  
+    
+  class __lambda_27_16
+  {
+    public: 
+    inline /*constexpr */ bool operator()(int val) const
+    {
+      return val > 10;
+    }
+    
+    using retType_27_16 = bool (*)(int);
+    inline /*constexpr */ operator retType_27_16 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline bool __invoke(int val)
+    {
+      return val > 10;
+    }
+    
+    public: 
+    // inline /*constexpr */ __lambda_27_16(__lambda_27_16 &&) noexcept = default;
+    
+  };
+  
+  __lambda_27_16 Gt_10 = __lambda_27_16{};
+    
+  class __lambda_32_16
+  {
+    public: 
+    inline /*constexpr */ bool operator()(int val) const
+    {
+      return val < 20;
+    }
+    
+    using retType_32_16 = bool (*)(int);
+    inline /*constexpr */ operator retType_32_16 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline bool __invoke(int val)
+    {
+      return val < 20;
+    }
+    
+    public: 
+    // inline /*constexpr */ __lambda_32_16(__lambda_32_16 &&) noexcept = default;
+    
+  };
+  
+  __lambda_32_16 Lt_20 = __lambda_32_16{};
+  
+}
+
+int main()
+{
+  __lambda_20_10 f = expressions::operator&&(expressions::Gt_10, expressions::Lt_20);
+  std::operator<<(std::operator<<(std::cout, "Ok?").operator<<(f.operator()(15)), '\n');
+  return 0;
+}
+
