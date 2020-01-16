@@ -213,11 +213,16 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         # (VerQueryValue, GetFileVersionInfoSize, GetFileVersionInfo)
         # llvm-config does not contain it. Add manually.
         set(LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS};Mincore.lib")
+    elseif(APPLE)
+        string(REPLACE ".dylib" "" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS2}")
+        string(REPLACE "/usr/lib/lib" "-l" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS}")
+        set(LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS}")
     else()
         set(LLVM_SYSTEM_LIBS ${LLVM_SYSTEM_LIBS2})
     endif()
 
     llvm_config(LLVM_PACKAGE_VERSION "--version")
+    string(REPLACE "git" "" LLVM_PACKAGE_VERSION_PLAIN "${LLVM_PACKAGE_VERSION}")
 
     # always generate the compile commands
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

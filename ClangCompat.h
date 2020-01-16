@@ -50,6 +50,16 @@ auto inline GetEndLoc(const T* decl)
 }
 //-----------------------------------------------------------------------------
 
+inline auto* GetTemporary(const MaterializeTemporaryExpr* stmt)
+{
+#if IS_CLANG_NEWER_THAN(9)
+    return stmt->getSubExpr();
+#else
+    return stmt->getTemporary();
+#endif
+}
+//-----------------------------------------------------------------------------
+
 }  // namespace clang::insights
 
 #endif /* INSIGHTS_CLANG_COMPAT_H */
