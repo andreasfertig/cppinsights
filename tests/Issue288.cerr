@@ -1,0 +1,38 @@
+.tmp.cpp:13:7: error: templates cannot be declared inside of a local class
+      template<class type_parameter_1_0>
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:19:7: error: 'auto' not allowed in non-static class member
+      auto ex1;
+      ^~~~
+.tmp.cpp:20:7: error: 'auto' not allowed in non-static class member
+      auto ex2;
+      ^~~~
+.tmp.cpp:23:22: error: 'auto' not allowed in function prototype
+      __lambda_10_10(auto _ex1, auto _ex2)
+                     ^~~~
+.tmp.cpp:23:33: error: 'auto' not allowed in function prototype
+      __lambda_10_10(auto _ex1, auto _ex2)
+                                ^~~~
+.tmp.cpp:39:7: error: templates cannot be declared inside of a local class
+      template<class type_parameter_1_0>
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:45:7: error: 'auto' not allowed in non-static class member
+      auto ex1;
+      ^~~~
+.tmp.cpp:46:7: error: 'auto' not allowed in non-static class member
+      auto ex2;
+      ^~~~
+.tmp.cpp:49:22: error: 'auto' not allowed in function prototype
+      __lambda_20_10(auto _ex1, auto _ex2)
+                     ^~~~
+.tmp.cpp:49:33: error: 'auto' not allowed in function prototype
+      __lambda_20_10(auto _ex1, auto _ex2)
+                                ^~~~
+.tmp.cpp:156:3: error: unknown type name '__lambda_20_10'; did you mean 'expressions::__lambda_27_16'?
+  __lambda_20_10 f = expressions::operator&&(expressions::Gt_10, expressions::Lt_20);
+  ^~~~~~~~~~~~~~
+  expressions::__lambda_27_16
+.tmp.cpp:98:9: note: 'expressions::__lambda_27_16' declared here
+  class __lambda_27_16
+        ^
+11 errors generated.

@@ -718,16 +718,22 @@ private:
 
     bool HandleType(const DecltypeType* type)
     {
-        const bool skipSpace{mSkipSpace};
-        mSkipSpace = true;
+        // A DecltypeType in a template definition is unevaluated and refers ti itself. This check ensures, that in such
+        // a situation no expansion is performed.
+        if(const auto* subType = type->desugar().getTypePtrOrNull(); not isa<DecltypeType>(subType)) {
+            const bool skipSpace{mSkipSpace};
+            mSkipSpace = true;
 
-        HandleType(type->desugar().getTypePtrOrNull());
+            HandleType(type->desugar().getTypePtrOrNull());
 
-        mSkipSpace = skipSpace;
+            mSkipSpace = skipSpace;
 
-        // if we hit a DecltypeType always use the expanded version to support things like a DecltypeType wrapped in an
-        // LValueReferenceType
-        return true;
+            // if we hit a DecltypeType always use the expanded version to support things like a DecltypeType wrapped in
+            // an LValueReferenceType
+            return true;
+        }
+
+        return false;
     }
 
     bool HandleType(const Type* type)
