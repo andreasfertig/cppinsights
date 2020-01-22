@@ -130,9 +130,9 @@ public:
     void CloseScope(const NoNewLineBefore newLineBefore = NoNewLineBefore::No);
 
     /// \brief Similiar to \ref CloseScope only this time a ';' is inserted after the brace.
-    void CloseScopeWithSemi()
+    void CloseScopeWithSemi(const NoNewLineBefore newLineBefore = NoNewLineBefore::No)
     {
-        CloseScope();
+        CloseScope(newLineBefore);
         Append(";");
     }
 
@@ -175,6 +175,9 @@ public:
             lambda(arg);
         }
     }
+
+    void InsertIfDefTemplateGuard() { AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE"); }
+    void InsertEndIfTemplateGuard() { AppendNewLine("#endif"); }
 
 private:
     static constexpr unsigned SCOPE_INDENT{2};
