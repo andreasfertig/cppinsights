@@ -1,0 +1,3 @@
+union U {
+  struct {} s;
+};

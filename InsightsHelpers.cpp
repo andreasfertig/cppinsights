@@ -274,8 +274,10 @@ static std::string MakeLineColumnName(const Decl& decl, const std::string& prefi
 {
     const auto& sm       = GetSM(decl);
     const auto  locBegin = GetBeginLoc(decl);
-    const auto  lineNo   = sm.getSpellingLineNumber(locBegin);
-    const auto  columnNo = sm.getSpellingColumnNumber(locBegin);
+    // In case of a macro expansion the expansion(line/column) number gives a unique value.
+    const auto lineNo = locBegin.isMacroID() ? sm.getExpansionLineNumber(locBegin) : sm.getSpellingLineNumber(locBegin);
+    const auto columnNo =
+        locBegin.isMacroID() ? sm.getExpansionColumnNumber(locBegin) : sm.getSpellingColumnNumber(locBegin);
 
     return StrCat(prefix, lineNo, "_", columnNo);
 }
@@ -285,6 +287,13 @@ std::string GetLambdaName(const CXXRecordDecl& lambda)
 {
     static const std::string lambdaPrefix{"__lambda_"};
     return MakeLineColumnName(lambda, lambdaPrefix);
+}
+//-----------------------------------------------------------------------------
+
+static std::string GetAnonymStructOrUnionName(const CXXRecordDecl& cxxRecordDecl)
+{
+    static const std::string prefix{"__anon_"};
+    return MakeLineColumnName(cxxRecordDecl, prefix);
 }
 //-----------------------------------------------------------------------------
 
@@ -533,6 +542,13 @@ private:
 
             if(cxxRecordDecl->isLambda()) {
                 mData.Append(GetLambdaName(*cxxRecordDecl));
+
+                return true;
+            }
+
+            // Handle anonymous struct or union.
+            if(IsAnonymousStructOrUnion(cxxRecordDecl)) {
+                mData.Append(GetAnonymStructOrUnionName(*cxxRecordDecl));
 
                 return true;
             }
@@ -892,7 +908,14 @@ std::string GetName(const CXXRecordDecl& RD)
         return details::GetQualifiedName(RD);
     }
 
-    std::string ret{StrCat(GetNestedName(RD.getQualifier()), RD.getNameAsString())};
+    std::string ret{GetNestedName(RD.getQualifier())};
+
+    if(auto&& name = RD.getNameAsString(); not name.empty()) {
+        ret += RD.getNameAsString();
+
+    } else {
+        ret += GetAnonymStructOrUnionName(RD);
+    }
 
     return ScopeHandler::RemoveCurrentScope(ret);
 }

@@ -1,0 +1,20 @@
+#define macro(name) \
+    struct { int x; } name
+struct __anon_4_1
+{
+  int x;
+  // inline __anon_4_1() noexcept = default;
+};
+
+
+__anon_4_1 myAnonStruct = __anon_4_1();
+struct __anon_5_1
+{
+  int x;
+  // inline __anon_5_1() noexcept = default;
+};
+
+
+__anon_5_1 myAnonStruct2 = __anon_5_1();
+
+

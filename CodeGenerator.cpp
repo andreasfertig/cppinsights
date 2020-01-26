@@ -66,12 +66,13 @@ static const char* GetCastName(const CastKind castKind)
 }
 //-----------------------------------------------------------------------------
 
-static const char* GetClassOrStructTagName(const TagDecl& decl)
+static const char* GetTagDeclTypeName(const TagDecl& decl)
 {
-    const bool isClass{decl.isClass()};
-
-    if(isClass) {
+    if(decl.isClass()) {
         return kwClassSpace;
+
+    } else if(decl.isUnion()) {
+        return "union ";
 
     } else {
         return "struct ";
@@ -2405,7 +2406,7 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
             if(const auto* ctd = dyn_cast_or_null<ClassTemplateDecl>(stmt->getFriendDecl())) {
                 InsertTemplateParameters(*ctd->getTemplateParameters());
 
-                cls = GetClassOrStructTagName(*ctd->getTemplatedDecl());
+                cls = GetTagDeclTypeName(*ctd->getTemplatedDecl());
             }
 
             mOutputFormatHelper.AppendNewLine("friend ", cls, GetName(*stmt->getFriendDecl()), ";");
@@ -2564,7 +2565,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         }
     }
 
-    mOutputFormatHelper.Append(GetClassOrStructTagName(*stmt));
+    mOutputFormatHelper.Append(GetTagDeclTypeName(*stmt));
 
     InsertAttributes(stmt->attrs());
 
