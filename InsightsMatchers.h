@@ -50,32 +50,6 @@ AST_MATCHER(FunctionDecl, isTemplateInstantiationPlain)
     return Node.isTemplateInstantiation();
 }
 
-static inline bool IsMatchingCast(const CastKind kind)
-{
-    switch(kind) {
-        case CastKind::CK_Dependent: [[fallthrough]];
-        case CastKind::CK_IntegralCast: [[fallthrough]];
-        case CastKind::CK_IntegralToBoolean: [[fallthrough]];
-        case CastKind::CK_IntegralToPointer: [[fallthrough]];
-        case CastKind::CK_PointerToIntegral: [[fallthrough]];
-        case CastKind::CK_BitCast: [[fallthrough]];
-        case CastKind::CK_UncheckedDerivedToBase: [[fallthrough]];
-        case CastKind::CK_ToUnion: [[fallthrough]];
-        case CastKind::CK_UserDefinedConversion: [[fallthrough]];
-        case CastKind::CK_AtomicToNonAtomic: [[fallthrough]];
-        case CastKind::CK_DerivedToBase: [[fallthrough]];
-        case CastKind::CK_FloatingCast: [[fallthrough]];
-        case CastKind::CK_IntegralToFloating: [[fallthrough]];
-        case CastKind::CK_FloatingToIntegral: [[fallthrough]];
-        /* these are implicit conversions. We get them right, but they may end up in a compiler internal type,
-         * which leads to compiler errors */
-        // case CastKind::CK_NoOp:
-        case CastKind::CK_NonAtomicToAtomic: return true;
-        default: return false;
-    }
-}
-//-----------------------------------------------------------------------------
-
 AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl, Stmt))
 {
     SILENCE;
