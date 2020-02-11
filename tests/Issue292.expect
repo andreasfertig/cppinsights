@@ -1,0 +1,20 @@
+// cmdlineinsights:--show-all-implicit-casts
+class H
+{
+  
+  public: 
+  H(const char *, int, double, double);
+  
+  H(const char *, int, double *);
+  
+  ~H() noexcept;
+  
+};
+
+
+
+H foo()
+{
+  return H{static_cast<const char *>("hai"), 4, static_cast<double *>(0)};
+}
+

@@ -1329,7 +1329,42 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
     const auto  castKind = stmt->getCastKind();
     const bool  hideImplicitCasts{not GetInsightsOptions().ShowAllImplicitCasts};
 
-    if(!clang::ast_matchers::IsMatchingCast(castKind)) {
+    auto isMatchingCast = [](const CastKind kind, const bool hideImplicitCasts) {
+        switch(kind) {
+            case CastKind::CK_Dependent: [[fallthrough]];
+            case CastKind::CK_IntegralCast: [[fallthrough]];
+            case CastKind::CK_IntegralToBoolean: [[fallthrough]];
+            case CastKind::CK_IntegralToPointer: [[fallthrough]];
+            case CastKind::CK_PointerToIntegral: [[fallthrough]];
+            case CastKind::CK_BitCast: [[fallthrough]];
+            case CastKind::CK_UncheckedDerivedToBase: [[fallthrough]];
+            case CastKind::CK_ToUnion: [[fallthrough]];
+            case CastKind::CK_UserDefinedConversion: [[fallthrough]];
+            case CastKind::CK_AtomicToNonAtomic: [[fallthrough]];
+            case CastKind::CK_DerivedToBase: [[fallthrough]];
+            case CastKind::CK_FloatingCast: [[fallthrough]];
+            case CastKind::CK_IntegralToFloating: [[fallthrough]];
+            case CastKind::CK_FloatingToIntegral: [[fallthrough]];
+            /* these are implicit conversions. We get them right, but they may end up in a compiler internal type,
+             * which leads to compiler errors */
+            // case CastKind::CK_NoOp:
+            case CastKind::CK_NonAtomicToAtomic: return true;
+            default:
+                // Show this casts only if ShowAllImplicitCasts is turned on.
+                if(not hideImplicitCasts) {
+                    switch(kind) {
+                        case CastKind::CK_NullToPointer: [[fallthrough]];
+                        case CastKind::CK_NullToMemberPointer: [[fallthrough]];
+                        case CastKind::CK_ArrayToPointerDecay: return true;
+                        default: break;
+                    }
+                }
+
+                return false;
+        }
+    };
+
+    if(not isMatchingCast(castKind, hideImplicitCasts)) {
         InsertArg(subExpr);
     } else if(isa<IntegerLiteral>(subExpr) && hideImplicitCasts) {
         InsertArg(stmt->IgnoreCasts());

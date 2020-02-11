@@ -1,0 +1,28 @@
+// cmdlineinsights:--show-all-implicit-casts
+class NullToMemberPtrTest
+{
+  
+  public: 
+  inline int Fun(int)
+  {
+    return 1;
+  }
+  
+  int mMember;
+};
+
+
+
+int main()
+{
+  using FuncPtr_12 = int NullToMemberPtrTest::*;
+  FuncPtr_12 mMember1 = static_cast<int NullToMemberPtrTest::*>(nullptr);
+  using FuncPtr_14 = int NullToMemberPtrTest::*;
+  FuncPtr_14 mMember2 = static_cast<int NullToMemberPtrTest::*>(0);
+  using FuncPtr_16 = int (NullToMemberPtrTest::*)(int);
+  FuncPtr_16 Func1 = static_cast<int (NullToMemberPtrTest::*)(int)>(nullptr);
+  using FuncPtr_18 = int (NullToMemberPtrTest::*)(int);
+  FuncPtr_18 Func2 = static_cast<int (NullToMemberPtrTest::*)(int)>(0);
+}
+
+
