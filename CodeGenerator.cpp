@@ -1037,14 +1037,17 @@ void CodeGenerator::InsertArg(const ParenListExpr* stmt)
 std::string
 CodeGenerator::FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt)
 {
-    const auto         size{std::clamp(ct->getSize().getZExtValue(), uint64_t{0}, MAX_FILL_VALUES_FOR_ARRAYS)};
     OutputFormatHelper ret{};
 
-    OnceFalse needsComma{uint64_t{0} != startAt};
-    for_each(startAt, size, [&](auto) {
-        ret.AppendComma(needsComma);
-        ret.Append(value);
-    });
+    if(ct) {
+        const auto size{std::clamp(ct->getSize().getZExtValue(), uint64_t{0}, MAX_FILL_VALUES_FOR_ARRAYS)};
+
+        OnceFalse needsComma{uint64_t{0} != startAt};
+        for_each(startAt, size, [&](auto) {
+            ret.AppendComma(needsComma);
+            ret.Append(value);
+        });
+    }
 
     return ret.GetString();
 }
