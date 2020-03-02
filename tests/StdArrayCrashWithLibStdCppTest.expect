@@ -1,0 +1,15 @@
+#include <array>
+
+int foo()
+{
+  std::array<int, 20> localArray = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+  return localArray.operator[](1);
+}
+
+
+int main()
+{
+  return foo();
+}
+
+
