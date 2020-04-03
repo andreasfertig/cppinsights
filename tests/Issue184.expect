@@ -28,6 +28,7 @@ struct CustomerEq
     return std::operator==(c0.getName(), c1.getName());
   }
   
+  // inline constexpr CustomerEq() noexcept = default;
 };
 
 
@@ -39,6 +40,7 @@ struct CustomerHash
     return std::hash<std::basic_string<char> >().operator()(c.getName());
   }
   
+  // inline constexpr CustomerHash() noexcept = default;
 };
 
 
@@ -48,7 +50,7 @@ struct ManyParentsWithOperator : Bases...{
 using Bases::operator()...;//C++17
 };
 
-/* First instantiated from: type_traits:1561 */
+/* First instantiated from: type_traits:1541 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, public CustomerEq
@@ -59,12 +61,13 @@ struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, 
   using CustomerEq::operator();
   // inline bool CustomerEq::operator()(const Customer & c0, const Customer & c1) const;
   
+  // inline constexpr ManyParentsWithOperator() noexcept = default;
 };
 
 #endif
 
 
-/* First instantiated from: type_traits:1561 */
+/* First instantiated from: type_traits:1541 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, public CustomerHash
@@ -75,6 +78,7 @@ struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, pu
   using CustomerHash::operator();
   // inline std::size_t CustomerHash::operator()(const Customer & c) const;
   
+  // inline constexpr ManyParentsWithOperator() noexcept = default;
 };
 
 #endif

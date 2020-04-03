@@ -43,7 +43,7 @@ struct generator
       throw std::bad_alloc();
     }
     
-    // inline promise_type() noexcept = default;
+    // inline constexpr promise_type() noexcept = default;
   };
   
   using coro_handle = stdx::coroutine_handle<promise_type>;
