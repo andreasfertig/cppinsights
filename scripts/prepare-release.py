@@ -12,12 +12,12 @@ import subprocess
 #------------------------------------------------------------------------------
 
 def main():
-    oldClangDevel  = '9'
-    newClangDevel = '10'
-    oldClangStable = '8'
+    oldClangDevel  = '10'
+    newClangDevel = '11'
+    oldClangStable = '9'
     newClangStable = oldClangDevel
-    oldInsightsVersion = '0.4'
-    newInsightsVersion = '0.5'
+    oldInsightsVersion = '0.5'
+    newInsightsVersion = '0.6'
 
     print('Preparing a new release:')
     print(' Current Clang development : %s' %(oldClangDevel))
