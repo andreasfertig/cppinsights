@@ -19,7 +19,7 @@ endif()
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
-set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 9)
+set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 10)
 set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
 
 if(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder
@@ -213,11 +213,16 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         # (VerQueryValue, GetFileVersionInfoSize, GetFileVersionInfo)
         # llvm-config does not contain it. Add manually.
         set(LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS};Mincore.lib")
+    elseif(APPLE)
+        string(REPLACE ".dylib" "" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS2}")
+        string(REPLACE "/usr/lib/lib" "-l" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS}")
+        set(LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS}")
     else()
         set(LLVM_SYSTEM_LIBS ${LLVM_SYSTEM_LIBS2})
     endif()
 
     llvm_config(LLVM_PACKAGE_VERSION "--version")
+    string(REPLACE "git" "" LLVM_PACKAGE_VERSION_PLAIN "${LLVM_PACKAGE_VERSION}")
 
     # always generate the compile commands
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

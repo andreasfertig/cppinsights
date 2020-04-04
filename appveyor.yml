@@ -8,12 +8,12 @@ install:
   - cmd: if not exist C:\llvm-bin\downloaded ( 
             mkdir C:\llvm-bin &&
             cd C:\llvm-bin &&
-            (powershell Start-FileDownload "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/9.0.0/llvm+clang-9.0.0-win64-msvc-release.tar.xz" -FileName llvm.tar.xz) &&
+            (powershell Start-FileDownload "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/10.0.0/llvm+clang-10.0.0-win64-msvc-release.tar.xz" -FileName llvm.tar.xz) &&
             7z x C:\llvm-bin\llvm.tar.xz &&
             7z x C:\llvm-bin\llvm.tar &&
             del llvm.tar &&
             echo "downloaded" > downloaded )
-  - cmd: set PATH=%PATH%;C:\llvm-bin\llvm+clang-9.0.0-win64-msvc-release\bin
+  - cmd: set PATH=%PATH%;C:\llvm-bin\llvm+clang-10.0.0-win64-msvc-release\bin
   - cmd: echo PATH %PATH%
   - cmd: md c:\ciuploadtool
   - cmd: cd c:\ciuploadtool
@@ -28,7 +28,7 @@ build_script:
   - cmd: mkdir "%APPVEYOR_BUILD_FOLDER%/build"
   - cmd: cd "%APPVEYOR_BUILD_FOLDER%/build"
   - cmd: clang++ --version
-  - cmd: cmake -G "Visual Studio 15 2017 Win64" -T LLVM -DINSIGHTS_STATIC=Yes -DINSIGHTS_LLVM_CONFIG=C:\llvm-bin\llvm+clang-9.0.0-win64-msvc-release\bin\llvm-config ..
+  - cmd: cmake -G "Visual Studio 15 2017 Win64" -T LLVM -DINSIGHTS_STATIC=Yes -DINSIGHTS_LLVM_CONFIG=C:\llvm-bin\llvm+clang-10.0.0-win64-msvc-release\bin\llvm-config ..
 
   - cmd: cmake --build . --config Release --target insights
   - cmd: cd Release

@@ -893,7 +893,7 @@ void CodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 
     // peal of __promise.yield_value
     if(const auto* matTemp = dyn_cast_or_null<MaterializeTemporaryExpr>(stmt->getCommonExpr())) {
-        const auto* temporary = matTemp->getTemporary();
+        const auto* temporary = GetTemporary(matTemp);
 
         if(const auto* memExpr = dyn_cast_or_null<CXXMemberCallExpr>(temporary)) {
             ForEachArg(memExpr->arguments(), [&](const auto& arg) { InsertArg(arg); });
@@ -967,7 +967,7 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
                 mOutputFormatHelper.Append("... ");
             }
 
-            if(0 == typeName.size()) {
+            if(0 == typeName.size() || tt->isImplicit() /* fixes class container:auto*/) {
                 mOutputFormatHelper.Append("type_parameter_", tt->getDepth(), "_", tt->getIndex());
             } else {
                 mOutputFormatHelper.Append(typeName);
@@ -1653,7 +1653,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
 
 void CodeGenerator::InsertArg(const MaterializeTemporaryExpr* stmt)
 {
-    InsertArg(stmt->getTemporary());
+    InsertArg(GetTemporary(stmt));
 }
 //-----------------------------------------------------------------------------
 
@@ -2785,7 +2785,7 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 
         const auto* mat  = dyn_cast<MaterializeTemporaryExpr>(stmt->getSubExpr());
         const auto  size = [&]() -> size_t {
-            if(const auto* list = dyn_cast_or_null<InitListExpr>(mat->GetTemporaryExpr())) {
+            if(const auto* list = dyn_cast_or_null<InitListExpr>(GetTemporary(mat))) {
                 return list->getNumInits();
             }
 

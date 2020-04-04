@@ -70,8 +70,14 @@
 .tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   inline constexpr int get(Q &&)
                        ^
-.tmp.cpp:117:36: error: variables defined in a constexpr function must be initialized
+.tmp.cpp:117:36: warning: uninitialized variable in a constexpr function is a C++20 extension [-Wc++20-extensions]
     std::tuple_element<0, Q>::type a = get<0UL>(__q19);
+                                   ^
+.tmp.cpp:118:36: warning: uninitialized variable in a constexpr function is a C++20 extension [-Wc++20-extensions]
+    std::tuple_element<1, Q>::type b = get<1UL>(__q19);
+                                   ^
+.tmp.cpp:119:36: warning: uninitialized variable in a constexpr function is a C++20 extension [-Wc++20-extensions]
+    std::tuple_element<2, Q>::type c = get<2UL>(__q19);
                                    ^
 .tmp.cpp:127:42: error: no matching function for call to 'get'
       std::tuple_element<0, Q>::type a = get<0UL>(__q26);
@@ -91,7 +97,13 @@
 .tmp.cpp:54:24: note: candidate function template not viable: no known conversion from 'constant::Q' to 'constant::Q &&' for 1st argument
   inline constexpr int get(Q &&)
                        ^
-.tmp.cpp:127:38: error: variables defined in a constexpr function must be initialized
+.tmp.cpp:127:38: warning: uninitialized variable in a constexpr function is a C++20 extension [-Wc++20-extensions]
       std::tuple_element<0, Q>::type a = get<0UL>(__q26);
                                      ^
-17 errors generated.
+.tmp.cpp:128:38: warning: uninitialized variable in a constexpr function is a C++20 extension [-Wc++20-extensions]
+      std::tuple_element<1, Q>::type b = get<1UL>(__q26);
+                                     ^
+.tmp.cpp:129:38: warning: uninitialized variable in a constexpr function is a C++20 extension [-Wc++20-extensions]
+      std::tuple_element<2, Q>::type c = get<2UL>(__q26);
+                                     ^
+6 warnings and 15 errors generated.

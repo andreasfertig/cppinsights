@@ -111,7 +111,7 @@ struct generator<unsigned int>
       return generator<unsigned int>{nullptr};
     }
     
-    // inline promise_type() noexcept = default;
+    // inline constexpr promise_type() noexcept = default;
   };
   
   struct iterator

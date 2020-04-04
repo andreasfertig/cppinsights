@@ -481,7 +481,14 @@ private:
 
     bool HandleType(const TemplateTypeParmType* type)
     {
-        if(nullptr == type->getIdentifier()) {
+        TemplateTypeParmDecl* decl = type->getDecl();
+
+        if(decl) {
+            DPrint("have decl: %d\n", decl->isImplicit());
+        }
+
+        if((nullptr == type->getIdentifier()) ||
+           (decl && decl->isImplicit()) /* this fixes auto operator()(type_parameter_0_0 container) const */) {
             mData.Append("type_parameter_", type->getDepth(), "_", type->getIndex());
 
             return true;

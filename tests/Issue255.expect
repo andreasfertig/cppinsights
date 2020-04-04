@@ -22,7 +22,7 @@ struct Iterable
     
     inline access_type operator*()
     {
-      Widget tmp = this->m_iterable->m_storage[this->m_pos];
+      Widget tmp = std::tuple<int, float>(this->m_iterable->m_storage.operator[](this->m_pos));
       return std::get<access_type>(tmp);
     }
     
