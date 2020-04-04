@@ -13,22 +13,22 @@ common_sources: &all_sources
   key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
 llvm_current_packages: &all_llvm_current_packages
-- llvm-10-dev
-- libclang-10-dev
+- llvm-11-dev
+- libclang-11-dev
 
 jobs:
   include:
 
-    # OSX clang 9 build
-  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='9.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+    # OSX clang 10 build
+  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='No' DEBUG='No' UPLOAD='Yes' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     os: osx
-    name: "Clang 9 @ macOS Release"
+    name: "Clang 10 @ macOS Release"
     osx_image: xcode11.2
     compiler: clang
 
-    #  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='9.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
+    #  - env: COMPILER='clang++' LLVM_CONFIG='llvm-config' LLVM_VERSION='10.0.0' COVERAGE='Yes' STATIC='No' DEBUG='Yes' UPLOAD='No' SKIP_TESTS='No' TIDY='No' SHACMD='shasum -a 256'
     #    os: osx
-    #    name: "Clang 9 @ macOS Code Coverage & Debug"
+    #    name: "Clang 10 @ macOS Code Coverage & Debug"
     #    osx_image: xcode11.2
     #    compiler: clang
 
@@ -40,14 +40,14 @@ jobs:
   #     apt:
   #       sources: *all_sources
   #       packages: 
-  #       - clang-10
+  #       - clang-11
   #       - *all_llvm_current_packages
   #       - libstdc++-8-dev
-  #   env: COMPILER='clang++-10' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
+  #   env: COMPILER='clang++-11' LLVM_CONFIG=${LLVM_CONFIG_CURRENT}  COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang stable deployment
   - os: linux
-    name: "Clang 9 @ Ubuntu Release"
+    name: "Clang 10 @ Ubuntu Release"
     sudo: required
     services:
     - docker
@@ -55,7 +55,7 @@ jobs:
       ssh_known_hosts: cppinsights.io
     before_install:
     - docker pull andreasfertig/cppinsights-builder
-    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum' USE_DOCKER='Yes'
+    env: COMPILER='clang++-10' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum' USE_DOCKER='Yes'
     
   # Linux g++ Build
   # - os: linux
@@ -70,45 +70,45 @@ jobs:
   #       - *all_llvm_current_packages
   #   env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
-  # Linux g++ clang 9 build
+  # Linux g++ clang 10 build
   - os: linux
-    name: "GCC 8 / LLVM 9 @ Ubuntu"
+    name: "GCC 8 / LLVM 10 @ Ubuntu"
     sudo: required
     compiler: gcc
-    addons: &clang90
+    addons: &clang100
       apt:
         packages:
         - g++-8
-        - llvm-9-dev
-        - libclang-9-dev
-        - clang-format-9
-        - clang-tidy-9
+        - llvm-10-dev
+        - libclang-10-dev
+        - clang-format-10
+        - clang-tidy-10
         sources:
         - ubuntu-toolchain-r-test
-        - llvm-toolchain-bionic-9
-        - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
+        - llvm-toolchain-bionic-10
+        - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main'
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-10' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No'
 
   # Clang-tidy analysis
   - os: linux
-    name: "GCC 8 / LLVM 9 @ Ubuntu clang-tidy check"
+    name: "GCC 8 / LLVM 10 @ Ubuntu clang-tidy check"
     sudo: required
     compiler: gcc
-    addons: *clang90
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
+    addons: *clang100
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-10' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
 
   # Clang-format check
   - os: linux
-    name: "GCC 8 / LLVM 9 @ Ubuntu clang-format check"
+    name: "GCC 8 / LLVM 10 @ Ubuntu clang-format check"
     sudo: required
     compiler: gcc
-    addons: *clang90
-    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-9' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-9'
+    addons: *clang100
+    env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-10' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-10'
 
   # Debug build with coverage
   - os: linux
-    name: "GCC 8 / LLVM 9 @ Ubuntu Code Coverage & Debug"
+    name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage & Debug"
     # sudo: required
     # compiler: gcc
     # addons: &covcurrent
@@ -125,10 +125,10 @@ jobs:
     - docker
     before_install:
     - docker pull andreasfertig/cppinsights-builder
-    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No' USE_DOCKER='Yes'
+    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No' USE_DOCKER='Yes'
 
   - os: linux
-    name: "GCC 8 / LLVM 9 @ Ubuntu Code Coverage"
+    name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage"
     # sudo: required
     # compiler: gcc
     # addons: *covcurrent
@@ -138,16 +138,16 @@ jobs:
     - docker
     before_install:
     - docker pull andreasfertig/cppinsights-builder
-    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes'
+    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes'
 
   - os: linux
-    name: "GCC 8 / LLVM 9 @ Ubuntu Code Coverage (libc++)"
+    name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage (libc++)"
     sudo: required
     services:
     - docker
     before_install:
     - docker pull andreasfertig/cppinsights-builder
-    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes' USE_LIBCPP='Yes'
+    env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes' USE_LIBCPP='Yes'
 
   - stage: "Deploy Docker"
     install: true
@@ -161,7 +161,7 @@ jobs:
       fi  
     after_success: true
     before_deploy: true
-    env: COMPILER='clang++-9' LLVM_CONFIG=/usr/bin/llvm-config-9  COVERAGE='No' DEPLOY='No' STATIC='No' DEBUG='No' UPLOAD='No' TIDY='No' SHACMD='sha256sum' DOCKER_UPLOAD='Yes'
+    env: COMPILER='clang++-10' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='No' DEPLOY='No' STATIC='No' DEBUG='No' UPLOAD='No' TIDY='No' SHACMD='sha256sum' DOCKER_UPLOAD='Yes'
     os: linux
     name: "Final deploy to DockerHub"
     
@@ -302,6 +302,6 @@ deploy:
 #
 env:
   global:
-  - LLVM_CONFIG_CURRENT='/usr/bin/llvm-config-10'
+  - LLVM_CONFIG_CURRENT='/usr/bin/llvm-config-11'
   - secure: CFbIrswqs8U7pCMnF57QrC/KgNlybr5SNFlKE9BHA9I9WXcjLBGm3tv9JM7TvzwD5ivhe9P/MVcc1ROaTSPVRSdOI9aQuNBauDYoab1OrlO0SFnHjr6tKzvw9P+wnfuyawhH8vm6m/cdyyIKagFUKtFSKUnpLeakTEUUG6O9IBLHzBa0BTqlmviV9OjDUjD61adUSWVWe96T6A/tlGyFAWAYuAU1jvGN9HSE06mFlGC0NmbT25kq/8SGv9+9KoGgXNFB6lsQ6C5C3cWIlsaO0EtTnLGa2IfSZk4lg4CzZ97CGcraH5avrG5guSDWUGZEe8a+rxA42SvrhKVRDhu3qz0agH1BlXi+0q7k8oS7wAaRG63sjyD0DtFlA783bQmdLXh/BY5rz1FsqV9rr8qVdfo+5cVfW6sOZLrNeyF8OcxWAln5SNiuLpAb2cYTGNJ15J0KLynYBL/6e3Qe6gsUS4BIHFORr9dHMXA3TBnqEIo4hzJwnGNDixs7rLXCmdX3uxsAHUJEtSxm63AiCNvZhWq6Lm+Lf1CKQ9mNRzUT3IQGwuhCmv6XFR/ZTCFCiXwwC6lTy1ItC6c/90quMZpdxTcUVts6JmMI6i86bJgKrx4dzHpZmYkQ4D+r9LpqAOm1IgDlACZnCIjgHbTh6VOjNpU3jonzN1mHNxDP8Ezgjss=
   - secure: g6rm6GwWwbMe70xa25WHNvZ5NepGwda9F2e3R9iIr+EUTT/1zvZATTJfeNxt6YSCUKrxkRgO7MchjpngmVeP2bIC/0XCiiCfb46ENcINCRHxQ7jHmKIxDJypUK6rTiqsleprfGLFJ9jBUj4nEUzu0+N6EPC0hAzM5WeCZxitOifzPrs9L8/ATGJ2xvpazgkrVs0+Onv6Zn2O8XsoVaYZpUXHGIqXpZWTAyUnvRG3z/LInU7dyoiSgnoEAlruXUf+OuOAKOmiIaLBBsnyXsR2cS/kXcoQZNeTmxMjyguhC3c77OJxQ0dzJgN3pWznMNZ+Va5cetpM+P8wyeqXaVTxlLwCuj0KB8gsGKDfzHno8MHcbw71eV3/9laVmxZyOAQgeQVEj8vuclcaFIvbPMUtCGahlgPCr1l8gTVrgzdtJyEK0nf/Tk0LBS+5gvHg1aYIg6G9iqvX4oodJ8mH5RCTibWP/yOP65B5MmU/FNHFmeM4qREPWiclE351SrsraSUZ9H2onoaLBnDnNiHrr9OWaKD6BEKh66MxKS1u+Gi3Bb/xhK86JXtfq4K6OiQggbBPk/JPczn07czssAesu/gnMMuXSbkJc0m1YMBt0PtUoX4/bzTgTw485wVkBxeQYby7Q+7/vc5HKjl7OQqE73kctXWlhCuTzdF1wvcALu5oF78=
