@@ -84,6 +84,27 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
 }
 //-----------------------------------------------------------------------------
 
+// Special treatment for function templates which end with a semi-colon but have a valid body. In theory getting the end
+// of the location should be equivalent to what is done in FunctionDeclHandler.cpp. However, this approach fails for
+// example for AutoHandler2Test.cpp.
+static SourceLocation FindLocationAfterRBrace(const SourceLocation                          loc,
+                                              const ast_matchers::MatchFinder::MatchResult& result,
+                                              const bool                                    mustHaveSemi)
+{
+    if(not mustHaveSemi) {
+        auto nToken = clang::Lexer::findNextToken(loc, GetSM(result), result.Context->getLangOpts());
+
+        if(nToken.hasValue()) {
+            if(auto& rToken = nToken.getValue(); rToken.getKind() == tok::semi) {
+                return rToken.getLocation();
+            }
+        }
+    }
+
+    return FindLocationAfterSemi(loc, result).getLocWithOffset(1);
+}
+//-----------------------------------------------------------------------------
+
 void TemplateHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* functionDecl = result.Nodes.getNodeAs<FunctionDecl>("func")) {
@@ -92,9 +113,14 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         }
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(functionDecl);
-        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(functionDecl), result);
+        const auto         endOfCond          = FindLocationAfterRBrace(
+            GetEndLoc(functionDecl),
+            result,
+            isa<CXXDeductionGuideDecl>(
+                functionDecl));  // if we lift the "not getBody()" restriction above we need to take this in account
+                                                  // here, as then we require a semi at the end.
 
-        InsertIndentedText(endOfCond.getLocWithOffset(1), outputFormatHelper);
+        InsertIndentedText(endOfCond, outputFormatHelper);
 
     } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("class")) {
         // skip classes/struct's without a definition

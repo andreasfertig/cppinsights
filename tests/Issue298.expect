@@ -1,0 +1,15 @@
+template <typename T> void fun (T&& t) { }
+
+/* First instantiated from: Issue298.cpp:2 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void fun<int>(int && t)
+{
+}
+#endif
+;
+void test()
+{
+  fun(1);
+}
+
