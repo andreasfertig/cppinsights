@@ -543,6 +543,33 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+/// Get the name of a \c FieldDecl in case this \c FieldDecl is part of a lambda. The name has to be retrieved from the
+/// capture fields or can be \c __this.
+static Optional<std::string> GetFieldDeclNameForLambda(const FieldDecl& fieldDecl, const CXXRecordDecl& cxxRecordDecl)
+{
+    if(cxxRecordDecl.isLambda()) {
+        llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
+        FieldDecl*                                 thisCapture{};
+
+        cxxRecordDecl.getCaptureFields(captures, thisCapture);
+
+        if(&fieldDecl == thisCapture) {
+            return {"__this"};
+        } else {
+            // No `const` as workaround for Clang bug on Windows,
+            // see https://bugs.llvm.org/show_bug.cgi?id=33236
+            for(/*const*/ auto& [key, value] : captures) {
+                if(&fieldDecl == value) {
+                    return GetName(*key);
+                }
+            }
+        }
+    }
+
+    return {};
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const MemberExpr* stmt)
 {
     const auto* base = stmt->getBase();
@@ -575,6 +602,15 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
                 skipTemplateArgs = true;
 
                 return StrCat("operator ", GetLambdaName(*rd), "::", BuildRetTypeName(*rd));
+            }
+        }
+
+        // This is at least the case for lambdas, where members are created by capturing a structured binding. See #181.
+        else if(const auto* fd = dyn_cast_or_null<FieldDecl>(meDecl)) {
+            if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(fd->getParent())) {
+                if(const auto& fieldName = GetFieldDeclNameForLambda(*fd, *cxxRecordDecl)) {
+                    return fieldName.getValue();
+                }
             }
         }
 
@@ -2196,24 +2232,9 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
 
     if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(stmt->getParent())) {
         std::string name{GetName(*stmt)};
-        if(cxxRecordDecl->isLambda()) {
-            llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
-            FieldDecl*                                 thisCapture{};
 
-            cxxRecordDecl->getCaptureFields(captures, thisCapture);
-
-            if(stmt == thisCapture) {
-                name = "__this";
-            } else {
-                // No `const` as workaround for Clang bug on Windows,
-                // see https://bugs.llvm.org/show_bug.cgi?id=33236
-                for(/*const*/ auto& [key, value] : captures) {
-                    if(value == stmt) {
-                        name = GetName(*key);
-                        break;
-                    }
-                }
-            }
+        if(const auto fieldName = GetFieldDeclNameForLambda(*stmt, *cxxRecordDecl)) {
+            name = std::move(fieldName.getValue());
         }
 
         mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), name));
@@ -2590,7 +2611,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
                 const auto& fieldName{StrCat(isThis ? "__" : "", name)};
 
-                // Special handling for lambdas with init caputures which contain a move. In such a case, copy the
+                // Special handling for lambdas with init captures which contain a move. In such a case, copy the
                 // initial move statement and make the variable a &&.
                 if(const auto* cxxConstructExpr = dyn_cast_or_null<CXXConstructExpr>(expr);
                    cxxConstructExpr && cxxConstructExpr->getConstructor()->isMoveConstructor()) {
@@ -3361,7 +3382,12 @@ void StructuredBindingsCodeGenerator::InsertDecompositionBindings(const Decompos
                 const bool isRefToObject{IsReference(decompositionDeclStmt)};
                 const bool isArrayBinding{isa<ArraySubscriptExpr>(binding) && isRefToObject};
                 const bool isNotTemporary{holdingVarOrMemberExpr && !isa<ExprWithCleanups>(holdingVarOrMemberExpr)};
-                if(isArrayBinding || isNotTemporary) {
+                const bool isTypeAlreadyCarryingRef{
+                    bindingDecl->getType()
+                        ->isLValueReferenceType()};  // In case of a lambda that captures variables
+                                                     // and is expanded as a structured binding (#181), the
+                                                     // type of GetName below already carries the "&".
+                if((isArrayBinding || isNotTemporary) && not isTypeAlreadyCarryingRef) {
                     return "&";
                 }
 
