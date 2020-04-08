@@ -1,0 +1,46 @@
+int main()
+{
+  int x = 1;
+  int y = 2;
+    
+  class __lambda_5_11
+  {
+    public: 
+    template<class type_parameter_0_0>
+    inline /*constexpr */ auto operator()(type_parameter_0_0 self) const
+    {
+      static_cast<void>(x);
+      static_cast<void>(y);
+      auto & __self7 = *self;
+      return b - a;
+    }
+    
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline /*constexpr */ int operator()(__lambda_5_11 * self) const
+    {
+      static_cast<void>(x);
+      static_cast<void>(y);
+      __lambda_5_11 & __self7 = *self;
+      int & a = __self7.x;
+      int & b = __self7.y;
+      return b - a;
+    }
+    #endif
+    
+    private: 
+    int & x;
+    int & y;
+    
+    public:
+    __lambda_5_11(int & _x, int & _y)
+    : x{_x}
+    , y{_y}
+    {}
+    
+  };
+  
+  __lambda_5_11 f = __lambda_5_11{x, y};
+  return f.operator()(&f);
+}
+

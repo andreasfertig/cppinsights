@@ -1,0 +1,13 @@
+.tmp.cpp:9:5: error: templates cannot be declared inside of a local class
+    template<class type_parameter_0_0>
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:15:14: error: use of undeclared identifier 'b'
+      return b - a;
+             ^
+.tmp.cpp:15:18: error: use of undeclared identifier 'a'
+      return b - a;
+                 ^
+.tmp.cpp:44:12: error: no matching member function for call to 'operator()'
+  return f.operator()(&f);
+         ~~^~~~~~~~~~
+4 errors generated.
