@@ -127,7 +127,11 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             set(LIB_TYPE "--link-static")
         endif()
 
-        set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -static")
+        if(WIN32)
+            add_definitions(/MT)
+        else()
+            set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -static")
+        endif()
     endif()
     
     # This function saves the output of the llvm-config command with the given
@@ -176,6 +180,9 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             string(REGEX REPLACE "-Wno-unknown-warning-option" "" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
             string(REGEX REPLACE "-Wno-unused-command-line-argument" "" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
         endif()
+
+        # Since Clang 10 of ziglang C++14 is set
+        string(REGEX REPLACE "-std[:=]+c\\+\\+[0-9][0-9]" "" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
 
         # make result available outside
         set(${VARNAME} ${CONFIG_OUTPUT} PARENT_SCOPE)
@@ -616,6 +623,7 @@ endif()
 message(STATUS "")
 message(STATUS "[ Build summary ]")
 message(STATUS "CMAKE_GENERATOR       : ${CMAKE_GENERATOR}")
+message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
 message(STATUS "Compiler ID           : ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Compiler version      : ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "Compiler path         : ${CMAKE_CXX_COMPILER}")
