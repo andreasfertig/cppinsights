@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import sys
 import os
@@ -13,11 +13,11 @@ def main():
     htmlFiles = [os.path.join(mypath, f) for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.html'))]
 
     for f in htmlFiles:
-        data = open(f, 'r').read()
+        data = open(f, 'r', encoding='utf-8').read()
 
         data = data.replace('href="http', 'target="_blank" href="http')
 
-        open(f, 'w').write(data)
+        open(f, 'w', encoding='utf-8').write(data)
 
 
     print('Removing empty markdown source files')
@@ -39,7 +39,7 @@ def main():
 
     xmlData += '</urlset>\n'
 
-    open(os.path.join(mypath,'sitemap.xml'), 'w').write(xmlData)
+    open(os.path.join(mypath,'sitemap.xml'), 'w', encoding='utf-8').write(xmlData)
 
     return
 
