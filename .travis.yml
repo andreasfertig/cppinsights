@@ -1,5 +1,4 @@
 language: cpp
-sudo: false
 dist: bionic
 
 cache:
@@ -48,7 +47,6 @@ jobs:
   # Clang stable deployment
   - os: linux
     name: "Clang 10 @ Ubuntu Release"
-    sudo: required
     services:
     - docker
     before_install:
@@ -58,7 +56,6 @@ jobs:
   # Linux g++ Build
   # - os: linux
   #   name: "GCC 8 / LLVM unstable @ Ubuntu"
-  #   sudo: required
   #   compiler: gcc
   #   addons:
   #     apt:
@@ -71,7 +68,6 @@ jobs:
   # Linux g++ clang 10 build
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu"
-    sudo: required
     compiler: gcc
     addons: &clang100
       apt:
@@ -91,7 +87,6 @@ jobs:
   # Clang-tidy analysis
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu clang-tidy check"
-    sudo: required
     compiler: gcc
     addons: *clang100
     env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-10' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
@@ -99,7 +94,6 @@ jobs:
   # Clang-format check
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu clang-format check"
-    sudo: required
     compiler: gcc
     addons: *clang100
     env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-10' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-10'
@@ -107,7 +101,6 @@ jobs:
   # Debug build with coverage
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage & Debug"
-    # sudo: required
     # compiler: gcc
     # addons: &covcurrent
     #   apt:
@@ -118,7 +111,6 @@ jobs:
     #     - *all_llvm_current_packages
     #     - lcov
     # env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
-    sudo: required
     services:
     - docker
     before_install:
@@ -127,11 +119,9 @@ jobs:
 
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage"
-    # sudo: required
     # compiler: gcc
     # addons: *covcurrent
     # env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
-    sudo: required
     services:
     - docker
     before_install:
@@ -140,7 +130,6 @@ jobs:
 
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage (libc++)"
-    sudo: required
     services:
     - docker
     before_install:
@@ -288,6 +277,7 @@ branches:
 
 deploy:
 - provider: pages
+  strategy: git
   cleanup: false
   keep_history: true
   local_dir: build/html
