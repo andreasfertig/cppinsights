@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #------------------------------------------------------------------------------
 
 import sys
@@ -9,10 +9,20 @@ import subprocess
 import base64
 #------------------------------------------------------------------------------
 
+def runCmd(cmd, data=None):
+    if None == input:
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate()
+    else:
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate(input=data)
+
+    return stdout.decode('utf-8'), stderr.decode('utf-8'), p.returncode
+#------------------------------------------------------------------------------
+
 def getDefaultIncludeDirs(cxx):
     cmd = [cxx, '-E', '-x', 'c++', '-v', '/dev/null']
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = p.communicate()
+    stdout, stderr, retCode = runCmd(cmd)
 
     m = re.findall('\n (/.*)', stderr)
 
@@ -72,12 +82,11 @@ def replaceInsights(match, parser, args):
     cpp += '```{.cpp}\n'
 
     cmd = [insightsPath, 'examples/%s' %(cppFileName), '--', defaultCppStd, '-m64']
-    p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = p.communicate()
+    stdout, stderr, retCode = runCmd(cmd)
 
     cpp += stdout
 
-    cppData = open('examples/%s' %(cppFileName), 'r').read().strip()
+    cppData = open('examples/%s' %(cppFileName), 'r').read().strip().encode('utf-8')
 
 
     cpp += '\n```\n'
@@ -117,8 +126,7 @@ def main():
         data = data.replace('%s-source' %(optionName), cpp)
 
         cmd = [insightsPath, cppFileName, '--%s' %(optionName), '--', defaultCppStd, '-m64']
-        p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = p.communicate()
+        stdout, stderr, retCode = runCmd(cmd)
 
         data = data.replace('%s-transformed' %(optionName), stdout)
 
