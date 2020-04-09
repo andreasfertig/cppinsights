@@ -1,5 +1,6 @@
 language: cpp
 dist: bionic
+os: linux
 
 cache:
   ccache: true
