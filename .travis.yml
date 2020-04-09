@@ -1,6 +1,6 @@
 language: cpp
-sudo: false
 dist: bionic
+os: linux
 
 cache:
   ccache: true
@@ -48,11 +48,8 @@ jobs:
   # Clang stable deployment
   - os: linux
     name: "Clang 10 @ Ubuntu Release"
-    sudo: required
     services:
     - docker
-    addons:
-      ssh_known_hosts: cppinsights.io
     before_install:
     - docker pull andreasfertig/cppinsights-builder
     env: COMPILER='clang++-10' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='No' DEPLOY='Yes' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' SHACMD='sha256sum' USE_DOCKER='Yes'
@@ -60,7 +57,6 @@ jobs:
   # Linux g++ Build
   # - os: linux
   #   name: "GCC 8 / LLVM unstable @ Ubuntu"
-  #   sudo: required
   #   compiler: gcc
   #   addons:
   #     apt:
@@ -73,7 +69,6 @@ jobs:
   # Linux g++ clang 10 build
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu"
-    sudo: required
     compiler: gcc
     addons: &clang100
       apt:
@@ -93,7 +88,6 @@ jobs:
   # Clang-tidy analysis
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu clang-tidy check"
-    sudo: required
     compiler: gcc
     addons: *clang100
     env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-10' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='Yes'
@@ -101,7 +95,6 @@ jobs:
   # Clang-format check
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu clang-format check"
-    sudo: required
     compiler: gcc
     addons: *clang100
     env: COMPILER='g++-8' LLVM_CONFIG='/usr/bin/llvm-config-10' COVERAGE='No' STATIC='No' DEBUG='No' TIDY='No' CFORMAT='Yes' CFORMAT_NAME='clang-format-10'
@@ -109,7 +102,6 @@ jobs:
   # Debug build with coverage
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage & Debug"
-    # sudo: required
     # compiler: gcc
     # addons: &covcurrent
     #   apt:
@@ -120,7 +112,6 @@ jobs:
     #     - *all_llvm_current_packages
     #     - lcov
     # env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} COVERAGE='Yes' STATIC='No' DEBUG='Yes' TIDY='No'
-    sudo: required
     services:
     - docker
     before_install:
@@ -129,11 +120,9 @@ jobs:
 
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage"
-    # sudo: required
     # compiler: gcc
     # addons: *covcurrent
     # env: COMPILER='g++-8' LLVM_CONFIG=${LLVM_CONFIG_CURRENT} STATIC='No' COVERAGE='Yes' DEBUG='No' TIDY='No'
-    sudo: required
     services:
     - docker
     before_install:
@@ -142,7 +131,6 @@ jobs:
 
   - os: linux
     name: "GCC 8 / LLVM 10 @ Ubuntu Code Coverage (libc++)"
-    sudo: required
     services:
     - docker
     before_install:
@@ -290,12 +278,13 @@ branches:
 
 deploy:
 - provider: pages
-  skip-cleanup: true
-  keep-history: true
-  local-dir: build/html
-  github-token: $GITHUB_TOKEN
+  strategy: git
+  cleanup: false
+  keep_history: true
+  local_dir: build/html
+  token: $GITHUB_TOKEN
   repo: andreasfertig/andreasfertig.github.io
-  target-branch: master
+  target_branch: master
   on:
     branch: master
     condition: $DEPLOY = Yes
@@ -303,5 +292,4 @@ deploy:
 env:
   global:
   - LLVM_CONFIG_CURRENT='/usr/bin/llvm-config-11'
-  - secure: CFbIrswqs8U7pCMnF57QrC/KgNlybr5SNFlKE9BHA9I9WXcjLBGm3tv9JM7TvzwD5ivhe9P/MVcc1ROaTSPVRSdOI9aQuNBauDYoab1OrlO0SFnHjr6tKzvw9P+wnfuyawhH8vm6m/cdyyIKagFUKtFSKUnpLeakTEUUG6O9IBLHzBa0BTqlmviV9OjDUjD61adUSWVWe96T6A/tlGyFAWAYuAU1jvGN9HSE06mFlGC0NmbT25kq/8SGv9+9KoGgXNFB6lsQ6C5C3cWIlsaO0EtTnLGa2IfSZk4lg4CzZ97CGcraH5avrG5guSDWUGZEe8a+rxA42SvrhKVRDhu3qz0agH1BlXi+0q7k8oS7wAaRG63sjyD0DtFlA783bQmdLXh/BY5rz1FsqV9rr8qVdfo+5cVfW6sOZLrNeyF8OcxWAln5SNiuLpAb2cYTGNJ15J0KLynYBL/6e3Qe6gsUS4BIHFORr9dHMXA3TBnqEIo4hzJwnGNDixs7rLXCmdX3uxsAHUJEtSxm63AiCNvZhWq6Lm+Lf1CKQ9mNRzUT3IQGwuhCmv6XFR/ZTCFCiXwwC6lTy1ItC6c/90quMZpdxTcUVts6JmMI6i86bJgKrx4dzHpZmYkQ4D+r9LpqAOm1IgDlACZnCIjgHbTh6VOjNpU3jonzN1mHNxDP8Ezgjss=
   - secure: g6rm6GwWwbMe70xa25WHNvZ5NepGwda9F2e3R9iIr+EUTT/1zvZATTJfeNxt6YSCUKrxkRgO7MchjpngmVeP2bIC/0XCiiCfb46ENcINCRHxQ7jHmKIxDJypUK6rTiqsleprfGLFJ9jBUj4nEUzu0+N6EPC0hAzM5WeCZxitOifzPrs9L8/ATGJ2xvpazgkrVs0+Onv6Zn2O8XsoVaYZpUXHGIqXpZWTAyUnvRG3z/LInU7dyoiSgnoEAlruXUf+OuOAKOmiIaLBBsnyXsR2cS/kXcoQZNeTmxMjyguhC3c77OJxQ0dzJgN3pWznMNZ+Va5cetpM+P8wyeqXaVTxlLwCuj0KB8gsGKDfzHno8MHcbw71eV3/9laVmxZyOAQgeQVEj8vuclcaFIvbPMUtCGahlgPCr1l8gTVrgzdtJyEK0nf/Tk0LBS+5gvHg1aYIg6G9iqvX4oodJ8mH5RCTibWP/yOP65B5MmU/FNHFmeM4qREPWiclE351SrsraSUZ9H2onoaLBnDnNiHrr9OWaKD6BEKh66MxKS1u+Gi3Bb/xhK86JXtfq4K6OiQggbBPk/JPczn07czssAesu/gnMMuXSbkJc0m1YMBt0PtUoX4/bzTgTw485wVkBxeQYby7Q+7/vc5HKjl7OQqE73kctXWlhCuTzdF1wvcALu5oF78=
