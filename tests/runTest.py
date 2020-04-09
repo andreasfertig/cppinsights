@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python3
 #------------------------------------------------------------------------------
 
 import os
@@ -12,19 +12,28 @@ import datetime
 
 mypath = '.'
 
-
-def testCompare(tmpFileName, stdout, expectFile, f, args, time):
-    expect = open(expectFile, 'r').read()
-
-    if stdout != expect:
-        print '[FAILED] %s - %s' %(f, time)
-        cmd = ['/usr/bin/diff', expectFile, tmpFileName]
+def runCmd(cmd, data=None):
+    if None == input:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
-
-        print stdout
     else:
-        print '[PASSED] %s - %s' %(f, time)
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate(input=data)
+
+    return stdout.decode('utf-8'), stderr.decode('utf-8'), p.returncode
+#------------------------------------------------------------------------------
+
+def testCompare(tmpFileName, stdout, expectFile, f, args, time):
+    expect = open(expectFile, 'r', encoding='utf-8').read()
+
+    if stdout != expect:
+        print('[FAILED] %s - %s' %(f, time))
+        cmd = ['/usr/bin/diff', expectFile, tmpFileName]
+        stdout, stderr, returncode = runCmd(cmd)
+
+        print(stdout)
+    else:
+        print('[PASSED] %s - %s' %(f, time))
         return True
 
     return False
@@ -39,40 +48,39 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
 
     cmd += ['-c', tmpFileName]
 
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = p.communicate()
+    stdout, stderr, returncode = runCmd(cmd)
 
     compileErrorFile = os.path.join(mypath, fileName + '.cerr')
-    if 0 != p.returncode:
+    if 0 != returncode:
         if os.path.isfile(compileErrorFile):
-            ce = open(compileErrorFile, 'r').read()
+            ce = open(compileErrorFile, 'r', encoding='utf-8').read()
             stderr = stderr.replace(tmpFileName, '.tmp.cpp')
             # Replace paths, as for example, the STL path differs from a local build to Travis-CI at least for macOS
             stderr = re.sub('/(.*)/(.*?:[0-9]+):', '... \\2:', stderr)
 
             if ce == stderr:
-                print '[PASSED] Compile: %s' %(f)
+                print('[PASSED] Compile: %s' %(f))
                 return True, None
 
         compileErrorFile = os.path.join(mypath, fileName + '.ccerr')
         if os.path.isfile(compileErrorFile):
-                ce = open(compileErrorFile, 'r').read()
+                ce = open(compileErrorFile, 'r', encoding='utf-8').read()
                 stderr = stderr.replace(tmpFileName, '.tmp.cpp')
 
                 if ce == stderr:
-                    print '[PASSED] Compile: %s' %(f)
+                    print('[PASSED] Compile: %s' %(f))
                     return True, None
 
-        print '[ERROR] Compile failed: %s' %(f)
-        print stderr
+        print('[ERROR] Compile failed: %s' %(f))
+        print(stderr)
     else:
         if os.path.isfile(compileErrorFile):
-            print 'unused file: %s' %(compileErrorFile)
+            print('unused file: %s' %(compileErrorFile))
 
         objFileName = '%s.o' %(os.path.splitext(os.path.basename(tmpFileName))[0])
         os.remove(objFileName)
 
-        print '[PASSED] Compile: %s' %(f)
+        print('[PASSED] Compile: %s' %(f))
         return True, None
 
     return False, stderr
@@ -115,7 +123,7 @@ def main():
         cppStd       = defaultCppStd
         insightsOpts = ''
 
-        fileHeader = open(f, 'r').readline().strip()
+        fileHeader = open(f, 'r', encoding='utf-8').readline().strip()
         m = regEx.match(fileHeader)
         if None != m:
             cppStd = m.group(1)
@@ -125,7 +133,7 @@ def main():
             insightsOpts = m.group(1)
 
         if not os.path.isfile(expectFile) and not os.path.isfile(ignoreFile):
-            print 'Missing expect/ignore for: %s' %(f)
+            print('Missing expect/ignore for: %s' %(f))
             missingExpected += 1
             continue
 
@@ -141,14 +149,13 @@ def main():
         cmd.extend(['--', cppStd, '-m64'])
 
         begin = datetime.datetime.now()
-        p   = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr, returncode = runCmd(cmd)
         end   = datetime.datetime.now()
-        stdout, stderr = p.communicate()
 
-        if 0 != p.returncode:
+        if 0 != returncode:
             compileErrorFile = os.path.join(mypath, fileName + '.cerr')
             if os.path.isfile(compileErrorFile):
-                ce = open(compileErrorFile, 'r').read()
+                ce = open(compileErrorFile, 'r', encoding='utf-8').read()
 
                 # Linker errors name the tmp file and not the .tmp.cpp, replace the name here to be able to suppress
                 # these errors.
@@ -160,38 +167,24 @@ def main():
                 stderr = re.sub('/(.*)/(.*?:[0-9]+):', '... \\2:', stderr)
 
                 # The cerr output matches and the return code says that we hit a compile error, accept it as passed
-                if (ce == stderr) and (1 == p.returncode):
-                    print '[PASSED] Compile: %s' %(f)
+                if (ce == stderr) and (1 == returncode):
+                    print('[PASSED] Compile: %s' %(f))
                     filesPassed += 1
                     continue
                 else:
-                    print '[ERROR] Compile: %s' %(f)
+                    print('[ERROR] Compile: %s' %(f))
                     ret = 1
 
 
-            print 'Insight crashed for: %s with: %d' %(f, p.returncode)
-            print stderr
+            print('Insight crashed for: %s with: %d' %(f, returncode))
+            print(stderr)
 
             if not bUpdateTests:
                 continue
 
         fd, tmpFileName = tempfile.mkstemp('.cpp')
         try:
-            with os.fdopen(fd, 'w') as tmp:
-                # stupid replacements for clang 6.0. With 7.0 they added a 1.
-                stdout = stdout.replace('__range ', '__range1 ')
-                stdout = stdout.replace('__range.', '__range1.')
-                stdout = stdout.replace('__range)', '__range1)')
-                stdout = stdout.replace('__range;', '__range1;')
-                stdout = stdout.replace('__begin ', '__begin1 ')
-                stdout = stdout.replace('__begin.', '__begin1.')
-                stdout = stdout.replace('__begin,', '__begin1,')
-                stdout = stdout.replace('__begin;', '__begin1;')
-                stdout = stdout.replace('__end ', '__end1 ')
-                stdout = stdout.replace('__end.', '__end1.')
-                stdout = stdout.replace('__end;', '__end1;')
-                stdout = stdout.replace('__end)', '__end1)')
-
+            with os.fdopen(fd, 'w', encoding='utf-8') as tmp:
                 # write the data to the temp file
                 tmp.write(stdout)
 
@@ -204,11 +197,11 @@ def main():
                 filesPassed += 1
             elif bUpdateTests:
                 if bCompiles and not equal:
-                    open(expectFile, 'w').write(stdout)
+                    open(expectFile, 'w', encoding='utf-8').write(stdout)
                     print('Updating test')
                 elif not bCompiles and os.path.exists(compileErrorFile):
-                    open(expectFile, 'w').write(stdout)
-                    open(compileErrorFile, 'w').write(stderr)
+                    open(expectFile, 'w', encoding='utf-8').write(stdout)
+                    open(compileErrorFile, 'w', encoding='utf-8').write(stderr)
                     print('Updating test cerr')
 
 
@@ -218,8 +211,8 @@ def main():
 
 
     expectedToPass = len(cppFiles)-missingExpected
-    print '-----------------------------------------------------------------'
-    print 'Tests passed: %d/%d' %(filesPassed, expectedToPass)
+    print('-----------------------------------------------------------------')
+    print('Tests passed: %d/%d' %(filesPassed, expectedToPass))
 
     if bFailureIsOk:
         return 0
