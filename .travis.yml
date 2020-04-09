@@ -279,7 +279,7 @@ branches:
 deploy:
 - provider: pages
   strategy: git
-  cleanup: false
+  skip_cleanup: true
   keep_history: true
   local_dir: build/html
   token: $GITHUB_TOKEN
