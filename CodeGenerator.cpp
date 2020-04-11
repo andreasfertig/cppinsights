@@ -556,9 +556,7 @@ static Optional<std::string> GetFieldDeclNameForLambda(const FieldDecl& fieldDec
         if(&fieldDecl == thisCapture) {
             return {"__this"};
         } else {
-            // No `const` as workaround for Clang bug on Windows,
-            // see https://bugs.llvm.org/show_bug.cgi?id=33236
-            for(/*const*/ auto& [key, value] : captures) {
+            for(const auto& [key, value] : captures) {
                 if(&fieldDecl == value) {
                     return GetName(*key);
                 }
