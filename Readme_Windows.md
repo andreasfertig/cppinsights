@@ -4,9 +4,7 @@
 
 |         Name       | Version | Actual compiler |    Version    |        CMake command                      |
 |--------------------|---------|-----------------|---------------|-------------------------------------------|
-| Visual Studio 2017 | 15.9.3  |     cl.exe      | 19.16.27031.1 | -G "Visual Studio 15 2017" -A x64         |
 | Visual Studio 2019 | 16.1.3  |     cl.exe      | 19.21.27702.2 | -G "Visual Studio 16 2019" -A x64         |
-| Clang (VS 2017)    | 15.9.3  |   clang-cl.exe  | 8.0.0         | -G "Visual Studio 15 2017" -A x64 -T LLVM |
 | Clang (VS 2019)    | 16.1.3  |   clang-cl.exe  | 8.0.0         | -G "Visual Studio 16 2019" -A x64 -T LLVM |
 
 Note: supports only building **outside** LLVM.
@@ -61,11 +59,11 @@ cd C:\dev\cppinsights\
 mkdir build
 cd build
 set path=%path%;C:\Programs\LLVM_local2\bin
-cmake -G "Visual Studio 15 2017 Win64" -T LLVM ..
+cmake -G "Visual Studio 16 2019" -A x64 -T LLVM_v142 ..
 cmake --build . --config Release --target insights
 ```
 
-Instead of "Visual Studio 15 2017" generator with Clang,
+Instead of "Visual Studio 16 2019" generator with Clang,
 you can choose whatever works for you.
 See "Tested with (supported compilers)", *CMake command* column above.
 

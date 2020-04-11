@@ -6,6 +6,7 @@ cache:
   ccache: true
   directories:
     - $HOME/Library/Caches/Homebrew
+    - ${TRAVIS_BUILD_DIR}/clang
     - ${TRAVIS_BUILD_DIR}/clang-windows
     - ${TRAVIS_BUILD_DIR}/llvm-utils
     - ${TRAVIS_BUILD_DIR}/upload-tool
@@ -142,7 +143,12 @@ jobs:
     env: COMPILER='g++-8' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes' USE_LIBCPP='Yes'
 
   - os: windows
-    env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' CFORMAT='No' SHACMD='sha256deep64'
+    name: "Clang 10 / LLVM 10 @ Windows"
+    env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='No' TIDY='No' CFORMAT='No' SHACMD='sha256deep64' MSVC_TOOLCHAIN='LLVM_v142'
+
+  - os: windows
+    name: "MSVC / LLVM 10 @ Windows Release"
+    env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' CFORMAT='No' SHACMD='sha256deep64' MSVC_TOOLCHAIN='host=x64'
 
   - stage: "Deploy Docker"
     install: npm install github-release-notes -g
@@ -176,12 +182,29 @@ install:
     brew install ccache
     export PATH="/usr/local/opt/ccache/libexec:$PATH"
 
-    mkdir ${TRAVIS_BUILD_DIR}/clang
+    mkdir -p ${TRAVIS_BUILD_DIR}/clang
     cd ${TRAVIS_BUILD_DIR}/clang
-    wget -q --continue --directory-prefix=$HOME/Library/Caches/Homebrew https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz
 
-    mkdir current
-    tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1    
+    CACHED_LLVM_VERSION="0"
+    if [ -f "downloaded" ]; then
+        CACHED_LLVM_VERSION="`cat downloaded`"
+    fi
+
+    echo "Cached version: ${CACHED_LLVM_VERSION}"
+
+    if [ "${CACHED_LLVM_VERSION}" != "${LLVM_VERSION}" ]; then
+        echo "Updating cached LLVM version to ${LLVM_VERSION}"
+        wget -q --continue --directory-prefix=$HOME/Library/Caches/Homebrew https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz
+
+        mkdir -p current
+        tar -xJf $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz -C current --strip-components 1
+        rm -f $HOME/Library/Caches/Homebrew/clang+llvm-${LLVM_VERSION}-x86_64-apple-darwin.tar.xz
+
+        echo -n "${LLVM_VERSION}" > downloaded
+    else
+        echo -e "\033[1;32m\xE2\x9C\x93 LLVM version ${CACHED_LLVM_VERSION} already installed.\033[0m"
+    fi
+
     # Temporary fix for image: xcode11 to use GCC.
     travis_retry $TRAVIS_BUILD_DIR/scripts/travis-install-macos-commandline-tools.sh
   fi
@@ -219,14 +242,14 @@ install:
     choco install visualstudio2019-workload-nativedesktop
     choco install visualstudio2019buildtools
     choco install llvm --version=${LLVM_VERSION}
+    export VS160COMNTOOLS="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/Tools"
+
     mkdir -p ${TRAVIS_BUILD_DIR}/llvm-utils
     cd ${TRAVIS_BUILD_DIR}/llvm-utils
-    export VS160COMNTOOLS="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/Tools"
     wget -q --continue "https://github.com/zufuliu/llvm-utils/releases/download/v19.05/LLVM_VS2017.zip"
     7z x -y ${TRAVIS_BUILD_DIR}/llvm-utils/LLVM_VS2017.zip
+
     ${TRAVIS_BUILD_DIR}/llvm-utils/LLVM_VS2017/install.bat
-    #    rm -rf /c/Program\ Files/LLVM
-    #    ln -s ${TRAVIS_BUILD_DIR}/clang-windows/llvm+clang-${LLVM_VERSION}-win64-msvc-release /c/Program\ Files/LLVM
   fi
 - |
   if [[ "${UPLOAD}" = "Yes" ]] && [[ "${TRAVIS_OS_NAME}" != "windows" ]]; then
@@ -250,7 +273,7 @@ before_script:
     elif [[ "${CFORMAT}" == "Yes" ]]; then
       echo "Nothing to do here for the clang-format check run."
     elif [[ "${TRAVIS_OS_NAME}" == "windows" ]]; then
-      cmake -G "Visual Studio 16 2019" -A x64 -T LLVM_v142 -DINSIGHTS_STATIC=${STATIC} -DINSIGHTS_LLVM_CONFIG="${TRAVIS_BUILD_DIR}/${LLVM_CONFIG}" ..
+      cmake -G "Visual Studio 16 2019" -A x64 -T ${MSVC_TOOLCHAIN} -DINSIGHTS_STATIC=${STATIC} -DINSIGHTS_LLVM_CONFIG="${TRAVIS_BUILD_DIR}/${LLVM_CONFIG}" ..
     else
       cmake -DINSIGHTS_LLVM_CONFIG=${LLVM_CONFIG} -DINSIGHTS_COVERAGE=${COVERAGE} -DINSIGHTS_STATIC=${STATIC} -DDEBUG=${DEBUG} -DINSIGHTS_TIDY=${TIDY} ..
     fi
@@ -271,7 +294,10 @@ script:
   elif [[ "${CFORMAT}" == "Yes" ]]; then
     cd $TRAVIS_BUILD_DIR && $TRAVIS_BUILD_DIR/scripts/travis-clang-format-check.sh $CFORMAT_NAME
   elif [[ "${TRAVIS_OS_NAME}" == "windows" ]]; then
-    cmake --build . --config Release
+    cmake --build . --config Release -j 2
+    # Invoke the binary to ensure that it is at least a little bit alive. It looks like that a failing linking does not
+    # make the build fail.
+    ./Release/insights.exe --version
   else
     make -j 2
   fi
