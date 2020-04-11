@@ -12,10 +12,18 @@ if(NOT WIN32)
     option(INSIGHTS_STRIP      "Strip insight after build" On )
     option(INSIGHTS_TIDY       "Run clang-tidy"            Off)
     option(INSIGHTS_IWYU       "Run include-what-you-use"  Off)
-    option(INSIGHTS_STATIC     "Use static linking"        Off)
     option(INSIGHTS_COVERAGE   "Enable code coverage"      Off)
     option(INSIGHTS_USE_LIBCPP "Enable code coverage"      Off)
+else()
+    set(DEBUG               Off)
+    set(INSIGHTS_STRIP      Off)
+    set(INSIGHTS_TIDY       Off)
+    set(INSIGHTS_IWYU       Off)
+    set(INSIGHTS_COVERAGE   Off)
+    set(INSIGHTS_USE_LIBCPP Off)
 endif()
+
+option(INSIGHTS_STATIC     "Use static linking"        Off)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
@@ -81,11 +89,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
 
     check_compiler("GNU" 7.3)
     check_compiler("Clang" 6.0)
-
-    # TODO: add check for cl.exe
-    if(IS_MSVC_CL)
-        set(HAVE_COMPILER ON)
-    endif()
+    check_compiler("MSVC" 19.25.0.0)
 
     if(NOT HAVE_COMPILER)
         message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang and GCC.")

@@ -48,15 +48,6 @@ def main():
     open('.travis.yml', 'w').write(travis)
 
 
-    print('  - Updating appveyor.yml')
-    appveyor = open('appveyor.yml', 'r').read()
-    appveyor = re.sub('(clang|llvm|clang\+\+|llvm-config|llvm-toolchain-bionic|clang-format|clang-tidy|llvm-toolchain-trusty)(-%s)' %(oldClangDevel), '\\1-%s' %(newClangDevel) , appveyor)
-    appveyor = re.sub('(clang|llvm|clang\+\+|llvm-config|llvm-toolchain-bionic|clang-format|clang-tidy|llvm-toolchain-trusty)(-%s)' %(oldClangStable), '\\1-%s' %(newClangStable) , appveyor)
-    appveyor = re.sub('(download)(/%s.)(0.0/llvm)' %(oldClangStable), '\\1/%s.\\3' %(newClangStable) , appveyor)
-    appveyor = re.sub(r"(LLVM_VERSION=)('%s)" %(oldClangStable), r"\1'%s" %(newClangStable) , appveyor)
-    open('appveyor.yml', 'w').write(appveyor)
-
-
     print('  - Updating CMakeLists.txt')
     cmake = open('CMakeLists.txt', 'r').read()
     cmake = re.sub('(set\(INSIGHTS_MIN_LLVM_MAJOR_VERSION)( %s)\)' %(oldClangStable), '\\1 %s)' %(newClangStable) , cmake)
