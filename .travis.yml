@@ -145,11 +145,12 @@ jobs:
     env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' CFORMAT='No' SHACMD='sha256deep64'
 
   - stage: "Deploy Docker"
-    install: true
+    install: npm install github-release-notes -g
     before_script: true
     script:
     - cd ${TRAVIS_BUILD_DIR}/
     - wget -c https://raw.githubusercontent.com/andreasfertig/travisci-trigger-build/master/trigger_travisci_build.sh
+    - gren release --override --username=andreasfertig --repo=cppinsights -t `git tag --sort=-creatordate | grep -v continuous | head -n 1 `..continuous -c .github/grenrc.json  -P      
     - |
       if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
         bash trigger_travisci_build.sh > /dev/null
@@ -229,7 +230,6 @@ install:
   fi
 - |
   if [[ "${UPLOAD}" = "Yes" ]] && [[ "${TRAVIS_OS_NAME}" != "windows" ]]; then
-    npm install github-release-notes -g
     mkdir -p ${TRAVIS_BUILD_DIR}/upload-tool
     cd ${TRAVIS_BUILD_DIR}/upload-tool
     wget -c https://raw.githubusercontent.com/andreasfertig/uploadtool/27066299131e9af259821bdc4508c8469eb1997c/upload.sh
@@ -344,10 +344,6 @@ after_success:
         tar -czf ${GZ_FILE_NAME} -C ${BIN_FILE_DIR} ${BIN_FILE_NAME} ${HASH_FILE_NAME}
         ${SHACMD} ${GZ_FILE_NAME} | cut -d ' ' -f 1 > ${HASH_GZ_FILE_NAME}
         bash ${TRAVIS_BUILD_DIR}/upload-tool/upload.sh ${GZ_FILE_NAME} ${HASH_GZ_FILE_NAME} ${HASH_FILE_NAME}
-      fi
-
-      if [[ "${TRAVIS_OS_NAME}" = "osx" ]]; then
-        cd ${TRAVIS_BUILD_DIR} && gren release --override --username=andreasfertig --repo=cppinsights -t `git tag --sort=-creatordate | grep -v continuous | head -n 1 `..continuous -c .github/grenrc.json  -P
       fi
   fi
 
