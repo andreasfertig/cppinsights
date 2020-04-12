@@ -1,6 +1,7 @@
 #define INSIGHTS_USE_TEMPLATE
 
 #include <string>
+#include <typeinfo>
 
 template <typename T>
 class Foo{
