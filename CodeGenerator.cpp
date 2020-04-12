@@ -2988,9 +2988,8 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
 {
     mHaveLocalStatic = true;
 
-    const auto* cxxRecordDecl = stmt->getType()->getAsCXXRecordDecl();
-    auto&       langOpts{GetLangOpts(*stmt)};
-    const bool  threadSafe{langOpts.ThreadsafeStatics && langOpts.CPlusPlus11 &&
+    auto&      langOpts{GetLangOpts(*stmt)};
+    const bool threadSafe{langOpts.ThreadsafeStatics && langOpts.CPlusPlus11 &&
                           (stmt->isLocalVarDecl() /*|| NonTemplateInline*/) && !stmt->getTLSKind()};
 
     const std::string internalVarName{BuildInternalVarName(GetName(*stmt))};
