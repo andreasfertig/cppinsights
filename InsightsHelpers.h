@@ -23,12 +23,6 @@
 
 namespace clang::insights {
 
-static inline bool IsNewLine(const char c)
-{
-    return '\n' == c;
-}
-//-----------------------------------------------------------------------------
-
 std::string BuildInternalVarName(const std::string& varName);
 //-----------------------------------------------------------------------------
 
