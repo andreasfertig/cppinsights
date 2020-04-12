@@ -948,7 +948,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
     const bool isFunctionPointer = HasTypeWithSubType<ReferenceType, FunctionProtoType>(t);
     const bool isArrayRef        = HasTypeWithSubType<ReferenceType, ArrayType>(t);
     // Special case for Issue81, auto returns an array-ref and to catch auto deducing an array (Issue106)
-    const bool isAutoType             = dyn_cast_or_null<AutoType>(t.getTypePtrOrNull());
+    const bool isAutoType             = (nullptr != dyn_cast_or_null<AutoType>(t.getTypePtrOrNull()));
     const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
     const bool isPointerToArray       = HasTypeWithSubType<PointerType, ArrayType>(pointerToArrayBaseType);
 
