@@ -288,6 +288,19 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     endif()
     
     if(IS_MSVC_CL)
+        add_definitions(/Wall)
+        add_definitions(/WX)     # Warnings as errors
+        add_definitions(/wd4577) # 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify EHsc
+        add_definitions(/wd5045) # spectre mitigation introduced
+        add_definitions(/wd4514) # unreferenced inline function removed
+        add_definitions(/wd4710) # inline function _not_ inlined
+        add_definitions(/wd4711) # selected for automatic inline
+        add_definitions(/wd4820) # padding introduced
+        add_definitions(/wd4459) # hides global symbol disabled for now
+        add_definitions(/wd4626 /wd5027 /wd4623 /wd4625 /wd5026) # implicitly deleted operators
+        add_definitions(/wd4061) # enumerator 'clang::CK_BitCast' in switch of enum 'clang::CastKind' is not explicitly handled by a case label
+        #add_definitions(/err)
+        
         # To support /external:I:
         # - enables "system headers" and
         # - sets warning level 0 for them
