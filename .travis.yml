@@ -297,7 +297,7 @@ script:
     cmake --build . --config Release -j 2
     # Invoke the binary to ensure that it is at least a little bit alive. It looks like that a failing linking does not
     # make the build fail.
-    ./Release/insights.exe --version
+    ./insights.exe --version
   else
     make -j 2
   fi
@@ -321,7 +321,7 @@ script:
   fi
 - |
   if [[ "${TRAVIS_OS_NAME}" == "windows" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]]; then
-      export BIN_FILE_DIR=${TRAVIS_BUILD_DIR}/build/Release/
+      export BIN_FILE_DIR=${TRAVIS_BUILD_DIR}/build/
       export BIN_FILE_NAME=insights.exe
       export ARCHIVE_FILE_NAME=${TRAVIS_BUILD_DIR}/insights-windows
       export ARCHIVE_EXT=zip
