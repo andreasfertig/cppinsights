@@ -118,7 +118,9 @@ public:
             const auto& mainFileId = sm.getMainFileID();
             const auto  loc        = sm.translateFileLineCol(sm.getFileEntryForID(mainFileId), 1, 1);
 
-            mRewriter.InsertText(loc, "#include <new> // for thread-safe static's placement new\n");
+            mRewriter.InsertText(loc,
+                                 "#include <new> // for thread-safe static's placement new\n#include <cstdint> // for "
+                                 "uint64_t under Linux/GCC\n");
         }
     }
 
