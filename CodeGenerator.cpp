@@ -2595,11 +2595,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
         SmallVector<std::string, 5> ctorInitializerList{};
         std::string                 ctorArguments{"{"};
-        OnceTrue                    bFirst{};
+        OnceTrue                    firstCtorArgument{};
 
         auto addToInits =
             [&](std::string name, const FieldDecl* fd, bool isThis, const Expr* expr, bool /*useBraces*/) {
-                if(bFirst) {
+                if(firstCtorArgument) {
                 } else {
                     mOutputFormatHelper.Append(", ");
                     ctorArguments.append(", ");
@@ -2686,9 +2686,9 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             } else {
                 mOutputFormatHelper.AppendNewLine();
 
-                OnceTrue bFirst{};
+                OnceTrue firstCtorInitializer{};
                 for(const auto& initializer : ctorInitializerList) {
-                    if(bFirst) {
+                    if(firstCtorInitializer) {
                         mOutputFormatHelper.Append(": ");
                     } else {
                         mOutputFormatHelper.Append(", ");
@@ -2988,9 +2988,8 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
 {
     mHaveLocalStatic = true;
 
-    const auto* cxxRecordDecl = stmt->getType()->getAsCXXRecordDecl();
-    auto&       langOpts{GetLangOpts(*stmt)};
-    const bool  threadSafe{langOpts.ThreadsafeStatics && langOpts.CPlusPlus11 &&
+    auto&      langOpts{GetLangOpts(*stmt)};
+    const bool threadSafe{langOpts.ThreadsafeStatics && langOpts.CPlusPlus11 &&
                           (stmt->isLocalVarDecl() /*|| NonTemplateInline*/) && !stmt->getTLSKind()};
 
     const std::string internalVarName{BuildInternalVarName(GetName(*stmt))};

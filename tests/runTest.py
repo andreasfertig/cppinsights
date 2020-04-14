@@ -8,6 +8,7 @@ import re
 import argparse
 import tempfile
 import datetime
+import difflib
 #------------------------------------------------------------------------------
 
 mypath = '.'
@@ -26,21 +27,33 @@ def runCmd(cmd, data=None):
 def testCompare(tmpFileName, stdout, expectFile, f, args, time):
     expect = open(expectFile, 'r', encoding='utf-8').read()
 
+    # align line-endings under Windows to Unix-style
+    if os.name == 'nt':
+        stdout = stdout.replace('\r\n', '\n')
+
     if stdout != expect:
         print('[FAILED] %s - %s' %(f, time))
-        cmd = ['/usr/bin/diff', expectFile, tmpFileName]
-        stdout, stderr, returncode = runCmd(cmd)
 
-        print(stdout)
+        for line in difflib.unified_diff(expect.splitlines(keepends=True), stdout.splitlines(keepends=True), fromfile=expectFile, tofile='stdout', n=3):
+            print('%s' %((line[1:] if line.startswith(' ') else line) ), end='')
     else:
-        print('[PASSED] %s - %s' %(f, time))
+        print('[PASSED] %-50s - %s' %(f, time))
         return True
 
     return False
 #------------------------------------------------------------------------------
 
 def testCompile(tmpFileName, f, args, fileName, cppStd):
-    cmd = [args['cxx'], cppStd, '-m64', '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)']
+    if os.name == 'nt':
+        cppStd = cppStd.replace('-std=', '/std:')
+        cppStd = cppStd.replace('2a', 'latest')
+
+    cmd = [args['cxx'], cppStd, '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)']
+
+    if os.name != 'nt':
+        cmd.append('-m64')
+    else:
+        cmd.extend(['/nologo', '/EHsc', '/IGNORE:C4335']) # C4335: mac file format detected. EHsc assume only C++ functions throw exceptions.
 
     # GCC seems to dislike empty ''
     if '-std=c++98' == cppStd:
@@ -77,7 +90,9 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
         if os.path.isfile(compileErrorFile):
             print('unused file: %s' %(compileErrorFile))
 
-        objFileName = '%s.o' %(os.path.splitext(os.path.basename(tmpFileName))[0])
+        ext = 'obj' if os.name == 'nt' else 'o'
+
+        objFileName = '%s.%s' %(os.path.splitext(os.path.basename(tmpFileName))[0], ext)
         os.remove(objFileName)
 
         print('[PASSED] Compile: %s' %(f))
@@ -111,6 +126,7 @@ def main():
 
     filesPassed     = 0
     missingExpected = 0
+    crashes         = 0
     ret             = 0
 
     regEx         = re.compile('.*cmdline:(.*)')
@@ -176,6 +192,7 @@ def main():
                     ret = 1
 
 
+            crashes += 1
             print('Insight crashed for: %s with: %d' %(f, returncode))
             print(stderr)
 
@@ -217,8 +234,8 @@ def main():
     if bFailureIsOk:
         return 0
 
-    if missingExpected:
-        print('Missing expected files: %d' %(missingExpected))
+    print('Insights crashed: %d' %(crashes))
+    print('Missing expected files: %d' %(missingExpected))
 
     passed = (0 == missingExpected) and (expectedToPass == filesPassed)
 

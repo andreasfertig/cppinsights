@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 # 3.8* is required because of C++17 support
 
 set(CXX_STANDARD_REQUIRED ON)
@@ -68,13 +68,13 @@ if(NOT IS_CLANG AND MSVC)
     set(IS_MSVC_CL 1)
 endif()
 
-cmake_print_variables(
-    CMAKE_CXX_COMPILER_ID
-    BUILD_INSIGHTS_OUTSIDE_LLVM
-    IS_CLANG
-    IS_GNU
-    IS_MSVC_CL
-    MSVC)
+# cmake_print_variables(
+#     CMAKE_CXX_COMPILER_ID
+#     BUILD_INSIGHTS_OUTSIDE_LLVM
+#     IS_CLANG
+#     IS_GNU
+#     IS_MSVC_CL
+#     MSVC)
 
 if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     function(check_compiler COMPILER version)
@@ -288,6 +288,19 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     endif()
     
     if(IS_MSVC_CL)
+        add_definitions(/Wall)
+        add_definitions(/WX)     # Warnings as errors
+        add_definitions(/wd4577) # 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify EHsc
+        add_definitions(/wd5045) # spectre mitigation introduced
+        add_definitions(/wd4514) # unreferenced inline function removed
+        add_definitions(/wd4710) # inline function _not_ inlined
+        add_definitions(/wd4711) # selected for automatic inline
+        add_definitions(/wd4820) # padding introduced
+        add_definitions(/wd4459) # hides global symbol disabled for now
+        add_definitions(/wd4626 /wd5027 /wd4623 /wd4625 /wd5026) # implicitly deleted operators
+        add_definitions(/wd4061) # enumerator 'clang::CK_BitCast' in switch of enum 'clang::CastKind' is not explicitly handled by a case label
+        #add_definitions(/err)
+        
         # To support /external:I:
         # - enables "system headers" and
         # - sets warning level 0 for them
@@ -357,6 +370,22 @@ if (${LLVM_PACKAGE_VERSION} VERSION_LESS ${INSIGHTS_MIN_LLVM_VERSION})
     message(FATAL_ERROR "LLVM version ${INSIGHTS_MIN_LLVM_VERSION} or higher required. Current version is: ${LLVM_PACKAGE_VERSION}.")
 endif()
 
+
+if(WIN32)
+    # First for the generic no-config case (e.g. with mingw)
+    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+    set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+    # Second, for multi-config builds (e.g. msvc)
+        foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
+                string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
+                set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
+                set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
+                set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
+            endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
+endif()
+
+
 # clang 8 and later or better ld warn, if the visibility is not the same as for the libs.
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
@@ -401,7 +430,7 @@ find_program(
   DOC "Path to clang-tidy executable"
   )
 if(NOT CLANG_TIDY_EXE)
-  message(STATUS "clang-tidy not found.")
+  message(STATUS "Could not find the program clang-tidy.")
 
 else()
   message(STATUS "Found clang-tidy: ${CLANG_TIDY_EXE}")
@@ -505,31 +534,45 @@ if (NOT WIN32)
             COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/docs/postProcessDoxygen.py ${CMAKE_CURRENT_BINARY_DIR}/html
         )
 
-        if(NOT WIN32)
-            add_dependencies(doc gen-options)
-        endif()
+        add_dependencies(doc gen-options)
     endif()
+endif ()
 
-    # XXX: hack to allow coverage build to run tests which fail
-    set(TEST_FAILURE_IS_OK "")
-    if(INSIGHTS_COVERAGE)
-        set(TEST_FAILURE_IS_OK "--failure-is-ok")
-    endif()
+# XXX: hack to allow coverage build to run tests which fail
+set(TEST_FAILURE_IS_OK "")
+if(INSIGHTS_COVERAGE)
+    set(TEST_FAILURE_IS_OK "--failure-is-ok")
+endif()
 
-    set(TEST_USE_LIBCPP "")
-    if(INSIGHTS_USE_LIBCPP)
-        set(TEST_USE_LIBCPP "--use-libcpp")
-    endif()
+set(TEST_USE_LIBCPP "")
+if(INSIGHTS_USE_LIBCPP)
+    set(TEST_USE_LIBCPP "--use-libcpp")
+endif()
+
+# Look for Python3, only relevant for target tests. As linux currently ships cmake 3.11.4 we need to workaround
+if(${CMAKE_VERSION} VERSION_LESS "3.12.0") 
+    set(Python3_EXECUTABLE "/usr/bin/python")
+    set(Python3_FOUND "Yes")
+else()
+    find_package(Python3 COMPONENTS Interpreter )
+endif()
+
+if (NOT Python3_FOUND)
+    message(WARNING "Could not find the program Python3. Target tests disabled.")
+else()
+    message(STATUS "Found Python3: ${Python3_EXECUTABLE}. Target tests enabled.")
 
     # add a target to generate run tests
     add_custom_target(tests
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK} ${TEST_USE_LIBCPP}
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK} ${TEST_USE_LIBCPP}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights>
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
         COMMENT "Running tests" VERBATIM
     )
+endif()
 
+if (NOT WIN32)
     add_custom_target(update-tests
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} --update-tests ${TEST_FAILURE_IS_OK}
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
@@ -618,9 +661,7 @@ if (NOT WIN32)
             COMMENT "Analyzing clang-tidy output..."
         )
     endif()
-endif ()
 
-if(NOT WIN32)
     add_subdirectory(docs)
 endif()
 

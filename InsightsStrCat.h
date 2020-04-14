@@ -29,7 +29,7 @@ static inline std::string ConvertToBoolString(bool b)
 static inline std::string ToString(const llvm::APSInt& val)
 {
     if(1 == val.getBitWidth()) {
-        return details::ConvertToBoolString(val.getExtValue());
+        return details::ConvertToBoolString(0 != val.getExtValue());
     }
 
     return val.toString(10);

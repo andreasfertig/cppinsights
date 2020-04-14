@@ -11,11 +11,11 @@
 
 namespace clang::insights {
 
-static const std::string MakeIndent(const int indent)
+static const std::string MakeIndent(const unsigned indent)
 {
     std::string str{};
 
-    for(int i = 1; i < indent; i++) {
+    for(unsigned i = 1; i < indent; i++) {
         str += ' ';
     }
 

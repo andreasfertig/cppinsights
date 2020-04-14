@@ -231,8 +231,8 @@ SourceLocation FindLocationAfterSemi(const SourceLocation                       
         // if we do not find a ; then it can possibly be a paren init like this:
         // int x(23);
         // Try to find the right paren which seems to also contain the semi.
-        else if(const auto locEnd2{findLocation(tok::r_paren)}; locEnd2.isValid()) {
-            return locEnd2;
+        else if(const auto locEnd3{findLocation(tok::r_paren)}; locEnd3.isValid()) {
+            return locEnd3;
         }
     }
 
@@ -948,7 +948,7 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
     const bool isFunctionPointer = HasTypeWithSubType<ReferenceType, FunctionProtoType>(t);
     const bool isArrayRef        = HasTypeWithSubType<ReferenceType, ArrayType>(t);
     // Special case for Issue81, auto returns an array-ref and to catch auto deducing an array (Issue106)
-    const bool isAutoType             = dyn_cast_or_null<AutoType>(t.getTypePtrOrNull());
+    const bool isAutoType             = (nullptr != dyn_cast_or_null<AutoType>(t.getTypePtrOrNull()));
     const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
     const bool isPointerToArray       = HasTypeWithSubType<PointerType, ArrayType>(pointerToArrayBaseType);
 
