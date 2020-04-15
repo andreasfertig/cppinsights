@@ -2811,7 +2811,8 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
             return 0;
         }();
 
-        const auto& internalListName = BuildInternalVarName("list").append(std::to_string(variableInsertPos));
+        auto internalListName = BuildInternalVarName("list");
+        internalListName.append(std::to_string(variableInsertPos));
 
         ofm.Append(modifiers, GetTypeNameAsParameter(mat->getType(), internalListName));
         CodeGenerator codeGenerator{ofm};
