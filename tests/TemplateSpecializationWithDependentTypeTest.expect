@@ -1,0 +1,45 @@
+#define INSIGHTS_USE_TEMPLATE
+
+//CXXDependentScopeMemberExpr
+// http://lists.llvm.org/pipermail/cfe-dev/2017-January/052433.html
+
+template <typename T>
+struct A
+{
+   void foo(int);
+};
+
+/* First instantiated from: TemplateSpecializationWithDependentTypeTest.cpp:22 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct A<int *>
+{
+  struct B
+  {
+    // inline constexpr B() noexcept = default;
+  };
+  
+  A<int *>::B foo;
+  // inline constexpr A() noexcept = default;
+};
+
+#endif
+
+
+template<typename T>
+struct A<T *>
+{
+  struct B
+  {
+  };
+  
+  A<T *>::B foo;
+};
+
+
+
+int main()
+{
+  A<int *> a = A<int *>();
+}
+

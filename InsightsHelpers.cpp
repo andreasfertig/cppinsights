@@ -483,10 +483,6 @@ private:
     {
         TemplateTypeParmDecl* decl = type->getDecl();
 
-        if(decl) {
-            DPrint("have decl: %d\n", decl->isImplicit());
-        }
-
         if((nullptr == type->getIdentifier()) ||
            (decl && decl->isImplicit()) /* this fixes auto operator()(type_parameter_0_0 container) const */) {
             mData.Append("type_parameter_", type->getDepth(), "_", type->getIndex());
@@ -541,6 +537,18 @@ private:
                 return true;
             }
         } else if(const auto* cxxRecordDecl = type->getAsCXXRecordDecl()) {
+            // Special handling for dependent types. For example, ClassOperatorHandler7Test.cpp A<...* >::B.
+            if(type->isDependentType()) {
+                std::string context{GetDeclContext(type->getDecl()->getDeclContext())};
+
+                if(not context.empty()) {
+                    mData.Append(std::move(context));
+                    mData.Append(cxxRecordDecl->getName());
+
+                    return true;
+                }
+            }
+
             if(cxxRecordDecl->isLambda()) {
                 mData.Append(GetLambdaName(*cxxRecordDecl));
 
