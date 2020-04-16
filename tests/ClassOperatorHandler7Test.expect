@@ -50,7 +50,7 @@ struct A<T *>
     
   };
   
-  A<type_parameter_0_0 *>::B foo;
+  A<T *>::B foo;
 };
 
 
