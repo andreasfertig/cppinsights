@@ -796,6 +796,8 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         InsertTemplateSpecializationHeader();
     }
 
+    InsertAttributes(stmt->attrs());
+
     if(IsTrivialStaticClassVarDecl(*stmt)) {
         HandleLocalStaticNonTrivialClass(stmt);
 
@@ -2244,6 +2246,8 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 
 void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
+    InsertAttributes(stmt->attrs());
+
     if(stmt->isMutable()) {
         mOutputFormatHelper.Append("mutable ");
     }
@@ -2488,6 +2492,43 @@ void CodeGenerator::InsertArg(const TypeAliasTemplateDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const AttributedStmt* stmt)
+{
+    for(const auto& attr : stmt->getAttrs()) {
+        InsertAttribute(*attr);
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertAttributes(const Decl::attr_range& attrs)
+{
+    // attrs required for constinit
+    for(const auto& attr : attrs) {
+        InsertAttribute(*attr);
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertAttribute(const Attr& attr)
+{
+    // skip this attribute. Clang seems to tag virtual methods with override
+    if(attr::Override == attr.getKind()) {
+        return;
+    }
+
+    StringStream   stream{};
+    PrintingPolicy pp{LangOptions{}};
+    pp.Alignof = true;
+
+    attr.printPretty(stream, pp);
+
+    // attributes start with a space, skip it as it is not required for the first attribute
+    const char* start = stream.str().c_str() + 1;
+
+    mOutputFormatHelper.Append(start, " ");
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
     SCOPE_HELPER(stmt);
@@ -2529,7 +2570,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         }
     }
 
-    mOutputFormatHelper.Append(GetClassOrStructTagName(*stmt), GetName(*stmt));
+    mOutputFormatHelper.Append(GetClassOrStructTagName(*stmt));
+
+    InsertAttributes(stmt->attrs());
+
+    mOutputFormatHelper.Append(GetName(*stmt));
 
     // skip classes/struct's without a definition
     if(not stmt->hasDefinition() || not stmt->isCompleteDefinition()) {
@@ -3177,6 +3222,8 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     } else if(decl.isFunctionTemplateSpecialization()) {
         InsertTemplateSpecializationHeader();
     }
+
+    InsertAttributes(decl.attrs());
 
     if(!decl.isFunctionTemplateSpecialization() || (isCXXMethodDecl && isFirstCxxMethodDecl)) {
         mOutputFormatHelper.Append(GetStorageClassAsStringWithSpace(decl.getStorageClass()));

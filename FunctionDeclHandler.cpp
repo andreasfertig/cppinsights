@@ -62,10 +62,20 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 
         // Find the correct ending of the source range. In case of a declaration we need to find the ending semi,
         // otherwise the provided source range is correct.
-        const auto sr =
-            GetSourceRangeAfterSemi(funcDecl->getSourceRange(),
-                                    result,
-                                    funcDecl->doesThisDeclarationHaveABody() ? RequireSemi::No : RequireSemi::Yes);
+        const auto sr = [&] {
+            auto funcRange =
+                GetSourceRangeAfterSemi(funcDecl->getSourceRange(),
+                                        result,
+                                        funcDecl->doesThisDeclarationHaveABody() ? RequireSemi::No : RequireSemi::Yes);
+
+            // Adjust the begin location, if this decl has an attribute
+            if(funcDecl->hasAttrs()) {
+                // the -3 are a guess that seems to work
+                funcRange.setBegin((*funcDecl->attr_begin())->getLocation().getLocWithOffset(-3));
+            }
+
+            return funcRange;
+        }();
 
         // DPrint("fd rw:  %d %s\n", (sr.getBegin() == sr.getEnd()), outputFormatHelper.GetString());
 

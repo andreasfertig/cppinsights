@@ -1,0 +1,10 @@
+struct alignas(alignof(double)) foo
+{
+  int i;
+};
+
+
+
+/* PASSED: static_assert(sizeof(foo) == 8); */
+
+

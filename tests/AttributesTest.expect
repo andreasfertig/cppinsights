@@ -1,0 +1,50 @@
+namespace test
+{
+  [[maybe_unused]] [[nodiscard("")]] inline int multipleGnuAttributes();
+  [[nodiscard("")]] int forwardDeclWithAttributes();
+  [[nodiscard("")]] int forwardDeclWithAttributes()
+  {
+    return 0;
+  }
+  [[gnu::const]] [[gnu::always_inline]] [[gnu::hot]] [[nodiscard("")]] int usingAttribute();
+  [[nodiscard("")]] [[nodiscard("")]] int twiceTheSameAttributeOnDifferentPlace();
+  [[noreturn]] void noReturn();
+  [[deprecated("")]] void deprecatedFunc();
+  [[deprecated("Replaced by bar, which has an improved interface")]] void deprecatedWithMsgFunc();
+  void fallThroughAtrrTest(int n)
+  {
+    switch(n) {
+      case 1: [[fallthrough]] ;
+      case 2: break;
+    }
+  }
+  struct [[nodiscard("")]] nodiscardTest
+  {
+  };
+  
+  struct [[nodiscard("just a test")]] nodiscardWithMsgTest
+  {
+  };
+  
+  [[maybe_unused]] void maybeUnusedTest([[maybe_unused]] bool b)
+  {
+    [[maybe_unused]] bool b2 = b;
+  }
+  struct Empty
+  {
+  };
+  
+  struct NoUniqueAddrTest
+  {
+    int i;
+    [[no_unique_address]] Empty e;
+  };
+  
+  
+}  // namespace test
+
+int main()
+{
+}
+
+

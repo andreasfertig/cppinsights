@@ -183,6 +183,9 @@ public:
         mOutputFormatHelper.Append('>');
     }
 
+    void InsertAttributes(const Decl::attr_range&);
+    void InsertAttribute(const Attr&);
+
 protected:
     virtual bool InsertVarDecl() { return true; }
     virtual bool InsertComma() { return false; }

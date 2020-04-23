@@ -122,6 +122,7 @@ SUPPORTED_STMT(CoroutineSuspendExpr)
 SUPPORTED_STMT(CoreturnStmt)
 SUPPORTED_STMT(DependentScopeDeclRefExpr)
 SUPPORTED_STMT(CXXRewrittenBinaryOperator)
+SUPPORTED_STMT(AttributedStmt)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

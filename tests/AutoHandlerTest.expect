@@ -42,7 +42,6 @@ inline constexpr char CEWest()
   return 'c';
 }
 
-
 [[maybe_unused]] inline constexpr char MUCEWest()
                  {
                    return 'c';
@@ -69,8 +68,8 @@ int main()
   char c = 'c';
   unsigned int u = 0U;
   unsigned int uu = u;
-  unsigned int mu = 0U;
-  unsigned int muu = u;
+  [[maybe_unused]] unsigned int mu = 0U;
+  [[maybe_unused]] unsigned int muu = u;
 }
 
 
