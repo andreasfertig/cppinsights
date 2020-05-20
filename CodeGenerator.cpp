@@ -1382,9 +1382,6 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
             case CastKind::CK_FloatingCast: [[fallthrough]];
             case CastKind::CK_IntegralToFloating: [[fallthrough]];
             case CastKind::CK_FloatingToIntegral: [[fallthrough]];
-            /* these are implicit conversions. We get them right, but they may end up in a compiler internal type,
-             * which leads to compiler errors */
-            // case CastKind::CK_NoOp:
             case CastKind::CK_NonAtomicToAtomic: return true;
             default:
                 // Show this casts only if ShowAllImplicitCasts is turned on.
@@ -1392,6 +1389,9 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
                     switch(kind) {
                         case CastKind::CK_NullToPointer: [[fallthrough]];
                         case CastKind::CK_NullToMemberPointer: [[fallthrough]];
+                        /* these are implicit conversions. We get them right, but they may end up in a compiler internal
+                         * type, which leads to compiler errors */
+                        case CastKind::CK_NoOp: [[fallthrough]];
                         case CastKind::CK_ArrayToPointerDecay: return true;
                         default: break;
                     }
@@ -1406,9 +1406,9 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
     } else if(isa<IntegerLiteral>(subExpr) && hideImplicitCasts) {
         InsertArg(stmt->IgnoreCasts());
 
-        // If this is part of an explicit cast, for example a CStyleCast ignore it, if ShowAllImplicitCasts is not
-        // selected
-    } else if(stmt->isPartOfExplicitCast() && hideImplicitCasts) {
+        // If this is part of an explicit cast, for example a CStyleCast or static_cast, ignore it, because it belongs
+        // to the cast written by the user.
+    } else if(stmt->isPartOfExplicitCast()) {
         InsertArg(stmt->IgnoreCasts());
 
     } else {
@@ -1699,8 +1699,20 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
     const bool  isCXXMethod{callee && isa<CXXMethodDecl>(callee->getDecl())};
 
     if(2 == stmt->getNumArgs()) {
-        const auto* param1 = dyn_cast_or_null<DeclRefExpr>(stmt->getArg(0)->IgnoreImpCasts());
-        const auto* param2 = dyn_cast_or_null<DeclRefExpr>(stmt->getArg(1)->IgnoreImpCasts());
+        auto getArg = [&](unsigned idx) {
+            const auto* arg = stmt->getArg(idx);
+
+            // In show all casts mode don't filter this. It shows how the compiler adds const to arguments, if the
+            // argument is non-const but the parameter demands a const object
+            if(not GetInsightsOptions().ShowAllImplicitCasts) {
+                arg = arg->IgnoreImpCasts();
+            }
+
+            return dyn_cast_or_null<DeclRefExpr>(arg);
+        };
+
+        const auto* param1 = getArg(0);
+        const auto* param2 = getArg(1);
 
         if(callee && param1 && param2) {
 
