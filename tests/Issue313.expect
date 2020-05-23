@@ -1,0 +1,29 @@
+// cmdlineinsights:--show-all-implicit-casts
+
+struct A
+{
+};
+
+
+struct B
+{
+  using retType_5_4 = A;
+  inline operator retType_5_4 ()
+  {
+    return {};
+  }
+  
+};
+
+
+
+void DangerousFunc(const A &)
+{
+}
+
+
+int main()
+{
+  DangerousFunc(static_cast<const A>(static_cast<A>(B{}.operator A())));
+}
+
