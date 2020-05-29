@@ -1,0 +1,21 @@
+// cmdline:-std=c++2a
+#include <compare>
+
+struct Spaceship
+{
+  int x;
+  inline constexpr std::strong_ordering operator<=>(const Spaceship & value) const noexcept = default;
+  inline constexpr bool operator==(const Spaceship & value) const noexcept = default;
+};
+
+
+
+int main()
+{
+  constexpr const Spaceship enterprise = {2};
+  constexpr const Spaceship millenniumFalcon = {2};
+  /* PASSED: static_assert(std::operator<=(enterprise.operator<=>(millenniumFalcon), 0)); */
+  /* PASSED: static_assert(enterprise.operator==(millenniumFalcon)); */
+}
+
+

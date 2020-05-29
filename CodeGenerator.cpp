@@ -718,6 +718,14 @@ void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXRewrittenBinaryOperator* stmt)
+{
+    LAMBDA_SCOPE_HELPER(BinaryOperator);
+
+    InsertArg(stmt->getSemanticForm());
+}
+//-----------------------------------------------------------------------------
+
 static const char* GetStorageClassAsString(const StorageClass& sc)
 {
     if(SC_None != sc) {
