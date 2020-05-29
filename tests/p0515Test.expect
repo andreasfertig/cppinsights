@@ -1,0 +1,42 @@
+// cmdline:-std=c++2a
+#include <compare>
+
+struct Spaceship
+{
+  int x;
+  inline constexpr std::strong_ordering operator<=>(const int & value) const
+  {
+    if(this->x == value) {
+      return std::strong_ordering(std::strong_ordering::equal);
+    } else {
+      if(value > this->x) {
+        return std::strong_ordering(std::strong_ordering::less);
+      } else {
+        return std::strong_ordering(std::strong_ordering::greater);
+      }
+      
+      
+    }
+    
+  }
+  
+  inline constexpr bool operator==(const int & value) const
+  {
+    return std::operator==((*this).operator<=>(value), 0);
+  }
+  
+};
+
+
+
+int main()
+{
+  constexpr const int y = 2;
+  constexpr const Spaceship millenniumFalcon = {3};
+  /* PASSED: static_assert(std::operator>=(millenniumFalcon.operator<=>(y), 0)); */
+  /* PASSED: static_assert(std::operator<=(0, millenniumFalcon.operator<=>(y))); */
+  /* PASSED: static_assert(!(millenniumFalcon.operator==(y))); */
+  /* PASSED: static_assert(!(millenniumFalcon.operator==(y))); */
+}
+
+
