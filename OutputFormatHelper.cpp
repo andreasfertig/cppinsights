@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "OutputFormatHelper.h"
+#include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 //-----------------------------------------------------------------------------
 
@@ -33,6 +34,10 @@ void OutputFormatHelper::AppendParameterList(const ArrayRef<ParmVarDecl*> parame
 {
     ForEachArg(parameters, [&](const auto& p) {
         const auto& name{GetName(*p)};
+
+        // Get the attributes and insert them, if there are any
+        CodeGenerator codeGenerator{*this};
+        codeGenerator.InsertAttributes(p->attrs());
 
         if(NameOnly::No == nameOnly) {
             const auto& type{p->getType()};
