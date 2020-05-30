@@ -5,28 +5,18 @@
  *
  ****************************************************************************/
 
-#include "OutputFormatHelper.h"
+#include <algorithm>
+
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
+#include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
 
-static const std::string MakeIndent(const unsigned indent)
-{
-    std::string str{};
-
-    for(unsigned i = 1; i < indent; i++) {
-        str += ' ';
-    }
-
-    return str;
-}
-//-----------------------------------------------------------------------------
-
 void OutputFormatHelper::Indent(unsigned count)
 {
-    mOutput.append(MakeIndent(count + 1));
+    mOutput.insert(mOutput.size(), count, ' ');
 }
 //-----------------------------------------------------------------------------
 
@@ -68,12 +58,14 @@ void OutputFormatHelper::RemoveIndent()
 {
     /* After a newline we are already indented by one level to much. Try to decrease it. */
     if(0 != mDefaultIndent) {
-        for(unsigned i = 0; i < SCOPE_INDENT; ++i) {
-            if(' ' != mOutput.back()) {
-                break;
-            }
+        // go the string backwards and find the first non-whitespace character
+        const auto res = std::find_if(
+            std::rbegin(mOutput), std::rbegin(mOutput) + SCOPE_INDENT, [](const char& c) { return ' ' != c; });
 
-            mOutput.pop_back();
+        // check if the string did end with at least one whitespace
+        if(const auto& end = std::rbegin(mOutput); res != end) {
+            // remove the whitespaces at the end of the string
+            mOutput.resize(mOutput.size() - std::distance(end, res));
         }
     }
 }
