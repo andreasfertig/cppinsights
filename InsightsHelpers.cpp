@@ -166,27 +166,9 @@ std::string GetNestedName(const NestedNameSpecifier* nns)
 }
 //-----------------------------------------------------------------------------
 
-static std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
-{
-    if(Contains(str, "type-parameter-")) {
-        for(size_t startPos = 0; (startPos = str.find(from, startPos)) != std::string::npos; startPos += to.length()) {
-            str.replace(startPos, from.length(), to);
-        }
-    }
-
-    return str;
-}
-//-----------------------------------------------------------------------------
-
-static std::string ReplaceDash(std::string&& str)
-{
-    return ReplaceAll(std::move(str), "-", "_");
-}
-//-----------------------------------------------------------------------------
-
 static const std::string GetAsCPPStyleString(const QualType& t, const CppInsightsPrintingPolicy& printingPolicy)
 {
-    return ReplaceDash(t.getAsString(printingPolicy));
+    return t.getAsString(printingPolicy);
 }
 //-----------------------------------------------------------------------------
 
@@ -893,7 +875,7 @@ std::string GetName(const NamedDecl& nd)
         name = details::GetScope(nd.getDeclContext(), details::RemoveCurrentScope::No);
     }
 
-    name += ReplaceDash(nd.getNameAsString());
+    name += nd.getNameAsString();
 
     return ScopeHandler::RemoveCurrentScope(name);
 }
@@ -907,12 +889,10 @@ std::string GetName(const CXXRecordDecl& RD)
 
     // get the namespace as well
     if(NeedsNamespace(RD, UseLexicalParent::Yes)) {
-        return ReplaceDash(details::GetQualifiedName(RD));
+        return details::GetQualifiedName(RD);
     }
 
-    std::string ret{GetNestedName(RD.getQualifier())};
-
-    ret += ReplaceDash(RD.getNameAsString());
+    std::string ret{StrCat(GetNestedName(RD.getQualifier()), RD.getNameAsString())};
 
     return ScopeHandler::RemoveCurrentScope(ret);
 }
