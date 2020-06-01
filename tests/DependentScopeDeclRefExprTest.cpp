@@ -42,6 +42,21 @@ struct dependentScope4
 
 }
 
+namespace DependentScopeDeclRefExpr {
+
+template <typename T>
+struct A;
+
+template <typename T>
+void test() {
+  A<T>::foo;
+  A<T>::template foo;
+  A<T>::template foo<>;
+  A<T>::template foo<T>;
+}
+
+} // namespace DependentScopeDeclRefExpr
+
 int main()
 {
     auto a = Test::dependentScope<int>::result;

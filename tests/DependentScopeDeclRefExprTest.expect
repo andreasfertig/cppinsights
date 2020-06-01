@@ -49,7 +49,7 @@ namespace Test
     inline static constexpr const bool result = true;
   };
   
-  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:47 */
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:62 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   struct dependentScope<int, false>
@@ -64,7 +64,7 @@ namespace Test
     inline static constexpr const bool result = has<T>::value;
   };
   
-  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:48 */
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:63 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   struct dependentScope2<int>
@@ -80,7 +80,7 @@ namespace Test
     inline static constexpr const bool result = has<T, U>::value;
   };
   
-  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:49 */
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:64 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   struct dependentScope3<int>
@@ -96,7 +96,7 @@ namespace Test
     inline static constexpr const typename has<T>::type result = has<T>::value;
   };
   
-  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:50 */
+  /* First instantiated from: DependentScopeDeclRefExprTest.cpp:65 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   struct dependentScope4<bool>
@@ -107,6 +107,21 @@ namespace Test
   #endif
   
 }
+
+namespace DependentScopeDeclRefExpr
+{
+  template<typename T>
+  struct A;
+  template<typename T>
+  void test()
+  {
+    A<T>::foo;
+    A<T>::template foo;
+    A<T>::template foo<>;
+    A<T>::template foo<T>;
+  }
+  
+} // namespace DependentScopeDeclRefExpr
 
 int main()
 {

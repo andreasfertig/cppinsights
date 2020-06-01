@@ -344,11 +344,13 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 }
 //-----------------------------------------------------------------------------
 
-static void InsertQualifierAndName(const DeclarationName&     declName,
-                                   const NestedNameSpecifier* qualifier,
-                                   OutputFormatHelper&        outputFormatHelper)
+void CodeGenerator::InsertQualifierAndName(const DeclarationName&     declName,
+                                           const NestedNameSpecifier* qualifier,
+                                           const bool                 hasTemplateKeyword)
 {
-    outputFormatHelper.Append(ScopeHandler::RemoveCurrentScope(GetNestedName(qualifier)), declName.getAsString());
+    mOutputFormatHelper.Append(ScopeHandler::RemoveCurrentScope(GetNestedName(qualifier)),
+                               hasTemplateKeyword ? "template " : "",
+                               declName.getAsString());
 }
 //-----------------------------------------------------------------------------
 
@@ -360,21 +362,13 @@ void CodeGenerator::InsertNamespace(const NestedNameSpecifier* stmt)
 
 void CodeGenerator::InsertArg(const UnresolvedLookupExpr* stmt)
 {
-    InsertQualifierAndName(stmt->getName(), stmt->getQualifier(), mOutputFormatHelper);
-
-    if(stmt->getNumTemplateArgs()) {
-        InsertTemplateArgs(*stmt);
-    }
+    InsertQualifierAndNameWithTemplateArgs(stmt->getName(), stmt);
 }
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertArg(const DependentScopeDeclRefExpr* stmt)
 {
-    if(stmt->hasTemplateKeyword()) {
-        mOutputFormatHelper.Append("template ");
-    }
-
-    InsertQualifierAndName(stmt->getDeclName(), stmt->getQualifier(), mOutputFormatHelper);
+    InsertQualifierAndNameWithTemplateArgs(stmt->getDeclName(), stmt);
 }
 //-----------------------------------------------------------------------------
 
@@ -2376,7 +2370,7 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
 
     mOutputFormatHelper.Append("using ");
 
-    InsertQualifierAndName(stmt->getDeclName(), stmt->getQualifier(), mOutputFormatHelper);
+    InsertQualifierAndName(stmt->getDeclName(), stmt->getQualifier(), false);
 
     mOutputFormatHelper.AppendNewLine(";");
 

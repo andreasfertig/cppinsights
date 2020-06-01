@@ -218,6 +218,23 @@ protected:
     bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
     void InsertTemplateParameters(const TemplateParameterList& list);
 
+    template<typename T>
+    void InsertQualifierAndNameWithTemplateArgs(const DeclarationName& declName, const T* stmt)
+    {
+        InsertQualifierAndName(declName, stmt->getQualifier(), stmt->hasTemplateKeyword());
+
+        if(stmt->getNumTemplateArgs()) {
+            InsertTemplateArgs(*stmt);
+        } else if(stmt->hasExplicitTemplateArgs()) {
+            // we have empty templates arguments, but angle brackets provided by the user
+            mOutputFormatHelper.Append("<>");
+        }
+    }
+
+    void InsertQualifierAndName(const DeclarationName&     declName,
+                                const NestedNameSpecifier* qualifier,
+                                const bool                 hasTemplateKeyword);
+
     /// For a special case, when a LambdaExpr occurs in a Constructor from an
     /// in class initializer, there is a need for a more narrow scope for the \c LAMBDA_SCOPE_HELPER.
     void InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputFormatHelper& initOutputFormatHelper);
