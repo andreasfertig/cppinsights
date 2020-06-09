@@ -5,8 +5,10 @@
  *
  ****************************************************************************/
 
-#include "GlobalVariableHandler.h"
+#include <algorithm>
+
 #include "CodeGenerator.h"
+#include "GlobalVariableHandler.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
 #include "OutputFormatHelper.h"
@@ -57,12 +59,35 @@ void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* matchedDecl = result.Nodes.getNodeAs<VarDecl>("varDecl")) {
         OutputFormatHelper outputFormatHelper{};
-        CodeGenerator      codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(matchedDecl);
 
         const auto sr = GetSourceRangeAfterSemi(matchedDecl->getSourceRange(), result, RequireSemi::Yes);
 
-        mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
+        // Check whether we already have rewritten this location. If so, insert the text after the location. This is the
+        // case for an anonymous struct declared with TU as root.
+        if(not IsMacroLocation(matchedDecl->getSourceRange()) && (mRewrite.buffer_begin() != mRewrite.buffer_end()) &&
+           IsAnonymousStructOrUnion(matchedDecl->getType()->getAsCXXRecordDecl())) {
+            if(auto&& text = mRewrite.getRewrittenText(sr); not text.empty()) {
+                const char* data = result.SourceManager->getCharacterData(matchedDecl->getSourceRange().getBegin());
+
+                StringRef sref{data, static_cast<size_t>(std::distance(text.begin(), text.end()))};
+
+                if(not std::equal(text.begin(), text.end(), sref.begin(), sref.end())) {
+                    outputFormatHelper.Append(std::move(text));
+                }
+            }
+        }
+
+        CodeGenerator codeGenerator{outputFormatHelper};
+        codeGenerator.InsertArg(matchedDecl);
+
+        if(IsMacroLocation(sr)) {
+            // Special case for AnonymousStructInMacroTest.cpp (#290) where a macro gets expanded
+            mRewrite.ReplaceText(GetSM(result).getImmediateExpansionRange(matchedDecl->getSourceRange().getBegin()),
+                                 outputFormatHelper.GetString());
+
+        } else {
+            mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
+        }
     }
 }
 //-----------------------------------------------------------------------------

@@ -1,0 +1,10 @@
+union U
+{
+  struct __anon_2_3
+  {
+  };
+  
+  __anon_2_3 s;
+};
+
+

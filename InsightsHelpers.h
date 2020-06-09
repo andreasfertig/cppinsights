@@ -146,6 +146,20 @@ static inline std::string GetLambdaName(const LambdaExpr& lambda)
 std::string GetName(const CXXRecordDecl& RD);
 //-----------------------------------------------------------------------------
 
+/// \brief Check whether this is an anonymous struct or union.
+///
+/// There is a dedicated function `isAnonymousStructOrUnion` which at this point no longer returns true. Hence this
+/// method uses an empty record decl name as indication for an anonymous struct/union.
+static inline bool IsAnonymousStructOrUnion(const CXXRecordDecl* cxxRecordDecl)
+{
+    if(cxxRecordDecl) {
+        return cxxRecordDecl->getName().empty();
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 /// \brief Remove decltype from a QualType, if possible.
 const QualType GetDesugarType(const QualType& QT);
 // -----------------------------------------------------------------------------

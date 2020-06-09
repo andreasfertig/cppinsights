@@ -28,8 +28,7 @@ RecordDeclHandler::RecordDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
                                                   hasAncestor(functionDecl()),
                                                   hasAncestor(cxxRecordDecl()),
                                                   isTemplate,
-                                                  isExpansionInSystemHeader(),
-                                                  isMacroOrInvalidLocation())))
+                                                  isExpansionInSystemHeader())))
                            .bind("cxxRecordDecl"),
                        this);
 
@@ -48,8 +47,22 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
         CodeGenerator codeGenerator{outputFormatHelper};
         codeGenerator.InsertArg(cxxRecordDecl);
 
-        mRewrite.ReplaceText(GetSourceRangeAfterSemi(cxxRecordDecl->getSourceRange(), result),
-                             outputFormatHelper.GetString());
+        if(auto sourceRange = cxxRecordDecl->getSourceRange(); not IsMacroLocation(sourceRange)) {
+            if(IsAnonymousStructOrUnion(cxxRecordDecl)) {
+                sourceRange.setEnd(sourceRange.getEnd().getLocWithOffset(2));  // 2 is just what worked
+            }
+
+            mRewrite.ReplaceText(GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::Yes),
+                                 outputFormatHelper.GetString());
+
+        } else {
+            // We're just interested in the start location, -1 work(s|ed)
+            const auto startLoc =
+                GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::No).getBegin().getLocWithOffset(-1);
+
+            mRewrite.InsertText(startLoc, outputFormatHelper.GetString());
+        }
+
     } else if(const auto* namespaceDecl = result.Nodes.getNodeAs<NamespaceDecl>("namespaceDecl")) {
         OutputFormatHelper outputFormatHelper{};
 
