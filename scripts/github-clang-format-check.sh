@@ -1,6 +1,8 @@
 #! /bin/bash
 
 CLANG_FORMAT=$1
+EVENT=$2
+BASE_COMMIT=$3
 
 echo -n "Running clang-format checks, version: "
 ${CLANG_FORMAT} --version
@@ -10,13 +12,13 @@ if [ 0 != $? ]; then
     exit 1
 fi
 
-if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
-  # Not in a pull request, so compare against parent commit
-  base_commit="HEAD^"
+if [ "${EVENT}" == "pull_request" ] ; then
+  base_commit="${BASE_COMMIT}"
+  echo "Checking against commit $base_commit"
   echo "Checking against parent commit $(git rev-parse $base_commit)"
 else
-  base_commit="$TRAVIS_COMMIT_RANGE"
-  echo "Checking against commit $base_commit"
+  # Not in a pull request, so compare against parent commit
+  base_commit="HEAD^"
 fi
 
 filesToCheck="$(git diff --name-only --diff-filter=d ${base_commit} | grep -e '.\(\.cpp\|\.h\)$' || true)"
