@@ -16,13 +16,13 @@ namespace detail
   struct to<int>
   {
     template<typename ... Ts>
-    struct detail::to<int>::result;
+    struct result;
     /* First instantiated from: TemplateKeywordTest.cpp:31 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    struct detail::to<int>::result<int, char>
+    struct result<int, char>
     {
-      // inline constexpr detail::to<int>::result() noexcept = default;
+      // inline constexpr result() noexcept = default;
     };
     
     #endif

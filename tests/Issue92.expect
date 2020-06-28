@@ -116,27 +116,27 @@ struct generator<unsigned int>
   
   struct iterator
   {
-    std::experimental::coroutine_handle<generator<unsigned int>::promise_type> hco;
+    std::experimental::coroutine_handle<promise_type> hco;
     bool done;
-    inline iterator(std::experimental::coroutine_handle<generator<unsigned int>::promise_type> hco, bool done)
-    : hco{std::experimental::coroutine_handle<generator<unsigned int>::promise_type>(hco)}
+    inline iterator(std::experimental::coroutine_handle<promise_type> hco, bool done)
+    : hco{std::experimental::coroutine_handle<promise_type>(hco)}
     , done{done}
     {
     }
     
-    inline generator<unsigned int>::iterator & operator++()
+    inline iterator & operator++()
     {
       static_cast<std::experimental::coroutine_handle<void>&>(this->hco).resume();
       this->done = static_cast<const std::experimental::coroutine_handle<void>&>(this->hco).done();
       return *this;
     }
     
-    inline bool operator==(const generator<unsigned int>::iterator & o) const
+    inline bool operator==(const iterator & o) const
     {
       return static_cast<int>(this->done) == static_cast<int>(o.done);
     }
     
-    inline bool operator!=(const generator<unsigned int>::iterator & o) const
+    inline bool operator!=(const iterator & o) const
     {
       return !((*this).operator==(o));
     }
@@ -150,19 +150,19 @@ struct generator<unsigned int>
     
   };
   
-  inline generator<unsigned int>::iterator begin()
+  inline iterator begin()
   {
     static_cast<std::experimental::coroutine_handle<void>&>(this->p).resume();
-    return generator<unsigned int>::iterator{std::experimental::coroutine_handle<generator<unsigned int>::promise_type>(this->p), static_cast<const std::experimental::coroutine_handle<void>&>(this->p).done()};
+    return iterator{std::experimental::coroutine_handle<promise_type>(this->p), static_cast<const std::experimental::coroutine_handle<void>&>(this->p).done()};
   }
   
-  inline generator<unsigned int>::iterator end()
+  inline iterator end()
   {
-    return generator<unsigned int>::iterator{std::experimental::coroutine_handle<generator<unsigned int>::promise_type>(this->p), true};
+    return iterator{std::experimental::coroutine_handle<promise_type>(this->p), true};
   }
   
   inline generator(generator<unsigned int> && rhs)
-  : p{std::experimental::coroutine_handle<generator<unsigned int>::promise_type>(rhs.p)}
+  : p{std::experimental::coroutine_handle<promise_type>(rhs.p)}
   {
     rhs.p.operator=(nullptr);
   }
@@ -176,12 +176,12 @@ struct generator<unsigned int>
   
   
   private: 
-  inline explicit generator(generator<unsigned int>::promise_type * p)
-  : p{std::experimental::coroutine_handle<generator<unsigned int>::promise_type>::from_promise(*p)}
+  inline explicit generator(promise_type * p)
+  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*p)}
   {
   }
   
-  std::experimental::coroutine_handle<generator<unsigned int>::promise_type> p;
+  std::experimental::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator<unsigned int> &) = delete;
 };

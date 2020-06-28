@@ -44,7 +44,7 @@ struct Index<&Person::age>
   using Key = Key_t<&Person::age>;
   using POD = POD_t<&Person::age>;
   std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > data;
-  static inline Index<&Person::age>::Key extractKey(const Index<&Person::age>::POD & pod);
+  static inline Key extractKey(const POD & pod);
   
   // inline ~Index() noexcept = default;
   // inline Index() noexcept = default;
