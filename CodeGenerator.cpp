@@ -1692,7 +1692,9 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
 
 void CodeGenerator::InsertArg(const MaterializeTemporaryExpr* stmt)
 {
-    InsertArg(GetTemporary(stmt));
+    // At least in case of a tenary operator wrapped inside a MaterializeTemporaryExpr parens are necessary
+    const auto* temporary = GetTemporary(stmt);
+    WrapInParensIfNeeded(isa<ConditionalOperator>(temporary), [&] { InsertArg(temporary); });
 }
 //-----------------------------------------------------------------------------
 
