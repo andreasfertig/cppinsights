@@ -1,0 +1,28 @@
+struct Str
+{
+  inline Str(const char * string)
+  : string{string}
+  {
+  }
+  
+  using retType_4_3 = const char *;
+  inline operator retType_4_3 () const
+  {
+    return this->string;
+  }
+  
+  const char * string;
+  // inline constexpr Str(const Str &) noexcept = default;
+};
+
+
+
+Str globalString = Str("test");
+
+
+
+const char * getString(bool empty)
+{
+  return static_cast<const char *>((empty ? Str("") : Str(globalString)).operator const char *());
+}
+
