@@ -160,6 +160,12 @@ static inline bool IsAnonymousStructOrUnion(const CXXRecordDecl* cxxRecordDecl)
 }
 //-----------------------------------------------------------------------------
 
+void AppendTemplateTypeParamName(class OutputFormatHelper&   ofm,
+                                 const TemplateTypeParmDecl* decl,
+                                 const bool                  isParameter,
+                                 const TemplateTypeParmType* type = nullptr);
+//-----------------------------------------------------------------------------
+
 /// \brief Remove decltype from a QualType, if possible.
 const QualType GetDesugarType(const QualType& QT);
 // -----------------------------------------------------------------------------
@@ -271,18 +277,40 @@ private:
 //-----------------------------------------------------------------------------
 
 /// \brief Specialization for \c ::llvm::raw_string_ostream with an internal \c std::string buffer.
-///
 class StringStream : public ::llvm::raw_string_ostream
 {
 private:
-    std::string mData;
+    std::string mData{};
 
 public:
     StringStream()
     : ::llvm::raw_string_ostream{mData}
     {
     }
+
+    void Print(const TemplateArgument&);
+    void Print(const TemplateSpecializationType&);
+    void Print(const TypeConstraint&);
+    void Print(const StringLiteral&);
 };
+//-----------------------------------------------------------------------------
+
+/// \brief A helper which invokes a lambda when the scope is destroyed.
+template<typename T>
+class FinalAction
+{
+public:
+    explicit FinalAction(T&& action)
+    : mAction{std::forward<T>(action)}
+    {
+    }
+
+    ~FinalAction() { mAction(); }
+
+private:
+    T mAction;
+};
+//-----------------------------------------------------------------------------
 
 }  // namespace clang::insights
 

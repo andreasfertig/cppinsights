@@ -1,0 +1,9 @@
+// cmdline:-std=c++2a
+template<typename T>
+concept FWD = requires { T{}; T(); };
+
+int main()
+{
+  int x = 4;
+}
+

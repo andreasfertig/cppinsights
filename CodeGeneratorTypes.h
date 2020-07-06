@@ -43,6 +43,7 @@ SUPPORTED_DECL(LabelDecl)
 SUPPORTED_DECL(ClassTemplateDecl)
 SUPPORTED_DECL(NamespaceDecl)
 SUPPORTED_DECL(VarTemplateDecl)
+SUPPORTED_DECL(ConceptDecl)
 
 SUPPORTED_STMT(CXXDeleteExpr)
 SUPPORTED_STMT(CXXDefaultInitExpr)
@@ -123,6 +124,8 @@ SUPPORTED_STMT(CoreturnStmt)
 SUPPORTED_STMT(DependentScopeDeclRefExpr)
 SUPPORTED_STMT(CXXRewrittenBinaryOperator)
 SUPPORTED_STMT(AttributedStmt)
+SUPPORTED_STMT(ConceptSpecializationExpr)
+SUPPORTED_STMT(RequiresExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

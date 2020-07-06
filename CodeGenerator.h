@@ -218,6 +218,14 @@ protected:
     bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
     void InsertTemplateParameters(const TemplateParameterList& list);
 
+    STRONG_BOOL(InsertInline);
+
+    void InsertConceptConstraint(const llvm::SmallVectorImpl<const Expr*>& constraints,
+                                 const InsertInline                        insertInline);
+    void InsertConceptConstraint(const FunctionDecl* tmplDecl);
+    void InsertConceptConstraint(const VarDecl* varDecl);
+    void InsertConceptConstraint(const TemplateParameterList& tmplDecl);
+
     template<typename T>
     void InsertQualifierAndNameWithTemplateArgs(const DeclarationName& declName, const T* stmt)
     {
@@ -250,6 +258,10 @@ protected:
 
     STRONG_BOOL(SkipBody);
     void InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody);
+
+    /// \brief Generalized function to insert either a \c CXXConstructExpr or \c CXXUnresolvedConstructExpr
+    template<typename T>
+    void InsertConstructorExpr(const T* stmt);
 
     /// \brief Check whether or not this statement will add curlys or parentheses and add them only if required.
     void InsertCurlysIfRequired(const Stmt* stmt);
@@ -311,12 +323,15 @@ protected:
 
     STRONG_BOOL(SkipVarDecl);
     STRONG_BOOL(UseCommaInsteadOfSemi);
+    STRONG_BOOL(NoEmptyInitList);
 
     SkipVarDecl           mSkipVarDecl;
     UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
-    const LambdaExpr*     mLambdaExpr;
-    static inline bool    mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code. This
-                                             //!< requires adding the \c <new> header.
+    NoEmptyInitList       mNoEmptyInitList{
+        NoEmptyInitList::No};  //!< At least in case if a requires-clause containing T{} we don't want to get T{{}}.
+    const LambdaExpr*  mLambdaExpr;
+    static inline bool mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code. This
+                                          //!< requires adding the \c <new> header.
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
         uint64_t{100}};  //!< This is the upper limit of elements which will be shown for an array when filled by \c
                          //!< FillConstantArray.

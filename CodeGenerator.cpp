@@ -404,6 +404,17 @@ void CodeGenerator::InsertArg(const VarTemplateDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const ConceptDecl* stmt)
+{
+    InsertTemplateParameters(*stmt->getTemplateParameters());
+    mOutputFormatHelper.Append("concept ", stmt->getName(), " = ");
+
+    InsertArg(stmt->getConstraintExpr());
+    mOutputFormatHelper.AppendSemiNewLine();
+    mOutputFormatHelper.AppendNewLine();
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const ConditionalOperator* stmt)
 {
     InsertArg(stmt->getCond());
@@ -748,13 +759,13 @@ static std::string GetQualifiers(const VarDecl& vd)
     std::string qualifiers{};
 
     if(vd.isInline() || vd.isInlineSpecified()) {
-        qualifiers += "inline ";
+        qualifiers += kwInlineSpace;
     }
 
     qualifiers += GetStorageClassAsStringWithSpace(vd.getStorageClass());
 
     if(vd.isConstexpr()) {
-        qualifiers += "constexpr ";
+        qualifiers += kwConstExprSpace;
     }
 
     return qualifiers;
@@ -792,6 +803,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
     }
 
     InsertAttributes(stmt->attrs());
+    InsertConceptConstraint(stmt);
 
     if(IsTrivialStaticClassVarDecl(*stmt)) {
         HandleLocalStaticNonTrivialClass(stmt);
@@ -902,7 +914,7 @@ void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
 {
     if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
         InsertInstantiationPoint(mOutputFormatHelper, GetSM(*stmt), stmt->getPointOfInstantiation());
-        mOutputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
+        mOutputFormatHelper.InsertIfDefTemplateGuard();
     }
 }
 //-----------------------------------------------------------------------------
@@ -910,7 +922,7 @@ void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
 void CodeGenerator::InsertTemplateGuardEnd(const FunctionDecl* stmt)
 {
     if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
-        mOutputFormatHelper.AppendNewLine("#endif");
+        mOutputFormatHelper.InsertEndIfTemplateGuard();
     }
 }
 //-----------------------------------------------------------------------------
@@ -985,6 +997,19 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+static std::string GetTypeConstraintAsString(const TypeConstraint* typeConstraint)
+{
+    if(typeConstraint) {
+        StringStream sstream{};
+        sstream.Print(*typeConstraint);
+
+        return sstream.str();
+    }
+
+    return {};
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
 {
     mOutputFormatHelper.Append("template<");
@@ -998,7 +1023,7 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
         if(const auto* tt = dyn_cast_or_null<TemplateTypeParmDecl>(param)) {
             if(tt->wasDeclaredWithTypename()) {
                 mOutputFormatHelper.Append("typename ");
-            } else {
+            } else if(not tt->hasTypeConstraint()) {
                 mOutputFormatHelper.Append("class ");
             }
 
@@ -1007,14 +1032,21 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
             }
 
             if(0 == typeName.size() || tt->isImplicit() /* fixes class container:auto*/) {
-                mOutputFormatHelper.Append("type_parameter_", tt->getDepth(), "_", tt->getIndex());
+                AppendTemplateTypeParamName(mOutputFormatHelper, tt, false);
+
             } else {
+                if(auto typeConstraint = GetTypeConstraintAsString(tt->getTypeConstraint());
+                   not typeConstraint.empty()) {
+                    mOutputFormatHelper.Append(std::move(typeConstraint), " ");
+                }
+
                 mOutputFormatHelper.Append(typeName);
             }
 
             if(tt->hasDefaultArgument()) {
                 mOutputFormatHelper.Append(" = ", GetName(tt->getDefaultArgument()));
             }
+
         } else if(const auto* nonTmplParam = dyn_cast_or_null<NonTypeTemplateParmDecl>(param)) {
 
             mOutputFormatHelper.Append(GetName(nonTmplParam->getType()), " ");
@@ -1039,6 +1071,8 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
     }
 
     mOutputFormatHelper.AppendNewLine(">");
+
+    InsertConceptConstraint(list);
 }
 //-----------------------------------------------------------------------------
 
@@ -1094,6 +1128,11 @@ CodeGenerator::FillConstantArray(const ConstantArrayType* ct, const std::string&
 
 void CodeGenerator::InsertArg(const InitListExpr* stmt)
 {
+    // At least in case if a requires-clause containing T{} we don't want to get T{{}}.
+    if((NoEmptyInitList::Yes == mNoEmptyInitList) && (0 == stmt->getNumInits())) {
+        return;
+    }
+
     WrapInCurlys([&]() {
         mOutputFormatHelper.IncreaseIndent();
 
@@ -1139,7 +1178,8 @@ void CodeGenerator::InsertArg(const CXXDeleteExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
+template<typename T>
+void CodeGenerator::InsertConstructorExpr(const T* stmt)
 {
     mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
 
@@ -1151,29 +1191,22 @@ void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
     }();
 
     WrapInParensOrCurlys(braceKind, [&]() {
-        if(stmt->getNumArgs()) {
+        if(const auto& arguments = stmt->arguments(); not arguments.empty()) {
             ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
         }
     });
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
+{
+    InsertConstructorExpr(stmt);
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXUnresolvedConstructExpr* stmt)
 {
-    mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
-
-    const BraceKind braceKind = [&]() {
-        if(stmt->isListInitialization()) {
-            return BraceKind::Curlys;
-        }
-        return BraceKind::Parens;
-    }();
-
-    WrapInParensOrCurlys(braceKind, [&]() {
-        if(stmt->arg_size()) {
-            ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); });
-        }
-    });
+    InsertConstructorExpr(stmt);
 }
 //-----------------------------------------------------------------------------
 
@@ -1286,7 +1319,7 @@ void CodeGenerator::InsertArg(const UnaryOperator* stmt)
 void CodeGenerator::InsertArg(const StringLiteral* stmt)
 {
     StringStream stream{};
-    stmt->outputString(stream);
+    stream.Print(*stmt);
 
     mOutputFormatHelper.Append(stream.str());
 }
@@ -2041,7 +2074,7 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         }
 
         StringStream stream{};
-        templateSpecializationType->getTemplateName().dump(stream);
+        stream.Print(*templateSpecializationType);
 
         mOutputFormatHelper.Append(stream.str());
 
@@ -2419,7 +2452,7 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
 
 void CodeGenerator::InsertArg(const CXXNoexceptExpr* stmt)
 {
-    mOutputFormatHelper.Append("noexcept(");
+    mOutputFormatHelper.Append(kwNoexcept, "(");
 
     if(stmt->getValue()) {
         mOutputFormatHelper.Append("true");
@@ -2552,12 +2585,18 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         return false;
     }()};
 
+    FinalAction _{[&] {
+        if(tmplRequiresIfDef) {
+            mOutputFormatHelper.InsertEndIfTemplateGuard();
+        }
+    }};
+
     if(isClassTemplateSpecialization) {
         if(tmplRequiresIfDef) {
             InsertInstantiationPoint(mOutputFormatHelper,
                                      GetSM(*classTemplateSpecializationDecl),
                                      classTemplateSpecializationDecl->getPointOfInstantiation());
-            mOutputFormatHelper.AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE");
+            mOutputFormatHelper.InsertIfDefTemplateGuard();
         }
 
         if(classTemplatePartialSpecializationDecl) {
@@ -2778,10 +2817,6 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     mOutputFormatHelper.AppendSemiNewLine();
     mOutputFormatHelper.AppendNewLine();
-
-    if(tmplRequiresIfDef) {
-        mOutputFormatHelper.AppendNewLine("#endif");
-    }
 }
 //-----------------------------------------------------------------------------
 
@@ -2830,6 +2865,70 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
 {
     mOutputFormatHelper.AppendSemiNewLine();
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const ConceptSpecializationExpr* stmt)
+{
+    if(const auto* namedConcept = stmt->getNamedConcept()) {
+        mOutputFormatHelper.Append(GetName(*namedConcept));
+        InsertTemplateArgs(stmt->getTemplateArgsAsWritten()->arguments());
+
+#if 0
+        if(not stmt->isValueDependent()) {
+            mOutputFormatHelper.Append("/* ", stmt->isSatisfied(), " */ ");
+        }
+#endif
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const RequiresExpr* stmt)
+{
+    mOutputFormatHelper.Append(kwRequires);
+
+    const auto localParameters = stmt->getLocalParameters();
+    WrapInParensIfNeeded(
+        not localParameters.empty(),
+        [&] { mOutputFormatHelper.AppendParameterList(localParameters); },
+        AddSpaceAtTheEnd::Yes);
+
+    mOutputFormatHelper.OpenScope();
+
+    const auto  noEmptyInitList = mNoEmptyInitList;
+    FinalAction _{[&] { mNoEmptyInitList = noEmptyInitList; }};
+    mNoEmptyInitList = NoEmptyInitList::Yes;
+
+    for(const auto& requirement : stmt->getRequirements()) {
+        if(const auto* typeRequirement = dyn_cast_or_null<concepts::TypeRequirement>(requirement)) {
+            mOutputFormatHelper.Append(GetName(typeRequirement->getType()->getType()));
+
+            // SimpleRequirement
+        } else if(const auto* exprRequirement = dyn_cast_or_null<concepts::ExprRequirement>(requirement)) {
+            WrapInCurliesIfNeeded(exprRequirement->isCompound(), [&] { InsertArg(exprRequirement->getExpr()); });
+
+            if(exprRequirement->hasNoexceptRequirement()) {
+                mOutputFormatHelper.Append(kwSpaceNoexcept);
+            }
+
+            if(const auto& returnTypeRequirement = exprRequirement->getReturnTypeRequirement();
+               not returnTypeRequirement.isEmpty()) {
+                if(auto typeConstraint = GetTypeConstraintAsString(returnTypeRequirement.getTypeConstraint());
+                   not typeConstraint.empty()) {
+                    mOutputFormatHelper.Append(" -> ", std::move(typeConstraint));
+                }
+            }
+
+        } else if(const auto* nestedRequirement = dyn_cast_or_null<concepts::NestedRequirement>(requirement)) {
+            mOutputFormatHelper.Append(kwRequiresSpace);
+
+            InsertArg(nestedRequirement->getConstraintExpr());
+        }
+
+        mOutputFormatHelper.AppendSemiNewLine();
+    }
+
+    mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
 }
 //-----------------------------------------------------------------------------
 
@@ -3180,6 +3279,61 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertConceptConstraint(const llvm::SmallVectorImpl<const Expr*>& constraints,
+                                            const InsertInline                        insertInline)
+{
+    OnceTrue first{};
+    for(const auto* c : constraints) {
+        if(first && (InsertInline::Yes == insertInline)) {
+            mOutputFormatHelper.Append(' ');
+        }
+
+        mOutputFormatHelper.Append(kwRequiresSpace);
+        InsertArg(c);
+
+        if(InsertInline::No == insertInline) {
+            mOutputFormatHelper.AppendNewLine();
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
+// This inserts the requires clause after template<...>
+void CodeGenerator::InsertConceptConstraint(const TemplateParameterList& tmplDecl)
+{
+    SmallVector<const Expr*, 1> constraints{};
+
+    if(const auto* reqClause = tmplDecl.getRequiresClause()) {
+        constraints.push_back(reqClause);
+    }
+
+    InsertConceptConstraint(constraints, InsertInline::No);
+}
+//-----------------------------------------------------------------------------
+
+// This inserts the requires clause after the function header
+void CodeGenerator::InsertConceptConstraint(const FunctionDecl* tmplDecl)
+{
+    SmallVector<const Expr*, 5> constraints{};
+    tmplDecl->getAssociatedConstraints(constraints);
+
+    InsertConceptConstraint(constraints, InsertInline::Yes);
+}
+//-----------------------------------------------------------------------------
+
+// This inserts the requires clause after a variable type
+void CodeGenerator::InsertConceptConstraint(const VarDecl* varDecl)
+{
+    if(const auto* t = varDecl->getType()->getContainedAutoType()) {
+        if(t->getTypeConstraintConcept()) {
+#if 0
+            mOutputFormatHelper.Append("/*", t->getTypeConstraintConcept()->getName(), "*/ ");
+#endif
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl&       decl,
                                                               const SkipAccess          skipAccess,
                                                               const CXXConstructorDecl* cxxInheritedCtorDecl)
@@ -3247,15 +3401,20 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     }
 
     if(decl.isConstexpr()) {
-        const bool skipConstexpr{isLambda};
-        if(skipConstexpr) {
-            mOutputFormatHelper.Append("/*");
-        }
+        if(decl.isConstexprSpecified()) {
+            const bool skipConstexpr{isLambda};
+            if(skipConstexpr) {
+                mOutputFormatHelper.Append("/*");
+            }
 
-        mOutputFormatHelper.Append(kwConstExprSpace);
+            mOutputFormatHelper.Append(kwConstExprSpace);
 
-        if(skipConstexpr) {
-            mOutputFormatHelper.Append("*/ ");
+            if(skipConstexpr) {
+                mOutputFormatHelper.Append("*/ ");
+            }
+
+        } else if(decl.isConsteval()) {
+            mOutputFormatHelper.Append(kwConstEvalSpace);
         }
     }
 
@@ -3331,6 +3490,10 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
     }
 
     mOutputFormatHelper.Append(GetNoExcept(decl));
+
+    // insert the trailing requires-clause, if any. In case, this is a template then we already inserted the template
+    // requires-clause during creation of the template head.
+    InsertConceptConstraint(&decl);
 
     if(decl.isPure()) {
         mOutputFormatHelper.Append(" = 0");

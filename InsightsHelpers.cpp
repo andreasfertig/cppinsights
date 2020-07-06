@@ -476,7 +476,8 @@ private:
 
         if((nullptr == type->getIdentifier()) ||
            (decl && decl->isImplicit()) /* this fixes auto operator()(type_parameter_0_0 container) const */) {
-            mData.Append("type_parameter_", type->getDepth(), "_", type->getIndex());
+
+            AppendTemplateTypeParamName(mData, decl, true, type);
 
             return true;
         }
@@ -609,7 +610,7 @@ private:
         const bool hasNoName{[&] {
             for(const auto& arg : type->template_arguments()) {
                 StringStream sstream{};
-                arg.print(mPrintingPolicy, sstream);
+                sstream.Print(arg);
 
                 if(Contains(sstream.str(), "type-parameter")) {
                     return true;
@@ -621,7 +622,7 @@ private:
 
         if(hasNoName) {
             StringStream sstream{};
-            type->getTemplateName().print(sstream, mPrintingPolicy, true);
+            sstream.Print(*type);
 
             mData.Append(sstream.str());
 
@@ -1024,6 +1025,27 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
 }
 //-----------------------------------------------------------------------------
 
+void AppendTemplateTypeParamName(OutputFormatHelper&         ofm,
+                                 const TemplateTypeParmDecl* decl,
+                                 const bool                  isParameter,
+                                 const TemplateTypeParmType* type)
+{
+    if(decl) {
+        if(const auto* typeConstraint = decl->getTypeConstraint(); typeConstraint && not isParameter) {
+            StringStream sstream{};
+            sstream.Print(*typeConstraint);
+
+            ofm.Append(sstream.str(), " ");
+        }
+    }
+
+    const auto depth = [&] { return decl ? decl->getDepth() : type->getDepth(); }();
+    const auto index = [&] { return decl ? decl->getIndex() : type->getIndex(); }();
+
+    ofm.Append("type_parameter_", depth, "_", index);
+}
+//-----------------------------------------------------------------------------
+
 static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 {
     if(const VarDecl* vd = GetVarDeclFromDeclRefExpr(declRefExpr)) {
@@ -1267,6 +1289,30 @@ std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
     }
 
     return {};
+}
+//-----------------------------------------------------------------------------
+
+void StringStream::Print(const TemplateArgument& arg)
+{
+    arg.print(CppInsightsPrintingPolicy{}, *this);
+}
+//-----------------------------------------------------------------------------
+
+void StringStream::Print(const TemplateSpecializationType& arg)
+{
+    arg.getTemplateName().print(*this, CppInsightsPrintingPolicy{}, true);
+}
+//-----------------------------------------------------------------------------
+
+void StringStream::Print(const TypeConstraint& arg)
+{
+    arg.print(*this, CppInsightsPrintingPolicy{});
+}
+//-----------------------------------------------------------------------------
+
+void StringStream::Print(const StringLiteral& arg)
+{
+    arg.outputString(*this);
 }
 //-----------------------------------------------------------------------------
 

@@ -1,0 +1,59 @@
+// cmdline:-std=c++2a
+namespace ConceptsDefinition
+{
+  template<typename T>
+  concept C = true;
+  
+  template<typename T, typename U>
+  concept D = true;
+  
+  template<typename T>
+  concept SimpleRequirement = requires{
+    T{};
+    T();
+  };
+  
+  template<typename T>
+  concept CompoundRequirement = requires(T a, T b) {
+    {a == b} noexcept;
+    a != b;
+    {a} -> C;
+    {a == b} noexcept -> C;
+    {a == b} noexcept -> D<T>;
+  };
+  
+  template<typename T>
+  concept NestedRequirement = requires(T a, T b) {
+    {a == b} noexcept;
+    requires C<T>;
+  };
+  
+  template<typename T>
+  concept TypeRequirement = requires(T a, T b) {
+    {a == b} noexcept;
+    typename T::inner;
+  };
+  
+  
+}
+
+bool areEqual(ConceptsDefinition::CompoundRequirement auto a, ConceptsDefinition::CompoundRequirement auto b) {
+  return a == b;
+}
+
+/* First instantiated from: conceptsDefinition.cpp:45 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+bool areEqual<int, double>(int a, double b)
+{
+  return static_cast<double>(a) == b;
+}
+#endif
+
+
+int main()
+{
+  int x = 4;
+  return static_cast<int>(areEqual(2, 3.0));
+}
+

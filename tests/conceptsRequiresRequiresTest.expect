@@ -1,0 +1,29 @@
+// cmdline:-std=c++2a
+namespace RequiresRequires
+{
+  template<typename T>
+  requires requires(T x) {
+    x + x;
+  }
+  T add(T a, T b)
+  {
+    return a + b;
+  }
+  
+  /* First instantiated from: conceptsRequiresRequiresTest.cpp:10 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  int add<int>(int a, int b)
+  {
+    return a + b;
+  }
+  #endif
+  
+  
+}
+
+int main()
+{
+  return RequiresRequires::add(2, 5);
+}
+

@@ -1,0 +1,54 @@
+// cmdline:-std=c++2a
+namespace Constraints
+{
+  template<typename T>
+  requires (sizeof(T) > 1) && (sizeof(T) < 255)
+  void f(T)
+  {
+  }
+  
+  /* First instantiated from: conceptsConstraintsTest.cpp:24 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  void f<int>(int)
+  {
+  }
+  #endif
+  
+  template<unsigned int N>
+  constexpr const bool Atomic = true;
+  template<unsigned int N>
+  concept C = Atomic<N>;
+  
+  template<unsigned int N>
+  concept Add1 = C<N + 1>;
+  
+  template<unsigned int N>
+  struct WrapN;
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct WrapN;
+  #endif
+  template<unsigned int N>
+  using AddOneTy = WrapN<N + 1>;
+  template<unsigned int M>
+  void g(AddOneTy<2 * M> *);
+  
+  /* First instantiated from: conceptsConstraintsTest.cpp:18 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  void g<0>(WrapN<1> *);
+  #endif
+  
+  void h()
+  {
+    g<0>(nullptr);
+  }
+  
+}
+
+int main()
+{
+  Constraints::f(2);
+}
+
