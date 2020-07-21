@@ -1,0 +1,50 @@
+
+
+template<typename T>
+constexpr const bool is_v = false;
+
+template<>
+constexpr const bool is_v<int> = false;
+
+class Foo
+{
+  public: 
+};
+
+
+
+bool operator==(const Foo & left, const bool & right)
+{
+  return false;
+}
+
+
+bool operator==(const bool & right, const Foo & left)
+{
+  return false;
+}
+
+
+
+struct out
+{
+  inline void operator<<(bool)
+  {
+  }
+  
+  // inline constexpr out() noexcept = default;
+};
+
+
+
+static out cout = out();
+
+
+int main()
+{
+  Foo f = {};
+  cout.operator<<((operator==(f, is_v<int>)));
+  cout.operator<<((operator==(is_v<int>, f)));
+}
+
+

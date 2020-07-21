@@ -1,0 +1,27 @@
+
+
+template<typename T>
+constexpr const bool is_v = false;
+
+template<>
+constexpr const bool is_v<void (int)> = false;
+
+struct out
+{
+  inline void operator<<(bool)
+  {
+  }
+  
+  // inline constexpr out() noexcept = default;
+};
+
+
+
+static out cout = out();
+
+
+int main()
+{
+  cout.operator<<(is_v<void (int)>);
+}
+

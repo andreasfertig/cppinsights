@@ -1757,12 +1757,17 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
         if(callee && param1 && param2) {
 
             const std::string replace = [&]() {
-                if(isa<CXXMethodDecl>(callee->getDecl())) {
-                    const std::string tmpl = FormatVarTemplateSpecializationDecl(param1->getDecl(), {});
+                // If the argument is a variable template, add the template arguments to the parameter name.
+                auto nameWithTmplArguments = [](const auto param) {
+                    return FormatVarTemplateSpecializationDecl(param->getDecl(), GetName(*param));
+                };
 
-                    return StrCat(GetName(*param1), tmpl, ".", GetName(*callee), "(", GetName(*param2), ")");
+                if(isa<CXXMethodDecl>(callee->getDecl())) {
+                    return StrCat(
+                        nameWithTmplArguments(param1), ".", GetName(*callee), "(", nameWithTmplArguments(param2), ")");
                 } else {
-                    return StrCat(GetName(*callee), "(", GetName(*param1), ", ", GetName(*param2), ")");
+                    return StrCat(
+                        GetName(*callee), "(", nameWithTmplArguments(param1), ", ", nameWithTmplArguments(param2), ")");
                 }
             }();
 
