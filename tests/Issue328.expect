@@ -1,0 +1,9 @@
+#include <iostream>
+#include <type_traits>
+
+int main()
+{
+  std::operator<<(std::cout.operator<<(std::is_same_v<void (int), void (int)>), '\n');
+  std::operator<<(std::cout.operator<<(std::is_same_v<void (int *), void (const int *)>), '\n');
+}
+
