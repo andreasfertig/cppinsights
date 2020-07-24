@@ -539,10 +539,7 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
     if(hasCompoundStmt) {
         mOutputFormatHelper.AppendNewLine();
     } else {
-        const bool isBodyBraced = isa<CompoundStmt>(body);
-        if(!isBodyBraced) {
-            mOutputFormatHelper.AppendSemiNewLine();
-        }
+        mOutputFormatHelper.AppendSemiNewLine();
     }
 
     mOutputFormatHelper.AppendNewLine();
@@ -1500,7 +1497,8 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
     for(const auto* item : stmt->body()) {
         InsertArg(item);
 
-        if(IsStmtRequieringSemi<IfStmt, ForStmt, DeclStmt, WhileStmt, DoStmt, CXXForRangeStmt, SwitchStmt>(item)) {
+        if(IsStmtRequieringSemi<IfStmt, NullStmt, ForStmt, DeclStmt, WhileStmt, DoStmt, CXXForRangeStmt, SwitchStmt>(
+               item)) {
             mOutputFormatHelper.AppendSemiNewLine();
         }
     }
@@ -1532,17 +1530,21 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
     InsertArg(body);
 
-    const bool isBodyBraced = isa<CompoundStmt>(body);
+    const auto insertSemiIfNeeded = [](OutputFormatHelper& ofm, const auto* inner) {
+        // Add semi-colon if necessary. A do{} while does already add one.
+        if(IsStmtRequieringSemi<IfStmt, CompoundStmt, NullStmt, WhileStmt, DoStmt>(inner)) {
+            ofm.AppendSemiNewLine();
+        }
+    };
 
-    if(!isBodyBraced && !isa<NullStmt>(body)) {
-        mOutputFormatHelper.AppendSemiNewLine();
-    }
+    // Add semi-colon if necessary.
+    insertSemiIfNeeded(mOutputFormatHelper, body);
 
     // else
     if(const auto* elsePart = stmt->getElse()) {
         const std::string cexprElse{stmt->isConstexpr() ? StrCat("/* ", kwConstExprSpace, "*/ ") : ""};
 
-        if(isBodyBraced) {
+        if(isa<CompoundStmt>(body)) {
             mOutputFormatHelper.Append(' ');
         }
 
@@ -1556,9 +1558,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
         InsertArg(elsePart);
 
         // an else with just a single statement seems not to carry a semi-colon at the end
-        if(!needScope && !isa<CompoundStmt>(elsePart)) {
-            mOutputFormatHelper.AppendSemiNewLine();
-        }
+        insertSemiIfNeeded(mOutputFormatHelper, elsePart);
 
         if(needScope) {
             mOutputFormatHelper.CloseScope();
