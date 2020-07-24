@@ -1,0 +1,13 @@
+#define foo(x) do { return (x); } while (0)
+
+int f(int num)
+{
+  if(num > 0) do {
+    return (num);
+  } while(0);
+  
+  else return num * num;
+  
+  
+}
+
