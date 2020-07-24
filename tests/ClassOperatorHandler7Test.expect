@@ -34,7 +34,7 @@ struct A<int *>
     // inline constexpr B() noexcept = default;
   };
   
-  A<int *>::B foo;
+  B foo;
   // inline constexpr A() noexcept = default;
 };
 
@@ -50,7 +50,7 @@ struct A<T *>
     
   };
   
-  A<T *>::B foo;
+  B foo;
 };
 
 

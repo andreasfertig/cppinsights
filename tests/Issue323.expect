@@ -1,0 +1,32 @@
+template<typename... Args> struct count;
+
+/* First instantiated from: Issue323.cpp:14 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct count<double>
+{
+  static const int value = 1 + count<>::value;
+};
+
+#endif
+
+
+template<>
+struct count<>
+{
+  static const int value = 0;
+};
+
+
+
+template<typename T, typename ... Args>
+struct count<T, Args...>
+{
+  static const int value = 1 + count<Args...>::value;
+};
+
+
+
+/* PASSED: static_assert(count<double>::value == 1, "2 elements"); */
+
+

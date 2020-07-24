@@ -244,7 +244,7 @@ template<>
 struct compose<add_pointer>
 {
   using continuation = typename add_pointer::continuation;
-  template<typename C = compose<add_pointer>::continuation>
+  template<typename C = continuation>
   struct to;
   /* First instantiated from: Issue101.cpp:213 */
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -252,7 +252,7 @@ struct compose<add_pointer>
   struct to<identity>
   {
     template<typename ... Ts>
-    using result = to<add_pointer::to<identity> >::result<Ts...>;
+    using result = compose<>::to<add_pointer::to<identity> >::result<Ts...>;
   };
   
   #endif
@@ -262,7 +262,7 @@ struct compose<add_pointer>
   struct to<add_const::to<identity> >
   {
     template<typename ... Ts>
-    using result = to<add_pointer::to<add_const::to<identity> > >::result<Ts...>;
+    using result = compose<>::to<add_pointer::to<add_const::to<identity> > >::result<Ts...>;
   };
   
   #endif
@@ -272,7 +272,7 @@ struct compose<add_pointer>
   struct to<wrap>
   {
     template<typename ... Ts>
-    using result = to<add_pointer::to<wrap> >::result<Ts...>;
+    using result = compose<>::to<add_pointer::to<wrap> >::result<Ts...>;
   };
   
   #endif
@@ -287,7 +287,7 @@ template<>
 struct compose<add_pointer, add_const>
 {
   using continuation = typename add_pointer::continuation;
-  template<typename C = compose<add_pointer, add_const>::continuation>
+  template<typename C = continuation>
   struct to;
   /* First instantiated from: Issue101.cpp:213 */
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -320,7 +320,7 @@ template<>
 struct compose<add_const>
 {
   using continuation = typename add_const::continuation;
-  template<typename C = compose<add_const>::continuation>
+  template<typename C = continuation>
   struct to;
   /* First instantiated from: Issue101.cpp:169 */
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -328,7 +328,7 @@ struct compose<add_const>
   struct to<add_pointer::to<identity> >
   {
     template<typename ... Ts>
-    using result = to<add_const::to<add_pointer::to<identity> > >::result<Ts...>;
+    using result = compose<>::to<add_const::to<add_pointer::to<identity> > >::result<Ts...>;
   };
   
   #endif
@@ -338,7 +338,7 @@ struct compose<add_const>
   struct to<add_pointer::to<wrap> >
   {
     template<typename ... Ts>
-    using result = to<add_const::to<add_pointer::to<wrap> > >::result<Ts...>;
+    using result = compose<>::to<add_const::to<add_pointer::to<wrap> > >::result<Ts...>;
   };
   
   #endif
@@ -353,7 +353,7 @@ template<>
 struct compose<add_const, add_pointer>
 {
   using continuation = typename add_const::continuation;
-  template<typename C = compose<add_const, add_pointer>::continuation>
+  template<typename C = continuation>
   struct to;
   /* First instantiated from: Issue101.cpp:213 */
   #ifdef INSIGHTS_USE_TEMPLATE

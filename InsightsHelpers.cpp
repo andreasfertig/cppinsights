@@ -28,11 +28,12 @@ ScopeHandler::ScopeHandler(const Decl* d)
     if(const auto* recordDecl = dyn_cast_or_null<CXXRecordDecl>(d)) {
         mScope.append(GetName(*recordDecl));
 
-        const bool isClassTemplateSpecialization{isa<ClassTemplatePartialSpecializationDecl>(recordDecl) ||
-                                                 isa<ClassTemplateSpecializationDecl>(recordDecl)};
+        if(const auto* classTmplSpec = dyn_cast_or_null<ClassTemplateSpecializationDecl>(recordDecl)) {
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm};
+            codeGenerator.InsertTemplateArgs(*classTmplSpec);
 
-        if(isClassTemplateSpecialization) {
-            mScope.append("<>");
+            mScope.append(ofm.GetString());
         }
 
     } else if(const auto* namespaceDecl = dyn_cast_or_null<NamespaceDecl>(d)) {
