@@ -70,8 +70,14 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 
             // Adjust the begin location, if this decl has an attribute
             if(funcDecl->hasAttrs()) {
-                // the -3 are a guess that seems to work
-                funcRange.setBegin((*funcDecl->attr_begin())->getLocation().getLocWithOffset(-3));
+                // Find the first attribute with a valid source-location
+                for(const auto& attr : funcDecl->attrs()) {
+                    if(const auto location = attr->getLocation(); location.isValid()) {
+                        // the -3 are a guess that seems to work
+                        funcRange.setBegin(location.getLocWithOffset(-3));
+                        return funcRange;
+                    }
+                }
             }
 
             return funcRange;
