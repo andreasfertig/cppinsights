@@ -1,0 +1,6 @@
+int main()
+{
+  const int x = 20;
+  const int y = 30;
+}
+

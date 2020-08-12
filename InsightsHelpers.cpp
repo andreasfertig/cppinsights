@@ -563,10 +563,6 @@ private:
 
     bool HandleType(const SubstTemplateTypeParmType* type)
     {
-        // At least when coming from a TypedefType there can be a `const` attached to the actual type. To get it do
-        // another round of `AddCVQulifiers` here.
-        AddCVQualifiers(QualType(type, 0).getQualifiers());
-
         return HandleType(type->getReplacementType().getTypePtrOrNull());
     }
 
@@ -820,7 +816,13 @@ public:
     bool GetTypeString()
     {
         if(const SplitQualType splitted{mType.split()}; splitted.Quals.empty()) {
-            AddCVQualifiers(mType.getCanonicalType()->getPointeeType().getLocalQualifiers());
+            const auto& canonicalType = mType.getCanonicalType();
+
+            if(canonicalType->getPointeeType().getLocalFastQualifiers()) {
+                AddCVQualifiers(canonicalType->getPointeeType().getLocalQualifiers());
+            } else if(canonicalType.getLocalFastQualifiers()) {
+                AddCVQualifiers(canonicalType.getLocalQualifiers());
+            }
         } else {
             AddCVQualifiers(splitted.Quals);
         }
