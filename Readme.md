@@ -65,7 +65,7 @@ int main(){
 You can see all the compiler provided functions. Also the downcast from `Derived` to `Base`.
 
 I do not claim to get all the things right. This is just the initial version of insights I consider good enough to hand
-it to the public. Keep also in mind that is solely based on clang and it's understanding of the AST.
+it to the public. Keep also in mind that is solely based on clang and its understanding of the AST.
 
 ## Why
 
