@@ -105,6 +105,14 @@ C++ Insights can be build inside the clang-source tree or outside.
 
 See [Readme_Windows.md](Readme_Windows.md)
 
+### Building on Arch Linux
+
+To build with `extra/clang` use the following extra flags: `-DINSIGHTS_USE_SYSTEM_INCLUDES=off -DCLANG_LINK_CLANG_DYLIB=on -DLLVM_LINK_LLVM_DYLIB=on`
+
+See https://github.com/andreasfertig/cppinsights/issues/186 for an explanation of why `INSIGHTS_USE_SYSTEM_INCLUDES` needs to be turned off.
+
+`extra/clang` and `extra/llvm` provide `/usr/lib/{libclangAST.so,libLLVM*.a,libLLVM.so}`. `libclangAST.so` needs `libLLVM.so` and there would be a conflict if `libLLVM*.a` (instead of `libLLVM.so`) are linked. See https://bugs.archlinux.org/task/60512
+
 ### Building outside clang
 
 You need to have a clang installation in the search path.
