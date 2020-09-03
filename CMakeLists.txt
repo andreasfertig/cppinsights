@@ -8,19 +8,21 @@ include(CMakePrintHelpers)
 
 # TODO: enable those options on Windows once tested
 if(NOT WIN32)
-    option(DEBUG               "Enable debug"              Off)
-    option(INSIGHTS_STRIP      "Strip insight after build" On )
-    option(INSIGHTS_TIDY       "Run clang-tidy"            Off)
-    option(INSIGHTS_IWYU       "Run include-what-you-use"  Off)
-    option(INSIGHTS_COVERAGE   "Enable code coverage"      Off)
-    option(INSIGHTS_USE_LIBCPP "Enable code coverage"      Off)
+    option(DEBUG                        "Enable debug"               Off)
+    option(INSIGHTS_STRIP               "Strip insight after build"  On )
+    option(INSIGHTS_TIDY                "Run clang-tidy"             Off)
+    option(INSIGHTS_IWYU                "Run include-what-you-use"   Off)
+    option(INSIGHTS_COVERAGE            "Enable code coverage"       Off)
+    option(INSIGHTS_USE_LIBCPP          "Enable code coverage"       Off)
+    option(INSIGHTS_USE_SYSTEM_INCLUDES "Elevate to system includes" On )
 else()
-    set(DEBUG               Off)
-    set(INSIGHTS_STRIP      Off)
-    set(INSIGHTS_TIDY       Off)
-    set(INSIGHTS_IWYU       Off)
-    set(INSIGHTS_COVERAGE   Off)
-    set(INSIGHTS_USE_LIBCPP Off)
+    set(DEBUG                         Off)
+    set(INSIGHTS_STRIP                Off)
+    set(INSIGHTS_TIDY                 Off)
+    set(INSIGHTS_IWYU                 Off)
+    set(INSIGHTS_COVERAGE             Off)
+    set(INSIGHTS_USE_LIBCPP           Off)
+    set(INSIGHTS_USE_SYSTEM_INCLUDES  On )
 endif()
 
 option(INSIGHTS_STATIC     "Use static linking"        Off)
@@ -162,13 +164,15 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             "[ \t]*[\r\n]+[ \t]*" ";"
             CONFIG_OUTPUT ${CONFIG_OUTPUT})
 
-        # make all includes system include to prevent the compiler to warn about issues in LLVM/Clang
-        if(NOT WIN32)
-            string(REGEX REPLACE "-I" "-isystem" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
-        else()
-            if(IS_MSVC_CL)
-                # See https://devblogs.microsoft.com/cppblog/broken-warnings-theory/
-                string(REGEX REPLACE "-I" "/external:I" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
+        if(INSIGHTS_USE_SYSTEM_INCLUDES)
+            # make all includes system include to prevent the compiler to warn about issues in LLVM/Clang
+            if(NOT WIN32)
+                string(REGEX REPLACE "-I" "-isystem" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
+            else()
+                if(IS_MSVC_CL)
+                    # See https://devblogs.microsoft.com/cppblog/broken-warnings-theory/
+                    string(REGEX REPLACE "-I" "/external:I" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
+                endif()
             endif()
         endif()
 
@@ -473,13 +477,28 @@ add_clang_tool(insights
     TemplateHandler.cpp
 )
 
-# general include also provided by clang-build
-target_link_libraries(insights
-  PRIVATE
-  clangTooling
-  clangASTMatchers
-  ${ADDITIONAL_LIBS}
-)
+
+if(CLANG_LINK_CLANG_DYLIB)
+    if (NOT LLVM_LINK_LLVM_DYLIB)
+        message(FATAL_ERROR "CLANG_LINK_CLANG_DYLIB and LLVM_LINK_LLVM_DYLIB must have the same value.")
+    endif()
+    target_link_libraries(insights PRIVATE clang-cpp)
+else()
+    # general include also provided by clang-build
+    target_link_libraries(insights
+        PRIVATE
+        clangTooling
+        clangASTMatchers
+        ${ADDITIONAL_LIBS}
+    )
+endif()
+
+if(LLVM_LINK_LLVM_DYLIB)
+    if (NOT CLANG_LINK_CLANG_DYLIB)
+        message(FATAL_ERROR "CLANG_LINK_CLANG_DYLIB and LLVM_LINK_LLVM_DYLIB must have the same value.")
+    endif()
+    target_link_libraries(insights PRIVATE LLVM)
+endif()
 
 if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
   set(RUN_CLANG_TIDY On)
@@ -684,6 +703,7 @@ message(STATUS "Debug                 : ${DEBUG}")
 message(STATUS "Code Coverage         : ${INSIGHTS_COVERAGE}")
 message(STATUS "Static linking        : ${INSIGHTS_STATIC}")
 message(STATUS "Strip executable      : ${INSIGHTS_STRIP}")
+message(STATUS "Elevate includes:     : ${INSIGHTS_USE_SYSTEM_INCLUDES}")
 message(STATUS "clang-tidy            : ${RUN_CLANG_TIDY}")
 message(STATUS "include-what-you-use  : ${RUN_IWYU}")
 message(STATUS "")
