@@ -38,7 +38,7 @@ int main()
     int c;
     public: 
     // inline __lambda_20_16(const __lambda_20_16 &) = delete;
-    __lambda_20_16(Movable && _x, int _c)
+    __lambda_20_16(Movable && _x, int & _c)
     : x{std::move(_x)}
     , c{_c}
     {}
@@ -59,8 +59,8 @@ int main()
     int c;
     
     public:
-    __lambda_24_16(int _c)
-    : c{_c}
+    __lambda_24_16(int && _c)
+    : c{std::move(_c)}
     {}
     
   };

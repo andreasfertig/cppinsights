@@ -56,7 +56,7 @@ class Foo
       Foo __this;
       
       public:
-      __lambda_14_18(Foo _this)
+      __lambda_14_18(const Foo & _this)
       : __this{_this}
       {}
       

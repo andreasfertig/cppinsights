@@ -20,13 +20,13 @@ int main(int argc, const char **)
     std::initializer_list<int> list;
     
     public:
-    __lambda_10_17(std::initializer_list<int> _list)
+    __lambda_10_17(const std::initializer_list<int> & _list)
     : list{_list}
     {}
     
   };
   
-  __lambda_10_17 lamb = __lambda_10_17{std::initializer_list<int>(list)};
+  __lambda_10_17 lamb = __lambda_10_17{list};
   std::initializer_list<int> l = lamb.operator()();
     
   class __lambda_14_18
@@ -43,7 +43,7 @@ int main(int argc, const char **)
     int x;
     
     public:
-    __lambda_14_18(int _i, int _x)
+    __lambda_14_18(int & _i, int & _x)
     : i{_i}
     , x{_x}
     {}

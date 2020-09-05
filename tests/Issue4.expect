@@ -19,7 +19,7 @@ int main()
     char uuu;
     
     public:
-    __lambda_9_11(char _uuu)
+    __lambda_9_11(const char & _uuu)
     : uuu{_uuu}
     {}
     

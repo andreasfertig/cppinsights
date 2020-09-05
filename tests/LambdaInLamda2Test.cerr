@@ -19,13 +19,13 @@
 .tmp.cpp:17:17: note: to match this '('
     __lambda_4_5(    
                 ^
-.tmp.cpp:53:5: error: unknown type name 'S'
-    S _s)
-    ^
-.tmp.cpp:53:9: error: expected ';' at end of declaration list
-    S _s)
-        ^
-        ;
+.tmp.cpp:53:11: error: unknown type name 'S'
+    const S & _s)
+          ^
+.tmp.cpp:53:17: error: expected ';' at end of declaration list
+    const S & _s)
+                ^
+                ;
 .tmp.cpp:59:33: error: use of undeclared identifier '__lambda_5_7'
   __lambda_4_5 l = __lambda_4_5{__lambda_5_7.operator()()};
                                 ^
