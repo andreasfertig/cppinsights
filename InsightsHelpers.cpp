@@ -993,7 +993,13 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
             const std::string insertBefore{isRValueRef ? "&&[" : "&["};
 
             InsertBefore(typeName, insertBefore, "(");
-            InsertAfter(typeName, contains, StrCat(varName, ")"));
+
+            // check whether we are dealing with a function or an array
+            if(Contains(typeName, contains)) {
+                InsertAfter(typeName, contains, StrCat(varName, ")"));
+            } else {
+                InsertAfter(typeName, typeName, StrCat(" ", varName));
+            }
         }
 
     } else if(isFunctionPointer) {
