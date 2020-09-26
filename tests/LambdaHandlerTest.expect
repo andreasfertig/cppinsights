@@ -268,7 +268,7 @@ int main()
     int b;
     
     public:
-    __lambda_46_20(int _foo, int _b)
+    __lambda_46_20(int & _foo, int & _b)
     : foo{_foo}
     , b{_b}
     {}
@@ -291,7 +291,7 @@ int main()
     int b;
     
     public:
-    __lambda_48_20(int _foo, int _b)
+    __lambda_48_20(int & _foo, int & _b)
     : foo{_foo}
     , b{_b}
     {}

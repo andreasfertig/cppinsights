@@ -38,7 +38,7 @@ class __lambda_5_11
   int a;
   
   public:
-  __lambda_5_11(int _a)
+  __lambda_5_11(const int & _a)
   : a{_a}
   {}
   

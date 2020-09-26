@@ -1,0 +1,25 @@
+#include <string>
+
+int main()
+{
+  const std::string str = std::basic_string<char>{"Hello World"};
+    
+  class __lambda_5_12
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    private: 
+    const std::basic_string<char> str;
+    public: 
+    __lambda_5_12(const const std::basic_string<char> & _str)
+    : str{_str}
+    {}
+    
+  };
+  
+  __lambda_5_12 foo = __lambda_5_12{str};
+}
+

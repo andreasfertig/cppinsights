@@ -2712,8 +2712,13 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 }
 
                 std::string refRef{};
+                std::string addConst{};
+                bool        byConstRef{false};
 
                 const auto& fieldName{StrCat(isThis ? "__" : "", name)};
+                const auto& fieldDeclType{fd->getType()};
+
+                std::string fname = StrCat("_", name);
 
                 // Special handling for lambdas with init captures which contain a move. In such a case, copy the
                 // initial move statement and make the variable a &&.
@@ -2729,27 +2734,61 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     }
 
                     refRef = "&& ";
+                    fname  = ofm.GetString();
 
-                    ctorInitializerList.push_back(StrCat(fieldName, "{", ofm.GetString(), "}"));
-                } else {
+                    // If it is not an object, check for other conditions why we take the variable by const &/&& in the
+                    // ctor
+                } else if(not fieldDeclType->isReferenceType() && not fieldDeclType->isAnyPointerType() &&
+                          not fieldDeclType->isUndeducedAutoType()) {
+                    byConstRef                      = true;
+                    refRef                          = "& ";
+                    const auto* exprWithoutImpCasts = expr->IgnoreParenImpCasts();
 
-                    ctorInitializerList.push_back(StrCat(fieldName, "{", "_", name, "}"));
+                    // treat a move of a primitive type
+                    if(exprWithoutImpCasts->isXValue()) {
+                        refRef     = "&& ";
+                        byConstRef = false;
+
+                        OutputFormatHelper             ofm{};
+                        LambdaInitCaptureCodeGenerator codeGenerator{ofm, mLambdaStack, name};
+                        codeGenerator.InsertArg(expr);
+
+                        fname = ofm.GetString();
+
+                    } else if(exprWithoutImpCasts
+                                  ->isRValue()  // If we are looking at an rvalue (temporary) we need a const ref
+                              || exprWithoutImpCasts->getType().isConstQualified()  // If the captured variable is const
+                                                                                    // we can take it only by const ref
+
+                    ) {
+                        addConst = "const ";
+                    }
                 }
+
+                ctorInitializerList.push_back(StrCat(fieldName, "{", fname, "}"));
 
                 if(not isThis && expr) {
                     OutputFormatHelper ofm{};
                     CodeGenerator      codeGenerator{ofm, mLambdaStack};
-                    codeGenerator.InsertArg(expr);
+
+                    if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(expr);
+                       ctorExpr && byConstRef && (1 == ctorExpr->getNumArgs())) {
+                        codeGenerator.InsertArg(ctorExpr->getArg(0));
+
+                    } else {
+                        codeGenerator.InsertArg(expr);
+                    }
+
                     ctorArguments.append(ofm.GetString());
                 } else {
-                    if(isThis && not fd->getType()->isPointerType()) {
+                    if(isThis && not fieldDeclType->isPointerType()) {
                         ctorArguments.append("*");
                     }
 
                     ctorArguments.append(name);
                 }
 
-                mOutputFormatHelper.Append(GetTypeNameAsParameter(fd->getType(), StrCat(refRef, "_", name)));
+                mOutputFormatHelper.Append(addConst, GetTypeNameAsParameter(fieldDeclType, StrCat(refRef, "_", name)));
             };
 
         llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
@@ -2815,7 +2854,6 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         } else {
             mLambdaStack.back().inits().append(ctorArguments);
         }
-
     } else {
         mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
     }

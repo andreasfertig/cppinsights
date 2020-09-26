@@ -50,7 +50,7 @@ int main()
       
     } __lambda_5_7{};
     
-    S _s)
+    const S & _s)
     : s{_s}
     {}
     

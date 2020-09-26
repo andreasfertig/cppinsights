@@ -14,11 +14,11 @@ void func(const std::basic_string<char> & arg)
     private: 
     const std::basic_string<char> arg;
     public: 
-    __lambda_5_11(const std::basic_string<char> _arg)
+    __lambda_5_11(const const std::basic_string<char> & _arg)
     : arg{_arg}
     {}
     
-  } __lambda_5_11{std::basic_string<char>(arg)};
+  } __lambda_5_11{arg};
   
   unsigned long s = __lambda_5_11.operator()();
 }
