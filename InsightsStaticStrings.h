@@ -59,4 +59,8 @@ static constexpr const char kwSpaceConstExpr[] = BUILD_WITH_SPACE_BEFORE(KW_CONS
 static constexpr const char kwSpaceVolatile[]  = BUILD_WITH_SPACE_BEFORE(KW_VOLATILE);
 //-----------------------------------------------------------------------------
 
+static constexpr const char memberVariablePointerPrefix[] = "MemberVarPtr_";
+static constexpr const char functionPointerPrefix[]       = "FuncPtr_";
+//-----------------------------------------------------------------------------
+
 #endif /* INSIGHTS_STATIC_STRINGS_H */

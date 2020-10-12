@@ -809,10 +809,12 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         if(InsertVarDecl()) {
             mOutputFormatHelper.Append(GetQualifiers(*stmt));
 
-            if(const auto type = GetDesugarType(stmt->getType());
-               type->isFunctionPointerType() || isa<MemberPointerType>(type.getTypePtrOrNull())) {
-                const auto        lineNo = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
-                const std::string funcPtrName{StrCat("FuncPtr_", lineNo, " ")};
+            const auto type = GetDesugarType(stmt->getType());
+            const bool isMemberPointer{isa<MemberPointerType>(type.getTypePtrOrNull())};
+            if(type->isFunctionPointerType() || isMemberPointer) {
+                const auto        lineNo    = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
+                const auto        ptrPrefix = isMemberPointer ? memberVariablePointerPrefix : functionPointerPrefix;
+                const std::string funcPtrName{StrCat(ptrPrefix, lineNo, " ")};
 
                 mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
                 mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
