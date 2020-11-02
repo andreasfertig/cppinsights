@@ -331,7 +331,11 @@ const std::string EvaluateAsFloat(const FloatingLiteral& expr)
         str.append(".0");
     }
 
-    return std::string(str.str());
+#if IS_CLANG_NEWER_THAN(10)
+    return std::string{str.str()};
+#else
+    return str.str();
+#endif
 }
 //-----------------------------------------------------------------------------
 
