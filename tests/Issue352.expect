@@ -1,0 +1,20 @@
+struct Foo
+{
+  int a[5];
+  float b[];
+  // inline constexpr Foo(const Foo &) noexcept = default;
+};
+
+
+
+int main()
+{
+  Foo foo = {{10, 0, 0, 0, 0}, {}};
+  Foo __foo9 = Foo(foo);
+  int (&a1)[5] = __foo9.a;
+  float (&b1)[] = __foo9.b;
+  const Foo & __foo10 = foo;
+  int const (&a2)[5] = __foo10.a;
+  float const (&b2)[] = __foo10.b;
+}
+

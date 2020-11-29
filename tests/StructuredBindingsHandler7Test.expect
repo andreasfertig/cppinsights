@@ -8,8 +8,8 @@ int main()
     inline /*constexpr */ void operator()() const
     {
       char (&__buffer5)[2] = buffer;
-      char& a = __buffer5[0];
-      char& b = __buffer5[1];
+      char & a = __buffer5[0];
+      char & b = __buffer5[1];
     }
     
     private: 
