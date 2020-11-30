@@ -11,8 +11,8 @@ int main()
   
   SP sp = {1, 2};
   SP __sp12 = SP(sp);
-  int& sx = __sp12.x;
-  int& sy = __sp12.y;
+  int & sx = __sp12.x;
+  int & sy = __sp12.y;
   class CP
   {
     
@@ -24,15 +24,15 @@ int main()
   
   CP cp = {1, 2};
   CP __cp23 = CP(cp);
-  int& c1 = __cp23.x;
-  int& c2 = __cp23.y;
+  int & c1 = __cp23.x;
+  int & c2 = __cp23.y;
   printf("c1: %d c2: %d\n", cp.x, cp.y);
   ++c1;
   ++c2;
   printf("c1: %d c2: %d\n", cp.x, cp.y);
   CP & __cp30 = cp;
-  int& c3 = __cp30.x;
-  int& c4 = __cp30.y;
+  int & c3 = __cp30.x;
+  int & c4 = __cp30.y;
   printf("c3: %d c4: %d\n", cp.x, cp.y);
   ++c3;
   ++c4;

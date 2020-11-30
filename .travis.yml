@@ -129,13 +129,13 @@ jobs:
     - docker pull andreasfertig/cppinsights-builder
     env: COMPILER='g++-10' LLVM_CONFIG=/usr/bin/llvm-config-10  COVERAGE='Yes' STATIC='No' DEBUG='No' TIDY='No' USE_DOCKER='Yes' USE_LIBCPP='Yes'
 
-  - os: windows
-    name: "Clang 10 / LLVM 10 @ Windows"
-    env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='No' TIDY='No' CFORMAT='No' SHACMD='sha256deep64' MSVC_TOOLCHAIN='LLVM_v142'
+    #  - os: windows
+    #    name: "Clang 10 / LLVM 10 @ Windows"
+    #    env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='No' TIDY='No' CFORMAT='No' SHACMD='sha256deep64' MSVC_TOOLCHAIN='LLVM_v142'
 
-  - os: windows
-    name: "MSVC / LLVM 10 @ Windows Release"
-    env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' CFORMAT='No' SHACMD='sha256deep64' MSVC_TOOLCHAIN='host=x64'
+#  - os: windows
+#    name: "MSVC / LLVM 10 @ Windows Release"
+#    env: COMPILER='clang++-10' LLVM_CONFIG='clang-windows/llvm+clang-10.0.0-win64-msvc-release/bin/llvm-config.exe' LLVM_VERSION='10.0.0' COVERAGE='No' STATIC='Yes' DEBUG='No' UPLOAD='Yes' TIDY='No' CFORMAT='No' SHACMD='sha256deep64' MSVC_TOOLCHAIN='host=x64'
 
   - stage: "Deploy Docker"
     install: npm install github-release-notes -g

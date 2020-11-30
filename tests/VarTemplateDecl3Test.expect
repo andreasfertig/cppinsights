@@ -64,8 +64,8 @@ int main()
 {
   int x = 1;
   X<int> __DoIt30 = DoIt(x);
-  int& a = __DoIt30.x;
-  int& b = __DoIt30.y;
+  int & a = __DoIt30.x;
+  int & b = __DoIt30.y;
   return circular_area(x);
 }
 

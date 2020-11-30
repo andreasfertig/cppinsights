@@ -3648,23 +3648,24 @@ void StructuredBindingsCodeGenerator::InsertDecompositionBindings(const Decompos
                 return dyn_cast_or_null<MemberExpr>(binding);
             }();
 
-            const std::string refOrRefRef = [&]() -> std::string {
+            const auto bindingDeclType = [&] {
+                auto type = bindingDecl->getType();
+
                 const bool isRefToObject{IsReference(decompositionDeclStmt)};
                 const bool isArrayBinding{isa<ArraySubscriptExpr>(binding) && isRefToObject};
                 const bool isNotTemporary{holdingVarOrMemberExpr && !isa<ExprWithCleanups>(holdingVarOrMemberExpr)};
                 const bool isTypeAlreadyCarryingRef{
-                    bindingDecl->getType()
-                        ->isLValueReferenceType()};  // In case of a lambda that captures variables
+                    type->isLValueReferenceType()};  // In case of a lambda that captures variables
                                                      // and is expanded as a structured binding (#181), the
                                                      // type of GetName below already carries the "&".
                 if((isArrayBinding || isNotTemporary) && not isTypeAlreadyCarryingRef) {
-                    return "&";
+                    type = decompositionDeclStmt.getASTContext().getLValueReferenceType(type);
                 }
 
-                return {};
+                return type;
             }();
 
-            mOutputFormatHelper.Append(GetName(bindingDecl->getType()), refOrRefRef, " ", GetName(*bindingDecl), " = ");
+            mOutputFormatHelper.Append(GetTypeNameAsParameter(bindingDeclType, GetName(*bindingDecl)), " = ");
 
             // tuple decomposition
             if(holdingVarOrMemberExpr) {
