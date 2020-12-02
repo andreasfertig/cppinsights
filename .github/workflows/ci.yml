@@ -1,0 +1,598 @@
+name: ci
+on:
+  push:
+    branches-ignore:
+      - 'continuous'
+
+  pull_request:
+    branches-ignore:
+      - 'continuous'
+
+  repository_dispatch:
+    types: [rebuild_trigger]
+
+env:
+  CMAKE_VERSION: 3.16.2
+  NINJA_VERSION: 1.10.0
+  LLVM_VERSION: 10.0.0
+
+jobs:
+  checks:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        # Clang 10
+        - {
+            name: "Linux Clang 10 - Format check",
+            os: ubuntu-latest,
+            build_type: Release,
+            cformat_name: 'clang-format-10'
+          }
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Install Clang 10
+      shell: bash
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 10
+        sudo apt-get install clang-format-10
+
+    - name: clang-format check
+      id: clang_format_check
+      shell: bash
+      run: |
+        ${GITHUB_WORKSPACE}/scripts/github-clang-format-check.sh ${{ matrix.config.cformat_name }} ${{ github.event_name }} ${{ github.event.before }}
+
+#------------------------------------------------------------------------------
+# BUILD macOS and Windows
+#------------------------------------------------------------------------------
+  build:
+    needs: checks
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        # AppleClang
+        - {
+            name: "Clang 10 / LLVM 10 @ macOS Release",
+            os: macos-latest,
+            build_type: Release,
+            cxx: "clang++",
+            llvm_version: "10.0.0",
+            llvm_config: "llvm-config",
+            coverage: "No",
+            static: "No",
+            debug: "No",
+            tidy: "No",
+            run_tests: "Yes",
+            bin_name: "insights",
+            archive_name: "insights-macos",
+            upload: "Yes",
+          }
+
+        # AppleClang
+        - {
+            name: "Clang 10 / LLVM 10 @ macOS Debug",
+            os: macos-latest,
+            build_type: Release,
+            cxx: "clang++",
+            llvm_version: "10.0.0",
+            llvm_config: "llvm-config",
+            coverage: "No",
+            static: "No",
+            debug: "Yes",
+            tidy: "No",
+            run_tests: "Yes",
+            bin_name: "insights",
+            archive_name: "insights-macos",
+            upload: "No",
+          }
+
+        # MSVC 2019
+        - {
+            name: "MSVC 2019 / LLVM 10 @ Windows Release",
+            os: windows-latest,
+            build_type: Release,
+            cxx: "cl",
+            llvm_version: "10.0.0",
+            llvm_config: "current/bin/llvm-config.exe",
+            static: "Yes",
+            debug: "No",
+            tidy: "No",
+            run_tests: "No",
+            bin_name: "insights.exe",
+            archive_name: "insights-windows",
+            upload: "Yes",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            #            cmake_args: "-A x64 -T LLVM_v142",
+          }
+
+        # MSVC 2019
+        - {
+            name: "MSVC 2019 / LLVM 10 @ Windows Debug",
+            os: windows-latest,
+            build_type: Release,
+            cxx: "cl",
+            llvm_version: "10.0.0",
+            llvm_config: "current/bin/llvm-config.exe",
+            static: "Yes",
+            debug: "Yes",
+            tidy: "No",
+            run_tests: "Yes",
+            bin_name: "insights.exe",
+            archive_name: "insights-windows",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+          }
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+        path: cppinsights
+
+    - name: Download Ninja and CMake
+      id: cmake_and_ninja_setup
+      shell: cmake -P {0}
+      run: |
+        set(cmake_version $ENV{CMAKE_VERSION})
+        set(ninja_version $ENV{NINJA_VERSION})
+
+        message(STATUS "Using host CMake version: ${CMAKE_VERSION}")
+
+        if ("${{ runner.os }}" STREQUAL "Windows")
+          set(ninja_suffix "win.zip")
+          set(cmake_suffix "win64-x64.zip")
+          set(cmake_base_dir "cmake-${cmake_version}-win64-x64")
+          set(cmake_dir "${cmake_base_dir}/bin")
+        elseif ("${{ runner.os }}" STREQUAL "Linux")
+          set(ninja_suffix "linux.zip")
+          set(cmake_suffix "Linux-x86_64.tar.gz")
+          set(cmake_base_dir "cmake-${cmake_version}-Linux-x86_64")
+          set(cmake_dir "${cmake_base_dir}/bin")
+        elseif ("${{ runner.os }}" STREQUAL "macOS")
+          set(ninja_suffix "mac.zip")
+          set(cmake_suffix "Darwin-x86_64.tar.gz")
+          set(cmake_base_dir "cmake-${cmake_version}-Darwin-x86_64")
+          set(cmake_dir "${cmake_base_dir}/CMake.app/Contents/bin")
+        endif()
+
+        set(ninja_url "https://github.com/ninja-build/ninja/releases/download/v${ninja_version}/ninja-${ninja_suffix}")
+        message("::set-output name=ninja_url::${ninja_url}")
+
+        set(cmake_url "https://github.com/Kitware/CMake/releases/download/v${cmake_version}/cmake-${cmake_version}-${cmake_suffix}")
+        message("::set-output name=cmake_url::${cmake_url}")
+
+        # preserve it for the next steps
+        message("::set-output name=cmake_dir::${cmake_dir}")
+
+        # preserve it for the next steps
+        message("::set-output name=cmake_base_dir::${cmake_base_dir}")
+
+    - name: Cache Ninja and CMake
+      id: cache-ninja-and-cmake
+      uses: actions/cache@v2
+      with:
+        path: |
+            ${{ github.workspace }}/ninja*
+            ${{ github.workspace }}/current
+            ${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}
+        key: ${{ runner.os }}-ninja-cmake-${{ hashFiles('${{ github.workspace }}/ninja') }}-${{ hashFiles('${{ github.workspace }}/current') }}-${{ hashFiles('${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}') }}
+        restore-keys: |
+            ${{ runner.os }}-ninja-cmake
+
+    - name: Download Ninja and CMake
+      id: cmake_and_ninja
+      if: steps.cache-ninja-and-cmake.outputs.cache-hit != 'true'
+      shell: cmake -P {0}
+      run: |
+        set(ninja_url "${{ steps.cmake_and_ninja_setup.outputs.ninja_url }}")
+        file(DOWNLOAD "${ninja_url}" ./ninja.zip SHOW_PROGRESS)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./ninja.zip)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./ninja.zip)
+
+        set(cmake_url "${{ steps.cmake_and_ninja_setup.outputs.cmake_url }}")
+        file(DOWNLOAD "${cmake_url}" ./cmake.zip SHOW_PROGRESS)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./cmake.zip)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./cmake.zip)
+
+        set(cmake_dir "${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}")
+        file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/${cmake_dir}" cmake_dir)
+
+        if (NOT "${{ runner.os }}" STREQUAL "Windows")
+          execute_process(
+            COMMAND chmod +x ninja
+            COMMAND chmod +x ${cmake_dir}/cmake
+          )
+        endif()
+
+    - name: Install Clang 10
+      id: install_clang_10
+      if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-ninja-and-cmake.outputs.cache-hit != 'true'"
+      shell: cmake -P {0}
+      run: |
+        set(llvm_version ${{ matrix.config.llvm_version }})
+        set(path_separator ":")
+        set(archive_name "clang+llvm-${llvm_version}-x86_64-apple-darwin")
+        if ("${{ runner.os }}" STREQUAL "Windows")
+            set(archive_name "llvm+clang-${llvm_version}-win64-msvc-release")
+            set(path_separator ";")
+        endif()
+
+        file(DOWNLOAD "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${llvm_version}/${archive_name}.tar.xz" ./llvm.tar.xz)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./llvm.tar.xz)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm.tar.xz)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E rename "./${archive_name}" "./current")
+
+    - name: Set Clang 10 Path
+      id: set_clang_10_path
+      if: "startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')"
+      shell: cmake -P {0}
+      run: |
+        set(path_separator ":")
+        if ("${{ runner.os }}" STREQUAL "Windows")
+            set(path_separator ";")
+        endif()
+
+        file(WRITE "$ENV{GITHUB_PATH}"  "$ENV{GITHUB_WORKSPACE}/current/bin${path_separator}$ENV{PATH}")
+
+    - name: Install LLVM build tools
+      id: install_llvm_build_tools
+      if: "startsWith(matrix.config.os, 'Window') && contains(matrix.config.cmake_args, 'LLVM_v')"
+      shell: cmake -P {0}
+      run: |
+        file(DOWNLOAD "https://github.com/zufuliu/llvm-utils/releases/download/v19.05/LLVM_VS2017.zip" ./llvm-utils.zip)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./llvm-utils.zip)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm-utils.zip)
+        execute_process(COMMAND $ENV{GITHUB_WORKSPACE}/LLVM_VS2017/install.bat)
+
+    - name: Setup MSVC Dev
+      if: "startsWith(matrix.config.os, 'Windows')"
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Configure
+      id: cmake_configure
+      shell: cmake -P {0}
+      run: |
+        set(ENV{CXX} ${{ matrix.config.cxx }})
+        set(generator "Ninja")
+
+        set(path_separator ":")
+        if ("${{ runner.os }}" STREQUAL "Windows")
+          set(path_separator ";")
+        endif()
+        file(WRITE "$ENV{GITHUB_PATH}"  "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
+
+        if ("x${{ matrix.config.libcxx }}" STREQUAL "xtrue")
+          set(cxx_flags "${cxx_flags} -stdlib=libc++ -Wno-unused-command-line-argument")
+          set(link_flags "${link_flags} -lc++abi")
+        endif()
+
+        execute_process(
+          COMMAND ${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}/cmake
+            -S cppinsights
+            -B build
+            -G ${generator}
+            -D INSIGHTS_LLVM_CONFIG=${{ matrix.config.llvm_config}}
+            -D INSIGHTS_COVERAGE=${{ matrix.config.coverage }}
+            -D INSIGHTS_STATIC=${{ matrix.config.static }}
+            -D DEBUG=${{ matrix.config.debug }}
+            -D INSIGHTS_TIDY=${{ matrix.config.tidy }}
+            -D CMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+            -D "CMAKE_MAKE_PROGRAM:STRING=$ENV{GITHUB_WORKSPACE}/ninja"
+            #            -D "CMAKE_CXX_FLAGS:STRING=${cxx_flags}"
+            #            -D "CMAKE_EXE_LINKER_FLAGS:STRING=${link_flags}"
+            ${{ matrix.config.cmake_args }}
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit from cmake configure status")
+        endif()
+
+    - name: Build
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+        execute_process(
+          COMMAND ${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}/cmake --build build
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status")
+        endif()
+
+    - name: Run tests
+      id: run_tests
+      if: matrix.config.run_tests == 'Yes'
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        if (NOT "${{ runner.os }}" STREQUAL "Windows")
+          set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include")
+        endif()
+
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+        execute_process(
+          COMMAND ${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}/cmake --build build --target tests
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status during tests")
+        endif()
+
+    - name: Create archive
+      if:  matrix.config.upload == 'Yes'
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}")
+        file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
+        file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
+
+    - uses: actions/upload-artifact@v2
+      if:  matrix.config.upload == 'Yes'
+      with:
+        name: insights-artifact-${{ matrix.config.os }}
+        if-no-files-found: error
+        path: |
+            ${{ github.workspace }}/build/archive/*
+
+
+#------------------------------------------------------------------------------
+# BUILD INSIDE DOCKER
+#------------------------------------------------------------------------------
+  docker:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.config.name }}
+    container:
+      image: andreasfertig/cppinsights-builder
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        # GCC 10 / LLVM 10
+        - {
+            name: "GCC 10 / LLVM 10 @ Ubuntu Release @docker",
+            build_type: Release,
+            cxx: "g++-10",
+            llvm_version: "10.0.0",
+            llvm_config: "/usr/bin/llvm-config-10",
+            coverage: "No",
+            static: "Yes",
+            debug: "No",
+            tidy: "No",
+            run_tests: "No",
+            libcxx: "No",
+            bin_name: "insights",
+            archive_name: "insights-ubuntu-14.04",
+            upload: "Yes",
+          }
+
+        # GCC 10 / LLVM 10
+        - {
+            name: "GCC 10 / LLVM 10 @ Ubuntu Code Coverage @docker",
+            build_type: Release,
+            cxx: "g++-10",
+            llvm_version: "10.0.0",
+            llvm_config: "/usr/bin/llvm-config-10",
+            coverage: "Yes",
+            static: "No",
+            debug: "No",
+            tidy: "No",
+            run_tests: "No",
+            libcxx: "No",
+            bin_name: "insights",
+            archive_name: "insights-ubuntu-14.04",
+          }
+
+        # GCC 10 / LLVM 10
+        - {
+            name: "GCC 10 / LLVM 10 @ Ubuntu Code Coverage & Debug @docker",
+            build_type: Release,
+            cxx: "g++-10",
+            llvm_version: "10.0.0",
+            llvm_config: "/usr/bin/llvm-config-10",
+            coverage: "Yes",
+            static: "No",
+            debug: "Yes",
+            tidy: "No",
+            run_tests: "No",
+            libcxx: "No",
+            bin_name: "insights",
+            archive_name: "insights-ubuntu-14.04",
+          }
+
+        # GCC 10 / LLVM 10
+        - {
+            name: "GCC 10 / LLVM 10 @ Ubuntu Code Coverage (libc++) @docker",
+            build_type: Release,
+            cxx: "g++-10",
+            llvm_version: "10.0.0",
+            llvm_config: "/usr/bin/llvm-config-10",
+            coverage: "Yes",
+            static: "No",
+            debug: "Yes",
+            tidy: "No",
+            run_tests: "No",
+            libcxx: "Yes",
+            bin_name: "insights",
+            archive_name: "insights-ubuntu-14.04",
+          }
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: cppinsights
+
+    - name: Configure
+      id: cmake_configure
+      run: |
+          export CXX=${{ matrix.config.cxx }}
+          mkdir build
+          cd build
+          cmake -G Ninja -DINSIGHTS_STATIC=${{ matrix.config.static }} -DDEBUG=${{ matrix.config.debug }} -DINSIGHTS_COVERAGE=${{ matrix.config.coverage }} -DINSIGHTS_USE_LIBCPP=${{ matrix.config.libcxx }} ../cppinsights
+
+    - name: Build
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+        execute_process(
+          COMMAND cmake --build build
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status")
+        endif()
+
+    - name: Run tests
+      if:  matrix.config.run_tests == 'Yes'
+      id: run_tests
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+        execute_process(
+          COMMAND cmake --build build --target tests
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status during tests")
+        endif()
+
+    - name: Run coverage
+      if:  matrix.config.coverage == 'Yes'
+      id: run_coverage
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+        execute_process(
+          COMMAND cmake --build build --target coverage
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status during coverage")
+        endif()
+
+    - name: Run coverage upload
+      if:  matrix.config.coverage == 'Yes'
+      id: run_coverage_upload
+      continue-on-error: false
+      shell: bash
+      run: |
+        if [ ! -f ${GITHUB_WORKSPACE}/build/filtered.info ]; then
+            echo -e "\033[1;31mlcov did not create filtered.info!\033[0m"
+            exit 1;
+        fi
+        if [ ! -s ${GITHUB_WORKSPACE}/build/filtered.info ]; then
+            echo -e "\033[1;31mlcov did create an empty filtered.info!\033[0m"
+            exit 1;
+        fi
+
+        # Uploading report to CodeCov
+        bash <(curl -s https://codecov.io/bash) -f ${GITHUB_WORKSPACE}/build/filtered.info || echo "Codecov did not collect coverage reports"
+
+    - name: Create archive
+      if:  matrix.config.upload == 'Yes'
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}")
+        file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
+        file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
+
+    - uses: actions/upload-artifact@v2
+      if:  matrix.config.upload == 'Yes'
+      with:
+        name: insights-artifact-ubuntu
+        if-no-files-found: error
+        path: |
+            ${{ github.workspace }}/build/archive/*
+
+
+#------------------------------------------------------------------------------
+# DEPLOY
+#------------------------------------------------------------------------------
+  deploy:
+    needs: [build, docker]
+    if: github.ref == 'refs/heads/master'
+    name: Final Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: cppinsights
+        fetch-depth: 0
+
+    - name: Install node
+      uses: actions/setup-node@v1
+
+    - name: Install gren
+      id: install_gren
+      shell: bash
+      run: |
+        npm install github-release-notes -g
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+      with:
+          path: ~/binaries
+
+    - uses: dev-drprasad/delete-tag-and-release@v0.1.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        delete_release: true
+        tag_name: continuous
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GREN_GITHUB_TOKEN }}
+      with:
+        tag_name: continuous
+        release_name: continuous
+        draft: false
+        prerelease: true
+
+    - name: Upload binaries to GH
+      uses: svenstaro/upload-release-action@v2
+      with:
+        file: '/home/runner/binaries/insights-artifact-*/insights-*'
+        repo_token: ${{ secrets.GREN_GITHUB_TOKEN }}
+        tag: continuous
+        overwrite: true
+        file_glob: true
+
+    - name: Create release notes
+      id: create_release_notes
+      env:
+        GREN_GITHUB_TOKEN: ${{ secrets.GREN_GITHUB_TOKEN }}
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/cppinsights
+        gren release --override --username=andreasfertig --repo=cppinsights -t `git tag --sort=-creatordate | grep -v continuous | head -n 1 `..continuous -c .github/grenrc.json  -P
+
+    - name: Notify listeners
+      run: |
+          curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GH_TRIGGER }}" https://api.github.com/repos/andreasfertig/cppinsights-container/dispatches -d '{"event_type":"rebuild_trigger"}' &> /dev/null
