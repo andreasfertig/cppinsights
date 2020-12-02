@@ -335,10 +335,11 @@ jobs:
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
       shell: cmake -P {0}
+      working-directory: ${{ github.workspace }}/build
       continue-on-error: false
       run: |
         file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "${{ matrix.config.bin_name }}")
         file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
         file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
 
@@ -511,11 +512,12 @@ jobs:
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
+      working-directory: ${{ github.workspace }}/build
       shell: cmake -P {0}
       continue-on-error: false
       run: |
         file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "${{ matrix.config.bin_name }}")
         file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
         file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
 
