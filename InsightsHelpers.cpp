@@ -331,7 +331,7 @@ const std::string EvaluateAsFloat(const FloatingLiteral& expr)
         str.append(".0");
     }
 
-    return str.str();
+    return std::string(str.str());
 }
 //-----------------------------------------------------------------------------
 
