@@ -663,13 +663,13 @@ if(INSIGHTS_COVERAGE)
             message(STATUS "Found grcov: ${GRCOV_BIN}. Target coverage enabled.")
 
             add_custom_target(coverage
-                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm  --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t lcov -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm --ignore "${CMAKE_CURRENT_BINARY_DIR}/../current/*"  --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t lcov -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
                 COMMENT "Running code coverage analysis" VERBATIM
             )
 
             add_custom_target(coverage-html
-                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t html -o ${CMAKE_CURRENT_BINARY_DIR}/out
+                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm --ignore "${CMAKE_CURRENT_BINARY_DIR}/../current/*" --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t html -o ${CMAKE_CURRENT_BINARY_DIR}/out
                 COMMENT "Generating code coverage HTML" VERBATIM
             )
         endif()
@@ -696,7 +696,7 @@ if(INSIGHTS_COVERAGE)
 
             add_custom_target(coverage
                 COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir ${GCOV_TOOL} --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
-                COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*" "/Users/runner/work/cppinsights/cppinsights/current/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
                 COMMENT "Running code coverage analysis" VERBATIM
             )
