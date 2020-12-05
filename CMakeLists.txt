@@ -12,7 +12,6 @@ if(NOT WIN32)
     option(INSIGHTS_STRIP               "Strip insight after build"  On )
     option(INSIGHTS_TIDY                "Run clang-tidy"             Off)
     option(INSIGHTS_IWYU                "Run include-what-you-use"   Off)
-    option(INSIGHTS_COVERAGE            "Enable code coverage"       Off)
     option(INSIGHTS_USE_LIBCPP          "Enable code coverage"       Off)
     option(INSIGHTS_USE_SYSTEM_INCLUDES "Elevate to system includes" On )
 else()
@@ -20,11 +19,11 @@ else()
     set(INSIGHTS_STRIP                Off)
     set(INSIGHTS_TIDY                 Off)
     set(INSIGHTS_IWYU                 Off)
-    set(INSIGHTS_COVERAGE             Off)
     set(INSIGHTS_USE_LIBCPP           Off)
     set(INSIGHTS_USE_SYSTEM_INCLUDES  On )
 endif()
 
+option(INSIGHTS_COVERAGE   "Enable code coverage"      Off)
 option(INSIGHTS_STATIC     "Use static linking"        Off)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
@@ -139,26 +138,26 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -static")
         endif()
     endif()
-    
+
     # This function saves the output of the llvm-config command with the given
     # switch to the variable named VARNAME.
     #
     # Example usage: llvm_config(LLVM_CXXFLAGS "--cxxflags")
     function(llvm_config VARNAME switch)
         set(CONFIG_COMMAND "${LLVM_CONFIG_PATH}" "${switch}")
-        
+
         execute_process(
             COMMAND ${CONFIG_COMMAND} ${LIB_TYPE}
             RESULT_VARIABLE HAD_ERROR
             OUTPUT_VARIABLE CONFIG_OUTPUT
         )
-        
+
         if (HAD_ERROR)
             string(REPLACE ";" " " CONFIG_COMMAND_STR "${CONFIG_COMMAND}")
             message(STATUS "${CONFIG_COMMAND_STR}")
             message(FATAL_ERROR "llvm-config failed with status ${HAD_ERROR}")
         endif()
-        
+
         # replace linebreaks with semicolon
         string(REGEX REPLACE
             "[ \t]*[\r\n]+[ \t]*" ";"
@@ -194,14 +193,14 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
 
         # make result available outside
         set(${VARNAME} ${CONFIG_OUTPUT} PARENT_SCOPE)
-        
+
         # Optionally output the configured value
         message(STATUS "llvm_config(${VARNAME})=>${CONFIG_OUTPUT}")
-        
+
         # cleanup
         unset(CONFIG_COMMAND)
     endfunction(llvm_config)
-    
+
     llvm_config(LLVM_CXXFLAGS "--cxxflags")
     llvm_config(LLVM_LDFLAGS "--ldflags")
 
@@ -257,7 +256,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         add_definitions(-Wold-style-cast)
         add_definitions(-Werror)
     endif ()
-    
+
     if(IS_GNU AND NOT INSIGHTS_TIDY)
         add_definitions(-Wsuggest-override)
         #        add_definitions(-Wsuggest-final-types)
@@ -290,7 +289,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             endif()
         endforeach()
     endif()
-    
+
     if(IS_MSVC_CL)
         #add_definitions(/Wall)
         #add_definitions(/WX)     # Warnings as errors
@@ -304,7 +303,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         add_definitions(/wd4626 /wd5027 /wd4623 /wd4625 /wd5026) # implicitly deleted operators
         add_definitions(/wd4061) # enumerator 'clang::CK_BitCast' in switch of enum 'clang::CastKind' is not explicitly handled by a case label
         #add_definitions(/err)
-        
+
         # To support /external:I:
         # - enables "system headers" and
         # - sets warning level 0 for them
@@ -326,16 +325,23 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     if(INSIGHTS_COVERAGE)
         message(STATUS "Code coveraging enabled")
         if(IS_GNU)
-            set(GCC_COVERAGE_LINK_FLAGS    "-lgcov") 
+            set(COVERAGE_LINK_FLAGS    "-lgcov")
         endif()
 
-        add_definitions(-g) 
-        add_definitions(-O0) 
-        add_definitions(--coverage) 
-        add_definitions(-fprofile-arcs)
-        add_definitions(-ftest-coverage)
+	if(WIN32)
+            add_definitions(-fprofile-instr-generate)
+            set(COVERAGE_LINK_FLAGS "${COVERAGE_LINK_FLAGS} ${LLVM_LIBDIR}/clang/${LLVM_PACKAGE_VERSION_PLAIN}/lib/windows/clang_rt.profile-x86_64.lib /FORCE:MULTIPLE")
+	else()
+            add_definitions(-g)
+            add_definitions(-O0)
+#	    add_definitions(-fprofile-arcs)
+            add_definitions(-ftest-coverage)
+            set(COVERAGE_LINK_FLAGS "${COVERAGE_LINK_FLAGS} --coverage")
+	endif()
 
-        set( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS} --coverage" )
+        add_definitions(--coverage)
+
+        set( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${COVERAGE_LINK_FLAGS}")
     endif()
 
     # copied from: llvm/tools/clang/cmake/modules/AddClang.cmake
@@ -363,7 +369,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
 
 
 elseif(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder
-    message(FATAL_ERROR "Neither in LLVM directory nor BUILD_INSIGHTS_OUTSIDE_LLVM is set")    
+    message(FATAL_ERROR "Neither in LLVM directory nor BUILD_INSIGHTS_OUTSIDE_LLVM is set")
 elseif(NOT DEFINED LLVM_PACKAGE_VERSION)
     # clang seems not to set this variable. Do it ourselves, IF it is not already defined
     set(LLVM_PACKAGE_VERSION "${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}.${LLVM_VERSION_PATCH}")
@@ -407,7 +413,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     OUTPUT_VARIABLE GIT_REPO_URL
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-  
+
 else()
   set(GIT_REPO_URL "")
   set(GIT_COMMIT_HASH "")
@@ -428,7 +434,7 @@ include_directories(${CMAKE_BINARY_DIR}/generated)
 
 
 # http://www.mariobadr.com/using-clang-tidy-with-cmake-36.html
-find_program( 
+find_program(
   CLANG_TIDY_EXE
   NAMES "clang-tidy"
   DOC "Path to clang-tidy executable"
@@ -457,7 +463,7 @@ if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 
     if(IS_CLANG)
-        add_definitions(-Qunused-arguments)        
+        add_definitions(-Qunused-arguments)
     endif()
 endif()
 
@@ -520,7 +526,7 @@ install( TARGETS insights RUNTIME DESTINATION bin )
 if (NOT WIN32)
     # Not ready for Windows yet
     #
-    
+
     # additional includes we need when building outside the llvm-folder
     if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         if(INSIGHTS_STRIP)
@@ -569,7 +575,7 @@ if(INSIGHTS_USE_LIBCPP)
 endif()
 
 # Look for Python3, only relevant for target tests. As linux currently ships cmake 3.11.4 we need to workaround
-if(${CMAKE_VERSION} VERSION_LESS "3.12.0") 
+if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
     set(Python3_EXECUTABLE "/usr/bin/python")
     set(Python3_FOUND "Yes")
 else()
@@ -633,16 +639,50 @@ if (NOT WIN32)
         COMMENT "Open shell in docker" VERBATIM
     )
 
-    # code coverage
-    if(INSIGHTS_COVERAGE)
+    if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
+        add_custom_command(TARGET insights
+            POST_BUILD
+            COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clang-tidy-check.sh ${CMAKE_CURRENT_BINARY_DIR}/output.txt ${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy-ignore
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Analyzing clang-tidy output..."
+        )
+    endif()
+
+    add_subdirectory(docs)
+endif()
+
+
+# code coverage
+if(INSIGHTS_COVERAGE)
+    if(WIN32)
+        find_program(GRCOV_BIN grcov REQUIRED)
+
+        if(NOT GRCOV_BIN)
+            message(FATAL_ERROR "grcov not found")
+        else()
+            message(STATUS "Found grcov: ${GRCOV_BIN}. Target coverage enabled.")
+
+            add_custom_target(coverage
+                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm  --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t lcov -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+                COMMENT "Running code coverage analysis" VERBATIM
+            )
+
+            add_custom_target(coverage-html
+                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t html -o ${CMAKE_CURRENT_BINARY_DIR}/out
+                COMMENT "Generating code coverage HTML" VERBATIM
+            )
+        endif()
+    else()
         find_program(LCOV_BIN lcov)
         find_program(GENHTML_BIN genhtml)
         find_package_handle_standard_args(lcov
             REQUIRED_VARS LCOV_BIN GENHTML_BIN
         )
-        
+
+
         if (NOT LCOV_FOUND)
-            message(WARNING "Lcov not found")
+            message(FATAL_ERROR "Lcov not found")
         else()
             message(STATUS "Target coverage available")
 
@@ -666,28 +706,19 @@ if (NOT WIN32)
                 COMMENT "Generating code coverage HTML" VERBATIM
             )
 
-            add_dependencies(coverage tests)
-            add_dependencies(coverage-html coverage)
-
         endif()
     endif()
 
-    if(CLANG_TIDY_EXE AND INSIGHTS_TIDY)
-        add_custom_command(TARGET insights
-            POST_BUILD
-            COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clang-tidy-check.sh ${CMAKE_CURRENT_BINARY_DIR}/output.txt ${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy-ignore
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            COMMENT "Analyzing clang-tidy output..."
-        )
-    endif()
+    add_dependencies(coverage tests)
+    add_dependencies(coverage-html coverage)
 
-    add_subdirectory(docs)
 endif()
 
 message(STATUS "")
 message(STATUS "[ Build summary ]")
 message(STATUS "CMAKE_GENERATOR       : ${CMAKE_GENERATOR}")
 message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
+message(STATUS "CMAKE_LINKER          : ${CMAKE_LINKER}")
 message(STATUS "Compiler ID           : ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Compiler version      : ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "Compiler path         : ${CMAKE_CXX_COMPILER}")

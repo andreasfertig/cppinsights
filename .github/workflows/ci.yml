@@ -92,13 +92,31 @@ jobs:
             static: "No",
             debug: "Yes",
             tidy: "No",
-            run_tests: "Yes",
+            run_tests: "No",  # done by the coverage build
             bin_name: "insights",
             archive_name: "insights-macos",
             upload: "No",
           }
 
-        # MSVC 2019
+        # AppleClang
+        - {
+            name: "Clang 10 / LLVM 10 @ macOS Coveage & Debug",
+            os: macos-latest,
+            build_type: Release,
+            cxx: "clang++",
+            llvm_version: "10.0.0",
+            llvm_config: "llvm-config",
+            coverage: "Yes",
+            static: "No",
+            debug: "Yes",
+            tidy: "No",
+            run_tests: "No",
+            bin_name: "insights",
+            archive_name: "insights-macos",
+            upload: "No",
+          }
+
+          # MSVC 2019
         - {
             name: "MSVC 2019 / LLVM 10 @ Windows Release",
             os: windows-latest,
@@ -128,9 +146,29 @@ jobs:
             static: "Yes",
             debug: "Yes",
             tidy: "No",
-            run_tests: "Yes",
+            run_tests: "No",  # done by the coverage build
             bin_name: "insights.exe",
             archive_name: "insights-windows",
+            upload: "No",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+          }
+
+        # MSVC 2019
+        - {
+            name: "MSVC 2019 / LLVM 10 @ Windows Code Coverage & Debug",
+            os: windows-latest,
+            build_type: Release,
+            cxx: "clang-cl.exe",
+            llvm_version: "10.0.0",
+            llvm_config: "current/bin/llvm-config.exe",
+            coverage: "Yes",
+            static: "Yes",
+            debug: "Yes",
+            tidy: "No",
+            run_tests: "No",
+            bin_name: "insights.exe",
+            archive_name: "insights-windows",
+            upload: "No",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
           }
 
@@ -185,10 +223,11 @@ jobs:
         path: |
             ${{ github.workspace }}/ninja*
             ${{ github.workspace }}/current
+            ${{ github.workspace }}/grcov.exe
             ${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}
-        key: ${{ runner.os }}-ninja-cmake-${{ hashFiles('${{ github.workspace }}/ninja') }}-${{ hashFiles('${{ github.workspace }}/current') }}-${{ hashFiles('${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}') }}
+        key: ${{ runner.os }}-ninja-cmake-${{ hashFiles('${{ github.workspace }}/ninja.exe') }}-${{ hashFiles('${{ github.workspace }}/current') }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}-${{ hashFiles('${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}') }}
         restore-keys: |
-            ${{ runner.os }}-ninja-cmake
+            ${{ runner.os }}-ninja-cmake-grcov
 
     - name: Download Ninja and CMake
       id: cmake_and_ninja
@@ -196,12 +235,12 @@ jobs:
       shell: cmake -P {0}
       run: |
         set(ninja_url "${{ steps.cmake_and_ninja_setup.outputs.ninja_url }}")
-        file(DOWNLOAD "${ninja_url}" ./ninja.zip SHOW_PROGRESS)
+        file(DOWNLOAD "${ninja_url}" ./ninja.zip)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./ninja.zip)
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./ninja.zip)
 
         set(cmake_url "${{ steps.cmake_and_ninja_setup.outputs.cmake_url }}")
-        file(DOWNLOAD "${cmake_url}" ./cmake.zip SHOW_PROGRESS)
+        file(DOWNLOAD "${cmake_url}" ./cmake.zip)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./cmake.zip)
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./cmake.zip)
 
@@ -255,6 +294,28 @@ jobs:
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm-utils.zip)
         execute_process(COMMAND $ENV{GITHUB_WORKSPACE}/LLVM_VS2017/install.bat)
 
+    - name: Install LLVM compiler-rt and grcov
+      #      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && (steps.cache-ninja-and-cmake.outputs.cache-hit != 'true'))"
+      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes'))"
+      shell: cmake -P {0}
+      run: |
+        set(llvm_version ${{ matrix.config.llvm_version }})
+        file(DOWNLOAD "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${llvm_version}/clang-compiler-rt-win64-${llvm_version}.zip" ./compiler-rt.zip)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./compiler-rt.zip)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./compiler-rt.zip)
+        file(COPY lib DESTINATION "$ENV{GITHUB_WORKSPACE}/current/lib/clang/${llvm_version}/")
+
+        file(DOWNLOAD "https://github.com/mozilla/grcov/releases/download/v0.5.15/grcov-win-x86_64.tar.bz2" ./grcov.tar.bz2)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./grcov.tar.bz2)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./grcov.tar.bz2)
+
+    - name: Install lcov for macOS
+      if: "(startsWith(matrix.config.os, 'macos') && (matrix.config.coverage == 'Yes'))"
+      run: |
+        export HOMEBREW_NO_AUTO_UPDATE=1
+        brew update > /dev/null
+        brew install lcov || brew upgrade lcov
+
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
       uses: ilammy/msvc-dev-cmd@v1
@@ -264,13 +325,13 @@ jobs:
       shell: cmake -P {0}
       run: |
         set(ENV{CXX} ${{ matrix.config.cxx }})
-        set(generator "Ninja")
 
         set(path_separator ":")
         if ("${{ runner.os }}" STREQUAL "Windows")
           set(path_separator ";")
         endif()
         file(WRITE "$ENV{GITHUB_PATH}"  "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
+        set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
 
         if ("x${{ matrix.config.libcxx }}" STREQUAL "xtrue")
           set(cxx_flags "${cxx_flags} -stdlib=libc++ -Wno-unused-command-line-argument")
@@ -281,7 +342,7 @@ jobs:
           COMMAND ${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}/cmake
             -S cppinsights
             -B build
-            -G ${generator}
+            -G "Ninja"
             -D INSIGHTS_LLVM_CONFIG=${{ matrix.config.llvm_config}}
             -D INSIGHTS_COVERAGE=${{ matrix.config.coverage }}
             -D INSIGHTS_STATIC=${{ matrix.config.static }}
@@ -332,6 +393,33 @@ jobs:
           message(FATAL_ERROR "Bad exit status during tests")
         endif()
 
+    - name: Run coverage
+      if:  matrix.config.coverage == 'Yes'
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        if (NOT "${{ runner.os }}" STREQUAL "Windows")
+          set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include")
+        endif()
+
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+        execute_process(
+          COMMAND cmake --build build --target coverage
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status during coverage")
+        endif()
+
+    - name: Upload code coverage info
+      if:  matrix.config.coverage == 'Yes'
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+        flags: ${{ matrix.config.archive_name }}
+        fail_ci_if_error: true
+
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
       shell: cmake -P {0}
@@ -380,23 +468,6 @@ jobs:
             bin_name: "insights",
             archive_name: "insights-ubuntu-14.04",
             upload: "Yes",
-          }
-
-        # GCC 10 / LLVM 10
-        - {
-            name: "GCC 10 / LLVM 10 @ Ubuntu Code Coverage @docker",
-            build_type: Release,
-            cxx: "g++-10",
-            llvm_version: "10.0.0",
-            llvm_config: "/usr/bin/llvm-config-10",
-            coverage: "Yes",
-            static: "No",
-            debug: "No",
-            tidy: "No",
-            run_tests: "No",
-            libcxx: "No",
-            bin_name: "insights",
-            archive_name: "insights-ubuntu-14.04",
           }
 
         # GCC 10 / LLVM 10
@@ -508,7 +579,7 @@ jobs:
         fi
 
         # Uploading report to CodeCov
-        bash <(curl -s https://codecov.io/bash) -f ${GITHUB_WORKSPACE}/build/filtered.info || echo "Codecov did not collect coverage reports"
+        bash <(curl -s https://codecov.io/bash) -f ${GITHUB_WORKSPACE}/build/filtered.info -F ubuntu || echo "Codecov did not collect coverage reports"
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
