@@ -1205,6 +1205,10 @@ void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXUnresolvedConstructExpr* stmt)
 {
+    const auto  noEmptyInitList = mNoEmptyInitList;
+    FinalAction _{[&] { mNoEmptyInitList = noEmptyInitList; }};
+    mNoEmptyInitList = NoEmptyInitList::Yes;
+
     InsertConstructorExpr(stmt);
 }
 //-----------------------------------------------------------------------------
