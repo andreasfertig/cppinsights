@@ -127,7 +127,7 @@ jobs:
             static: "Yes",
             debug: "No",
             tidy: "No",
-            run_tests: "No",
+            run_tests: "Yes",
             bin_name: "insights.exe",
             archive_name: "insights-windows",
             upload: "Yes",
