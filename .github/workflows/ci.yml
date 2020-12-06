@@ -468,6 +468,7 @@ jobs:
             bin_name: "insights",
             archive_name: "insights-ubuntu-14.04",
             upload: "Yes",
+            docs: "Yes",
           }
 
         # GCC 10 / LLVM 10
@@ -547,6 +548,25 @@ jobs:
           message(FATAL_ERROR "Bad exit status during tests")
         endif()
 
+    - name: Make docs
+      if:  matrix.config.docs == 'Yes'
+      shell: cmake -P {0}
+      continue-on-error: false
+      run: |
+        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+        execute_process(
+          COMMAND cmake --build build --target doc
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status during doc")
+        endif()
+
+        file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive/")
+        file(COPY "$ENV{GITHUB_WORKSPACE}/build/html" DESTINATION "$ENV{GITHUB_WORKSPACE}/build/archive/")
+
+
     - name: Run coverage
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage
@@ -599,7 +619,6 @@ jobs:
         if-no-files-found: error
         path: |
             ${{ github.workspace }}/build/archive/*
-
 
 #------------------------------------------------------------------------------
 # DEPLOY
@@ -656,6 +675,35 @@ jobs:
         tag: continuous
         overwrite: true
         file_glob: true
+
+    - name: Upload docs to gh-pages
+      env:
+        GH_TOKEN: ${{ secrets.GREN_GITHUB_TOKEN }}
+      run: |
+        echo "Creating and changing into ${GITHUB_WORKSPACE}/gh-pages"
+        mkdir ${GITHUB_WORKSPACE}/gh-pages
+        cd ${GITHUB_WORKSPACE}/gh-pages
+
+        echo "Cloning gh-pages repo"
+        /usr/bin/git clone https://andreasfertig:${GH_TOKEN}@github.com/andreasfertig/andreasfertig.github.io.git .
+
+        echo "Setting up git config"
+        /usr/bin/git config user.name andreasfertig
+        /usr/bin/git config user.email andy@cppinsights.io
+
+        echo "Rsyncing files to gh-pages"
+        /usr/bin/rsync -q -av --checksum --progress ~/binaries/insights-artifact-ubuntu/html/. ${GITHUB_WORKSPACE}/gh-pages --delete --exclude CNAME --exclude .ssh --exclude .git --exclude .github
+
+        /usr/bin/git status --porcelain
+
+        echo "Adding all files"
+        /usr/bin/git add --all .
+
+        echo "Committing"
+        /usr/bin/git commit -m "Deploying to master from master @ ${GITHUB_SHA}" --quiet --no-verify
+
+        echo "Pushing"
+        /usr/bin/git push --force
 
     - name: Create release notes
       id: create_release_notes
