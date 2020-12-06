@@ -2717,12 +2717,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     ctorArguments.append(", ");
                 }
 
-                std::string refRef{};
-                std::string addConst{};
-                bool        byConstRef{false};
+                bool byConstRef{false};
 
                 const auto& fieldName{StrCat(isThis ? "__" : "", name)};
-                const auto& fieldDeclType{fd->getType()};
+                auto        fieldDeclType{fd->getType()};
 
                 std::string fname = StrCat("_", name);
 
@@ -2739,20 +2737,19 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                                    [&](const auto& arg) { codeGenerator.InsertArg(arg); });
                     }
 
-                    refRef = "&& ";
-                    fname  = ofm.GetString();
+                    fieldDeclType = stmt->getASTContext().getRValueReferenceType(fieldDeclType);
+
+                    fname = ofm.GetString();
 
                     // If it is not an object, check for other conditions why we take the variable by const &/&& in the
                     // ctor
                 } else if(not fieldDeclType->isReferenceType() && not fieldDeclType->isAnyPointerType() &&
                           not fieldDeclType->isUndeducedAutoType()) {
                     byConstRef                      = true;
-                    refRef                          = "& ";
                     const auto* exprWithoutImpCasts = expr->IgnoreParenImpCasts();
 
                     // treat a move of a primitive type
                     if(exprWithoutImpCasts->isXValue()) {
-                        refRef     = "&& ";
                         byConstRef = false;
 
                         OutputFormatHelper             ofm{};
@@ -2767,7 +2764,16 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                                                                                     // we can take it only by const ref
 
                     ) {
-                        addConst = "const ";
+                        // this must go before adding the L or R-value reference, otherwise we get T& const instead of
+                        // const T&
+                        fieldDeclType.addConst();
+                    }
+
+                    if(exprWithoutImpCasts->isXValue()) {
+                        fieldDeclType = stmt->getASTContext().getRValueReferenceType(fieldDeclType);
+
+                    } else {
+                        fieldDeclType = stmt->getASTContext().getLValueReferenceType(fieldDeclType);
                     }
                 }
 
@@ -2794,7 +2800,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     ctorArguments.append(name);
                 }
 
-                mOutputFormatHelper.Append(addConst, GetTypeNameAsParameter(fieldDeclType, StrCat(refRef, "_", name)));
+                mOutputFormatHelper.Append(GetTypeNameAsParameter(fieldDeclType, StrCat("_", name)));
             };
 
         llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};

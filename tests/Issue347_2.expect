@@ -14,7 +14,7 @@ int main()
     private: 
     const std::basic_string<char> str;
     public: 
-    __lambda_5_12(const const std::basic_string<char> & _str)
+    __lambda_5_12(const std::basic_string<char> & _str)
     : str{_str}
     {}
     

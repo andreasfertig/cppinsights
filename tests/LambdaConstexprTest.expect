@@ -14,7 +14,7 @@ void Test()
     const int Size;
     
     public:
-    __lambda_4_18(const const int & _Size)
+    __lambda_4_18(const int & _Size)
     : Size{_Size}
     {}
     
