@@ -3,7 +3,7 @@ struct demonstrator
   template<typename return_type = double>
   inline return_type templated_function()
   {
-    return return_type{{}};
+    return return_type{};
   }
   
   /* First instantiated from: Issue254.cpp:10 */
