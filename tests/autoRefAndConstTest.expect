@@ -1,5 +1,5 @@
 #include <new> // for thread-safe static's placement new
-#include <cstdint> // for uint64_t under Linux/GCC
+#include <stdint.h> // for uint64_t under Linux/GCC
 #include <vector>
 
 const std::vector<int, std::allocator<int> > & getTheData()
