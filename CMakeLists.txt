@@ -13,18 +13,17 @@ if(NOT WIN32)
     option(INSIGHTS_TIDY                "Run clang-tidy"             Off)
     option(INSIGHTS_IWYU                "Run include-what-you-use"   Off)
     option(INSIGHTS_USE_LIBCPP          "Enable code coverage"       Off)
-    option(INSIGHTS_USE_SYSTEM_INCLUDES "Elevate to system includes" On )
 else()
     set(DEBUG                         Off)
     set(INSIGHTS_STRIP                Off)
     set(INSIGHTS_TIDY                 Off)
     set(INSIGHTS_IWYU                 Off)
     set(INSIGHTS_USE_LIBCPP           Off)
-    set(INSIGHTS_USE_SYSTEM_INCLUDES  On )
 endif()
 
-option(INSIGHTS_COVERAGE   "Enable code coverage"      Off)
-option(INSIGHTS_STATIC     "Use static linking"        Off)
+option(INSIGHTS_USE_SYSTEM_INCLUDES "Elevate to system includes" On )
+option(INSIGHTS_COVERAGE            "Enable code coverage"       Off)
+option(INSIGHTS_STATIC              "Use static linking"         Off)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
@@ -662,8 +661,12 @@ if(INSIGHTS_COVERAGE)
         else()
             message(STATUS "Found grcov: ${GRCOV_BIN}. Target coverage enabled.")
 
+            llvm_config(LLVM_BIN_DIR "--bindir")
+            get_filename_component(CLANG_ABS_DIR "../" ABSOLUTE BASE_DIR "${LLVM_BIN_DIR}")
+            message(STATUS "${CLANG_ABS_DIR}")
+
             add_custom_target(coverage
-                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm --ignore "${CMAKE_CURRENT_BINARY_DIR}/../current/*"  --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t lcov -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                COMMAND ${GRCOV_BIN} -s ${CMAKE_CURRENT_SOURCE_DIR} --llvm --ignore "C:\\Program*" --ignore "${CLANG_ABS_DIR}/*" --ignore-not-existing ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir -t lcov -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
                 COMMENT "Running code coverage analysis" VERBATIM
             )
@@ -696,7 +699,7 @@ if(INSIGHTS_COVERAGE)
 
             add_custom_target(coverage
                 COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir ${GCOV_TOOL} --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
-                COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*" "/Users/runner/work/cppinsights/cppinsights/current/*"  -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*" "/Users/runner/work/cppinsights/cppinsights/current/*" "./current/*" "./build/*" "./cmake*/*" "${CMAKE_CURRENT_BINARY_DIR}" "./cppinsights/docs/*" "./cppinsights/tests/*" -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
                 COMMENT "Running code coverage analysis" VERBATIM
             )
