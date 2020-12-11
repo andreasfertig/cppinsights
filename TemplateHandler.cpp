@@ -112,9 +112,21 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
             return;
         }
 
+        // Figure out whether we are looking at a CXXDeductionGuideDecl. If so, ensure that the deduction guide comes
+        // after the primary template declaration.
+        const Decl* endLocDecl = functionDecl;
+        if(const auto* deductionGuide = dyn_cast_or_null<CXXDeductionGuideDecl>(functionDecl)) {
+            const auto* deducedTemplate = deductionGuide->getDeducedTemplate();
+
+            // deduction guide must follow after the template declaration
+            if(deducedTemplate->getEndLoc() > deductionGuide->getEndLoc()) {
+                endLocDecl = deducedTemplate;
+            }
+        }
+
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(functionDecl);
         const auto         endOfCond          = FindLocationAfterRBrace(
-            GetEndLoc(functionDecl),
+            GetEndLoc(endLocDecl),
             result,
             isa<CXXDeductionGuideDecl>(
                 functionDecl));  // if we lift the "not getBody()" restriction above we need to take this in account

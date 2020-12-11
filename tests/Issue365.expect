@@ -1,0 +1,39 @@
+template<long Len = 128, long BlockSize = 128, class T = wchar_t>
+class String {
+public:
+  bool Format(const wchar_t FormatStr[], ...) { return true; }
+};
+
+/* First instantiated from: Issue365.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class String<128, 128, wchar_t>
+{
+  
+  public: 
+  inline bool Format(const wchar_t * FormatStr, ...)
+  {
+    return true;
+  }
+  
+  // inline constexpr String() noexcept = default;
+};
+
+#endif
+
+
+
+/* First instantiated from: Issue365.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+String -> String<128, 128, wchar_t>;
+#endif
+
+void FTest()
+{
+  double d = {};
+  String<128, 128, wchar_t> s = String<128, 128, wchar_t>();
+  s.Format(L"%i", d);
+}
+
+
