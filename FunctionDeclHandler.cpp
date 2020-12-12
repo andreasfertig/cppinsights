@@ -73,8 +73,13 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
                 // Find the first attribute with a valid source-location
                 for(const auto& attr : funcDecl->attrs()) {
                     if(const auto location = attr->getLocation(); location.isValid()) {
-                        // the -3 are a guess that seems to work
-                        funcRange.setBegin(location.getLocWithOffset(-3));
+
+                        // only use the begin location of the attribute, if it is before the one of the function decl.
+                        if(funcRange.getBegin() > location) {
+                            // the -3 are a guess that seems to work
+                            funcRange.setBegin(location.getLocWithOffset(-3));
+                        }
+
                         return funcRange;
                     }
                 }
