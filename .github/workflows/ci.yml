@@ -587,6 +587,8 @@ jobs:
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage_upload
       continue-on-error: false
+      env:
+        LIBCXX: ${{ matrix.config.libcxx }}
       shell: bash
       run: |
         if [ ! -f ${GITHUB_WORKSPACE}/build/filtered.info ]; then
@@ -598,8 +600,13 @@ jobs:
             exit 1;
         fi
 
+        flag="ubuntu"
+        if [ "Yes" == "${LIBCXX}" ]; then
+          flag="ubuntu-libcxx"
+        fi
+
         # Uploading report to CodeCov
-        bash <(curl -s https://codecov.io/bash) -f ${GITHUB_WORKSPACE}/build/filtered.info -F ubuntu || echo "Codecov did not collect coverage reports"
+        bash <(curl -s https://codecov.io/bash) -f ${GITHUB_WORKSPACE}/build/filtered.info -F ${flag} || echo "Codecov did not collect coverage reports"
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
