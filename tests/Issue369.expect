@@ -1,0 +1,37 @@
+#include <new> // for thread-safe static's placement new
+#include <stdint.h> // for uint64_t under Linux/GCC
+struct foo
+{
+  foo();
+  
+};
+
+
+
+const foo & create()
+{
+  static uint64_t __valueGuard;
+  alignas(const foo) static char __value[sizeof(const foo)];
+  
+  if( ! __valueGuard )
+  {
+    if( __cxa_guard_acquire(&__valueGuard) )
+    {
+      try
+      {
+        new (&__value) foo();
+        __valueGuard = true;
+      }
+      catch(...)
+      {
+        __cxa_guard_abort(&__valueGuard);
+        throw;
+      }
+      
+      __cxa_guard_release(&__valueGuard);
+    }
+  }
+  return *reinterpret_cast<const foo*>(__value);
+}
+
+

@@ -3233,13 +3233,23 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
         mOutputFormatHelper.OpenScope();
     }
 
-    // try to find out whether this ctor can throw. If, then additional code needs to be generated for exception
-    // handling.
+    // try to find out whether this ctor or the CallExpr can throw. If, then additional code needs to be generated for
+    // exception handling.
     const bool canThrow{[&] {
-        if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(stmt->getInit())) {
-            const auto* ctor = ctorExpr->getConstructor();
-            if(const auto* func = ctor->getType()->castAs<FunctionProtoType>()) {
-                return CT_Cannot != func->canThrow();
+        const ValueDecl* decl = [&]() -> const ValueDecl* {
+            const auto* init = stmt->getInit()->IgnoreCasts();
+            if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(init)) {
+                return ctorExpr->getConstructor();
+            } else if(const auto* callExpr = dyn_cast_or_null<CallExpr>(init)) {
+                return callExpr->getDirectCallee();
+            }
+
+            return nullptr;
+        }();
+
+        if(decl) {
+            if(const auto* func = decl->getType()->castAs<FunctionProtoType>()) {
+                return not func->isNothrow();
             }
         }
 
@@ -3253,7 +3263,22 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
 
     mOutputFormatHelper.Append("new (&", internalVarName, ") ");
     // VarDecl of a static expression always have an initializer
-    InsertArg(stmt->getInit());
+
+    const auto* init = stmt->getInit();
+    const bool  isCallExpr{not isa<CXXConstructExpr>(init->IgnoreCasts())};
+
+    if(isCallExpr) {
+        // we have a function call
+
+        // Tests show that the compiler does better than std::move
+        mOutputFormatHelper.Append(typeName, "(std::move(");
+    }
+
+    InsertArg(init);
+
+    if(isCallExpr) {
+        mOutputFormatHelper.Append("))");
+    }
 
     mOutputFormatHelper.AppendNewLine(';');
     mOutputFormatHelper.AppendNewLine(compilerBoolVarName, " = true;");
