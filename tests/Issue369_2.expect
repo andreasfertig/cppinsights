@@ -1,0 +1,212 @@
+#include <new> // for thread-safe static's placement new
+#include <stdint.h> // for uint64_t under Linux/GCC
+struct foo
+{
+  foo();
+  
+};
+
+
+
+const void withNoexcept()
+{
+      
+  class __lambda_4_23
+  {
+    public: 
+    inline foo operator()() const noexcept
+    {
+      return foo();
+    }
+    
+    using retType_4_23 = foo (*)() noexcept;
+    inline /*constexpr */ operator retType_4_23 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline foo __invoke() noexcept
+    {
+      return foo();
+    }
+    
+    
+  } __lambda_4_23{};
+  
+  static uint64_t __valueGuard;
+  alignas(foo) static char __value[sizeof(foo)];
+  
+  if( ! __valueGuard )
+  {
+    if( __cxa_guard_acquire(&__valueGuard) )
+    {
+      new (&__value) foo(std::move(__lambda_4_23.operator()()));
+      __valueGuard = true;
+      __cxa_guard_release(&__valueGuard);
+    }
+  }
+}
+
+
+const void withNoexceptFalse()
+{
+      
+  class __lambda_8_23
+  {
+    public: 
+    inline foo operator()() const noexcept(false)
+    {
+      return foo();
+    }
+    
+    using retType_8_23 = foo (*)() noexcept(false);
+    inline /*constexpr */ operator retType_8_23 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline foo __invoke() noexcept(false)
+    {
+      return foo();
+    }
+    
+    
+  } __lambda_8_23{};
+  
+  static uint64_t __valueGuard;
+  alignas(foo) static char __value[sizeof(foo)];
+  
+  if( ! __valueGuard )
+  {
+    if( __cxa_guard_acquire(&__valueGuard) )
+    {
+      try
+      {
+        new (&__value) foo(std::move(__lambda_8_23.operator()()));
+        __valueGuard = true;
+      }
+      catch(...)
+      {
+        __cxa_guard_abort(&__valueGuard);
+        throw;
+      }
+      
+      __cxa_guard_release(&__valueGuard);
+    }
+  }
+}
+
+
+const void withNoexceptTrue()
+{
+      
+  class __lambda_12_23
+  {
+    public: 
+    inline foo operator()() const noexcept(true)
+    {
+      return foo();
+    }
+    
+    using retType_12_23 = foo (*)() noexcept(true);
+    inline /*constexpr */ operator retType_12_23 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline foo __invoke() noexcept(true)
+    {
+      return foo();
+    }
+    
+    
+  } __lambda_12_23{};
+  
+  static uint64_t __valueGuard;
+  alignas(foo) static char __value[sizeof(foo)];
+  
+  if( ! __valueGuard )
+  {
+    if( __cxa_guard_acquire(&__valueGuard) )
+    {
+      new (&__value) foo(std::move(__lambda_12_23.operator()()));
+      __valueGuard = true;
+      __cxa_guard_release(&__valueGuard);
+    }
+  }
+}
+
+
+
+struct buh
+{
+};
+
+
+
+const void withNoexceptNoexceptCtor()
+{
+      
+  class __lambda_19_23
+  {
+    public: 
+    inline /*constexpr */ buh operator()() const
+    {
+      return buh();
+    }
+    
+    using retType_19_23 = buh (*)();
+    inline /*constexpr */ operator retType_19_23 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline buh __invoke()
+    {
+      return buh();
+    }
+    
+    
+  } __lambda_19_23{};
+  
+  static buh value = __lambda_19_23.operator()();
+}
+
+
+
+foo func()
+{
+  return foo{};
+}
+
+
+
+void viaFunction()
+{
+  static uint64_t __fGuard;
+  alignas(foo) static char __f[sizeof(foo)];
+  
+  if( ! __fGuard )
+  {
+    if( __cxa_guard_acquire(&__fGuard) )
+    {
+      try
+      {
+        new (&__f) foo(std::move(func()));
+        __fGuard = true;
+      }
+      catch(...)
+      {
+        __cxa_guard_abort(&__fGuard);
+        throw;
+      }
+      
+      __cxa_guard_release(&__fGuard);
+    }
+  }
+}
+

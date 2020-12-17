@@ -1,0 +1,61 @@
+#include <new> // for thread-safe static's placement new
+#include <stdint.h> // for uint64_t under Linux/GCC
+struct foo
+{
+  foo();
+  
+};
+
+
+
+const foo & create()
+{
+      
+  class __lambda_4_23
+  {
+    public: 
+    inline foo operator()() const
+    {
+      return foo();
+    }
+    
+    using retType_4_23 = foo (*)();
+    inline /*constexpr */ operator retType_4_23 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline foo __invoke()
+    {
+      return foo();
+    }
+    
+    
+  } __lambda_4_23{};
+  
+  static uint64_t __valueGuard;
+  alignas(foo) static char __value[sizeof(foo)];
+  
+  if( ! __valueGuard )
+  {
+    if( __cxa_guard_acquire(&__valueGuard) )
+    {
+      try
+      {
+        new (&__value) foo(std::move(__lambda_4_23.operator()()));
+        __valueGuard = true;
+      }
+      catch(...)
+      {
+        __cxa_guard_abort(&__valueGuard);
+        throw;
+      }
+      
+      __cxa_guard_release(&__valueGuard);
+    }
+  }
+  return *reinterpret_cast<foo*>(__value);
+}
+
+
