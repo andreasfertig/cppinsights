@@ -1065,9 +1065,31 @@ static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 }
 //-----------------------------------------------------------------------------
 
+APValue* GetEvaluatedValue(const VarDecl& varDecl)
+{
+    if((nullptr != varDecl.ensureEvaluatedStmt()) && (nullptr != varDecl.ensureEvaluatedStmt()->Value)) {
+
+        const auto* init = cast<Expr>(varDecl.ensureEvaluatedStmt()->Value);
+        if(!init->isValueDependent()) {
+
+            return varDecl.evaluateValue();
+        }
+    }
+
+    return nullptr;
+}
+//-----------------------------------------------------------------------------
+
+bool IsEvaluatable(const VarDecl& varDecl)
+{
+    return (nullptr != GetEvaluatedValue(varDecl));
+}
+//-----------------------------------------------------------------------------
+
 bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl)
 {
-    if(varDecl.isStaticLocal()) {
+    // Should the VarDecl be evaluatable at compile-time, there is no additional guard added by the compiler.
+    if(varDecl.isStaticLocal() && not IsEvaluatable(varDecl)) {
         if(const auto* cxxRecordDecl = varDecl.getType()->getAsCXXRecordDecl()) {
             if(cxxRecordDecl->hasNonTrivialDestructor() || cxxRecordDecl->hasNonTrivialDefaultConstructor()) {
                 return true;
