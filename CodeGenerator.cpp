@@ -841,11 +841,11 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
             mOutputFormatHelper.Append(pointer, GetName(*stmt));
         }
 
-        if(stmt->hasInit()) {
+        if(const auto* init = stmt->getInit()) {
             mOutputFormatHelper.Append(" = ");
 
             InsertArg(stmt->getInit());
-        };
+        }
 
         if(stmt->isNRVOVariable()) {
             mOutputFormatHelper.Append(" /* NRVO variable */");

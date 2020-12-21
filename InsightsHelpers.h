@@ -117,6 +117,18 @@ static inline const LangOptions& GetLangOpts(const Decl& decl)
 
 std::string GetNameAsWritten(const QualType& t);
 
+/// \brief Get the evaluated APValue from a `VarDecl`
+///
+/// Returns `nullptr` is the \c VarDecl is not evaluatable.
+APValue* GetEvaluatedValue(const VarDecl& varDecl);
+//-----------------------------------------------------------------------------
+
+/// \brief Check whether a `VarDecl`s initialization can be done a compile-time.
+///
+/// This method checks, whether a \c VarDecl is initialized by a constant expression.
+bool IsEvaluatable(const VarDecl& varDecl);
+//-----------------------------------------------------------------------------
+
 bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl);
 //-----------------------------------------------------------------------------
 
