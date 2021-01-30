@@ -1608,7 +1608,17 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
 
         ArrayRef<Stmt*> bodyStmtsRef{bodyStmts};
         auto*           outerBody = CompoundStmt::Create(ctx, bodyStmtsRef, stmt->getBeginLoc(), stmt->getEndLoc());
-        auto*           whileStmt = WhileStmt::Create(ctx, nullptr, condition, outerBody, stmt->getBeginLoc());
+        auto*           whileStmt = WhileStmt::Create(ctx,
+                                            nullptr,
+                                            condition,
+                                            outerBody,
+                                            stmt->getBeginLoc()
+#if IS_CLANG_NEWER_THAN(10)
+                                                ,
+                                            stmt->getLParenLoc(),
+                                            stmt->getRParenLoc()
+#endif
+        );
 
         std::vector<Stmt*> outerScopeStmts{};
         AddStmt(outerScopeStmts, rwStmt->getInit());
