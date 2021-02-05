@@ -55,24 +55,29 @@ ScopeHandler::~ScopeHandler()
 
 std::string ScopeHandler::RemoveCurrentScope(std::string name)
 {
-    auto findAndReplace = [&name](const std::string& scope) {
-        if(const auto startPos = name.find(scope, 0); std::string::npos != startPos) {
-            name.replace(startPos, scope.length(), "");
-            return true;
+    if(mScope.length()) {
+        auto findAndReplace = [&name](const std::string& scope) {
+            if(const auto startPos = name.find(scope, 0); std::string::npos != startPos) {
+                if(const auto pos = startPos + scope.length();
+                   (pos > name.length()) || (name[pos] != '*')) {  // keep member points (See #374)
+                    name.replace(startPos, scope.length(), "");
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        // The default is that we can replace the entire scope. Suppose we are currently in N::X and having a symbol
+        // N::X::y then N::X:: is removed.
+        if(not findAndReplace(mScope)) {
+
+            // A special case where we need to remove the scope without the last item.
+            std::string tmp{mScope};
+            tmp.resize(mGlobalStack.back().mLength);
+
+            findAndReplace(tmp);
         }
-
-        return false;
-    };
-
-    // The default is that we can replace the entire scope. Suppose we are currently in N::X and having a symbol N::X::y
-    // then N::X:: is removed.
-    if(not findAndReplace(mScope)) {
-
-        // A special case where we need to remove the scope without the last item.
-        std::string tmp{mScope};
-        tmp.resize(mGlobalStack.back().mLength);
-
-        findAndReplace(tmp);
     }
 
     return name;

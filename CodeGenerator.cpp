@@ -807,7 +807,6 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
     } else {
         if(InsertVarDecl()) {
-            mOutputFormatHelper.Append(GetQualifiers(*stmt));
 
             const auto type = GetDesugarType(stmt->getType());
             const bool isMemberPointer{isa<MemberPointerType>(type.getTypePtrOrNull())};
@@ -817,9 +816,12 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                 const std::string funcPtrName{StrCat(ptrPrefix, lineNo, " ")};
 
                 mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
+                mOutputFormatHelper.Append(GetQualifiers(*stmt));
                 mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
 
             } else {
+                mOutputFormatHelper.Append(GetQualifiers(*stmt));
+
                 const auto varName = FormatVarTemplateSpecializationDecl(stmt, GetName(*stmt));
 
                 // TODO: to keep the special handling for lambdas, do this only for template specializations

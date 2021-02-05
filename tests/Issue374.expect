@@ -1,0 +1,33 @@
+struct S;
+
+struct T
+{
+  int S::* s_mptr;
+  int T::* t_mptr;
+  using MemberVarPtr_7 = int T::*;
+  static MemberVarPtr_7 static_mptr;
+  template<int S::* >
+  void f();
+  template<int T::* >
+  void f();
+  template<int (S::*)() >
+  void f();
+  template<int (T::*)() >
+  void f();
+  struct N
+  {
+    int S::* s_mptr;
+    int T::* t_mptr;
+    int N::* n_mptr;
+  };
+  
+  int N::* n_mptr;
+};
+
+
+
+using MemberVarPtr_24 = int T::*;
+MemberVarPtr_24 static_mptr = 0;
+
+template<int T::*>     void T::f() {}
+template<int (T::*)()> void T::f() {}
