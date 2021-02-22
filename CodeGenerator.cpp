@@ -2269,8 +2269,15 @@ void CodeGenerator::InsertArg(const EnumDecl* stmt)
         [&]() {
             mOutputFormatHelper.IncreaseIndent();
             mOutputFormatHelper.AppendNewLine();
+            OnceFalse needsComma{};
 
-            ForEachArg(stmt->enumerators(), [&](const auto* value) { InsertArg(value); });
+            ForEachArg(stmt->enumerators(), [&](const auto* value) {
+                if(needsComma) {
+                    mOutputFormatHelper.AppendNewLine();
+                }
+
+                InsertArg(value);
+            });
 
             InsertArg(stmt->getBody());
 

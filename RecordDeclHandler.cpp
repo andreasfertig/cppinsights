@@ -36,6 +36,11 @@ RecordDeclHandler::RecordDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
                                      unless(anyOf(isExpansionInSystemHeader(), isMacroOrInvalidLocation())))
                            .bind("namespaceDecl"),
                        this);
+
+    matcher.addMatcher(enumDecl(hasParent(translationUnitDecl()),
+                                unless(anyOf(isExpansionInSystemHeader(), isMacroOrInvalidLocation())))
+                           .bind("enumDecl"),
+                       this);
 }
 //-----------------------------------------------------------------------------
 
@@ -70,6 +75,15 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
         codeGenerator.InsertArg(namespaceDecl);
 
         mRewrite.ReplaceText(GetSourceRangeAfterSemi(namespaceDecl->getSourceRange(), result, RequireSemi::No),
+                             outputFormatHelper.GetString());
+
+    } else if(const auto* enumDecl = result.Nodes.getNodeAs<EnumDecl>("enumDecl")) {
+        OutputFormatHelper outputFormatHelper{};
+
+        CodeGenerator codeGenerator{outputFormatHelper};
+        codeGenerator.InsertArg(enumDecl);
+
+        mRewrite.ReplaceText(GetSourceRangeAfterSemi(enumDecl->getSourceRange(), result, RequireSemi::No),
                              outputFormatHelper.GetString());
     }
 }
