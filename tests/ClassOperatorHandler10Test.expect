@@ -1,15 +1,21 @@
 #include <iostream>
 
-enum class Color{
-  red,
-  blue,
+enum class Color : int
+{
+  red, 
+  blue, 
   green
 };
+
+
  
-enum struct State: char {
-  on,
-  off,
+enum struct State : char
+{
+  on, 
+  off
 };
+
+
 
 int main()
 {

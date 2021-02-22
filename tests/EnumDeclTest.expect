@@ -4,7 +4,9 @@ int main()
 {
   enum Colour
   {
-    red = static_cast<unsigned int>(0), green = static_cast<unsigned int>(2), blue
+    red = static_cast<unsigned int>(0), 
+    green = static_cast<unsigned int>(2), 
+    blue
   };
   
   printf("%d %d %d\n", static_cast<int>(red), static_cast<int>(green), static_cast<int>(blue));

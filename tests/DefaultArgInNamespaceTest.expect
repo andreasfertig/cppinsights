@@ -4,7 +4,8 @@ namespace Test
 {
   enum class Order : int
   {
-    A, B
+    A, 
+    B
   };
   
   inline constexpr const Order OrderA = Order::A;
