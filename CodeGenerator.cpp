@@ -2832,20 +2832,22 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             const auto* captureInit = mLambdaExpr->capture_init_begin();
 
             addToInits("this", thisCapture, true, *captureInit, false);
-        } else {
-            // Find the corresponding capture in the DenseMap. The DenseMap seems to be change its order each time.
-            // Hence we use \c captures() to keep the order stable. While using \c Captures to generate the code as
-            // it carries the better type infos.
-            for(const auto& [c, cinit] : zip(mLambdaExpr->captures(), mLambdaExpr->capture_inits())) {
-                if(not c.capturesVariable()) {
-                    continue;
-                }
+        }
 
-                const auto* capturedVar = c.getCapturedVar();
-                if(const auto* value = captures[capturedVar]) {
-                    addToInits(
-                        GetName(*capturedVar), value, false, cinit, VarDecl::ListInit == capturedVar->getInitStyle());
-                }
+        // Find the corresponding capture in the DenseMap. The DenseMap seems to be change its order each time.
+        // Hence we use \c captures() to keep the order stable. While using \c Captures to generate the code as
+        // it carries the better type infos.
+        for(const auto& [c, cinit] : zip(mLambdaExpr->captures(), mLambdaExpr->capture_inits())) {
+            if(not c.capturesVariable()) {
+                continue;
+            }
+
+            cinit->dump();
+
+            const auto* capturedVar = c.getCapturedVar();
+            if(const auto* value = captures[capturedVar]) {
+                addToInits(
+                    GetName(*capturedVar), value, false, cinit, VarDecl::ListInit == capturedVar->getInitStyle());
             }
         }
 

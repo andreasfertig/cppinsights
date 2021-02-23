@@ -1,0 +1,36 @@
+#include <algorithm>
+
+struct C
+{
+  inline int f()
+  {
+    int a = 5;
+        
+    class __lambda_6_19
+    {
+      public: 
+      inline /*constexpr */ int operator()() const
+      {
+        return __this->m + a;
+      }
+      
+      private: 
+      C * __this;
+      int & a;
+      
+      public:
+      __lambda_6_19(C * _this, int & _a)
+      : __this{_this}
+      , a{_a}
+      {}
+      
+    };
+    
+    const __lambda_6_19 b = __lambda_6_19{this, a};
+    return b.operator()();
+  }
+  
+  int m = 6;
+};
+
+
