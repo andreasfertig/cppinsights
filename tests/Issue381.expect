@@ -1,0 +1,10 @@
+#include <tuple>
+
+int main()
+{
+  std::tuple<int, int> tup = std::tuple<int, int>{2, 5};
+  std::tuple<int, int> __tup6 = std::tuple<int, int>(tup);
+  std::tuple_element<0, std::tuple<int, int> >::type a = std::get<0UL>(static_cast<std::tuple<int, int> &&>(__tup6));
+  std::tuple_element<1, std::tuple<int, int> >::type b = std::get<1UL>(static_cast<std::tuple<int, int> &&>(__tup6));
+}
+

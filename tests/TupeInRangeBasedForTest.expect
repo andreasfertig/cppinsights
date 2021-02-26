@@ -29,8 +29,8 @@ int main()
     for(; std::operator!=(__begin1, __end1); __begin1.operator++()) 
     {
       std::tuple<std::basic_string<char>, int> __operator15 = std::tuple<std::basic_string<char>, int>(__begin1.operator*());
-      std::basic_string<char> & s = std::get<0UL>(__operator15);
-      std::tuple_element<1, std::tuple<std::basic_string<char>, int> >::type & n = std::get<1UL>(__operator15);
+      std::basic_string<char> s = std::get<0UL>(static_cast<std::tuple<std::basic_string<char>, int> &&>(__operator15));
+      std::tuple_element<1, std::tuple<std::basic_string<char>, int> >::type n = std::get<1UL>(static_cast<std::tuple<std::basic_string<char>, int> &&>(__operator15));
       printf("c=%s, n=%d\n", s.c_str(), n);
     }
     

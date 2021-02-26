@@ -165,6 +165,6 @@ int main()
   constexpr const Point p2 = Point{3, 4};
   const Point & __p273 = p2;
   std::tuple_element<0, const Point>::type & x2 = __p273.get<0>();
-  std::tuple_element<1, const Point>::type y2 = __p273.get<1>();
+  std::tuple_element<1, const Point>::type y2 = static_cast<const double>(__p273.get<1>());
 }
 
