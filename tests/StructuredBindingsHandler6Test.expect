@@ -117,8 +117,8 @@ int main()
 {
   Point p = Point{1, 2};
   Point __p58 = Point(p);
-  std::tuple_element<0, Point>::type x = static_cast<const Point &&>(__p58).get<0>();
-  std::tuple_element<1, Point>::type y = static_cast<const Point &&>(__p58).get<1>();
+  double x = static_cast<const Point &&>(__p58).get<0>();
+  double y = static_cast<const Point &&>(__p58).get<1>();
   printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
   printf("x:%lf y:%lf\n", x, y);
   char ar[2] = {7, 8};
@@ -141,12 +141,12 @@ int main()
   const char a19 = __aa75[1];
   std::tuple<int, char, double> muple = std::make_tuple(1, 'a', 2.2999999999999998);
   std::tuple<int, char, double> & __muple80 = muple;
-  std::tuple_element<0, std::tuple<int, char, double> >::type & i = std::get<0UL>(__muple80);
-  std::tuple_element<1, std::tuple<int, char, double> >::type & c = std::get<1UL>(__muple80);
-  std::tuple_element<2, std::tuple<int, char, double> >::type & d = std::get<2UL>(__muple80);
+  int & i = std::get<0UL>(__muple80);
+  char & c = std::get<1UL>(__muple80);
+  double & d = std::get<2UL>(__muple80);
   std::tuple<int, char, double> __muple82 = std::tuple<int, char, double>(muple);
-  std::tuple_element<0, std::tuple<int, char, double> >::type ii = std::get<0UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
-  std::tuple_element<1, std::tuple<int, char, double> >::type cc = std::get<1UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
-  std::tuple_element<2, std::tuple<int, char, double> >::type dd = std::get<2UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
+  int ii = std::get<0UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
+  char cc = std::get<1UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
+  double dd = std::get<2UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
 }
 

@@ -3775,7 +3775,7 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
     if(const auto* holdingVar = stmt->getHoldingVar()) {
         // A rvalue reference boils down to just the type. If it is a reference then it is a lvalue reference at this
         // point. Hence we need to strip the &&.
-        type = holdingVar->getType();
+        type = holdingVar->getType().getCanonicalType();
         if(type->isRValueReferenceType()) {
             type = type.getNonReferenceType();
         }
