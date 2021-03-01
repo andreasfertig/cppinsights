@@ -105,15 +105,15 @@ namespace constant
 {
   Q q = Q();
   Q __q17 = Q(q);
-  std::tuple_element<0, Q>::type a = get<0UL>(static_cast<Q &&>(__q17));
-  std::tuple_element<1, Q>::type b = get<1UL>(static_cast<Q &&>(__q17));
-  std::tuple_element<2, Q>::type c = get<2UL>(static_cast<Q &&>(__q17));
+  int a = get<0UL>(static_cast<Q &&>(__q17));
+  int b = get<1UL>(static_cast<Q &&>(__q17));
+  int c = get<2UL>(static_cast<Q &&>(__q17));
   inline constexpr bool f()
   {
     Q __q19 = Q(q);
-    std::tuple_element<0, Q>::type a = get<0UL>(static_cast<Q &&>(__q19));
-    std::tuple_element<1, Q>::type b = get<1UL>(static_cast<Q &&>(__q19));
-    std::tuple_element<2, Q>::type c = get<2UL>(static_cast<Q &&>(__q19));
+    int a = get<0UL>(static_cast<Q &&>(__q19));
+    int b = get<1UL>(static_cast<Q &&>(__q19));
+    int c = get<2UL>(static_cast<Q &&>(__q19));
     return ((a == 0) && (b == 1)) && (c == 4);
   }
   inline constexpr int g()
@@ -121,9 +121,9 @@ namespace constant
     int * p = nullptr;
     {
       Q __q26 = Q(q);
-      std::tuple_element<0, Q>::type a = get<0UL>(static_cast<Q &&>(__q26));
-      std::tuple_element<1, Q>::type b = get<1UL>(static_cast<Q &&>(__q26));
-      std::tuple_element<2, Q>::type c = get<2UL>(static_cast<Q &&>(__q26));
+      int a = get<0UL>(static_cast<Q &&>(__q26));
+      int b = get<1UL>(static_cast<Q &&>(__q26));
+      int c = get<2UL>(static_cast<Q &&>(__q26));
       p = &c;
     };
     return *p;

@@ -155,8 +155,8 @@ int main()
 {
   Point p = Point{1, 2};
   Point & __p64 = p;
-  std::tuple_element<0, Point>::type & x = __p64.get<0>();
-  std::tuple_element<1, Point>::type y = __p64.get<1>();
+  double & x = __p64.get<0>();
+  double y = __p64.get<1>();
   printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
   ++x;
   ++y;
@@ -164,7 +164,7 @@ int main()
   printf("x:%lf y:%lf\n", p.GetX(), p.GetY());
   constexpr const Point p2 = Point{3, 4};
   const Point & __p273 = p2;
-  std::tuple_element<0, const Point>::type & x2 = __p273.get<0>();
-  std::tuple_element<1, const Point>::type y2 = static_cast<const double>(__p273.get<1>());
+  const double & x2 = __p273.get<0>();
+  const double y2 = static_cast<const double>(__p273.get<1>());
 }
 

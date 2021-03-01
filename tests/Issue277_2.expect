@@ -1,0 +1,63 @@
+#include <tuple>
+
+struct Point
+{
+  int data[2];
+};
+
+
+
+template <std::size_t N>
+constexpr int& get(Point& p) {
+  return p.data[N];
+}
+
+/* First instantiated from: Issue277_2.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int & get<0>(Point & p)
+{
+  return p.data[0UL];
+}
+#endif
+
+
+/* First instantiated from: Issue277_2.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int & get<1>(Point & p)
+{
+  return p.data[1UL];
+}
+#endif
+
+
+namespace std
+{
+  template<>
+  struct tuple_size<Point> : public integral_constant<unsigned long, 2>
+  {
+  };
+  
+  template<size_t N>
+  struct tuple_element<N, Point> : public tuple_element<N - 1, Point>
+  {
+  };
+  
+  template<>
+  struct tuple_element<0, Point>
+  {
+    using type = int;
+  };
+  
+  
+}
+
+int f(Point p)
+{
+  Point & __p19 = p;
+  int & x = get<0UL>(__p19);
+  int & y = get<1UL>(__p19);
+  return x;
+}
+
