@@ -250,7 +250,7 @@ int match<int &, __lambda_73_4, __lambda_74_4, __lambda_75_4>(int & value, const
   using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char> >;
   using arg = tuple_element_t<0, std::tuple<std::basic_string<char> > >;
   using match = is_same<std::basic_string<char>, decay_t<int &> >;
-  return details::match_call(_case, std::forward<int &>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false>&>(std::is_same<std::basic_string<char>, int>{{}})), __cases2, __cases3);
+  return details::match_call(_case, std::forward<int &>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char>, int>{{}})), __cases2, __cases3);
 }
 #endif
 
@@ -263,7 +263,7 @@ int match<int &, __lambda_74_4, __lambda_75_4>(int & value, const __lambda_74_4 
   using args = FunctionArgs<__lambda_74_4>::tuple<int>;
   using arg = tuple_element_t<0, std::tuple<int> >;
   using match = is_same<decay_t<arg>, decay_t<int &> >;
-  return details::match_call(_case, std::forward<int &>(value), std::integral_constant<bool, true>(static_cast<std::integral_constant<bool, true>&>(std::is_same<int, int>{{}})), __cases2);
+  return details::match_call(_case, std::forward<int &>(value), std::integral_constant<bool, true>(static_cast<std::integral_constant<bool, true> &&>(std::is_same<int, int>{{}})), __cases2);
 }
 #endif
 
@@ -276,7 +276,7 @@ int match<char const (&)[3], __lambda_73_4, __lambda_74_4, __lambda_75_4>(char c
   using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char> >;
   using arg = tuple_element_t<0, std::tuple<std::basic_string<char> > >;
   using match = is_same<std::basic_string<char>, decay_t<char const (&)[3]> >;
-  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false>&>(std::is_same<std::basic_string<char>, const char *>{{}})), __cases2, __cases3);
+  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char>, const char *>{{}})), __cases2, __cases3);
 }
 #endif
 
@@ -289,7 +289,7 @@ int match<char const (&)[3], __lambda_74_4, __lambda_75_4>(char const (&value)[3
   using args = FunctionArgs<__lambda_74_4>::tuple<int>;
   using arg = tuple_element_t<0, std::tuple<int> >;
   using match = is_same<decay_t<arg>, decay_t<char const (&)[3]> >;
-  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false>&>(std::is_same<int, const char *>{{}})), __cases2);
+  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<int, const char *>{{}})), __cases2);
 }
 #endif
 
@@ -302,7 +302,7 @@ std::basic_string<char> match<std::basic_string<char> &, __lambda_73_4, __lambda
   using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char> >;
   using arg = tuple_element_t<0, std::tuple<std::basic_string<char> > >;
   using match = is_same<std::basic_string<char>, std::basic_string<char> >;
-  return details::match_call(_case, std::forward<std::basic_string<char> &>(value), std::integral_constant<bool, true>(static_cast<std::integral_constant<bool, true>&>(std::is_same<std::basic_string<char>, std::basic_string<char> >{{}})), __cases2, __cases3);
+  return details::match_call(_case, std::forward<std::basic_string<char> &>(value), std::integral_constant<bool, true>(static_cast<std::integral_constant<bool, true> &&>(std::is_same<std::basic_string<char>, std::basic_string<char> >{{}})), __cases2, __cases3);
 }
 #endif
 

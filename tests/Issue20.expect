@@ -4,7 +4,7 @@ int main()
 {
   std::map<int, int> map = std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > >{std::initializer_list<std::pair<const int, int> >{std::pair<const int, int>{1, 2}}, std::less<int>()};
   std::pair<const int, int> __operator6 = std::pair<const int, int>(map.begin().operator*());
-  std::tuple_element<0, std::pair<const int, int> >::type & key = std::get<0UL>(__operator6);
-  std::tuple_element<1, std::pair<const int, int> >::type & value = std::get<1UL>(__operator6);
+  std::tuple_element<0, std::pair<const int, int> >::type key = std::get<0UL>(static_cast<std::pair<const int, int> &&>(__operator6));
+  std::tuple_element<1, std::pair<const int, int> >::type value = std::get<1UL>(static_cast<std::pair<const int, int> &&>(__operator6));
 }
 

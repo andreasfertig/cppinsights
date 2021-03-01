@@ -10,7 +10,7 @@ int main()
   const volatile char y2 = __p28[1];
   char p3[2];
   char (&__p311)[2] = p3;
-  char & x3 = __p311[0];
-  char & y3 = __p311[1];
+  char x3 = __p311[0];
+  char y3 = __p311[1];
 }
 

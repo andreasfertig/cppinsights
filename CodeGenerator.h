@@ -192,6 +192,11 @@ protected:
     virtual bool InsertSemi() { return true; }
     virtual bool InsertNamespace() const { return false; }
 
+    /// \brief Show casts to xvalues independent from the show all casts option.
+    ///
+    /// This helps showing xvalue casts in structured bindings.
+    virtual bool ShowXValueCasts() const { return false; }
+
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
     void HandleCompoundStmt(const CompoundStmt* stmt);
     /// \brief Show what is behind a local static variable.

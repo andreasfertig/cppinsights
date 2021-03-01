@@ -113,9 +113,13 @@ public:
 
     using CodeGenerator::InsertArg;
     void InsertArg(const DeclRefExpr* stmt) override;
+    void InsertArg(const BindingDecl* stmt) override;
 
     /// Inserts the bindings of a decompositions declaration.
     void InsertDecompositionBindings(const DecompositionDecl& decompositionDeclStmt);
+
+protected:
+    virtual bool ShowXValueCasts() const override { return true; }
 };
 //-----------------------------------------------------------------------------
 
@@ -786,8 +790,53 @@ static std::string FormatVarTemplateSpecializationDecl(const Decl* decl, std::st
 }
 //-----------------------------------------------------------------------------
 
+/// \brief Find a \c DeclRefExpr belonging to a \c DecompisitionDecl
+class BindingDeclFinder : public ConstStmtVisitor<BindingDeclFinder>
+{
+    bool mIsBinding{};
+
+public:
+    BindingDeclFinder() = default;
+
+    void VisitDeclRefExpr(const DeclRefExpr* expr)
+    {
+        if(isa<DecompositionDecl>(expr->getDecl())) {
+            mIsBinding = true;
+        }
+    }
+
+    void VisitStmt(const Stmt* stmt)
+    {
+        for(const auto* child : stmt->children()) {
+            if(child) {
+                Visit(child);
+            }
+
+            if(mIsBinding) {
+                return;
+            }
+        }
+    }
+
+    bool Find(const Stmt* stmt)
+    {
+        if(stmt) {
+            VisitStmt(stmt);
+        }
+
+        return mIsBinding;
+    }
+};
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const VarDecl* stmt)
 {
+    // If this is part of a DecompositionDecl then ignore this VarDecl as we already have seen and inserted it. This
+    // happens in StructuredBindingsHandler3Test.cpp
+    if(BindingDeclFinder isBindingDecl{}; isBindingDecl.Find(stmt->getInit())) {
+        return;
+    }
+
     LAMBDA_SCOPE_HELPER(VarDecl);
     UpdateCurrentPos();
 
@@ -808,14 +857,14 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
     } else {
         if(InsertVarDecl()) {
 
-            const auto type = GetDesugarType(stmt->getType());
-            const bool isMemberPointer{isa<MemberPointerType>(type.getTypePtrOrNull())};
-            if(type->isFunctionPointerType() || isMemberPointer) {
+            const auto desugaredType = GetDesugarType(stmt->getType());
+            const bool isMemberPointer{isa<MemberPointerType>(desugaredType.getTypePtrOrNull())};
+            if(desugaredType->isFunctionPointerType() || isMemberPointer) {
                 const auto        lineNo    = GetSM(*stmt).getSpellingLineNumber(stmt->getSourceRange().getBegin());
                 const auto        ptrPrefix = isMemberPointer ? memberVariablePointerPrefix : functionPointerPrefix;
                 const std::string funcPtrName{StrCat(ptrPrefix, lineNo, " ")};
 
-                mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(type), ";");
+                mOutputFormatHelper.AppendNewLine("using ", funcPtrName, "= ", GetName(desugaredType), ";");
                 mOutputFormatHelper.Append(GetQualifiers(*stmt));
                 mOutputFormatHelper.Append(funcPtrName, GetName(*stmt));
 
@@ -1409,7 +1458,7 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
     const auto  castKind = stmt->getCastKind();
     const bool  hideImplicitCasts{not GetInsightsOptions().ShowAllImplicitCasts};
 
-    auto isMatchingCast = [](const CastKind kind, const bool hideImplicitCasts) {
+    auto isMatchingCast = [](const CastKind kind, const bool hideImplicitCasts, const bool showXValueCasts) {
         switch(kind) {
             case CastKind::CK_Dependent: [[fallthrough]];
             case CastKind::CK_IntegralCast: [[fallthrough]];
@@ -1427,6 +1476,11 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
             case CastKind::CK_FloatingToIntegral: [[fallthrough]];
             case CastKind::CK_NonAtomicToAtomic: return true;
             default:
+                // Special case for structured bindings
+                if((showXValueCasts || not hideImplicitCasts) && (CastKind::CK_NoOp == kind)) {
+                    return true;
+                }
+
                 // Show this casts only if ShowAllImplicitCasts is turned on.
                 if(not hideImplicitCasts) {
                     switch(kind) {
@@ -1444,7 +1498,7 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
         }
     };
 
-    if(not isMatchingCast(castKind, hideImplicitCasts)) {
+    if(not isMatchingCast(castKind, hideImplicitCasts, ShowXValueCasts())) {
         InsertArg(subExpr);
     } else if(isa<IntegerLiteral>(subExpr) && hideImplicitCasts) {
         InsertArg(stmt->IgnoreCasts());
@@ -1456,7 +1510,15 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 
     } else {
         static const std::string castName{GetCastName(castKind)};
-        const QualType           castDestType{stmt->getType().getCanonicalType()};
+        const QualType           castDestType{[&] {
+            // In at least the case a structured bindings the compiler adds xvalue casts but the && is missing to make
+            // it valid C++.
+            if(VK_XValue == stmt->getValueKind()) {
+                return GetGlobalAST().getRValueReferenceType(stmt->getType().getCanonicalType());
+            }
+
+            return stmt->getType().getCanonicalType();
+        }()};
 
         FormatCast(castName, castDestType, subExpr, castKind);
     }
@@ -2842,8 +2904,6 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 continue;
             }
 
-            cinit->dump();
-
             const auto* capturedVar = c.getCapturedVar();
             if(const auto* value = captures[capturedVar]) {
                 addToInits(
@@ -3689,54 +3749,52 @@ static bool IsReference(const ValueDecl& valDecl)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const BindingDecl*)
+{
+    // We ignore this here in the global level. In some cases a BindingDecl appears _before_ the DecompositionDecl which
+    // leads to invalid code. See StructuredBindingsHandler3Test.cpp.
+}
+//-----------------------------------------------------------------------------
+
+void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
+{
+    // Assume that we are looking at a builtin type. We have to construct the variable declaration information.
+    const auto* bindingStmt = stmt->getBinding();
+
+    // In a dependent context we have no binding and with that no type. Leave this as it is, we are looking at a
+    // primary template here.
+    if(!bindingStmt) {
+        return;
+    }
+
+    // Assume that we are looking at a builtin type. We have to construct the variable declaration information.
+    auto type = stmt->getType();
+
+    // If we have holding var we are looking at a user defined type like tuple and those the defaults from above are
+    // wrong. This type contains the variable declaration so we insert this.
+    if(const auto* holdingVar = stmt->getHoldingVar()) {
+        // A rvalue reference boils down to just the type. If it is a reference then it is a lvalue reference at this
+        // point. Hence we need to strip the &&.
+        type = holdingVar->getType();
+        if(type->isRValueReferenceType()) {
+            type = type.getNonReferenceType();
+        }
+
+        bindingStmt = holdingVar->getAnyInitializer();
+    }
+
+    mOutputFormatHelper.Append(GetTypeNameAsParameter(type, GetName(*stmt)), " = ");
+
+    InsertArg(bindingStmt);
+
+    mOutputFormatHelper.AppendSemiNewLine();
+}
+//-----------------------------------------------------------------------------
+
 void StructuredBindingsCodeGenerator::InsertDecompositionBindings(const DecompositionDecl& decompositionDeclStmt)
 {
     for(const auto* bindingDecl : decompositionDeclStmt.bindings()) {
-        if(const auto* binding = bindingDecl->getBinding()) {
-
-            DPrint("sb name: %s\n", GetName(binding->getType()));
-
-            const auto* holdingVarOrMemberExpr = [&]() -> const Expr* {
-                if(const auto* holdingVar = bindingDecl->getHoldingVar()) {
-                    return holdingVar->getAnyInitializer();
-                }
-
-                return dyn_cast_or_null<MemberExpr>(binding);
-            }();
-
-            const auto bindingDeclType = [&] {
-                auto type = bindingDecl->getType();
-
-                const bool isRefToObject{IsReference(decompositionDeclStmt)};
-                const bool isArrayBinding{isa<ArraySubscriptExpr>(binding) && isRefToObject};
-                const bool isNotTemporary{holdingVarOrMemberExpr && !isa<ExprWithCleanups>(holdingVarOrMemberExpr)};
-                const bool isTypeAlreadyCarryingRef{
-                    type->isLValueReferenceType()};  // In case of a lambda that captures variables
-                                                     // and is expanded as a structured binding (#181), the
-                                                     // type of GetName below already carries the "&".
-                if((isArrayBinding || isNotTemporary) && not isTypeAlreadyCarryingRef) {
-                    type = decompositionDeclStmt.getASTContext().getLValueReferenceType(type);
-                }
-
-                return type;
-            }();
-
-            mOutputFormatHelper.Append(GetTypeNameAsParameter(bindingDeclType, GetName(*bindingDecl)), " = ");
-
-            // tuple decomposition
-            if(holdingVarOrMemberExpr) {
-                InsertArg(holdingVarOrMemberExpr);
-
-                // array decomposition
-            } else if(const auto* arraySubscription = dyn_cast_or_null<ArraySubscriptExpr>(binding)) {
-                InsertArg(arraySubscription);
-
-            } else {
-                TODO(bindingDecl, mOutputFormatHelper);
-            }
-
-            mOutputFormatHelper.AppendSemiNewLine();
-        }
+        InsertArg(bindingDecl);
     }
 }
 //-----------------------------------------------------------------------------
