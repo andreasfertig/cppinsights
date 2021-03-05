@@ -20,8 +20,7 @@ class Foo
   {
   }
   
-  using retType_23_5 = const int;
-  inline operator retType_23_5 () const
+  inline operator const int () const
   {
     return this->mX;
   }

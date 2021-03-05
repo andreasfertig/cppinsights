@@ -1,0 +1,95 @@
+// cmdline:-std=c++2a
+
+#include <cstdio>
+#include <type_traits>
+
+namespace p0892
+{
+  struct simple
+  {
+    inline explicit(false) simple(int)
+    {
+    }
+    
+  };
+  
+  template<class T>
+  struct wrapper
+  {
+    template<class U>
+    inline explicit(!std::is_convertible_v<U, T>) wrapper(const U & u)
+    {
+    }
+    
+    template<class U>
+    inline explicit(!std::is_convertible_v<T, U>) operator U () const
+    {
+      return {};
+    }
+  };
+  
+  /* First instantiated from: p0892Test.cpp:35 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct wrapper<A>
+  {
+    template<class U>
+    inline explicit(!std::is_convertible_v<U, A>) wrapper(const U & u);
+    
+    
+    /* First instantiated from: p0892Test.cpp:45 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline explicit(false) wrapper<A>(const A & u)
+    {
+    }
+    #endif
+    
+    
+    
+    /* First instantiated from: p0892Test.cpp:37 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline explicit(true) operator B () const
+    {
+      return {};
+    }
+    #endif
+    
+  };
+  
+  #endif
+  struct B
+  {
+  };
+  
+  struct A
+  {
+    inline constexpr A() noexcept = default;
+    inline explicit A(const B &)
+    {
+    }
+    
+    inline explicit operator B () const
+    {
+      return {};
+    }
+    
+  };
+  
+  void Fun(wrapper<A> a)
+  {
+    B b = static_cast<B>(a.operator B());
+  }
+  
+}
+
+int main()
+{
+  using namespace p0892;
+  p0892::Fun(p0892::wrapper<p0892::A>(p0892::A{}));
+  p0892::Fun(p0892::wrapper<p0892::A>(static_cast<p0892::A>(p0892::A(p0892::B{}))));
+  return 0;
+}
+
+

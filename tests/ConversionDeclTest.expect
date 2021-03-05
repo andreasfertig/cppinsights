@@ -3,8 +3,7 @@ namespace test
   template<class T = void>
   struct coroutine_handle
   {
-    using retType_5_5 = coroutine_handle<void>;
-    inline operator retType_5_5 ()
+    inline operator coroutine_handle<void> ()
     {
       return {};
     }
@@ -16,8 +15,7 @@ namespace test
   template<>
   struct coroutine_handle<void>
   {
-    using retType_5_5 = coroutine_handle<void>;
-    inline operator retType_5_5 ();
+    inline operator coroutine_handle<void> ();
     
   };
   
@@ -27,8 +25,7 @@ namespace test
   template<>
   struct coroutine_handle<int>
   {
-    using retType_5_5 = coroutine_handle<void>;
-    inline operator retType_5_5 ()
+    inline operator coroutine_handle<void> ()
     {
       return {};
     }

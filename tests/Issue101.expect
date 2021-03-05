@@ -6,8 +6,7 @@ struct typed_constant
 {
   using type = T;
   inline static constexpr const T value = {v};
-  using retType_9_3 = type;
-  inline constexpr operator retType_9_3 () const
+  inline constexpr operator type () const
   {
     return v;
   }

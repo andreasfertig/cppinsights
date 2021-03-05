@@ -667,7 +667,8 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
             if(haveArg) {
                 mOutputFormatHelper.Append(ofm, ">"sv);
 
-            } else {
+            } else if(not isa<CXXConversionDecl>(meDecl)) {  // A special case from p0892 a templated conversion
+                                                             // operator does not carry the specialization args...
                 InsertTemplateArgs(*tmplArgs);
             }
         }
@@ -3669,7 +3670,7 @@ void CodeGenerator::InsertArg(const RequiresExpr* stmt)
     for(const auto& requirement : stmt->getRequirements()) {
         if(const auto* typeRequirement = dyn_cast_or_null<concepts::TypeRequirement>(requirement)) {
             if(typeRequirement->isSubstitutionFailure()) {
-                mOutputFormatHelper.Append(kwRequires, " false");
+                mOutputFormatHelper.Append(kwRequiresSpace, kwFalse);
             } else {
                 mOutputFormatHelper.Append(GetName(typeRequirement->getType()->getType()));
             }
@@ -3679,7 +3680,7 @@ void CodeGenerator::InsertArg(const RequiresExpr* stmt)
             if(exprRequirement->isExprSubstitutionFailure()) {
                 // The requirement failed. We need some way to express that. Using a nested
                 // requirement with false seems to be the simplest solution.
-                mOutputFormatHelper.Append(kwRequires, " false");
+                mOutputFormatHelper.Append(kwRequiresSpace, kwFalse);
             } else {
                 WrapInCurliesIfNeeded(exprRequirement->isCompound(), [&] { InsertArg(exprRequirement->getExpr()); });
 
@@ -3705,7 +3706,7 @@ void CodeGenerator::InsertArg(const RequiresExpr* stmt)
 #endif
                 // The requirement failed. We need some way to express that. Using a nested
                 // requirement with false seems to be the simplest solution.
-                mOutputFormatHelper.Append("false");
+                mOutputFormatHelper.Append(kwFalse);
             } else {
                 InsertArg(nestedRequirement->getConstraintExpr());
             }
@@ -4149,6 +4150,7 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     const bool          isLambdaStaticInvoker{isCXXMethodDecl and methodDecl->isLambdaStaticInvoker()};
     const FunctionDecl& constExprDecl{not isLambdaStaticInvoker ? decl
                                                                 : *methodDecl->getParent()->getLambdaCallOperator()};
+    const auto          desugaredReturnType = GetDesugarReturnType(decl);
 
     if(methodDecl) {
         if(requiresComment) {
@@ -4160,9 +4162,9 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     }
 
     // types of conversion decls can be invalid to type at this place. So introduce a using
-    if(isa<CXXConversionDecl>(decl)) {
+    if(isa<CXXConversionDecl>(decl) and TypeContainsSubType<PointerType, FunctionProtoType>(desugaredReturnType)) {
         mOutputFormatHelper.AppendSemiNewLine(
-            kwUsingSpace, BuildRetTypeName(decl), hlpAssing, GetName(GetDesugarReturnType(decl)));
+            kwUsingSpace, BuildRetTypeName(decl), hlpAssing, GetName(desugaredReturnType));
     }
 
     if(decl.isTemplated()) {
@@ -4198,15 +4200,28 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
         mOutputFormatHelper.Append(kwInlineSpace);
     }
 
-    if(methodDecl) {
+    if(methodDecl and isFirstCxxMethodDecl) {
         if(methodDecl->isVirtual()) {
             mOutputFormatHelper.Append(kwVirtualSpace);
         }
 
-        if(const auto* ctorDecl = dyn_cast_or_null<CXXConstructorDecl>(methodDecl)) {
-            if(isFirstCxxMethodDecl and ctorDecl->isExplicit()) {
-                mOutputFormatHelper.Append(kwExplicitSpace);
-            }
+        const auto exspec = ExplicitSpecifier::getFromDecl(methodDecl);
+
+        if(const auto* expr = exspec.getExpr()) {
+            mOutputFormatHelper.Append(kwExplicit);
+
+            WrapInParens(
+                [&] {
+                    switch(exspec.getKind()) {
+                        case ExplicitSpecKind::Unresolved: InsertArg(expr); break;
+                        case ExplicitSpecKind::ResolvedFalse: mOutputFormatHelper.Append(kwFalse); break;
+                        case ExplicitSpecKind::ResolvedTrue: mOutputFormatHelper.Append("true"sv); break;
+                    }
+                },
+                AddSpaceAtTheEnd::Yes);
+
+        } else if(exspec.isExplicit()) {
+            mOutputFormatHelper.Append(kwExplicitSpace);
         }
     }
 
@@ -4299,10 +4314,13 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
 
     if(not isa<CXXConstructorDecl>(decl) and not isa<CXXDestructorDecl>(decl)) {
         if(isa<CXXConversionDecl>(decl)) {
-            mOutputFormatHelper.Append(kwOperatorSpace, BuildRetTypeName(decl), " ("sv, outputFormatHelper);
+            const std::string typeName{TypeContainsSubType<PointerType, FunctionProtoType>(desugaredReturnType)
+                                           ? BuildRetTypeName(decl)
+                                           : GetName(desugaredReturnType)};
+
+            mOutputFormatHelper.Append(kwOperatorSpace, typeName, " ("sv, outputFormatHelper.GetString());
         } else {
-            const auto t = GetDesugarReturnType(decl);
-            mOutputFormatHelper.Append(GetTypeNameAsParameter(t, outputFormatHelper));
+            mOutputFormatHelper.Append(GetTypeNameAsParameter(desugaredReturnType, outputFormatHelper.GetString()));
         }
     } else {
         mOutputFormatHelper.Append(outputFormatHelper);

@@ -1,0 +1,100 @@
+// cmdline:-std=c++20
+
+#include <type_traits>
+
+struct B
+{
+};
+
+
+struct C
+{
+};
+
+
+
+struct A
+{
+  inline constexpr A() noexcept = default;
+  inline explicit(true) A(const B &)
+  {
+  }
+  
+  inline explicit(false) A(const C &)
+  {
+  }
+  
+  inline explicit(true) operator B () const
+  {
+    return {};
+  }
+  
+};
+
+
+
+template<typename T>
+struct Wrapper
+{
+  template<typename U>
+  inline explicit(!std::is_convertible_v<U, T>) Wrapper(const U &)
+  {
+  }
+  
+};
+
+/* First instantiated from: conditionalExplicitTest.cpp:25 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Wrapper<A>
+{
+  template<typename U>
+  inline explicit(!std::is_convertible_v<U, A>) Wrapper(const U &);
+  
+  
+  /* First instantiated from: conditionalExplicitTest.cpp:25 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline explicit(false) Wrapper<A>(const A &)
+  {
+  }
+  #endif
+  
+  
+  
+  /* First instantiated from: conditionalExplicitTest.cpp:27 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline explicit(false) Wrapper<C>(const C &)
+  {
+  }
+  #endif
+  
+  
+};
+
+#endif
+
+
+void Fun(Wrapper<A> a);
+  // #A Takes Wrapper<A> now
+
+void Use()
+{
+  Fun(Wrapper<A>(A{}));
+  Fun(Wrapper<A>(static_cast<A>(A(B{}))));
+  Fun(Wrapper<A>(C{}));
+}
+
+
+void Fun(Wrapper<A> a)
+{
+}
+
+
+int main()
+{
+  Use();
+  return 0;
+}
+
