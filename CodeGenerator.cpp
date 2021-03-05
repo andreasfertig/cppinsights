@@ -3783,7 +3783,9 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
         bindingStmt = holdingVar->getAnyInitializer();
     }
 
-    mOutputFormatHelper.Append(GetTypeNameAsParameter(type, GetName(*stmt)), " = ");
+    mOutputFormatHelper.Append(GetQualifiers(*dyn_cast_or_null<VarDecl>(stmt->getDecomposedDecl())),
+                               GetTypeNameAsParameter(type, GetName(*stmt)),
+                               " = ");
 
     InsertArg(bindingStmt);
 
