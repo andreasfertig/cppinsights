@@ -126,6 +126,7 @@ SUPPORTED_STMT(CXXRewrittenBinaryOperator)
 SUPPORTED_STMT(AttributedStmt)
 SUPPORTED_STMT(ConceptSpecializationExpr)
 SUPPORTED_STMT(RequiresExpr)
+SUPPORTED_STMT(StmtExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

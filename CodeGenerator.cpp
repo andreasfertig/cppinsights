@@ -3004,6 +3004,12 @@ void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const StmtExpr* stmt)
+{
+    WrapInParens([&] { InsertArg(stmt->getSubStmt()); });
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const ConceptSpecializationExpr* stmt)
 {
     if(const auto* namedConcept = stmt->getNamedConcept()) {
