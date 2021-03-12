@@ -9,7 +9,7 @@ struct S
 int main()
 {
   static S __8 = S{0, 0};
-  static int a = __8.x;
-  static int b = __8.y;
+  static int & a = __8.x;
+  static int & b = __8.y;
 }
 
