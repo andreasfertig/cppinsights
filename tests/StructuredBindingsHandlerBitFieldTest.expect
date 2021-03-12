@@ -1,0 +1,37 @@
+// cmdline:-std=c++20
+struct Point
+{
+  int x:2;
+  int y:6;
+};
+
+
+
+Point pt = {1, 2};
+
+
+// The following will fail after the transformation. We users cannot bind a bit-field to a non-const reference. But the
+// variables below are still modifiable.
+Point & __pt12 = pt;
+int & a2x = __pt12.x;
+int & a2y = __pt12.y;
+
+
+// once we use a reference here it must be a const reference
+void Func(auto x) { }
+
+/* First instantiated from: StructuredBindingsHandlerBitFieldTest.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Func<int>(int x)
+{
+}
+#endif
+
+
+int main()
+{
+  Func(pt.x);
+  ++a2x;
+}
+

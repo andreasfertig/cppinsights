@@ -3787,6 +3787,8 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
         }
 
         bindingStmt = holdingVar->getAnyInitializer();
+    } else if(not type->isLValueReferenceType()) {
+        type = stmt->getASTContext().getLValueReferenceType(type);
     }
 
     mOutputFormatHelper.Append(GetQualifiers(*dyn_cast_or_null<VarDecl>(stmt->getDecomposedDecl())),

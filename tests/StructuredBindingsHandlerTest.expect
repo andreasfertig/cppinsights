@@ -2,7 +2,7 @@ int main()
 {
   char p[2];
   char __p4[2] = {p[0], p[1]};
-  char x = __p4[0];
-  char y = __p4[1];
+  char & x = __p4[0];
+  char & y = __p4[1];
 }
 

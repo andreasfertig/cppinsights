@@ -17,15 +17,15 @@ char c[3] = {'\0', '\0', '\0'};
 
 
 char __c11[3] = {c[0], c[1], c[2]};
-char x = __c11[0];
-char y = __c11[1];
-char z = __c11[2];
+char & x = __c11[0];
+char & y = __c11[1];
+char & z = __c11[2];
 
 
 char (&__c13)[3] = c;
-char cx = __c13[0];
-char cy = __c13[1];
-char cz = __c13[2];
+char & cx = __c13[0];
+char & cy = __c13[1];
+char & cz = __c13[2];
 
 
 
