@@ -4,10 +4,10 @@ int main()
 {
   unsigned int x = 3;
   if(static_cast<bool>(x & 2)) {
-  }
+  } 
   
   if((x & 2) == 2) {
-  }
+  } 
   
 }
 

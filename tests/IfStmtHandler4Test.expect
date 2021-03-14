@@ -1,28 +1,32 @@
 int main()
 {
-  if(true) do {
-  } while(0);
+  if(true) {
+    do {
+    } while(0);
+    
+  } else {
+  } 
   
-  else ;
-  
-  
-  if(true) while(false) {
-  }
-  
-  
-  
-  ;
-  if(true) ;
-  else while(false) {
-  }
-  
-  
+  if(true) {
+    while(false) {
+    }
+    
+  } 
   
   ;
-  if(true) if(false) ;
+  if(true) {
+  } else {
+    while(false) {
+    }
+    
+  } 
   
-  
-  
+  ;
+  if(true) {
+    if(false) {
+    } 
+    
+  } 
   
 }
 

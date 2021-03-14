@@ -31,10 +31,9 @@ class Foo
     } else /* constexpr */ {
       if constexpr(N == 0) {
         return 2;
-      }
+      } 
       
-      
-    }
+    } 
     
   }
   
@@ -44,7 +43,7 @@ class Foo
   {
     if constexpr(1 == 1) {
       return this->mX;
-    }
+    } 
     
   }
   #endif

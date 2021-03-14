@@ -11,8 +11,7 @@ void f()
       {
         auto i = init;
         auto && __range1 = container;
-        for(; ; ) 
-        {
+        for(; ; ) {
           auto test;
         }
         
@@ -25,8 +24,7 @@ void f()
       {
         auto i = init;
         auto && __range1 = container;
-        for(; ; ) 
-        {
+        for(; ; ) {
           auto test;
         }
         

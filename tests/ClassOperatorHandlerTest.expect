@@ -160,11 +160,11 @@ int main()
   t1.operator+=(t2);
   if(t1.operator>(t2)) {
     return 1;
-  }
+  } 
   
   if(t1.operator>=(t2)) {
     return 3;
-  }
+  } 
   
   Test & t3 = t1.operator[](0);
   Test t4 = Test(t1);
@@ -178,13 +178,13 @@ int main()
   Fest f2 = Fest{3};
   if(operator<(f1, f2)) {
     return 22;
-  }
+  } 
   
   Hello::Bello::Fest f3 = Hello::Bello::Fest{3};
   Hello::Bello::Fest f4 = Hello::Bello::Fest{3};
   if(Hello::Bello::operator<(f3, f4)) {
     return 44;
-  }
+  } 
   
   Hello::Bello::sF.operator<<(Hello::Bello::sF).operator<<(Hello::Bello::sF);
 }

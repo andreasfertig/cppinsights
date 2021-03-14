@@ -432,14 +432,8 @@ void CodeGenerator::InsertArg(const ConditionalOperator* stmt)
 void CodeGenerator::InsertArg(const DoStmt* stmt)
 {
     mOutputFormatHelper.Append("do ");
-    const auto* body = stmt->getBody();
-    InsertArg(body);
 
-    if(isa<CompoundStmt>(body)) {
-        mOutputFormatHelper.Append(' ');
-    } else if(!isa<NullStmt>(body)) {
-        mOutputFormatHelper.Append("; ");
-    }
+    WrapInCompoundIfNeeded(stmt->getBody(), AddNewLineAfter::No);
 
     mOutputFormatHelper.Append("while");
     WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::No);
@@ -535,16 +529,7 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
         WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
     }
 
-    const auto* body = stmt->getBody();
-    const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
-
-    InsertArg(body);
-
-    if(hasCompoundStmt) {
-        mOutputFormatHelper.AppendNewLine();
-    } else {
-        mOutputFormatHelper.AppendSemiNewLine();
-    }
+    WrapInCompoundIfNeeded(stmt->getBody(), AddNewLineAfter::Yes);
 
     mOutputFormatHelper.AppendNewLine();
 }
@@ -1596,45 +1581,18 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
     WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
 
-    const auto* body = stmt->getThen();
-
-    InsertArg(body);
-
-    const auto insertSemiIfNeeded = [](OutputFormatHelper& ofm, const auto* inner) {
-        // Add semi-colon if necessary. A do{} while does already add one.
-        if(IsStmtRequieringSemi<IfStmt, CompoundStmt, NullStmt, WhileStmt, DoStmt>(inner)) {
-            ofm.AppendSemiNewLine();
-        }
-    };
-
-    // Add semi-colon if necessary.
-    insertSemiIfNeeded(mOutputFormatHelper, body);
+    WrapInCompoundIfNeeded(stmt->getThen(), AddNewLineAfter::No);
 
     // else
     if(const auto* elsePart = stmt->getElse()) {
         const std::string cexprElse{stmt->isConstexpr() ? StrCat("/* ", kwConstExprSpace, "*/ ") : ""};
 
-        if(isa<CompoundStmt>(body)) {
-            mOutputFormatHelper.Append(' ');
-        }
-
         mOutputFormatHelper.Append("else ", cexprElse);
 
-        const bool needScope = isa<IfStmt>(elsePart);
-        if(needScope) {
-            mOutputFormatHelper.OpenScope();
-        }
-
-        InsertArg(elsePart);
-
-        // an else with just a single statement seems not to carry a semi-colon at the end
-        insertSemiIfNeeded(mOutputFormatHelper, elsePart);
-
-        if(needScope) {
-            mOutputFormatHelper.CloseScope();
-        }
+        WrapInCompoundIfNeeded(elsePart, AddNewLineAfter::No);
     }
 
+    // Add newline after last closing curly (either from if or else if).
     mOutputFormatHelper.AppendNewLine();
 
     if(hasInit) {
@@ -1720,23 +1678,7 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
                 AddSpaceAtTheEnd::Yes);
         }
 
-        const auto* body = stmt->getBody();
-        const bool  hasCompoundStmt{isa<CompoundStmt>(body)};
-
-        if(hasCompoundStmt) {
-            mOutputFormatHelper.AppendNewLine();
-        }
-
-        InsertArg(body);
-
-        // Note: an empty for-loop carries a simi-colon at the end
-        if(hasCompoundStmt) {
-            mOutputFormatHelper.AppendNewLine();
-        } else {
-            if(!isa<CompoundStmt>(body) && !isa<NullStmt>(body)) {
-                mOutputFormatHelper.AppendSemiNewLine();
-            }
-        }
+        WrapInCompoundIfNeeded(stmt->getBody(), AddNewLineAfter::Yes);
     }
 
     mOutputFormatHelper.AppendNewLine();
@@ -3702,6 +3644,36 @@ void CodeGenerator::WrapInParensOrCurlys(const BraceKind braceKind, T&& lambda, 
     }
 
     if(AddSpaceAtTheEnd::Yes == addSpaceAtTheEnd) {
+        mOutputFormatHelper.Append(' ');
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAfter addNewLineAfter)
+{
+    const bool hasNoCompoundStmt = not isa<CompoundStmt>(stmt);
+
+    if(hasNoCompoundStmt) {
+        mOutputFormatHelper.OpenScope();
+    }
+
+    if(not isa<NullStmt>(stmt)) {
+        InsertArg(stmt);
+
+        // Add semi-colon if necessary. A do{} while does already add one.
+        if(IsStmtRequieringSemi<IfStmt, CompoundStmt, NullStmt, WhileStmt, DoStmt>(stmt)) {
+            mOutputFormatHelper.AppendSemiNewLine();
+        }
+    }
+
+    if(hasNoCompoundStmt) {
+        mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
+    }
+
+    const bool addNewLine = (AddNewLineAfter::Yes == addNewLineAfter);
+    if(addNewLine || (hasNoCompoundStmt && addNewLine)) {
+        mOutputFormatHelper.AppendNewLine();
+    } else if(not addNewLine || (hasNoCompoundStmt && not addNewLine)) {
         mOutputFormatHelper.Append(' ');
     }
 }

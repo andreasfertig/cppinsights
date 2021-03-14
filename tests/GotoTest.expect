@@ -6,7 +6,7 @@ int main()
     return 2;
     end:
     return 3;
-  }
+  } 
   
   return 1;
 }

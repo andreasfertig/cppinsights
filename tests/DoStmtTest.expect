@@ -5,10 +5,12 @@ int main()
     ++x;
   } while(true);
   
-  do x++; while(true);
+  do {
+    x++;
+  } while(true);
   
-  do ;
-  while(false);
+  do {
+  } while(false);
   
 }
 

@@ -1,7 +1,7 @@
 int main()
 {
   if(1 == static_cast<int>((static_cast<unsigned char>(255)))) {
-  }
+  } 
   
 }
 

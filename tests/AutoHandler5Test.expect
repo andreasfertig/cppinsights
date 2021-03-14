@@ -11,7 +11,7 @@ int main()
     FuncPtr_5 add = foo;
     using FuncPtr_7 = int (*)(int, int);
     FuncPtr_7 add1 = foo;
-  }
+  } 
   
 }
 

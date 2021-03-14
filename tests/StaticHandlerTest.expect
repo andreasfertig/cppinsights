@@ -84,7 +84,7 @@ Bingleton * B(bool c)
   static Bingleton bb = Bingleton();
   if(c) {
     return nullptr;
-  }
+  } 
   
   return &bb;
 }
@@ -96,7 +96,7 @@ Bingleton & BB(bool c)
   static Bingleton bb = Bingleton();
   if(c) {
     return bb;
-  }
+  } 
   
   return bb;
 }

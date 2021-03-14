@@ -71,8 +71,9 @@ struct generator
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
-    
+    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
+      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    } 
     
   }
   

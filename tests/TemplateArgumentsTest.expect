@@ -14,10 +14,10 @@ static inline decltype(auto) Normalize(const T& arg)
 template<>
 inline char const (&Normalize<char [8]>(char const (&arg)[8]))[8]
 {
-  if constexpr(std::is_same_v<char [8], std::basic_string<char> >) ;
-  else /* constexpr */ {
+  if constexpr(std::is_same_v<char [8], std::basic_string<char> >) {
+  } else /* constexpr */ {
     return arg;
-  }
+  } 
   
 }
 #endif
@@ -27,10 +27,10 @@ inline char const (&Normalize<char [8]>(char const (&arg)[8]))[8]
 template<>
 inline const int & Normalize<int>(const int & arg)
 {
-  if constexpr(std::is_same_v<int, std::basic_string<char> >) ;
-  else /* constexpr */ {
+  if constexpr(std::is_same_v<int, std::basic_string<char> >) {
+  } else /* constexpr */ {
     return arg;
-  }
+  } 
   
 }
 #endif
@@ -42,7 +42,7 @@ inline const char * Normalize<std::basic_string<char> >(const std::basic_string<
 {
   if constexpr(std::is_same_v<std::basic_string<char>, std::basic_string<char> >) {
     return arg.c_str();
-  }
+  } 
   
 }
 #endif

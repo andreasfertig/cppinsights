@@ -13,8 +13,7 @@ int main()
         char volatile (&__range1)[10] = buffer;
         volatile char * __begin1 = __range1;
         volatile char * __end1 = __range1 + 10L;
-        for(; __begin1 != __end1; ++__begin1) 
-        {
+        for(; __begin1 != __end1; ++__begin1) {
           volatile char & c = *__begin1;
           c = 1;
         }
@@ -71,8 +70,7 @@ int main()
     inline void operator()() const
     {
       volatile char buffer[10];
-      for(int i = 0; static_cast<unsigned long>(i) < sizeof(buffer); ++i) 
-      {
+      for(int i = 0; static_cast<unsigned long>(i) < sizeof(buffer); ++i) {
         buffer[i] = 1;
       }
       
@@ -91,8 +89,7 @@ int main()
     {
       volatile char buffer[10];
       int i = 0;
-      for(; static_cast<unsigned long>(i) < sizeof(buffer); ++i) 
-      {
+      for(; static_cast<unsigned long>(i) < sizeof(buffer); ++i) {
         buffer[i] = 1;
       }
       
