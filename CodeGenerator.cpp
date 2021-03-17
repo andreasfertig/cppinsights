@@ -2580,6 +2580,11 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
         return;
     }
 
+    // skip this attribute. Clang seems to tag final methods or classes with final
+    if(attr::Final == attr.getKind()) {
+        return;
+    }
+
     StringStream   stream{};
     PrintingPolicy pp{LangOptions{}};
     pp.Alignof = true;
@@ -2645,6 +2650,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     InsertAttributes(stmt->attrs());
 
     mOutputFormatHelper.Append(GetName(*stmt));
+
+    if(stmt->hasAttr<FinalAttr>()) {
+        mOutputFormatHelper.Append(" final");
+    }
 
     // skip classes/struct's without a definition
     if(not stmt->hasDefinition() || not stmt->isCompleteDefinition()) {
@@ -3588,8 +3597,14 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
     mOutputFormatHelper.Append(GetConst(decl));
 
-    if(methodDecl && methodDecl->isVolatile()) {
-        mOutputFormatHelper.Append(kwSpaceVolatile);
+    if(methodDecl) {
+        if(methodDecl->isVolatile()) {
+            mOutputFormatHelper.Append(kwSpaceVolatile);
+        }
+
+        if(methodDecl->hasAttr<FinalAttr>()) {
+            mOutputFormatHelper.Append(" final");
+        }
     }
 
     switch(decl.getType()->getAs<FunctionProtoType>()->getRefQualifier()) {

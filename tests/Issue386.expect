@@ -3,7 +3,7 @@
 namespace tnt
 {
   template<typename T, std::size_t N>
-  struct final vector
+  struct vector final
   {
     
     /* PASSED: static_assert(N > 0); */
