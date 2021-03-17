@@ -48,7 +48,7 @@ X f8(bool x, int y)
 {
   if(x || (y == 2)) {
     return X(y);
-  }
+  } 
   
   return X(0);
 }

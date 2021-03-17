@@ -43,7 +43,7 @@ class Alloc<int, false>
       this->data = new int;
       this->data = new int{2};
       this->data = new int{2};
-    }
+    } 
     
   }
   
@@ -53,7 +53,7 @@ class Alloc<int, false>
       delete[] this->data;
     } else {
       delete this->data;
-    }
+    } 
     
   }
   
@@ -79,7 +79,7 @@ class Alloc<char, true>
       this->data = new char;
       this->data = new char{2};
       this->data = new char{2};
-    }
+    } 
     
   }
   
@@ -89,7 +89,7 @@ class Alloc<char, true>
       delete[] this->data;
     } else {
       delete this->data;
-    }
+    } 
     
   }
   

@@ -64,10 +64,9 @@ class Point
     } else /* constexpr */ {
       if constexpr(N == 0) {
         return (this->mY);
-      }
+      } 
       
-      
-    }
+    } 
     
   }
   
@@ -75,14 +74,13 @@ class Point
   template<>
   inline constexpr double & get<0>() noexcept
   {
-    if constexpr(0UL == 1) ;
-    else /* constexpr */ {
+    if constexpr(0UL == 1) {
+    } else /* constexpr */ {
       if constexpr(0UL == 0) {
         return (this->mY);
-      }
+      } 
       
-      
-    }
+    } 
     
   }
   #endif
@@ -94,7 +92,7 @@ class Point
   {
     if constexpr(1UL == 1) {
       return this->GetX();
-    }
+    } 
     
   }
   #endif
@@ -107,10 +105,9 @@ class Point
     } else /* constexpr */ {
       if constexpr(N == 0) {
         return (this->mY);
-      }
+      } 
       
-      
-    }
+    } 
     
   }
   
@@ -118,14 +115,13 @@ class Point
   template<>
   inline constexpr const double & get<0>() const noexcept
   {
-    if constexpr(0UL == 1) ;
-    else /* constexpr */ {
+    if constexpr(0UL == 1) {
+    } else /* constexpr */ {
       if constexpr(0UL == 0) {
         return (this->mY);
-      }
+      } 
       
-      
-    }
+    } 
     
   }
   #endif
@@ -137,7 +133,7 @@ class Point
   {
     if constexpr(1UL == 1) {
       return this->GetX();
-    }
+    } 
     
   }
   #endif

@@ -1,13 +1,13 @@
 .tmp.cpp:8:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0, class type_parameter_0_1>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:22:5: error: templates cannot be declared inside of a local class
+.tmp.cpp:21:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0, class type_parameter_0_1>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:16:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
+.tmp.cpp:15:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
           auto test;
                ^
-.tmp.cpp:30:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
+.tmp.cpp:28:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
           auto test;
                ^
 4 errors generated.

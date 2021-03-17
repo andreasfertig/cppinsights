@@ -22,8 +22,7 @@ int main()
     
   } __lambda_7_17{x};
   
-  for(int i = __lambda_7_17.operator()(); i < 20; ++i) 
-  {
+  for(int i = __lambda_7_17.operator()(); i < 20; ++i) {
     x += i;
   }
   
@@ -65,8 +64,7 @@ int main()
     
   } __lambda_11_43{x};
   
-  for(int i = __lambda_11_17.operator()(), z = __lambda_11_43.operator()(); i < 20; ++i) 
-  {
+  for(int i = __lambda_11_17.operator()(), z = __lambda_11_43.operator()(); i < 20; ++i) {
     x += i;
   }
   
@@ -137,8 +135,7 @@ int main()
     
   } __lambda_15_59{};
   
-  for(__lambda_15_9.operator()(); static_cast<bool>(__lambda_15_37.operator()()); __lambda_15_59.operator()()) 
-  {
+  for(__lambda_15_9.operator()(); static_cast<bool>(__lambda_15_37.operator()()); __lambda_15_59.operator()()) {
   }
   
       
@@ -232,8 +229,7 @@ int main()
     
   } __lambda_20_59{};
   
-  for(__lambda_19_9.operator()() , __lambda_20_9.operator()(); static_cast<bool>(__lambda_20_37.operator()()); __lambda_20_59.operator()()) 
-  {
+  for(__lambda_19_9.operator()() , __lambda_20_9.operator()(); static_cast<bool>(__lambda_20_37.operator()()); __lambda_20_59.operator()()) {
   }
   
 }

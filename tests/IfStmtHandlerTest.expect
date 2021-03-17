@@ -7,45 +7,46 @@ int main()
   } else /* constexpr */ {
     if(true) {
       printf("true");
-    }
+    } 
     
-    
-  }
+  } 
   
   if constexpr(false) {
     printf("False\n");
   } else /* constexpr */ {
     if constexpr(true) {
       printf("true");
-    }
+    } 
     
-    
-  }
+  } 
   
-  if constexpr(false) printf("False\n");
-  else /* constexpr */ {
-    if(true) printf("true");
+  if constexpr(false) {
+    printf("False\n");
+  } else /* constexpr */ {
+    if(true) {
+      printf("true");
+    } 
     
-    
-    
-  }
+  } 
   
   int x = 1;
-  if(1 == x) printf("a");
-  else {
+  if(1 == x) {
+    printf("a");
+  } else {
     if(2 == x) {
       printf("b");
-      if(x == 5) printf("5");
-      
+      if(x == 5) {
+        printf("5");
+      } 
       
     } else {
-      if(x == 3) printf("r");
+      if(x == 3) {
+        printf("r");
+      } 
       
-      
-    }
+    } 
     
-    
-  }
+  } 
   
 }
 

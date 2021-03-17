@@ -18,9 +18,9 @@ int Foo()
     if(static_cast<bool>(ret)) {
       if(1 != ret) {
         return ret;
-      }
+      } 
       
-    }
+    } 
     
   }
   

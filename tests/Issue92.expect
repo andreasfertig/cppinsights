@@ -169,8 +169,9 @@ struct generator<unsigned int>
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
-    
+    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
+      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    } 
     
   }
   
@@ -209,11 +210,11 @@ generator<unsigned int> take(generator<unsigned int> & g, uint32_t end)
     generator<unsigned int> & __range1 = g;
     generator<unsigned int>::iterator __begin1 = __range1.begin();
     generator<unsigned int>::iterator __end1 = __range1.end();
-    for(; __begin1.operator!=(__end1); __begin1.operator++()) 
-    {
+    for(; __begin1.operator!=(__end1); __begin1.operator++()) {
       unsigned int e = __begin1.operator*();
-      if(i >= end) break;
-      
+      if(i >= end) {
+        break;
+      } 
       
       co_yield e;
       ++i;
@@ -234,8 +235,7 @@ int main()
     generator<unsigned int> && __range1 = take(g, 10);
     generator<unsigned int>::iterator __begin1 = __range1.begin();
     generator<unsigned int>::iterator __end1 = __range1.end();
-    for(; __begin1.operator!=(__end1); __begin1.operator++()) 
-    {
+    for(; __begin1.operator!=(__end1); __begin1.operator++()) {
       uint32_t e = __begin1.operator*();
       arr[i++] = e;
     }

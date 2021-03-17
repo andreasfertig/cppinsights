@@ -8,8 +8,7 @@ int main()
   char arr[10] = {2, 4, 6, 8, 10, 12, 14, 16, 18, 20};
   {
     char (&__range1)[10] = arr;
-    for(char * __begin1 = __range1, *__end1 = __range1 + 10L; __begin1 != __end1; ++__begin1) 
-    {
+    for(char * __begin1 = __range1, *__end1 = __range1 + 10L; __begin1 != __end1; ++__begin1) {
       char c = *__begin1;
     }
     
@@ -17,16 +16,14 @@ int main()
   std::vector<int> v = std::vector<int, std::allocator<int> >{std::initializer_list<int>{1, 2, 3, 5}};
   {
     std::vector<int, std::allocator<int> > & __range1 = v;
-    for(std::__wrap_iter<int *> __begin1 = std::__wrap_iter<int *>(__range1.begin()), __end1 = std::__wrap_iter<int *>(__range1.end()); std::operator!=(__begin1, __end1); __begin1.operator++()) 
-    {
+    for(std::__wrap_iter<int *> __begin1 = std::__wrap_iter<int *>(__range1.begin()), __end1 = std::__wrap_iter<int *>(__range1.end()); std::operator!=(__begin1, __end1); __begin1.operator++()) {
       int & vv = __begin1.operator*();
     }
     
   }
   {
     std::vector<int, std::allocator<int> > & __range1 = v;
-    for(std::__wrap_iter<int *> __begin1 = std::__wrap_iter<int *>(__range1.begin()), __end1 = std::__wrap_iter<int *>(__range1.end()); std::operator!=(__begin1, __end1); __begin1.operator++()) 
-    {
+    for(std::__wrap_iter<int *> __begin1 = std::__wrap_iter<int *>(__range1.begin()), __end1 = std::__wrap_iter<int *>(__range1.end()); std::operator!=(__begin1, __end1); __begin1.operator++()) {
       int & vv = __begin1.operator*();
     }
     

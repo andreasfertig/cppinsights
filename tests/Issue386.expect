@@ -1,0 +1,52 @@
+#include <utility>
+
+namespace tnt
+{
+  template<typename T, std::size_t N>
+  struct vector final
+  {
+    
+    /* PASSED: static_assert(N > 0); */
+    public: 
+    template<typename U, std::size_t S>
+    inline constexpr vector<T, N> & operator=(vector<U, S> && rhs) noexcept
+    {
+      if(this != &rhs) {
+                
+        class __lambda_15_17
+        {
+          public: 
+          template<std::size_t ... I>
+          inline auto operator()(std::index_sequence<I...>) const noexcept
+          {
+            ((__this->data[I] = std::exchange(rhs.data[I], U(0))) , ...);
+          }
+          private: 
+          vector<T, N> * __this;
+          auto rhs;
+          
+          public:
+          __lambda_15_17(vector<T, N> * _this, auto _rhs)
+          : __this{_this}
+          , rhs{_rhs}
+          {}
+          
+        };
+        
+        __lambda_15_17{this, std::move(rhs)}(std::make_index_sequence<S>{});
+      } 
+      
+      return *this;
+    }
+    
+    private: 
+    T data[N];
+  };
+  
+  
+} // namespace tnt
+
+int main()
+{
+}
+

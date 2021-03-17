@@ -109,7 +109,7 @@ int main()
     return 0;
   } else {
     return 1;
-  }
+  } 
   
   const bool b2 = f1.operator==("main");
   const bool b3 = f1.operator==(typeid(f2));

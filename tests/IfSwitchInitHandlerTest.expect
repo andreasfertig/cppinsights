@@ -22,12 +22,11 @@ int Foo()
         int ret = Write();
         if(1 != ret) {
           return ret;
-        }
+        } 
         
       }
       
-      
-    }
+    } 
     
   }
   

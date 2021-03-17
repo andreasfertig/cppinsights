@@ -271,6 +271,10 @@ protected:
     /// \brief Check whether or not this statement will add curlys or parentheses and add them only if required.
     void InsertCurlysIfRequired(const Stmt* stmt);
 
+    STRONG_BOOL(AddNewLineAfter);
+
+    void WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAfter addNewLineAfter);
+
     STRONG_BOOL(AddSpaceAtTheEnd);
 
     enum class BraceKind

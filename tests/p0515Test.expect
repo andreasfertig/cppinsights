@@ -13,10 +13,9 @@ struct Spaceship
         return std::strong_ordering(std::strong_ordering::less);
       } else {
         return std::strong_ordering(std::strong_ordering::greater);
-      }
+      } 
       
-      
-    }
+    } 
     
   }
   

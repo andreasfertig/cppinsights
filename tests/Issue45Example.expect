@@ -1,35 +1,31 @@
 int main()
 {
   int x = 0;
-  for(; x < 20; ++x) 
-  {
+  for(; x < 20; ++x) {
     x += x;
   }
   
-  for(int i = 0; x < 20; ++x) 
-  {
+  for(int i = 0; x < 20; ++x) {
     x += i;
   }
   
-  for(int i = 0, y = 2, t = 4, o = 5; i < 20; ++i) 
-  {
+  for(int i = 0, y = 2, t = 4, o = 5; i < 20; ++i) {
     x += i;
   }
   
-  for(int * i = &x, *y = &x; i; ++i) 
-  {
+  for(int * i = &x, *y = &x; i; ++i) {
     x += *i;
   }
   
-  for(; ; ) ;
+  for(; ; ) {
+  }
   
   char data[5] = {'\0', '\0', '\0', '\0', '\0'};
   {
     char (&__range1)[5] = data;
     char * __begin1 = __range1;
     char * __end1 = __range1 + 5L;
-    for(; __begin1 != __end1; ++__begin1) 
-    {
+    for(; __begin1 != __end1; ++__begin1) {
       char & x = *__begin1;
       x = 2;
     }

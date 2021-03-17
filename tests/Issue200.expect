@@ -10,8 +10,9 @@ void f(U, T... rest)
 template<>
 void f<int, int>(int, int __rest1)
 {
-  if constexpr(1 != 0) f(__rest1);
-  
+  if constexpr(1 != 0) {
+    f(__rest1);
+  } 
   
 }
 #endif

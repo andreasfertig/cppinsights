@@ -47,8 +47,7 @@ void f()
     {
       {
         auto && __range1 = container;
-        for(; ; ) 
-        {
+        for(; ; ) {
           auto test;
         }
         
@@ -63,8 +62,7 @@ void f()
         MyArrayWrapper<int> & __range1 = container;
         int * __begin0 = __range1.begin();
         int * __end0 = __range1.end();
-        for(; __begin0 != __end0; ++__begin0) 
-        {
+        for(; __begin0 != __end0; ++__begin0) {
           int test = *__begin0;
         }
         
@@ -78,8 +76,7 @@ void f()
     {
       {
         auto && __range1 = container;
-        for(; ; ) 
-        {
+        for(; ; ) {
           auto test;
         }
         
