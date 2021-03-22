@@ -1,0 +1,24 @@
+struct Point
+{
+  int x = 0;
+  int y = 0;
+  // inline constexpr Point() noexcept = default;
+};
+
+
+
+
+int main()
+{
+  Point pt = Point();
+  Point * pPt = &pt;
+  const Point * cpPt = &pt;
+  Point & lrPt = pt;
+  Point && rrPt = {{0}, {0}};
+  using T1 = Point;
+  using T2 = Point *;
+  using T3 = const Point *;
+  using T4 = Point &;
+  using T5 = Point &&;
+}
+
