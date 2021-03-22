@@ -936,7 +936,7 @@ std::string GetName(const CXXRecordDecl& RD)
 
 std::string GetName(const QualType& t, const Unqualified unqualified)
 {
-    return details::GetName(t, unqualified);
+    return details::GetName(GetDesugarType(t), unqualified);
 }
 //-----------------------------------------------------------------------------
 
