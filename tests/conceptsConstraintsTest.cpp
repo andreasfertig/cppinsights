@@ -1,4 +1,6 @@
 // cmdline:-std=c++2a
+#define INSIGHTS_USE_TEMPLATE
+
 namespace Constraints {
     // N4861: [temp.constr.op]
     template<typename T>

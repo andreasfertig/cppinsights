@@ -1,0 +1,22 @@
+template<typename T>
+class FinalTest final
+{
+};
+
+/* First instantiated from: Final2Test.cpp:9 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class FinalTest<int> final
+{
+};
+
+#endif
+
+
+
+int main()
+{
+  FinalTest<int> a = {};
+}
+
+

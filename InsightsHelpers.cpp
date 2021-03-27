@@ -1021,6 +1021,9 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
             typeName += StrCat(" ", varName);
         }
 
+    } else if(isa<MemberPointerType>(t)) {
+        InsertAfter(typeName, "::*", varName);
+
     } else if(isPointerToArray) {
         if(Contains(typeName, "(*")) {
             InsertAfter(typeName, "(*", varName);

@@ -2651,6 +2651,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     mOutputFormatHelper.Append(GetName(*stmt));
 
+    if(classTemplateSpecializationDecl) {
+        InsertTemplateArgs(*classTemplateSpecializationDecl);
+    }
+
     if(stmt->hasAttr<FinalAttr>()) {
         mOutputFormatHelper.Append(" final");
     }
@@ -2659,10 +2663,6 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     if(not stmt->hasDefinition() || not stmt->isCompleteDefinition()) {
         mOutputFormatHelper.AppendSemiNewLine();
         return;
-    }
-
-    if(classTemplateSpecializationDecl) {
-        InsertTemplateArgs(*classTemplateSpecializationDecl);
     }
 
     if(stmt->getNumBases()) {
