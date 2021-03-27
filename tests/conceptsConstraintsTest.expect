@@ -1,4 +1,6 @@
 // cmdline:-std=c++2a
+#define INSIGHTS_USE_TEMPLATE
+
 namespace Constraints
 {
   template<typename T>
@@ -7,7 +9,7 @@ namespace Constraints
   {
   }
   
-  /* First instantiated from: conceptsConstraintsTest.cpp:24 */
+  /* First instantiated from: conceptsConstraintsTest.cpp:26 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   void f<int>(int)
@@ -27,14 +29,14 @@ namespace Constraints
   struct WrapN;
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  struct WrapN;
+  struct WrapN<1>;
   #endif
   template<unsigned int N>
   using AddOneTy = WrapN<N + 1>;
   template<unsigned int M>
   void g(AddOneTy<2 * M> *);
   
-  /* First instantiated from: conceptsConstraintsTest.cpp:18 */
+  /* First instantiated from: conceptsConstraintsTest.cpp:20 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
   void g<0>(WrapN<1> *);

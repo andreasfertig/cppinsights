@@ -1,0 +1,52 @@
+// cmdline:-std=c++11
+
+#define INSIGHTS_USE_TEMPLATE
+
+struct Other
+{
+  inline double Callback(int, double)
+  {
+    return 3.1400000000000001;
+  }
+  
+};
+
+
+
+
+template<typename T>
+struct Test
+{
+    template <typename R, typename... Args>
+    void fun(R (T::*ptr)(Args...))
+    {
+    }    
+};
+
+/* First instantiated from: MemberPointerTest.cpp:21 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Test<Other>
+{
+  template<typename R, typename ... Args>
+  inline void fun(R (Other::*ptr)(Args...));
+  
+  /* First instantiated from: MemberPointerTest.cpp:23 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline void fun<double, int, double>(double (Other::*ptr)(int, double))
+  {
+  }
+  #endif
+  
+};
+
+#endif
+
+
+int main()
+{
+  Test<Other> t = {};
+  t.fun<double, int, double>(&Other::Callback);
+}
+

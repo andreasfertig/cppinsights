@@ -1,0 +1,194 @@
+// cmdline:-std=c++2a
+#include <functional>
+#include <iostream>
+
+namespace tnt
+{
+  template<typename T>
+  [[nodiscard("")]] inline constexpr std::basic_string_view<char, std::char_traits<char> > type_name() noexcept
+  {
+    return {__PRETTY_FUNCTION__ + 39, sizeof(__PRETTY_FUNCTION__) - 41};
+  }
+  
+  /* First instantiated from: Issue391.cpp:96 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  [[nodiscard("")]] inline constexpr std::basic_string_view<char, std::char_traits<char> > type_name<my_type>() noexcept
+  {
+    return std::basic_string_view<char, std::char_traits<char> >{"std::string_view tnt::type_name() [T = my_type]" + 39, sizeof("std::string_view tnt::type_name() [T = my_type]") - 41};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue391.cpp:55 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  [[nodiscard("")]] inline constexpr std::basic_string_view<char, std::char_traits<char> > type_name<int>() noexcept
+  {
+    return std::basic_string_view<char, std::char_traits<char> >{"std::string_view tnt::type_name() [T = int]" + 39, sizeof("std::string_view tnt::type_name() [T = int]") - 41};
+  }
+  #endif
+  
+  
+  /* First instantiated from: Issue391.cpp:55 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  [[nodiscard("")]] inline constexpr std::basic_string_view<char, std::char_traits<char> > type_name<std::basic_string_view<char, std::char_traits<char> > >() noexcept
+  {
+    return std::basic_string_view<char, std::char_traits<char> >{"std::string_view tnt::type_name() [T = std::__1::basic_string_view<char, std::__1::char_traits<char> >]" + 39, sizeof("std::string_view tnt::type_name() [T = std::__1::basic_string_view<char, std::__1::char_traits<char> >]") - 41};
+  }
+  #endif
+  
+  template<auto A>
+  [[nodiscard("")]] inline constexpr std::basic_string_view<char, std::char_traits<char> > value_name() noexcept
+  {
+    return {__PRETTY_FUNCTION__ + 40, sizeof(__PRETTY_FUNCTION__) - 42};
+  }
+  template<typename type_parameter_0_0>
+  struct wrapper;
+  template<typename T>
+  struct printer final
+  {
+    inline explicit constexpr printer(const T & ref) noexcept
+    : data{std::addressof(ref)}
+    {
+    }
+    
+    // inline printer(const T &&) = delete;
+    template<typename R, typename ... Args>
+    inline void operator()(std::basic_string_view<char, std::char_traits<char> > name, R (T::*ptr)(Args...))
+    {
+      (((((std::operator<<(std::cout, "\t") << type_name<R>()) << ' ') << name) << " = ") << std::invoke(ptr, this->data)) << ";\n";
+    }
+    template<typename R>
+    inline void operator()(std::basic_string_view<char, std::char_traits<char> > name, R T::*ptr)
+    {
+      (((((std::operator<<(std::cout, "\t") << type_name<R>()) << ' ') << name) << " = ") << std::invoke(ptr, this->data)) << ";\n";
+    }
+    
+    private: 
+    const T * data;
+  };
+  
+  /* First instantiated from: Issue391.cpp:98 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct printer<my_type> final
+  {
+    inline explicit constexpr printer(const my_type & ref) noexcept
+    : data{std::addressof(ref)}
+    {
+    }
+    
+    // inline printer(const my_type &&) = delete;
+    template<typename R, typename ... Args>
+    inline void operator()(std::basic_string_view<char, std::char_traits<char> > name, R (my_type::*ptr)(Args...));
+    template<typename R>
+    inline void operator()(std::basic_string_view<char, std::char_traits<char> > name, R my_type::*ptr);
+    
+    /* First instantiated from: Issue391.cpp:88 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline void operator()<int>(std::basic_string_view<char, std::char_traits<char> > name, int my_type::*ptr)
+    {
+      std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "\t"), type_name<int>()), ' '), std::basic_string_view<char, std::char_traits<char> >(name)), " = ").operator<<(std::invoke(ptr, this->data)), ";\n");
+    }
+    #endif
+    
+    
+    /* First instantiated from: Issue391.cpp:89 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    inline void operator()<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > name, std::basic_string_view<char, std::char_traits<char> > my_type::*ptr)
+    {
+      std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "\t"), type_name<std::basic_string_view<char, std::char_traits<char> > >()), ' '), std::basic_string_view<char, std::char_traits<char> >(name)), " = "), std::basic_string_view<char, std::char_traits<char> >(std::invoke(ptr, this->data))), ";\n");
+    }
+    #endif
+    
+    
+    private: 
+    const my_type * data;
+    public: 
+  };
+  
+  #endif
+  template<typename T>
+  requires requires{
+    &wrapper<T>::template operator()<printer<T> >;
+  }
+  struct serializer final
+  {
+    template<typename Vis>
+    static inline constexpr void get_visit(Vis && vis)
+    {
+      wrap(std::forward<Vis>(vis));
+    }
+    inline static constexpr const wrapper<T> wrap;
+  };
+  
+  /* First instantiated from: Issue391.cpp:99 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct serializer<my_type> final
+  {
+    template<typename Vis>
+    static inline constexpr void get_visit(Vis && vis);
+    
+    /* First instantiated from: Issue391.cpp:99 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    static inline constexpr void get_visit<printer<my_type> &>(printer<my_type> & vis)
+    {
+      wrap.operator()(std::forward<printer<my_type> &>(vis));
+    }
+    #endif
+    
+    inline static constexpr const wrapper<my_type> wrap = wrapper<my_type>();
+  };
+  
+  #endif
+  
+}
+
+struct my_type final
+{
+  int a;
+  std::basic_string_view<char, std::char_traits<char> > b;
+};
+
+
+
+template<>
+struct tnt::wrapper<my_type> final
+{
+  template<typename Vis>
+  inline constexpr void operator()(Vis && vis) const
+  {
+    vis("a", &my_type::a);
+    vis("b", &my_type::b);
+  }
+  
+  /* First instantiated from: Issue391.cpp:69 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline constexpr void operator()<tnt::printer<my_type> &>(tnt::printer<my_type> & vis) const
+  {
+    vis.operator()(std::basic_string_view<char, std::char_traits<char> >("a"), &my_type::a);
+    vis.operator()(std::basic_string_view<char, std::char_traits<char> >("b"), &my_type::b);
+  }
+  #endif
+  
+  // inline constexpr tnt::wrapper() noexcept = default;
+};
+
+
+
+int main()
+{
+  constexpr const my_type t = {10, std::basic_string_view<char, std::char_traits<char> >("42")};
+  std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "struct "), tnt::type_name<my_type>()), " "), (std::is_final_v<my_type> ? "final" : "")), "\n{\n");
+  tnt::printer<my_type> p = tnt::printer<my_type>{t};
+  tnt::serializer<my_type>::get_visit(p);
+  std::operator<<(std::cout, "};\n");
+}
+

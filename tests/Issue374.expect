@@ -2,8 +2,8 @@ struct S;
 
 struct T
 {
-  int S::* s_mptr;
-  int T::* t_mptr;
+  int S::*s_mptr;
+  int T::*t_mptr;
   using MemberVarPtr_7 = int T::*;
   static MemberVarPtr_7 static_mptr;
   template<int S::* >
@@ -16,12 +16,12 @@ struct T
   void f();
   struct N
   {
-    int S::* s_mptr;
-    int T::* t_mptr;
-    int N::* n_mptr;
+    int S::*s_mptr;
+    int T::*t_mptr;
+    int N::*n_mptr;
   };
   
-  int N::* n_mptr;
+  int N::*n_mptr;
 };
 
 
