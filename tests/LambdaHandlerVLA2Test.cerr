@@ -28,7 +28,4 @@ void Test(int n)
 .tmp.cpp:18:5: note: candidate constructor not viable: no known conversion from 'char [n]' to 'char (&)[n]' for 1st argument
     __lambda_6_5(char (&_buffer)[n])
     ^
-.tmp.cpp:24:15: error: cannot use dot operator on a type
-  __lambda_6_5.operator()(1, 2);
-              ^
-1 warning and 5 errors generated.
+1 warning and 4 errors generated.

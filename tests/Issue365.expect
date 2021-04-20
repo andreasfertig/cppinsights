@@ -32,7 +32,7 @@ String -> String<128, 128, wchar_t>;
 void FTest()
 {
   double d = {};
-  String<128, 128, wchar_t> s = String<128, 128, wchar_t>();
+  String<128, 128> s = String<128, 128>();
   s.Format(L"%i", d);
 }
 

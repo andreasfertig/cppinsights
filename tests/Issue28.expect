@@ -4,6 +4,6 @@
 int main()
 {
   using namespace std::string_literals;
-  std::vector<std::string> foo = std::vector<std::basic_string<char>, std::allocator<std::basic_string<char> > >{std::initializer_list<std::basic_string<char> >{std::operator""s("foo", 3UL), std::operator""s("bar", 3UL)}};
+  std::vector<std::string> foo = std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >{std::initializer_list<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >{std::operator""s("foo", 3UL), std::operator""s("bar", 3UL)}};
 }
 

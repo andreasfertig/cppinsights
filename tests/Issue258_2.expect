@@ -39,6 +39,7 @@ int main()
     NonMoveable x;
     public: 
     // inline __lambda_22_19(const __lambda_22_19 &) = delete;
+    // inline __lambda_22_19 & operator=(const __lambda_22_19 &) = delete;
     __lambda_22_19(NonMoveable && _x)
     : x{static_cast<NonMoveable &&>(_x)}
     {}

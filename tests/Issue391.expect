@@ -35,7 +35,7 @@ namespace tnt
   template<>
   [[nodiscard("")]] inline constexpr std::basic_string_view<char, std::char_traits<char> > type_name<std::basic_string_view<char, std::char_traits<char> > >() noexcept
   {
-    return std::basic_string_view<char, std::char_traits<char> >{"std::string_view tnt::type_name() [T = std::__1::basic_string_view<char, std::__1::char_traits<char> >]" + 39, sizeof("std::string_view tnt::type_name() [T = std::__1::basic_string_view<char, std::__1::char_traits<char> >]") - 41};
+    return std::basic_string_view<char, std::char_traits<char> >{"std::string_view tnt::type_name() [T = std::string_view]" + 39, sizeof("std::string_view tnt::type_name() [T = std::string_view]") - 41};
   }
   #endif
   
@@ -99,7 +99,7 @@ namespace tnt
     /* First instantiated from: Issue391.cpp:89 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline void operator()<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > name, std::basic_string_view<char, std::char_traits<char> > my_type::*ptr)
+    inline void operator()<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > name, std::string_view my_type::*ptr)
     {
       std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "\t"), type_name<std::basic_string_view<char, std::char_traits<char> > >()), ' '), std::basic_string_view<char, std::char_traits<char> >(name)), " = "), std::basic_string_view<char, std::char_traits<char> >(std::invoke(ptr, this->data))), ";\n");
     }

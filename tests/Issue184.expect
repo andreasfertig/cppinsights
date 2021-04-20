@@ -3,17 +3,17 @@
 
 class Customer
 {
-  std::basic_string<char> name;
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > name;
   
   public: 
-  inline Customer(const std::basic_string<char> & n)
-  : name{std::basic_string<char>(n)}
+  inline Customer(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & n)
+  : name{std::basic_string<char, std::char_traits<char>, std::allocator<char> >(n)}
   {
   }
   
-  inline std::basic_string<char> getName() const
+  inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > getName() const
   {
-    return std::basic_string<char>(this->name);
+    return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(this->name);
   }
   
   // inline ~Customer() noexcept = default;
@@ -37,7 +37,7 @@ struct CustomerHash
 {
   inline std::size_t operator()(const Customer & c) const
   {
-    return std::hash<std::basic_string<char> >().operator()(c.getName());
+    return std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >().operator()(c.getName());
   }
   
   // inline constexpr CustomerHash() noexcept = default;
@@ -50,7 +50,7 @@ struct ManyParentsWithOperator : Bases...{
 using Bases::operator()...;//C++17
 };
 
-/* First instantiated from: type_traits:1541 */
+/* First instantiated from: type_traits:1797 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, public CustomerEq
@@ -67,7 +67,7 @@ struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, 
 #endif
 
 
-/* First instantiated from: type_traits:1541 */
+/* First instantiated from: type_traits:1797 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, public CustomerHash

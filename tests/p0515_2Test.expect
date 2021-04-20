@@ -14,7 +14,7 @@ int main()
 {
   constexpr const Spaceship enterprise = {2};
   constexpr const Spaceship millenniumFalcon = {2};
-  /* PASSED: static_assert(std::operator<=(enterprise.operator<=>(millenniumFalcon), 0)); */
+  /* PASSED: static_assert(std::operator<=(enterprise.operator<=>(millenniumFalcon), std::_CmpUnspecifiedParam(0))); */
   /* PASSED: static_assert(enterprise.operator==(millenniumFalcon)); */
 }
 

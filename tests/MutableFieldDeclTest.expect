@@ -4,7 +4,6 @@ int main()
   class Test
   {
     mutable int x;
-    public: 
   };
   
 }

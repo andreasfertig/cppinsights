@@ -38,6 +38,7 @@ int main()
     int c;
     public: 
     // inline __lambda_20_16(const __lambda_20_16 &) = delete;
+    // inline __lambda_20_16 & operator=(const __lambda_20_16 &) = delete;
     __lambda_20_16(Movable && _x, int & _c)
     : x{std::move(_x)}
     , c{_c}

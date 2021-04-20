@@ -153,6 +153,11 @@ def main():
             missingExpected += 1
             continue
 
+        if os.path.isfile(ignoreFile):
+            print('Ignoring: %s' %(f))
+            filesPassed += 1
+            continue
+
         cmd = [insightsPath, f]
 
         if args['use_libcpp']:

@@ -28,7 +28,7 @@
 .tmp.cpp:49:33: error: 'auto' not allowed in function prototype
       __lambda_20_10(auto _ex1, auto _ex2)
                                 ^~~~
-.tmp.cpp:156:3: error: unknown type name '__lambda_20_10'; did you mean 'expressions::__lambda_27_16'?
+.tmp.cpp:158:3: error: unknown type name '__lambda_20_10'; did you mean 'expressions::__lambda_27_16'?
   __lambda_20_10 f = expressions::operator&&(expressions::Gt_10, expressions::Lt_20);
   ^~~~~~~~~~~~~~
   expressions::__lambda_27_16

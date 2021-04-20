@@ -13,7 +13,7 @@ struct generator
 			return {};
 		}
 		std::experimental::suspend_always initial_suspend() { return {}; }
-		std::experimental::suspend_always final_suspend() { return {}; }
+		std::experimental::suspend_always final_suspend() noexcept { return {}; }
 		generator get_return_object() { return generator{ this }; };
 		void unhandled_exception() { std::terminate(); }
 		void return_void() {}
@@ -87,7 +87,7 @@ struct generator<unsigned int>
       return {};
     }
     
-    inline std::experimental::suspend_always final_suspend()
+    inline std::experimental::suspend_always final_suspend() noexcept
     {
       return {};
     }
@@ -185,6 +185,7 @@ struct generator<unsigned int>
   std::experimental::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator<unsigned int> &) = delete;
+  // inline generator<unsigned int> & operator=(const generator<unsigned int> &) = delete;
 };
 
 #endif

@@ -28,7 +28,7 @@ struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() co
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
+struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
 {
 };
 
@@ -68,7 +68,7 @@ struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() co
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
+struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
 {
 };
 
@@ -108,7 +108,7 @@ struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() co
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
+struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
 {
 };
 
@@ -125,11 +125,11 @@ struct FunctionArgsBase {
 /* First instantiated from: Issue102.cpp:30 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgsBase<std::basic_string<char>, std::basic_string<char> >
+struct FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
 {
-  using args = std::tuple<std::basic_string<char> >;
+  using args = std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
   using arity = std::integral_constant<unsigned int, static_cast<unsigned int>(1)>;
-  using result = std::basic_string<char>;
+  using result = std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
 };
 
 #endif
@@ -192,9 +192,9 @@ namespace details
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  std::basic_string<char> match_call<std::basic_string<char> &, __lambda_73_4, __lambda_74_4, __lambda_75_4>(const __lambda_73_4 & _case, std::basic_string<char> & value, std::integral_constant<bool, true>, const __lambda_74_4 & __other3, const __lambda_75_4 & __other4)
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > match_call<std::basic_string<char, std::char_traits<char>, std::allocator<char> > &, __lambda_73_4, __lambda_74_4, __lambda_75_4>(const __lambda_73_4 & _case, std::basic_string<char, std::char_traits<char>, std::allocator<char> > & value, std::integral_constant<bool, true>, const __lambda_74_4 & __other3, const __lambda_75_4 & __other4)
   {
-    return _case.operator()(std::basic_string<char>(std::forward<std::basic_string<char> &>(value)));
+    return _case.operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> >(std::forward<std::basic_string<char, std::char_traits<char>, std::allocator<char> > &>(value)));
   }
   #endif
   
@@ -247,10 +247,10 @@ template<>
 int match<int &, __lambda_73_4, __lambda_74_4, __lambda_75_4>(int & value, const __lambda_73_4 & _case, const __lambda_74_4 & __cases2, const __lambda_75_4 & __cases3)
 {
   using namespace std;
-  using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char> >;
-  using arg = tuple_element_t<0, std::tuple<std::basic_string<char> > >;
-  using match = is_same<std::basic_string<char>, decay_t<int &> >;
-  return details::match_call(_case, std::forward<int &>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char>, int>{{}})), __cases2, __cases3);
+  using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
+  using arg = tuple_element_t<0, std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >;
+  using match = is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, decay_t<int &> >;
+  return details::match_call(_case, std::forward<int &>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>{{}})), __cases2, __cases3);
 }
 #endif
 
@@ -273,10 +273,10 @@ template<>
 int match<char const (&)[3], __lambda_73_4, __lambda_74_4, __lambda_75_4>(char const (&value)[3], const __lambda_73_4 & _case, const __lambda_74_4 & __cases2, const __lambda_75_4 & __cases3)
 {
   using namespace std;
-  using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char> >;
-  using arg = tuple_element_t<0, std::tuple<std::basic_string<char> > >;
-  using match = is_same<std::basic_string<char>, decay_t<char const (&)[3]> >;
-  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char>, const char *>{{}})), __cases2, __cases3);
+  using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
+  using arg = tuple_element_t<0, std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >;
+  using match = is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, decay_t<char const (&)[3]> >;
+  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, const char *>{{}})), __cases2, __cases3);
 }
 #endif
 
@@ -296,13 +296,13 @@ int match<char const (&)[3], __lambda_74_4, __lambda_75_4>(char const (&value)[3
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-std::basic_string<char> match<std::basic_string<char> &, __lambda_73_4, __lambda_74_4, __lambda_75_4>(std::basic_string<char> & value, const __lambda_73_4 & _case, const __lambda_74_4 & __cases2, const __lambda_75_4 & __cases3)
+std::basic_string<char, std::char_traits<char>, std::allocator<char> > match<std::basic_string<char, std::char_traits<char>, std::allocator<char> > &, __lambda_73_4, __lambda_74_4, __lambda_75_4>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > & value, const __lambda_73_4 & _case, const __lambda_74_4 & __cases2, const __lambda_75_4 & __cases3)
 {
   using namespace std;
-  using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char> >;
-  using arg = tuple_element_t<0, std::tuple<std::basic_string<char> > >;
-  using match = is_same<std::basic_string<char>, std::basic_string<char> >;
-  return details::match_call(_case, std::forward<std::basic_string<char> &>(value), std::integral_constant<bool, true>(static_cast<std::integral_constant<bool, true> &&>(std::is_same<std::basic_string<char>, std::basic_string<char> >{{}})), __cases2, __cases3);
+  using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
+  using arg = tuple_element_t<0, std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >;
+  using match = is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
+  return details::match_call(_case, std::forward<std::basic_string<char, std::char_traits<char>, std::allocator<char> > &>(value), std::integral_constant<bool, true>(static_cast<std::integral_constant<bool, true> &&>(std::is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >{{}})), __cases2, __cases3);
 }
 #endif
 
@@ -344,20 +344,20 @@ int test<int>(int && value)
   class __lambda_73_4
   {
     public: 
-    inline std::basic_string<char> operator()(std::basic_string<char> value) const
+    inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
       return operator+(value, " Hi!");
     }
     
-    using retType_73_4 = std::basic_string<char> (*)(std::string);
+    using retType_73_4 = std::string (*)(std::string);
     inline /*constexpr */ operator retType_73_4 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline std::basic_string<char> __invoke(std::basic_string<char> value)
+    static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
     {
       std::operator<<(std::cout, "This is string ");
       return operator+(value, " Hi!");
@@ -425,20 +425,20 @@ int test<char const (&)[3]>(char const (&value)[3])
   class __lambda_73_4
   {
     public: 
-    inline std::basic_string<char> operator()(std::basic_string<char> value) const
+    inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
       return operator+(value, " Hi!");
     }
     
-    using retType_73_4 = std::basic_string<char> (*)(std::string);
+    using retType_73_4 = std::string (*)(std::string);
     inline /*constexpr */ operator retType_73_4 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline std::basic_string<char> __invoke(std::basic_string<char> value)
+    static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
     {
       std::operator<<(std::cout, "This is string ");
       return operator+(value, " Hi!");
@@ -510,26 +510,26 @@ int test<char const (&)[3]>(char const (&value)[3])
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-std::basic_string<char> test<std::basic_string<char> >(std::basic_string<char> && value)
+std::basic_string<char, std::char_traits<char>, std::allocator<char> > test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(std::basic_string<char, std::char_traits<char>, std::allocator<char> > && value)
 {
       
   class __lambda_73_4
   {
     public: 
-    inline std::basic_string<char> operator()(std::basic_string<char> value) const
+    inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
       return operator+(value, " Hi!");
     }
     
-    using retType_73_4 = std::basic_string<char> (*)(std::string);
+    using retType_73_4 = std::string (*)(std::string);
     inline /*constexpr */ operator retType_73_4 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline std::basic_string<char> __invoke(std::basic_string<char> value)
+    static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
     {
       std::operator<<(std::cout, "This is string ");
       return operator+(value, " Hi!");
@@ -593,7 +593,7 @@ int main()
 {
   std::cout.operator<<(test(200)).operator<<(std::endl);
   std::cout.operator<<(test("RR")).operator<<(std::endl);
-  std::operator<<(std::cout, test(std::basic_string<char>{"ARR"})).operator<<(std::endl);
+  std::operator<<(std::cout, test(std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"ARR"})).operator<<(std::endl);
   return 0;
 }
 
