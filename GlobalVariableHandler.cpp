@@ -20,7 +20,12 @@ using namespace clang::ast_matchers;
 
 namespace clang::ast_matchers {
 const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl> varTemplateSpecDecl;  // NOLINT
-const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl>             decompositionDecl;    // NOLINT
+#if IS_CLANG_NEWER_THAN(11)
+#else
+// Clang 12 has decompositionDecl but with different type
+const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl> decompositionDecl;  // NOLINT
+#endif
+
 // XXX: recent clang source has a declType matcher. Try to figure out a migration path.
 const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType> myDecltypeType;  // NOLINT
 }  // namespace clang::ast_matchers
