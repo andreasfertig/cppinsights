@@ -17,15 +17,7 @@ int main()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ int operator()(__lambda_5_11 * self) const
-    {
-      static_cast<void>(x);
-      static_cast<void>(y);
-      __lambda_5_11 & __self7 = *self;
-      int & a = __self7.x;
-      int & b = __self7.y;
-      return b - a;
-    }
+    inline /*constexpr */ auto operator()(__lambda_5_11 * self) const;
     #endif
     
     private: 
@@ -41,6 +33,6 @@ int main()
   };
   
   __lambda_5_11 f = __lambda_5_11{x, y};
-  return f.operator()(&f);
+  return /* INSIGHTS-TODO: CodeGenerator.cpp:3142 stmt: RecoveryExpr */;
 }
 

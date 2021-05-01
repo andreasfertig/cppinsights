@@ -2,7 +2,7 @@
 
 int main()
 {
-  std::string str = std::basic_string<char>{"Hello World"};
+  std::string str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"Hello World"};
     
   class __lambda_5_12
   {
@@ -12,9 +12,10 @@ int main()
     }
     
     private: 
-    std::basic_string<char> str;
+    std::basic_string<char, std::char_traits<char>, std::allocator<char> > str;
     public: 
-    __lambda_5_12(const std::basic_string<char> & _str)
+    // inline __lambda_5_12 & operator=(const __lambda_5_12 &) = delete;
+    __lambda_5_12(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & _str)
     : str{_str}
     {}
     

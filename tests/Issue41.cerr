@@ -5,12 +5,12 @@
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from .tmp.cpp:1:
-In file included from ... vector:274:
+In file included from ... vector:276:
 In file included from ... __bit_reference:15:
-... algorithm:933:13: error: no matching function for call to object of type '__lambda_12_26'
+... algorithm:943:13: error: no matching function for call to object of type '__lambda_12_26'
         if (__pred(*__first))
             ^~~~~~
-.tmp.cpp:37:57: note: in instantiation of function template specialization 'std::__1::find_if<std::__1::__wrap_iter<std::__1::basic_string<char> *>, __lambda_12_26>' requested here
-  std::__wrap_iter<std::basic_string<char> *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
-                                                        ^
+.tmp.cpp:37:104: note: in instantiation of function template specialization 'std::find_if<std::__wrap_iter<std::string *>, __lambda_12_26>' requested here
+  std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
+                                                                                                       ^
 3 errors generated.

@@ -13,11 +13,4 @@
 .tmp.cpp:68:72: error: use of undeclared identifier 'Iter'
   container(Iter b, Iter e) -> container<typename std::iterator_traits<Iter>::value_type>;
                                                                        ^
-.tmp.cpp:68:77: error: no type named 'value_type' in the global namespace; did you mean 'std::false_type'?
-  container(Iter b, Iter e) -> container<typename std::iterator_traits<Iter>::value_type>;
-                                                                            ^~~~~~~~~~~~
-                                                                            std::false_type
-... type_traits:456:38: note: 'std::false_type' declared here
-typedef _LIBCPP_BOOL_CONSTANT(false) false_type;
-                                     ^
-6 errors generated.
+5 errors generated.

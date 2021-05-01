@@ -1,19 +1,19 @@
 #include <string>
 
-std::basic_string<char> trim(const std::basic_string<char> & input)
+std::basic_string<char, std::char_traits<char>, std::allocator<char> > trim(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & input)
 {
   if(input.length() == 0) {
-    return std::basic_string<char>("");
+    return std::basic_string<char, std::char_traits<char>, std::allocator<char> >("");
   } 
   
-  std::string final = std::basic_string<char>(input);
+  std::string final = std::basic_string<char, std::char_traits<char>, std::allocator<char> >(input);
   int i = 0;
   while((i < static_cast<int>(input.length())) && (static_cast<int>(input.operator[](i)) <= static_cast<int>(' '))) {
     i++;
   }
   
   if(i >= static_cast<int>(input.length())) {
-    return std::basic_string<char>("");
+    return std::basic_string<char, std::char_traits<char>, std::allocator<char> >("");
   } 
   
   if(i > 0) {
@@ -31,7 +31,7 @@ std::basic_string<char> trim(const std::basic_string<char> & input)
 
 int main()
 {
-  std::string x = std::basic_string<char>{" ashj a a a aaa"};
+  std::string x = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{" ashj a a a aaa"};
   std::string b = trim(x);
 }
 

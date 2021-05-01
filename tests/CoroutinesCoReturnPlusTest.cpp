@@ -12,7 +12,7 @@ struct generator {
     }
     
     stdx::suspend_always initial_suspend() { return {}; }
-    stdx::suspend_always final_suspend() { return {}; }
+    stdx::suspend_always final_suspend() noexcept { return {}; }
     generator get_return_object() { return generator{this}; };
     void unhandled_exception() { std::terminate(); }
     void return_value(int value) { }

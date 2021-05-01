@@ -14,7 +14,7 @@ on:
 env:
   CMAKE_VERSION: 3.16.2
   NINJA_VERSION: 1.10.0
-  LLVM_VERSION: 10.0.0
+  LLVM_VERSION: 12.0.0
 
 jobs:
   checks:
@@ -24,12 +24,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # Clang 10
+        # Clang 12
         - {
-            name: "Linux Clang 10 - Format check",
+            name: "Linux Clang 12 - Format check",
             os: ubuntu-latest,
             build_type: Release,
-            cformat_name: 'clang-format-10'
+            cformat_name: 'clang-format-12'
           }
 
     steps:
@@ -37,13 +37,13 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Install Clang 10
+    - name: Install Clang 12
       shell: bash
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 10
-        sudo apt-get install clang-format-10
+        sudo ./llvm.sh 12
+        sudo apt-get install clang-format-12
 
     - name: clang-format check
       id: clang_format_check
@@ -64,11 +64,11 @@ jobs:
         config:
         # AppleClang
         - {
-            name: "Clang 10 / LLVM 10 @ macOS Release",
+            name: "Clang 12 / LLVM 12 @ macOS Release",
             os: macos-latest,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "10.0.0",
+            llvm_version: "12.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -82,11 +82,11 @@ jobs:
 
         # AppleClang
         - {
-            name: "Clang 10 / LLVM 10 @ macOS Debug",
+            name: "Clang 12 / LLVM 12 @ macOS Debug",
             os: macos-latest,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "10.0.0",
+            llvm_version: "12.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -98,31 +98,31 @@ jobs:
             upload: "No",
           }
 
-        # AppleClang
-        - {
-            name: "Clang 10 / LLVM 10 @ macOS Coveage & Debug",
-            os: macos-latest,
-            build_type: Release,
-            cxx: "clang++",
-            llvm_version: "10.0.0",
-            llvm_config: "llvm-config",
-            coverage: "Yes",
-            static: "No",
-            debug: "Yes",
-            tidy: "No",
-            run_tests: "No",
-            bin_name: "insights",
-            archive_name: "insights-macos",
-            upload: "No",
-          }
+        # # AppleClang
+        # - {
+        #     name: "Clang 12 / LLVM 12 @ macOS Coveage & Debug",
+        #     os: macos-latest,
+        #     build_type: Release,
+        #     cxx: "clang++",
+        #     llvm_version: "12.0.0",
+        #     llvm_config: "llvm-config",
+        #     coverage: "Yes",
+        #     static: "No",
+        #     debug: "Yes",
+        #     tidy: "No",
+        #     run_tests: "No",
+        #     bin_name: "insights",
+        #     archive_name: "insights-macos",
+        #     upload: "No",
+        #   }
 
           # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 10 @ Windows Release",
+            name: "MSVC 2019 / LLVM 12 @ Windows Release",
             os: windows-latest,
             build_type: Release,
             cxx: "cl",
-            llvm_version: "10.0.0",
+            llvm_version: "12.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             static: "Yes",
             debug: "No",
@@ -137,11 +137,11 @@ jobs:
 
         # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 10 @ Windows Debug",
+            name: "MSVC 2019 / LLVM 12 @ Windows Debug",
             os: windows-latest,
             build_type: Release,
             cxx: "cl",
-            llvm_version: "10.0.0",
+            llvm_version: "12.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             static: "Yes",
             debug: "Yes",
@@ -155,11 +155,11 @@ jobs:
 
         # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 10 @ Windows Code Coverage & Debug",
+            name: "MSVC 2019 / LLVM 12 @ Windows Code Coverage & Debug",
             os: windows-latest,
             build_type: Release,
             cxx: "clang-cl.exe",
-            llvm_version: "10.0.0",
+            llvm_version: "12.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             coverage: "Yes",
             static: "Yes",
@@ -254,8 +254,7 @@ jobs:
           )
         endif()
 
-    - name: Install Clang 10
-      id: install_clang_10
+    - name: Install Clang 12
       if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-ninja-and-cmake.outputs.cache-hit != 'true'"
       shell: cmake -P {0}
       run: |
@@ -272,8 +271,7 @@ jobs:
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm.tar.xz)
         execute_process(COMMAND ${CMAKE_COMMAND} -E rename "./${archive_name}" "./current")
 
-    - name: Set Clang 10 Path
-      id: set_clang_10_path
+    - name: Set Clang 12 Path
       if: "startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')"
       shell: cmake -P {0}
       run: |
@@ -315,6 +313,7 @@ jobs:
         export HOMEBREW_NO_AUTO_UPDATE=1
         brew update > /dev/null
         brew install lcov || brew upgrade lcov
+        brew install gcc@10 || brew upgrade gcc@10 # for Clang 12 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
@@ -452,13 +451,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # GCC 10 / LLVM 10
+        # GCC 10 / LLVM 12
         - {
-            name: "GCC 10 / LLVM 10 @ Ubuntu Release @docker",
+            name: "GCC 10 / LLVM 12 @ Ubuntu Release @docker",
             build_type: Release,
             cxx: "g++-10",
-            llvm_version: "10.0.0",
-            llvm_config: "/usr/bin/llvm-config-10",
+            llvm_version: "12.0.0",
+            llvm_config: "/usr/bin/llvm-config-12",
             coverage: "No",
             static: "Yes",
             debug: "No",
@@ -471,13 +470,13 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 10 / LLVM 10
+        # GCC 10 / LLVM 12
         - {
-            name: "GCC 10 / LLVM 10 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 10 / LLVM 12 @ Ubuntu Code Coverage & Debug @docker",
             build_type: Release,
             cxx: "g++-10",
-            llvm_version: "10.0.0",
-            llvm_config: "/usr/bin/llvm-config-10",
+            llvm_version: "12.0.0",
+            llvm_config: "/usr/bin/llvm-config-12",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -488,13 +487,13 @@ jobs:
             archive_name: "insights-ubuntu-14.04",
           }
 
-        # GCC 10 / LLVM 10
+        # GCC 10 / LLVM 12
         - {
-            name: "GCC 10 / LLVM 10 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 10 / LLVM 12 @ Ubuntu Code Coverage (libc++) @docker",
             build_type: Release,
             cxx: "g++-10",
-            llvm_version: "10.0.0",
-            llvm_config: "/usr/bin/llvm-config-10",
+            llvm_version: "12.0.0",
+            llvm_config: "/usr/bin/llvm-config-12",
             coverage: "Yes",
             static: "No",
             debug: "Yes",

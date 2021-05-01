@@ -19,7 +19,7 @@ struct generator
       return {};
     }
     
-    inline stdx::suspend_always final_suspend()
+    inline stdx::suspend_always final_suspend() noexcept
     {
       return {};
     }
@@ -85,6 +85,8 @@ struct generator
   }
   
   std::experimental::coroutine_handle<promise_type> p;
+  public: 
+  // inline generator & operator=(const generator &) = delete;
 };
 
 

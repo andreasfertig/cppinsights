@@ -5,13 +5,13 @@
 
 std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long long s)
 {
-  return std::chrono::duration<long long, std::ratio<1, 1> >(s, 0);
+  return std::chrono::duration<long long, std::ratio<1, 1> >(s, nullptr);
 }
 
 
-std::basic_string<char> operator""_str(const char * s, std::size_t len)
+std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator""_str(const char * s, std::size_t len)
 {
-  return std::basic_string<char>(s, len);
+  return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(s, len);
 }
 
 
@@ -52,7 +52,7 @@ int main()
   using namespace std::literals;
   std::chrono::seconds t = std::operator""s(98291919ULL);
   int t4 = operator""_x<char, '1', '2', '3', '4', '5'>();
-  std::basic_string<char> str = operator""_str("abcd", 4UL);
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > str = operator""_str("abcd", 4UL);
   std::chrono::duration<long long, std::ratio<1, 1> > sec = operator""_s(4ULL);
   int cookedTemplateLiteral = operator""_cs<'4', '5', '6', '7'>();
 }

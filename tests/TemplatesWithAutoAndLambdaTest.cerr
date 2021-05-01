@@ -1,12 +1,12 @@
 .tmp.cpp:29:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:37:32: error: no function template matches function template specialization 'operator()'
-    inline /*constexpr */ void operator()(const double & arg) const
-                               ^
-.tmp.cpp:46:32: error: no function template matches function template specialization 'operator()'
-    inline /*constexpr */ void operator()(const std::basic_string<char> & arg) const
-                               ^
+.tmp.cpp:36:5: error: templates cannot be declared inside of a local class
+    template<>
+    ^~~~~~~~~~
+.tmp.cpp:45:5: error: templates cannot be declared inside of a local class
+    template<>
+    ^~~~~~~~~~
 .tmp.cpp:53:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

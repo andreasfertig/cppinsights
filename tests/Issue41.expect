@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-  vector<std::string> v = std::vector<std::basic_string<char>, std::allocator<std::basic_string<char> > >{std::initializer_list<std::basic_string<char> >{std::basic_string<char>("aaa"), std::basic_string<char>("bbb"), std::basic_string<char>("ccc")}};
+  vector<std::string> v = std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >{std::initializer_list<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >{std::basic_string<char, std::char_traits<char>, std::allocator<char> >("aaa"), std::basic_string<char, std::char_traits<char>, std::allocator<char> >("bbb"), std::basic_string<char, std::char_traits<char>, std::allocator<char> >("ccc")}};
       
   class __lambda_12_26
   {
@@ -19,7 +19,7 @@ int main()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ bool operator()(const std::basic_string<char> & str) const
+    inline /*constexpr */ bool operator()(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & str) const
     {
       return std::operator==(str, "bbb");
     }
@@ -34,6 +34,6 @@ int main()
     
   };
   
-  std::__wrap_iter<std::basic_string<char> *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
+  std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
 }
 

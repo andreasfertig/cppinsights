@@ -23,6 +23,7 @@ class D
   std::unique_ptr<int, std::default_delete<int> > p;
   public: 
   // inline constexpr D(const D &) = delete;
+  // inline D & operator=(const D &) = delete;
 };
 
 

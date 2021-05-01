@@ -1,6 +1,6 @@
 #include <string>
 
-void func(const std::basic_string<char> & arg)
+void func(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & arg)
 {
       
   class __lambda_5_11
@@ -12,9 +12,10 @@ void func(const std::basic_string<char> & arg)
     }
     
     private: 
-    const std::basic_string<char> arg;
+    const std::basic_string<char, std::char_traits<char>, std::allocator<char> > arg;
     public: 
-    __lambda_5_11(const std::basic_string<char> & _arg)
+    // inline __lambda_5_11 & operator=(const __lambda_5_11 &) = delete;
+    __lambda_5_11(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & _arg)
     : arg{_arg}
     {}
     
@@ -26,7 +27,7 @@ void func(const std::basic_string<char> & arg)
 
 int main()
 {
-  std::string b = std::basic_string<char>();
+  std::string b = std::basic_string<char, std::char_traits<char>, std::allocator<char> >();
   func(b);
 }
 

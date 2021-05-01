@@ -5,15 +5,15 @@ using namespace std;
 
 int main()
 {
-  unordered_map<std::string, std::string> m = std::unordered_map<std::basic_string<char>, std::basic_string<char>, std::hash<std::basic_string<char> >, std::equal_to<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::basic_string<char> > > >();
+  unordered_map<std::string, std::string> m = std::unordered_map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >();
   {
-    std::unordered_map<std::basic_string<char>, std::basic_string<char>, std::hash<std::basic_string<char> >, std::equal_to<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::basic_string<char> > > > & __range1 = m;
-    std::__hash_map_iterator<std::__hash_iterator<std::__hash_node<std::__hash_value_type<std::basic_string<char>, std::basic_string<char> >, void *> *> > __begin1 = __range1.begin();
-    std::__hash_map_iterator<std::__hash_iterator<std::__hash_node<std::__hash_value_type<std::basic_string<char>, std::basic_string<char> >, void *> *> > __end1 = __range1.end();
+    std::unordered_map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > & __range1 = m;
+    std::__hash_map_iterator<std::__hash_iterator<std::__hash_node<std::__hash_value_type<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, void *> *> > __begin1 = __range1.begin();
+    std::__hash_map_iterator<std::__hash_iterator<std::__hash_node<std::__hash_value_type<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, void *> *> > __end1 = __range1.end();
     for(; operator!=(__begin1, __end1); __begin1.operator++()) {
-      std::pair<const std::basic_string<char>, std::basic_string<char> > & __operator9 = __begin1.operator*();
-      const std::basic_string<char> & key = std::get<0UL>(__operator9);
-      std::basic_string<char> & value = std::get<1UL>(__operator9);
+      std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > & __operator9 = __begin1.operator*();
+      const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & key = std::get<0UL>(__operator9);
+      std::basic_string<char, std::char_traits<char>, std::allocator<char> > & value = std::get<1UL>(__operator9);
     }
     
   }
