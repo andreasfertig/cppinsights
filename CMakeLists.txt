@@ -688,6 +688,7 @@ if(INSIGHTS_COVERAGE)
             message(FATAL_ERROR "Lcov not found")
         else()
             message(STATUS "Target coverage available")
+            message(STATUS "lcov                     : ${LCOV_BIN}")
 
             set(GCOV_TOOL "")
             if(IS_GNU)
@@ -695,6 +696,10 @@ if(INSIGHTS_COVERAGE)
                 string(REPLACE "." ";" CXX_VERSION_LIST "${CMAKE_CXX_COMPILER_VERSION}")
                 list(GET CXX_VERSION_LIST 0 CXX_MAJOR_VERSION)
                 set(GCOV_TOOL --gcov-tool /usr/bin/gcov-${CXX_MAJOR_VERSION})
+            else()
+                string(REPLACE "." ";" CXX_VERSION_LIST "${CMAKE_CXX_COMPILER_VERSION}")
+                list(GET CXX_VERSION_LIST 0 CXX_MAJOR_VERSION)
+                set(GCOV_TOOL --gcov-tool /usr/local/bin/gcov-${CXX_MAJOR_VERSION})
             endif()
 
             add_custom_target(coverage

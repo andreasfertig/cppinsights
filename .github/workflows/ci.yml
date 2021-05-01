@@ -313,6 +313,7 @@ jobs:
         export HOMEBREW_NO_AUTO_UPDATE=1
         brew update > /dev/null
         brew install lcov || brew upgrade lcov
+        brew install gcc@10 || brew upgrade gcc@10 # for Clang 12 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
