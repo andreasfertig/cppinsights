@@ -98,23 +98,23 @@ jobs:
             upload: "No",
           }
 
-        # AppleClang
-        - {
-            name: "Clang 12 / LLVM 12 @ macOS Coveage & Debug",
-            os: macos-latest,
-            build_type: Release,
-            cxx: "clang++",
-            llvm_version: "12.0.0",
-            llvm_config: "llvm-config",
-            coverage: "Yes",
-            static: "No",
-            debug: "Yes",
-            tidy: "No",
-            run_tests: "No",
-            bin_name: "insights",
-            archive_name: "insights-macos",
-            upload: "No",
-          }
+        # # AppleClang
+        # - {
+        #     name: "Clang 12 / LLVM 12 @ macOS Coveage & Debug",
+        #     os: macos-latest,
+        #     build_type: Release,
+        #     cxx: "clang++",
+        #     llvm_version: "12.0.0",
+        #     llvm_config: "llvm-config",
+        #     coverage: "Yes",
+        #     static: "No",
+        #     debug: "Yes",
+        #     tidy: "No",
+        #     run_tests: "No",
+        #     bin_name: "insights",
+        #     archive_name: "insights-macos",
+        #     upload: "No",
+        #   }
 
           # MSVC 2019
         - {

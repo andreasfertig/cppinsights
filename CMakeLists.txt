@@ -705,7 +705,7 @@ if(INSIGHTS_COVERAGE)
                 #endif()
 
                 #                set(GCOV_TOOL "--gcov-tool ${GCOV_BIN}")
-                set(GCOV_TOOL "--gcov-tool /usr/local/bin/gcov-10")
+                set(GCOV_TOOL --gcov-tool /usr/local/bin/gcov-10)
             endif()
 
             message(STATUS "gcov_tool                : ${GCOV_TOOL}")
