@@ -12,12 +12,12 @@ import subprocess
 #------------------------------------------------------------------------------
 
 def main():
-    oldClangDevel  = '10'
-    newClangDevel = '11'
-    oldClangStable = '9'
-    newClangStable = oldClangDevel
-    oldInsightsVersion = '0.5'
-    newInsightsVersion = '0.6'
+    oldClangDevel  = '9'
+    newClangDevel = '13'
+    oldClangStable = '10'
+    newClangStable = '12'
+    oldInsightsVersion = '0.6'
+    newInsightsVersion = '0.7'
 
     print('Preparing a new release:')
     print(' Current Clang development : %s' %(oldClangDevel))
@@ -28,8 +28,8 @@ def main():
     print(' New Insights version      : %s' %(newInsightsVersion))
 
 
-    print('  - Updating .travis.yml')
-    travis = open('.travis.yml', 'r').read()
+    print('  - Updating .github/workflows/ci.yml')
+    travis = open('.github/workflows/ci.yml', 'r').read()
 
     regEx = re.compile('[clang|llvm]-([0-9]+)')
 #    regEx = re.compile('llvm-([0-9]+)', re.MULTILINE)
@@ -38,14 +38,17 @@ def main():
     travis = re.sub('(clang|llvm|clang\+\+|llvm-config|llvm-toolchain-bionic|clang-format|clang-tidy|llvm-toolchain-trusty)(-%s)' %(oldClangStable), '\\1-%s' %(newClangStable) , travis)
     travis = re.sub('(clang|Clang|llvm|LLVM) (%s)' %(oldClangStable), '\\1 %s' %(newClangStable) , travis)
     travis = re.sub(r"(LLVM_VERSION=)('%s)" %(oldClangStable), r"\1'%s" %(newClangStable) , travis)
+    travis = re.sub(r"(LLVM_VERSION:)\s*(%s.0.0)" %(oldClangStable), r"\1 %s.0.0" %(newClangStable) , travis)
+    travis = re.sub(r'(llvm_version:\s*)("%s)(.0.0",)' %(oldClangStable), '\\1"%s.0.0",' %(newClangStable), travis)
     travis = re.sub(r"clang(%s)0" %(oldClangStable), r"clang%s0" %(newClangStable) , travis)
     travis = re.sub(r"(llvm-toolchain-xenial)-(%s)" %(oldClangStable), r"\1-%s" %(newClangStable) , travis)
+    travis = re.sub(r"(./llvm.sh) (%s)" %(oldClangStable), r"\1 %s" %(newClangStable) , travis)
 #    travis = re.sub('([clang|llvm])(-[0-9]+)', r'\1-%s' %(newClangDevel) , travis)
 #    print regEx.sub(travis, r'\1', newClangDevel)
 #    m = regEx.findall(travis)
 
 #    print(travis)
-    open('.travis.yml', 'w').write(travis)
+    open('.github/workflows/ci.yml', 'w').write(travis)
 
 
     print('  - Updating CMakeLists.txt')
