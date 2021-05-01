@@ -697,10 +697,19 @@ if(INSIGHTS_COVERAGE)
                 list(GET CXX_VERSION_LIST 0 CXX_MAJOR_VERSION)
                 set(GCOV_TOOL --gcov-tool /usr/bin/gcov-${CXX_MAJOR_VERSION})
             else()
-                string(REPLACE "." ";" CXX_VERSION_LIST "${CMAKE_CXX_COMPILER_VERSION}")
-                list(GET CXX_VERSION_LIST 0 CXX_MAJOR_VERSION)
-                set(GCOV_TOOL --gcov-tool /usr/local/bin/gcov-${CXX_MAJOR_VERSION})
+                #find_program(GCOV_BIN gcov PATHS /usr/local/bin NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_DEFAULT_PATH)
+                #find_package_handle_standard_args(gcov REQUIRED_VARS GCOV_BIN)
+
+                #if (NOT GCOV_FOUND)
+                #    message(FATAL_ERROR "gcov not found")
+                #endif()
+
+                #                set(GCOV_TOOL "--gcov-tool ${GCOV_BIN}")
+                set(GCOV_TOOL "--gcov-tool /usr/local/bin/gcov-10")
             endif()
+
+            message(STATUS "gcov_tool                : ${GCOV_TOOL}")
+
 
             add_custom_target(coverage
                 COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir ${GCOV_TOOL} --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
