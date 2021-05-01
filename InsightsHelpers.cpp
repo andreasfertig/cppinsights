@@ -133,17 +133,19 @@ static void BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier
     }
 
     switch(stmt->getKind()) {
-        case NestedNameSpecifier::Identifier: fullNamespace.append(stmt->getAsIdentifier()->getName()); break;
+        case NestedNameSpecifier::Identifier: fullNamespace.append(stmt->getAsIdentifier()->getName().str()); break;
 
         case NestedNameSpecifier::Namespace:
             if(stmt->getAsNamespace()->isAnonymousNamespace()) {
                 return;
             }
 
-            fullNamespace.append(stmt->getAsNamespace()->getName());
+            fullNamespace.append(stmt->getAsNamespace()->getName().str());
             break;
 
-        case NestedNameSpecifier::NamespaceAlias: fullNamespace.append(stmt->getAsNamespaceAlias()->getName()); break;
+        case NestedNameSpecifier::NamespaceAlias:
+            fullNamespace.append(stmt->getAsNamespaceAlias()->getName().str());
+            break;
 
         case NestedNameSpecifier::TypeSpecWithTemplate: fullNamespace.append("template "); [[fallthrough]];
 
