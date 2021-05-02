@@ -451,11 +451,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # GCC 10 / LLVM 12
+        # GCC 11 / LLVM 12
         - {
-            name: "GCC 10 / LLVM 12 @ Ubuntu Release @docker",
+            name: "GCC 11 / LLVM 12 @ Ubuntu Release @docker",
             build_type: Release,
-            cxx: "g++-10",
+            cxx: "g++-11",
             llvm_version: "12.0.0",
             llvm_config: "/usr/bin/llvm-config-12",
             coverage: "No",
@@ -470,11 +470,11 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 10 / LLVM 12
+        # GCC 11 / LLVM 12
         - {
-            name: "GCC 10 / LLVM 12 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 11 / LLVM 12 @ Ubuntu Code Coverage & Debug @docker",
             build_type: Release,
-            cxx: "g++-10",
+            cxx: "g++-11",
             llvm_version: "12.0.0",
             llvm_config: "/usr/bin/llvm-config-12",
             coverage: "Yes",
@@ -487,11 +487,11 @@ jobs:
             archive_name: "insights-ubuntu-14.04",
           }
 
-        # GCC 10 / LLVM 12
+        # GCC 11 / LLVM 12
         - {
-            name: "GCC 10 / LLVM 12 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 11 / LLVM 12 @ Ubuntu Code Coverage (libc++) @docker",
             build_type: Release,
-            cxx: "g++-10",
+            cxx: "g++-11",
             llvm_version: "12.0.0",
             llvm_config: "/usr/bin/llvm-config-12",
             coverage: "Yes",
