@@ -58,7 +58,7 @@ static std::string AccessToStringWithColon(const FunctionDecl& decl)
 
 static const char* GetCastName(const CastKind castKind)
 {
-    if(CastKind::CK_BitCast == castKind) {
+    if(is{castKind}.any_of(CastKind::CK_BitCast, CastKind::CK_IntegralToPointer)) {
         return "reinterpret_cast";
     }
 
@@ -3148,7 +3148,7 @@ void CodeGenerator::FormatCast(const std::string castName,
                                const Expr*       subExpr,
                                const CastKind&   castKind)
 {
-    const bool        isCastToBase{((castKind == CK_DerivedToBase) || (castKind == CK_UncheckedDerivedToBase)) &&
+    const bool        isCastToBase{is{castKind}.any_of(CK_DerivedToBase, CK_UncheckedDerivedToBase) &&
                             castDestType->isRecordType()};
     const std::string castDestTypeText{
         StrCat(GetName(castDestType), ((isCastToBase && !castDestType->isAnyPointerType()) ? "&" : ""))};
