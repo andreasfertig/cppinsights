@@ -29,34 +29,9 @@ struct IsClangNewerThan
 // inline constexpr bool IsClangNewerThan8 = IsClangNewerThan<8>::value;
 //-----------------------------------------------------------------------------
 
-template<typename T>
-auto inline GetBeginLoc(const T& decl)
-{
-    return decl.getBeginLoc();
-}
-//-----------------------------------------------------------------------------
-
-template<typename T>
-auto inline GetBeginLoc(const T* decl)
-{
-    return decl->getBeginLoc();
-}
-//-----------------------------------------------------------------------------
-
-template<typename T>
-auto inline GetEndLoc(const T* decl)
-{
-    return decl->getEndLoc();
-}
-//-----------------------------------------------------------------------------
-
 inline auto* GetTemporary(const MaterializeTemporaryExpr* stmt)
 {
-#if IS_CLANG_NEWER_THAN(9)
     return stmt->getSubExpr();
-#else
-    return stmt->getTemporary();
-#endif
 }
 //-----------------------------------------------------------------------------
 

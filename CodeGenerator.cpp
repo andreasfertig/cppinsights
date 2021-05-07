@@ -1779,11 +1779,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
             CodeGenerator      codeGenerator{ofm};
 
             ofm.Append("["sv);
-#if IS_CLANG_NEWER_THAN(8)
             codeGenerator.InsertArg(stmt->getArraySize().getValue());
-#else
-            codeGenerator.InsertArg(stmt->getArraySize());
-#endif
             ofm.Append(']');
 
             // In case of multi dimension the first dimension is the getArraySize() while the others are part of the
@@ -3827,18 +3823,6 @@ template<typename T>
 void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     WrapInParensOrCurlys(BraceKind::Curlys, std::forward<T>(lambda), addSpaceAtTheEnd);
-}
-//-----------------------------------------------------------------------------
-
-static bool IsReference(const QualType& type)
-{
-    return GetDesugarType(type)->isLValueReferenceType();
-}
-//-----------------------------------------------------------------------------
-
-static bool IsReference(const ValueDecl& valDecl)
-{
-    return IsReference(valDecl.getType());
 }
 //-----------------------------------------------------------------------------
 
