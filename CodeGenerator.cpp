@@ -265,8 +265,7 @@ void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-static void AddStmt(std::vector<Stmt*>& v, const T& stmt)
+static void AddStmt(std::vector<Stmt*>& v, const auto& stmt)
 {
     if(stmt) {
         v.push_back(const_cast<Stmt*>(static_cast<const Stmt*>(stmt)));
@@ -1274,8 +1273,7 @@ void CodeGenerator::InsertArg(const CXXDeleteExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-void CodeGenerator::InsertConstructorExpr(const T* stmt)
+void CodeGenerator::InsertConstructorExpr(const auto* stmt)
 {
     mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
 
@@ -3737,8 +3735,9 @@ void CodeGenerator::InsertCurlysIfRequired(const Stmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-void CodeGenerator::WrapInParensOrCurlys(const BraceKind braceKind, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInParensOrCurlys(const BraceKind        braceKind,
+                                         auto&&                 lambda,
+                                         const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(BraceKind::Curlys == braceKind) {
         mOutputFormatHelper.Append('{');
@@ -3790,39 +3789,35 @@ void CodeGenerator::WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAft
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-void CodeGenerator::WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInParens(auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Parens, std::forward<T>(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Parens, FWD(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-void CodeGenerator::WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInParensIfNeeded(bool needsParens, auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(needsParens) {
-        WrapInParensOrCurlys(BraceKind::Parens, std::forward<T>(lambda), addSpaceAtTheEnd);
+        WrapInParensOrCurlys(BraceKind::Parens, FWD(lambda), addSpaceAtTheEnd);
     } else {
         lambda();
     }
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-void CodeGenerator::WrapInCurliesIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInCurliesIfNeeded(bool needsParens, auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(needsParens) {
-        WrapInParensOrCurlys(BraceKind::Curlys, std::forward<T>(lambda), addSpaceAtTheEnd);
+        WrapInParensOrCurlys(BraceKind::Curlys, FWD(lambda), addSpaceAtTheEnd);
     } else {
         lambda();
     }
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-void CodeGenerator::WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInCurlys(auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, std::forward<T>(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Curlys, FWD(lambda), addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 

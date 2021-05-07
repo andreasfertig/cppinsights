@@ -21,11 +21,6 @@ using namespace std::literals;
 namespace clang::insights {
 //-----------------------------------------------------------------------------
 
-// Workaround to keep clang 6 Linux build alive
-template<class T, class U>
-inline constexpr bool is_same_v = std::is_same<T, U>::value;  // NOLINT
-//-----------------------------------------------------------------------------
-
 /// \brief The C++ Insights formatter.
 ///
 /// Most of the code is handed to \ref OutputFormatHelper for easy code formatting.
@@ -77,11 +72,7 @@ public:
     /// \brief Append a variable number of data
     ///
     /// The \c StrCat function which is used ensures, that a \c StringRef or a char are converted appropriately.
-    template<typename... Args>
-    void Append(const Args&... args)
-    {
-        details::StrCat(mOutput, args...);
-    }
+    void Append(const auto&... args) { details::StrCat(mOutput, args...); }
 
     /// \brief Same as \ref Append but adds a newline after the last argument.
     ///
@@ -99,8 +90,7 @@ public:
     }
 
     /// \brief Same as \ref Append but adds a newline after the last argument.
-    template<typename... Args>
-    void AppendNewLine(const Args&... args)
+    void AppendNewLine(const auto&... args)
     {
         if constexpr(0 < sizeof...(args)) {
             details::StrCat(mOutput, args...);
@@ -180,12 +170,11 @@ public:
     /// 		// do something with p
     /// });
     /// \endcode
-    template<typename T, typename Lambda>
-    inline void ForEachArg(const T& arguments, Lambda&& lambda)
+    inline void ForEachArg(const auto& arguments, /*XXX: invocable*/ auto&& lambda)
     {
         OnceFalse needsComma{};
         for(const auto& arg : arguments) {
-            if constexpr(is_same_v<const TemplateArgument&, decltype(arg)>) {
+            if constexpr(std::is_same_v<const TemplateArgument&, decltype(arg)>) {
                 if((TemplateArgument::Pack == arg.getKind()) && (0 == arg.pack_size())) {
                     break;
                 }
