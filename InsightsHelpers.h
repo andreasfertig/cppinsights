@@ -324,6 +324,27 @@ private:
 };
 //-----------------------------------------------------------------------------
 
+/// \brief Handy helper to avoid longish comparisons.
+///
+/// The idea is taken from a talk from Björn Fahller at NDC TechTown 2019: Modern Techniques for Keeping Your Code DRY
+/// (https://youtu.be/YUWuNpxZa5k)
+/// \code
+/// if( is{v}.any_of(A, B, C) ) { ... }
+/// \endcode
+template<typename T>
+struct is
+{
+    T t;
+    template<typename... Ts>
+    constexpr bool any_of(const Ts&... ts) const
+    {
+        return ((t == ts) || ...);
+    }
+};
+
+template<typename T>
+is(T) -> is<T>;
+
 }  // namespace clang::insights
 
 #endif /* INSIGHTS_HELPERS_H */
