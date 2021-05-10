@@ -1,0 +1,44 @@
+// cmdline:-std=c++20
+
+#include <concepts>
+
+auto foo(auto x)
+{
+   if constexpr (std::same_as<int, decltype(x)>)
+   {
+      return 1;
+   }
+   return 2;
+}
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int foo<int>(int x)
+{
+  if constexpr(true) {
+    return 1;
+  } 
+  
+  return 2;
+}
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int foo<double>(double x)
+{
+  if constexpr(false) {
+  } 
+  
+  return 2;
+}
+#endif
+
+
+int main()
+{
+  foo(1);
+  foo(1.0);
+}
+

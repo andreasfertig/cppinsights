@@ -83,9 +83,9 @@ class Point
   template<>
   inline constexpr double get<0>() const noexcept
   {
-    if constexpr(0UL == 1) {
+    if constexpr(false) {
     } else /* constexpr */ {
-      if constexpr(0UL == 0) {
+      if constexpr(true) {
         return this->mY;
       } 
       
@@ -99,7 +99,7 @@ class Point
   template<>
   inline constexpr double get<1>() const noexcept
   {
-    if constexpr(1UL == 1) {
+    if constexpr(true) {
       return this->GetX();
     } 
     
