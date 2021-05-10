@@ -41,7 +41,7 @@ class Foo
   template<>
   inline constexpr int get<1>() const noexcept
   {
-    if constexpr(1 == 1) {
+    if constexpr(true) {
       return this->mX;
     } 
     

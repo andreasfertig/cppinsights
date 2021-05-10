@@ -333,7 +333,9 @@ protected:
     STRONG_BOOL(SkipVarDecl);
     STRONG_BOOL(UseCommaInsteadOfSemi);
     STRONG_BOOL(NoEmptyInitList);
+    STRONG_BOOL(ShowConstantExprValue);
 
+    ShowConstantExprValue mShowConstantExprValue{ShowConstantExprValue::No};
     SkipVarDecl           mSkipVarDecl;
     UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
     NoEmptyInitList       mNoEmptyInitList{

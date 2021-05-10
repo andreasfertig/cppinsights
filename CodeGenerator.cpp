@@ -1579,7 +1579,15 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
     mOutputFormatHelper.Append("if", cexpr);
 
-    WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
+    WrapInParens(
+        [&]() {
+            mShowConstantExprValue = ShowConstantExprValue::Yes;
+
+            InsertArg(stmt->getCond());
+
+            mShowConstantExprValue = ShowConstantExprValue::No;
+        },
+        AddSpaceAtTheEnd::Yes);
 
     WrapInCompoundIfNeeded(stmt->getThen(), AddNewLineAfter::No);
 
@@ -2086,6 +2094,13 @@ void CodeGenerator::InsertArg(const CXXThrowExpr* stmt)
 
 void CodeGenerator::InsertArg(const ConstantExpr* stmt)
 {
+    if((ShowConstantExprValue::Yes == mShowConstantExprValue) && stmt->hasAPValueResult()) {
+        if(const auto value = stmt->getAPValueResult(); value.isInt()) {
+            mOutputFormatHelper.Append(value.getInt());
+            return;
+        }
+    }
+
     InsertArg(stmt->getSubExpr());
 }
 //-----------------------------------------------------------------------------

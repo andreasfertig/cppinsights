@@ -18,7 +18,7 @@ class Test
   template<>
   inline int sum<1, 5, 7>()
   {
-    if constexpr(2 > 0) {
+    if constexpr(true) {
       return 1 + this->sum<5>();
     } 
     
@@ -31,7 +31,7 @@ class Test
   template<>
   inline int sum<5, 7>()
   {
-    if constexpr(1 > 0) {
+    if constexpr(true) {
       return 5 + this->sum<7>();
     } 
     
@@ -44,7 +44,7 @@ class Test
   template<>
   inline int sum<7>()
   {
-    if constexpr(0 > 0) {
+    if constexpr(false) {
     } else /* constexpr */ {
       return 7;
     } 
@@ -68,7 +68,7 @@ class Test
   template<>
   inline int summ<int, int, int>(int && i, int && __rest1, int && __rest2)
   {
-    if constexpr(2 > 0) {
+    if constexpr(true) {
       return i + this->summ<int &, int &>(__rest1, __rest2);
     } 
     
@@ -81,7 +81,7 @@ class Test
   template<>
   inline int summ<int &, int &>(int & i, int & rest)
   {
-    if constexpr(1 > 0) {
+    if constexpr(true) {
       return i + this->summ<int &>(rest);
     } 
     
@@ -94,7 +94,7 @@ class Test
   template<>
   inline int summ<int &>(int & i)
   {
-    if constexpr(0 > 0) {
+    if constexpr(false) {
     } else /* constexpr */ {
       return i;
     } 
