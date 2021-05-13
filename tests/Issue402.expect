@@ -1,0 +1,47 @@
+int main()
+{
+    
+  class __lambda_2_3
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+            
+    class __lambda_2_8
+    {
+      public: 
+      inline /*constexpr */ void operator()() const
+      {
+      }
+      
+      using retType_2_8 = auto (*)() -> void;
+      inline /*constexpr */ operator retType_2_8 () const noexcept
+      {
+        return __invoke;
+      };
+      
+      private: 
+      static inline void __invoke()
+      {
+      }
+      
+      public: 
+      // inline /*constexpr */ __lambda_2_8 & operator=(const __lambda_2_8 &) = delete;
+      
+    };
+    
+    private: 
+    __lambda_2_8 var;
+    public: 
+    // inline /*constexpr */ __lambda_2_3 & operator=(const __lambda_2_3 &) = delete;
+    __lambda_2_3(const __lambda_2_8 & _var)
+    : var{_var}
+    {}
+    
+  } __lambda_2_3{__lambda_2_3::__lambda_2_8{}};
+  
+  ;
+}
+

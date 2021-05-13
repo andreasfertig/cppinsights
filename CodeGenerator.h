@@ -35,6 +35,7 @@ protected:
     enum class LambdaCallerType
     {
         VarDecl,
+        InitCapture,
         CallExpr,
         OperatorCallExpr,
         MemberCallExpr,
@@ -51,8 +52,6 @@ protected:
         : mLambdaCallerType{lambdaCallerType}
         , mCurrentPos{outputFormatHelper.CurrentPos()}
         , mOutputFormatHelper{outputFormatHelper}
-        , mLambdaOutputFormatHelper{}
-        , mInits{}
         {
             mLambdaOutputFormatHelper.SetIndent(mOutputFormatHelper);
         }
@@ -82,31 +81,38 @@ protected:
         const LambdaCallerType mLambdaCallerType;
         const size_t           mCurrentPos;
         OutputFormatHelper&    mOutputFormatHelper;
-        OutputFormatHelper     mLambdaOutputFormatHelper;
-        std::string            mInits;
+        OutputFormatHelper     mLambdaOutputFormatHelper{};
+        std::string            mInits{};
     };
     //-----------------------------------------------------------------------------
 
     using LambdaStackType = StackList<class LambdaHelper>;
 
+    STRONG_BOOL(LambdaInInitCapture);  ///! Singal whether we are processing a lambda created and assigned to an init
+                                       /// capture of another lambda.
+
+    CodeGenerator(OutputFormatHelper& _outputFormatHelper,
+                  LambdaStackType&    lambdaStack,
+                  LambdaInInitCapture lambdaInitCapture)
+    : mOutputFormatHelper{_outputFormatHelper}
+    , mLambdaStack{lambdaStack}
+    , mLambdaInitCapture{lambdaInitCapture}
+    {
+    }
+
 public:
     explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper)
-    : mOutputFormatHelper{_outputFormatHelper}
-    , mLambdaStackThis{}
-    , mLambdaStack{mLambdaStackThis}
-    , mSkipVarDecl{SkipVarDecl::No}
-    , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
-    , mLambdaExpr{nullptr}
+    : CodeGenerator{_outputFormatHelper, mLambdaStackThis}
+    {
+    }
+
+    explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaInInitCapture lambdaInitCapture)
+    : CodeGenerator{_outputFormatHelper, mLambdaStackThis, lambdaInitCapture}
     {
     }
 
     explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaStackType& lambdaStack)
-    : mOutputFormatHelper{_outputFormatHelper}
-    , mLambdaStackThis{}
-    , mLambdaStack{lambdaStack}
-    , mSkipVarDecl{SkipVarDecl::No}
-    , mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No}
-    , mLambdaExpr{nullptr}
+    : CodeGenerator{_outputFormatHelper, lambdaStack, LambdaInInitCapture::No}
     {
     }
 
@@ -327,20 +333,21 @@ protected:
     static std::string FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt);
     static std::string GetValueOfValueInit(const QualType& t);
 
-    LambdaStackType  mLambdaStackThis;
+    LambdaStackType  mLambdaStackThis{};
     LambdaStackType& mLambdaStack;
 
     STRONG_BOOL(SkipVarDecl);
     STRONG_BOOL(UseCommaInsteadOfSemi);
     STRONG_BOOL(NoEmptyInitList);
     STRONG_BOOL(ShowConstantExprValue);
+    LambdaInInitCapture mLambdaInitCapture{LambdaInInitCapture::No};
 
     ShowConstantExprValue mShowConstantExprValue{ShowConstantExprValue::No};
-    SkipVarDecl           mSkipVarDecl;
-    UseCommaInsteadOfSemi mUseCommaInsteadOfSemi;
+    SkipVarDecl           mSkipVarDecl{SkipVarDecl::No};
+    UseCommaInsteadOfSemi mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No};
     NoEmptyInitList       mNoEmptyInitList{
         NoEmptyInitList::No};  //!< At least in case if a requires-clause containing T{} we don't want to get T{{}}.
-    const LambdaExpr*  mLambdaExpr;
+    const LambdaExpr*  mLambdaExpr{};
     static inline bool mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code. This
                                           //!< requires adding the \c <new> header.
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
