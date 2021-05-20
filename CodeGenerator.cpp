@@ -1483,7 +1483,7 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
         }
     };
 
-    if(not isMatchingCast(castKind, hideImplicitCasts, ShowXValueCasts())) {
+    if(not isMatchingCast(castKind, hideImplicitCasts, stmt->isXValue() || ShowXValueCasts())) {
         InsertArg(subExpr);
     } else if(isa<IntegerLiteral>(subExpr) && hideImplicitCasts) {
         InsertArg(stmt->IgnoreCasts());

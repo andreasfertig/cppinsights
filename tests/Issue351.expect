@@ -1,0 +1,25 @@
+#include <optional>
+
+struct A
+{
+  // inline constexpr A() noexcept = default;
+};
+
+
+
+struct Test
+{
+  Test(const A &);
+  
+  Test(A &&);
+  
+};
+
+
+
+std::optional<Test> foo()
+{
+  A a = A();
+  return std::optional<Test>(static_cast<A &&>(a));
+}
+

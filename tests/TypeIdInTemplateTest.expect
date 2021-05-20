@@ -23,7 +23,7 @@ class Foo<int>
   inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > Get()
   {
     std::string typeId = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{typeid(const std::type_info).name()} /* NRVO variable */;
-    return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(typeId);
+    return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(static_cast<std::basic_string<char, std::char_traits<char>, std::allocator<char> > &&>(typeId));
   }
   
   // inline constexpr Foo() noexcept = default;
