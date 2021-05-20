@@ -17,7 +17,7 @@ class Test
   {
     Test tmp = Test{*this} /* NRVO variable */;
     this->mX++;
-    return Test(tmp);
+    return Test(static_cast<Test &&>(tmp));
   }
   
   inline Test operator--()
@@ -30,7 +30,7 @@ class Test
   {
     Test tmp = Test{*this} /* NRVO variable */;
     this->mX--;
-    return Test(tmp);
+    return Test(static_cast<Test &&>(tmp));
   }
   
   inline Test & operator+=(const Test & rhs)
