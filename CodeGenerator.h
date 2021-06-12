@@ -216,13 +216,15 @@ protected:
     /// - www.opensource.apple.com/source/libcppabi/libcppabi-14/src/cxa_guard.cxx
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
 
-    void
-    FormatCast(const std::string castName, const QualType& CastDestType, const Expr* SubExpr, const CastKind& castKind);
+    void FormatCast(const std::string_view castName,
+                    const QualType&        CastDestType,
+                    const Expr*            SubExpr,
+                    const CastKind&        castKind);
 
     template<typename T, typename Lambda>
     void ForEachArg(const T& arguments, Lambda&& lambda)
     {
-        OutputFormatHelper::ForEachArg(arguments, mOutputFormatHelper, lambda);
+        mOutputFormatHelper.ForEachArg(arguments, lambda);
     }
 
     void InsertArgWithParensIfNeeded(const Stmt* stmt);
@@ -249,7 +251,7 @@ protected:
             InsertTemplateArgs(*stmt);
         } else if(stmt->hasExplicitTemplateArgs()) {
             // we have empty templates arguments, but angle brackets provided by the user
-            mOutputFormatHelper.Append("<>");
+            mOutputFormatHelper.Append("<>"sv);
         }
     }
 
@@ -265,7 +267,7 @@ protected:
     void InsertTemplateGuardEnd(const FunctionDecl* stmt);
 
     /// \brief Insert \c template<> to introduce a template specialization.
-    void InsertTemplateSpecializationHeader() { mOutputFormatHelper.AppendNewLine("template<>"); }
+    void InsertTemplateSpecializationHeader() { mOutputFormatHelper.AppendNewLine("template<>"sv); }
 
     void InsertNamespace(const NestedNameSpecifier* namespaceSpecifier);
     void ParseDeclContext(const DeclContext* Ctx);
@@ -313,8 +315,7 @@ protected:
 
     void UpdateCurrentPos() { mCurrentPos = mOutputFormatHelper.CurrentPos(); }
 
-    static const char* GetKind(const UnaryExprOrTypeTraitExpr& uk);
-    static const char* GetBuiltinTypeSuffix(const BuiltinType::Kind& kind);
+    static std::string_view GetBuiltinTypeSuffix(const BuiltinType::Kind& kind);
 
     class LambdaScopeHandler
     {
@@ -395,7 +396,7 @@ public:
     using CodeGenerator::CodeGenerator;
 
     // Insert the semi after the last declaration. This implies that this class always requires its own scope.
-    ~MultiStmtDeclCodeGenerator() { mOutputFormatHelper.Append("; "); }
+    ~MultiStmtDeclCodeGenerator() { mOutputFormatHelper.Append("; "sv); }
 
     using CodeGenerator::InsertArg;
 

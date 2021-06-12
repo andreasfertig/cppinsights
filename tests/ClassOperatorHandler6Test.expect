@@ -122,7 +122,7 @@ int main()
   const bool b9 = f1.operator==(new char[2]);
   const bool b10 = f1.operator==(new char[2]{1, 2});
   char buffer[1024];
-  const bool b11 = f1.operator==(new (static_cast<void *>(buffer))char[2]{1, 2});
+  const bool b11 = f1.operator==(new (reinterpret_cast<void *>(buffer))char[2]{1, 2});
   const bool b12 = f1.operator==(new Woo{1, 'a'});
   const bool b13 = f1.operator==(Woo{1, 'a'});
   Foo f3 = Foo{'c'};

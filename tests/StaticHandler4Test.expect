@@ -28,7 +28,7 @@ Sing & Test()
   {
     if( __cxa_guard_acquire(&__sGuard) )
     {
-      try
+      try 
       {
         new (&__s) Sing();
         __sGuard = true;

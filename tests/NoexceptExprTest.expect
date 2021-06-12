@@ -23,7 +23,7 @@ void FooFoo() noexcept(false)
 
 int main()
 {
-  printf("Foo: %d\n", static_cast<int>(noexcept(false) ));
-  printf("Bar: %d\n", static_cast<int>(noexcept(true) ));
+  printf("Foo: %d\n", static_cast<int>(noexcept(false)));
+  printf("Bar: %d\n", static_cast<int>(noexcept(true)));
 }
 

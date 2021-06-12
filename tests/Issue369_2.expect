@@ -82,7 +82,7 @@ const void withNoexceptFalse()
   {
     if( __cxa_guard_acquire(&__valueGuard) )
     {
-      try
+      try 
       {
         new (&__value) foo(std::move(__lambda_8_23.operator()()));
         __valueGuard = true;
@@ -194,7 +194,7 @@ void viaFunction()
   {
     if( __cxa_guard_acquire(&__fGuard) )
     {
-      try
+      try 
       {
         new (&__f) foo(std::move(func()));
         __fGuard = true;

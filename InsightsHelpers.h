@@ -23,7 +23,7 @@
 
 namespace clang::insights {
 
-std::string BuildInternalVarName(const std::string& varName);
+std::string BuildInternalVarName(const std::string_view& varName);
 //-----------------------------------------------------------------------------
 
 STRONG_BOOL(RequireSemi);
@@ -88,13 +88,13 @@ std::string BuildRetTypeName(const Decl& decl);
     }
 //-----------------------------------------------------------------------------
 
-static inline bool Contains(const std::string& source, const std::string& search)
+static inline bool Contains(const std::string_view source, const std::string_view search)
 {
     return std::string::npos != source.find(search, 0);
 }
 //-----------------------------------------------------------------------------
 
-void InsertBefore(std::string& source, const std::string& find, const std::string& replace);
+void InsertBefore(std::string& source, const std::string_view& find, const std::string_view& replace);
 //-----------------------------------------------------------------------------
 
 static inline const SourceManager& GetSM(const ast_matchers::MatchFinder::MatchResult& Result)
@@ -197,19 +197,19 @@ std::string GetUnqualifiedScopelessName(const Type* type);
 //-----------------------------------------------------------------------------
 
 std::string
-GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified = Unqualified::No);
+GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqualified unqualified = Unqualified::No);
 //-----------------------------------------------------------------------------
 
 std::string GetNestedName(const NestedNameSpecifier* nns);
 std::string GetDeclContext(const DeclContext* ctx);
 //-----------------------------------------------------------------------------
 
-const std::string EvaluateAsFloat(const FloatingLiteral& expr);
-const std::string GetNoExcept(const FunctionDecl& decl);
-const char*       GetConst(const FunctionDecl& decl);
+const std::string      EvaluateAsFloat(const FloatingLiteral& expr);
+const std::string      GetNoExcept(const FunctionDecl& decl);
+const std::string_view GetConst(const FunctionDecl& decl);
 //-----------------------------------------------------------------------------
 
-std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
+std::string_view GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
 //-----------------------------------------------------------------------------
 
 template<typename T, typename TFunc>

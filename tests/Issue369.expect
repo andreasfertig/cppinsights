@@ -17,7 +17,7 @@ const foo & create()
   {
     if( __cxa_guard_acquire(&__valueGuard) )
     {
-      try
+      try 
       {
         new (&__value) foo();
         __valueGuard = true;

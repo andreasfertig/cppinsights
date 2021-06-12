@@ -313,6 +313,10 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         # enables more conformant C++ in general
         add_definitions(/permissive-)
 
+        # Need to "__cplusplus preprocessor macro to report an updated value for recent C++ language standards
+        # support" ...
+        add_definitions(/Zc:__cplusplus)
+
         # llvm-config says /EHs-c-.
         # C++ exception handler used, but unwind semantics are not enabled
         add_definitions(/wd4530)

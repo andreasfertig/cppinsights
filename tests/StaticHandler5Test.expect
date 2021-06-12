@@ -27,7 +27,7 @@ Sing & Test()
   
   if( ! __sGuard )
   {
-    try
+    try 
     {
       new (&__s) Sing();
       __sGuard = true;
