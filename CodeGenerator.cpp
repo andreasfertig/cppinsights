@@ -18,6 +18,7 @@
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "clang/Sema/Sema.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/Path.h"
 //-----------------------------------------------------------------------------
@@ -710,6 +711,47 @@ void CodeGenerator::InsertArg(const BinaryOperator* stmt)
 
     const bool needRHSParens{isa<BinaryOperator>(stmt->getRHS()->IgnoreImpCasts())};
     WrapInParensIfNeeded(needRHSParens, [&] { InsertArg(stmt->getRHS()); });
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CompoundAssignOperator* stmt)
+{
+    LAMBDA_SCOPE_HELPER(BinaryOperator);
+
+    const bool needLHSParens{isa<BinaryOperator>(stmt->getLHS()->IgnoreImpCasts())};
+    WrapInParensIfNeeded(needLHSParens, [&] { InsertArg(stmt->getLHS()); });
+
+    mOutputFormatHelper.Append(" = ");
+
+    // we may need a cast around this back to the src type
+    const bool needCast{stmt->getLHS()->getType() != stmt->getComputationLHSType()};
+    if(needCast) {
+        mOutputFormatHelper.Append(kwStaticCast, "<", GetName(stmt->getLHS()->getType()), ">(");
+    }
+
+    WrapInParensIfNeeded(needLHSParens, [&] {
+        clang::ExprResult res = stmt->getLHS();
+
+        // This cast is not present in the AST. However, if the LHS type is smaller than RHS there is an implicit cast
+        // to RHS-type and the result is casted back to LHS-type: static_cast<LHSTy>( static_cast<RHSTy>(LHS) + RHS )
+        if(const auto resultingType = GetGlobalCI().getSema().PrepareScalarCast(res, stmt->getComputationLHSType());
+           resultingType != CK_NoOp) {
+            const QualType castDestType = stmt->getComputationLHSType();
+            FormatCast(kwStaticCast, castDestType, stmt->getLHS(), resultingType);
+        } else {
+            InsertArg(stmt->getLHS());
+        }
+    });
+
+    mOutputFormatHelper.Append(
+        " ", BinaryOperator::getOpcodeStr(BinaryOperator::getOpForCompoundAssignment(stmt->getOpcode())), " ");
+
+    const bool needRHSParens{isa<BinaryOperator>(stmt->getRHS()->IgnoreImpCasts())};
+    WrapInParensIfNeeded(needRHSParens, [&] { InsertArg(stmt->getRHS()); });
+
+    if(needCast) {
+        mOutputFormatHelper.Append(")");
+    }
 }
 //-----------------------------------------------------------------------------
 

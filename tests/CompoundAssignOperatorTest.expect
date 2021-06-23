@@ -1,0 +1,34 @@
+int main()
+{
+  char c = 1;
+  short s = 3;
+  int i = 2;
+  float f = 2.9000001F;
+  double d = 3.1000000000000001;
+  c = static_cast<char>(static_cast<int>(c) + static_cast<int>(c));
+  c = static_cast<char>(static_cast<int>(c) + static_cast<int>(s));
+  c = static_cast<char>(static_cast<int>(c) + i);
+  c = static_cast<char>(static_cast<float>(c) + f);
+  c = static_cast<char>(static_cast<double>(c) + d);
+  s = static_cast<short>(static_cast<int>(s) + static_cast<int>(c));
+  s = static_cast<short>(static_cast<int>(s) + static_cast<int>(s));
+  s = static_cast<short>(static_cast<int>(s) + i);
+  s = static_cast<short>(static_cast<float>(s) + f);
+  s = static_cast<short>(static_cast<double>(s) + d);
+  i = i + static_cast<int>(c);
+  i = i + static_cast<int>(s);
+  i = i + i;
+  i = static_cast<int>(static_cast<float>(i) + f);
+  i = static_cast<int>(static_cast<double>(i) + d);
+  f = f + static_cast<float>(static_cast<int>(c));
+  f = f + static_cast<float>(static_cast<int>(s));
+  f = f + static_cast<float>(i);
+  f = f + f;
+  f = static_cast<float>(static_cast<double>(f) + d);
+  d = d + static_cast<double>(static_cast<int>(c));
+  d = d + static_cast<double>(static_cast<int>(s));
+  d = d + static_cast<double>(i);
+  d = d + static_cast<double>(f);
+  d = d + d;
+}
+

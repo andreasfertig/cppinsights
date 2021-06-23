@@ -4,7 +4,7 @@ int main()
   int x = 0;
   {
     while(x < 20) {
-      x += x;
+      x = x + x;
       ++x;
     }
     
@@ -13,7 +13,7 @@ int main()
   {
     int i = 0;
     while(x < 20) {
-      x += i;
+      x = x + i;
       ++x;
     }
     
@@ -25,7 +25,7 @@ int main()
     int t = 4;
     int o = 5;
     while(i < 20) {
-      x += i;
+      x = x + i;
       ++i;
     }
     
@@ -35,7 +35,7 @@ int main()
     int * i = &x;
     int * y = &x;
     while(i) {
-      x += *i;
+      x = x + *i;
       ++i;
     }
     

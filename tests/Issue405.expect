@@ -1,0 +1,17 @@
+#include <complex>
+using namespace std;
+
+int main()
+{
+  int q = 2;
+  ++q;
+  q--;
+  q = static_cast<int>(static_cast<double>(q) + 2.0);
+  complex<int> com1 = std::complex<int>{3, 4};
+  complex<int> com2 = std::complex<int>(com1);
+  com1.operator+=(com2);
+  com1.operator=(std::operator+(com1, com2));
+  ;
+  return 0;
+}
+

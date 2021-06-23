@@ -33,7 +33,7 @@ class Test
   
   inline Test & operator+=(const Test & rhs)
   {
-    this->mV += rhs.mV;
+    this->mV = this->mV + rhs.mV;
     return *this;
   }
   

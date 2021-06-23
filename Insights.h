@@ -11,7 +11,8 @@
 
 namespace clang {
 class ASTContext;
-}
+class CompilerInstance;
+}  // namespace clang
 //-----------------------------------------------------------------------------
 
 /// \brief Global C++ Insights command line options.
@@ -28,6 +29,10 @@ extern const InsightsOptions& GetInsightsOptions();
 
 /// \brief Get access to the ASTContext
 extern const clang::ASTContext& GetGlobalAST();
+//-----------------------------------------------------------------------------
+
+/// \brief Get access to the CompilerInstance
+extern const clang::CompilerInstance& GetGlobalCI();
 //-----------------------------------------------------------------------------
 
 #endif /* INSIGHTS_H */
