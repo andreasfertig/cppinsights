@@ -91,9 +91,9 @@ protected:
     STRONG_BOOL(LambdaInInitCapture);  ///! Singal whether we are processing a lambda created and assigned to an init
                                        /// capture of another lambda.
 
-    CodeGenerator(OutputFormatHelper& _outputFormatHelper,
-                  LambdaStackType&    lambdaStack,
-                  LambdaInInitCapture lambdaInitCapture)
+    constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper,
+                            LambdaStackType&    lambdaStack,
+                            LambdaInInitCapture lambdaInitCapture)
     : mOutputFormatHelper{_outputFormatHelper}
     , mLambdaStack{lambdaStack}
     , mLambdaInitCapture{lambdaInitCapture}
@@ -101,17 +101,17 @@ protected:
     }
 
 public:
-    explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper)
+    explicit constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper)
     : CodeGenerator{_outputFormatHelper, mLambdaStackThis}
     {
     }
 
-    explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaInInitCapture lambdaInitCapture)
+    constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaInInitCapture lambdaInitCapture)
     : CodeGenerator{_outputFormatHelper, mLambdaStackThis, lambdaInitCapture}
     {
     }
 
-    explicit CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaStackType& lambdaStack)
+    constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaStackType& lambdaStack)
     : CodeGenerator{_outputFormatHelper, lambdaStack, LambdaInInitCapture::No}
     {
     }
@@ -381,7 +381,7 @@ public:
     using CodeGenerator::InsertArg;
     void InsertArg(const CXXThisExpr* stmt) override;
 
-    bool mCapturedThisAsCopy;
+    bool mCapturedThisAsCopy{};
 };
 //-----------------------------------------------------------------------------
 
@@ -405,9 +405,9 @@ public:
     using CodeGenerator::InsertArg;
 
 protected:
-    OnceTrue  mInsertVarDecl;  //! Insert the \c VarDecl only once.
-    OnceFalse mInsertComma;    //! Insert the comma after we have generated the first \c VarDecl and we are about to
-                               //! insert another one.
+    OnceTrue  mInsertVarDecl{};  //! Insert the \c VarDecl only once.
+    OnceFalse mInsertComma{};    //! Insert the comma after we have generated the first \c VarDecl and we are about to
+                                 //! insert another one.
 
     bool InsertVarDecl() override { return mInsertVarDecl; }
     bool InsertComma() override { return mInsertComma; }
