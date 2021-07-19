@@ -856,7 +856,19 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
             } else {
                 mOutputFormatHelper.Append(GetQualifiers(*stmt));
 
-                const auto varName = FormatVarTemplateSpecializationDecl(stmt, GetName(*stmt));
+                const auto scope = [&] {
+                    if(const auto* ctx = stmt->getDeclContext(); stmt->getLexicalDeclContext() != ctx) {
+                        OutputFormatHelper scopeOfm{};
+                        CodeGenerator      codeGenerator{scopeOfm};
+                        codeGenerator.ParseDeclContext(ctx);
+
+                        return ScopeHandler::RemoveCurrentScope(scopeOfm.GetString());
+                    }
+
+                    return std::string{};
+                }();
+
+                const auto varName = FormatVarTemplateSpecializationDecl(stmt, StrCat(scope, GetName(*stmt)));
 
                 // TODO: to keep the special handling for lambdas, do this only for template specializations
                 if(stmt->getType()->getAs<TemplateSpecializationType>()) {
