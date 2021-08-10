@@ -1,0 +1,32 @@
+namespace ns
+{
+  template<typename T>
+  struct foo
+  {
+    T value;
+  };
+  
+  template<>
+  struct foo<int>
+  {
+    int value;
+  };
+  
+  
+}
+
+
+
+template<>
+struct ns::foo<double>
+{
+  double value;
+};
+
+
+   // [2]
+
+int main()
+{
+}
+

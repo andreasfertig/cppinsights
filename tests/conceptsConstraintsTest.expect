@@ -27,10 +27,6 @@ namespace Constraints
   
   template<unsigned int N>
   struct WrapN;
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct WrapN<1>;
-  #endif
   template<unsigned int N>
   using AddOneTy = WrapN<N + 1>;
   template<unsigned int M>
