@@ -74,13 +74,6 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
             unless(anyOf(isExpansionInSystemHeader(), hasAncestor(namespaceDecl()), hasParent(classTemplateDecl()))))
             .bind("vd"),
         this);
-
-    matcher.addMatcher(classTemplateSpecializationDecl(unless(anyOf(isExpansionInSystemHeader(),
-                                                                    hasAncestor(namespaceDecl()),
-                                                                    hasParent(classTemplateDecl()),
-                                                                    isExplicitTemplateSpecialization())))
-                           .bind("class"),
-                       this);
 }
 //-----------------------------------------------------------------------------
 

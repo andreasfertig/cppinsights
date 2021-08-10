@@ -1129,9 +1129,9 @@ void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
     InsertArg(stmt->getTemplatedDecl());
 
     for(const auto* spec : stmt->specializations()) {
-        // Explicit specializations will appear later in the AST as dedicated node. Don't generate code for them
-        // now, otherwise they are there twice.
-        if(TSK_ExplicitSpecialization != spec->getSpecializationKind()) {
+        // Explicit specializations and instantiations will appear later in the AST as dedicated node. Don't generate
+        // code for them now, otherwise they are there twice.
+        if(TSK_ImplicitInstantiation == spec->getSpecializationKind()) {
             InsertArg(spec);
         }
     }
