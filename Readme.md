@@ -196,7 +196,7 @@ Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 ## Editor Extension
 
 An extension for Visual Studio Code is available at the vscode marketplace: [C++
-Insights - VSCode Extension] https://marketplace.visualstudio.com/items?itemName=devtbi.vscode-cppinsights.
+Insights - VSCode Extension](https://marketplace.visualstudio.com/items?itemName=devtbi.vscode-cppinsights).
 
 
 ## Compatibility
