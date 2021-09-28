@@ -193,9 +193,7 @@ insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
 There is also another GitHub project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
-## Editor Extension
-
-An extension for Visual Studio Code is available at the vscode marketplace: [C++
+An extension for Visual Studio Code is available at the VS Code marketplace: [C++
 Insights - VSCode Extension](https://marketplace.visualstudio.com/items?itemName=devtbi.vscode-cppinsights).
 
 
