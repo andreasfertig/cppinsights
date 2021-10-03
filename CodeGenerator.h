@@ -222,7 +222,7 @@ protected:
                     const Expr*            SubExpr,
                     const CastKind&        castKind);
 
-    void ForEachArg(const auto& arguments, /*XXX: invocable*/ auto&& lambda)
+    void ForEachArg(const auto& arguments, auto&& lambda)
     {
         mOutputFormatHelper.ForEachArg(arguments, lambda);
     }
@@ -293,20 +293,20 @@ protected:
         Curlys
     };
 
-    void WrapInParens(auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+    void WrapInParens(void_func_ref lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
     void WrapInParensIfNeeded(bool                   needsParens,
-                              auto&&                 lambda,
+                              void_func_ref          lambda,
                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
     void WrapInCurliesIfNeeded(bool                   needsParens,
-                               auto&&                 lambda,
+                               void_func_ref          lambda,
                                const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
-    void WrapInCurlys(auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+    void WrapInCurlys(void_func_ref lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
     void WrapInParensOrCurlys(const BraceKind        curlys,
-                              auto&&                 lambda,
+                              void_func_ref          lambda,
                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
     void UpdateCurrentPos() { mCurrentPos = mOutputFormatHelper.CurrentPos(); }

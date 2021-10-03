@@ -3736,7 +3736,7 @@ void CodeGenerator::InsertCurlysIfRequired(const Stmt* stmt)
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::WrapInParensOrCurlys(const BraceKind        braceKind,
-                                         auto&&                 lambda,
+                                         void_func_ref          lambda,
                                          const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(BraceKind::Curlys == braceKind) {
@@ -3789,35 +3789,39 @@ void CodeGenerator::WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAft
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::WrapInParens(auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInParens(void_func_ref lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Parens, FWD(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Parens, lambda, addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::WrapInParensIfNeeded(bool needsParens, auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInParensIfNeeded(bool                   needsParens,
+                                         void_func_ref          lambda,
+                                         const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(needsParens) {
-        WrapInParensOrCurlys(BraceKind::Parens, FWD(lambda), addSpaceAtTheEnd);
+        WrapInParensOrCurlys(BraceKind::Parens, lambda, addSpaceAtTheEnd);
     } else {
         lambda();
     }
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::WrapInCurliesIfNeeded(bool needsParens, auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInCurliesIfNeeded(bool                   needsParens,
+                                          void_func_ref          lambda,
+                                          const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
     if(needsParens) {
-        WrapInParensOrCurlys(BraceKind::Curlys, FWD(lambda), addSpaceAtTheEnd);
+        WrapInParensOrCurlys(BraceKind::Curlys, lambda, addSpaceAtTheEnd);
     } else {
         lambda();
     }
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::WrapInCurlys(auto&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
+void CodeGenerator::WrapInCurlys(void_func_ref lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd)
 {
-    WrapInParensOrCurlys(BraceKind::Curlys, FWD(lambda), addSpaceAtTheEnd);
+    WrapInParensOrCurlys(BraceKind::Curlys, lambda, addSpaceAtTheEnd);
 }
 //-----------------------------------------------------------------------------
 
