@@ -1880,6 +1880,9 @@ void CodeGenerator::InsertArg(const LambdaExpr* stmt)
     if(!mLambdaStack.empty()) {
         HandleLambdaExpr(stmt, mLambdaStack.back());
         mOutputFormatHelper.Append(GetLambdaName(*stmt));
+    } else if(LambdaInInitCapture::Yes == mLambdaInitCapture) {
+        LAMBDA_SCOPE_HELPER(InitCapture);
+        HandleLambdaExpr(stmt, mLambdaStack.back());
     } else {
         LAMBDA_SCOPE_HELPER(LambdaExpr);
         HandleLambdaExpr(stmt, mLambdaStack.back());
@@ -2708,10 +2711,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     mCurrentFieldPos = mOutputFormatHelper.CurrentPos();
 
-    OnceTrue        firstRecordDecl{};
-    OnceTrue        firstDecl{};
-    Decl::Kind      formerKind{};
-    AccessSpecifier lastAccess{stmt->isClass() ? AS_private : AS_public};
+    OnceTrue               firstRecordDecl{};
+    OnceTrue               firstDecl{};
+    Decl::Kind             formerKind{};
+    llvm::Optional<size_t> insertPosBeforeCtor{};
+    AccessSpecifier        lastAccess{stmt->isClass() ? AS_private : AS_public};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) && firstRecordDecl) {
             continue;
@@ -2739,6 +2743,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         }
 
         InsertArg(d);
+
+        if(lastAccess == AS_public && not insertPosBeforeCtor.hasValue()) {
+            insertPosBeforeCtor = mOutputFormatHelper.CurrentPos();
+        }
+
         formerKind = d->getKind();
     }
 
@@ -2841,16 +2850,32 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 if(not isThis && expr) {
                     OutputFormatHelper ofm{};
                     CodeGenerator      codeGenerator{ofm, mLambdaStack};
+                    if(not isa<LambdaExpr>(expr)) {
+                        if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(expr);
+                           ctorExpr && byConstRef && (1 == ctorExpr->getNumArgs())) {
+                            codeGenerator.InsertArg(ctorExpr->getArg(0));
 
-                    if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(expr);
-                       ctorExpr && byConstRef && (1 == ctorExpr->getNumArgs())) {
-                        codeGenerator.InsertArg(ctorExpr->getArg(0));
+                        } else {
+                            codeGenerator.InsertArg(expr);
+                        }
 
+                        ctorArguments.append(ofm.GetString());
                     } else {
-                        codeGenerator.InsertArg(expr);
-                    }
+                        // We need to fake the namespace of the current lambda and append the braced init...
+                        const std::string name = GetName(*stmt) +
+                                                 "::" + GetName(*dyn_cast_or_null<LambdaExpr>(expr)->getLambdaClass()) +
+                                                 "{}";
 
-                    ctorArguments.append(ofm.GetString());
+                        ctorArguments.append(name);
+
+                        OutputFormatHelper ofm{};
+                        ofm.SetIndent(mOutputFormatHelper);
+
+                        CodeGenerator codeGenerator{ofm, LambdaInInitCapture::Yes};
+                        codeGenerator.InsertArg(expr);
+
+                        mOutputFormatHelper.InsertAt(insertPosBeforeCtor.getValueOr(-1), ofm.GetString());
+                    }
                 } else {
                     if(isThis && not fieldDeclType->isPointerType()) {
                         ctorArguments.append("*");
@@ -2920,7 +2945,8 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         // close the class scope
         mOutputFormatHelper.CloseScope();
 
-        if((LambdaCallerType::VarDecl != lambdaCallerType) && (LambdaCallerType::CallExpr != lambdaCallerType)) {
+        if(not is{lambdaCallerType}.any_of(
+               LambdaCallerType::VarDecl, LambdaCallerType::InitCapture, LambdaCallerType::CallExpr)) {
             mOutputFormatHelper.Append(" ", GetLambdaName(*stmt), ctorArguments);
         } else {
             mLambdaStack.back().inits().append(ctorArguments);
