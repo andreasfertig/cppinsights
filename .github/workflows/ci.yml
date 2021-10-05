@@ -631,7 +631,7 @@ jobs:
 #------------------------------------------------------------------------------
   deploy:
     needs: [build, docker]
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     name: Final Deploy
     runs-on: ubuntu-latest
 
@@ -706,7 +706,7 @@ jobs:
         /usr/bin/git add --all .
 
         echo "Committing"
-        /usr/bin/git commit -m "Deploying to master from master @ ${GITHUB_SHA}" --quiet --no-verify
+        /usr/bin/git commit -m "Deploying to main from main @ ${GITHUB_SHA}" --quiet --no-verify
 
         echo "Pushing"
         /usr/bin/git push --force
