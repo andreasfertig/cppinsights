@@ -1032,7 +1032,27 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
         if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
             if(stmt->doesThisDeclarationHaveABody()) {
                 mOutputFormatHelper.AppendNewLine();
+
+                const auto exSpec = stmt->getExceptionSpecType();
+                const bool showNoexcept =
+                    GetInsightsOptions().UseShowNoexcept && is{exSpec}.any_of(EST_BasicNoexcept, EST_NoexceptTrue);
+
+                if(showNoexcept) {
+                    mHaveException = true;
+                    mOutputFormatHelper.OpenScope();
+                    mOutputFormatHelper.Append("try ");
+                }
+
                 InsertArg(stmt->getBody());
+
+                if(showNoexcept) {
+                    mOutputFormatHelper.Append(" catch(...) ");
+                    mOutputFormatHelper.OpenScope();
+                    mOutputFormatHelper.Append("std::terminate();");
+                    mOutputFormatHelper.CloseScope();
+                    mOutputFormatHelper.CloseScope();
+                }
+
                 mOutputFormatHelper.AppendNewLine();
             } else {
                 mOutputFormatHelper.AppendSemiNewLine();

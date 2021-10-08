@@ -174,6 +174,9 @@ public:
     /// If so we need to insert the <new> header for the placement-new.
     static bool NeedToInsertNewHeader() { return mHaveLocalStatic; }
 
+    /// Track whether we have a noexcept transformation which needs the exception header.
+    static bool NeedToInsertExceptionHeader() { return mHaveException; }
+
     template<typename T>
     void InsertTemplateArgs(const ArrayRef<T>& array)
     {
@@ -349,7 +352,8 @@ protected:
         NoEmptyInitList::No};  //!< At least in case if a requires-clause containing T{} we don't want to get T{{}}.
     const LambdaExpr*  mLambdaExpr{};
     static inline bool mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code. This
-                                          //!< requires adding the \c <new> header.
+    static inline bool
+        mHaveException;  //!< Track whether there was a noexcept transformation requireing the exception header.
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
         uint64_t{100}};  //!< This is the upper limit of elements which will be shown for an array when filled by \c
                          //!< FillConstantArray.
