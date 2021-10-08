@@ -17,4 +17,5 @@ INSIGHTS_OPT("alt-syntax-subscription",
              "Transform array subscriptions E1[E2] into (*(E1 + E2)).", gInsightCategory)
 INSIGHTS_OPT("show-all-implicit-casts", ShowAllImplicitCasts, false, "Show all implicit casts which can be noisy.", gInsightCategory)
 INSIGHTS_OPT("edu-show-initlist", UseShowInitializerList, false, "Transform a std::initializer list", gInsightEduCategory)
+INSIGHTS_OPT("edu-show-noexcept", UseShowNoexcept, false, "Transform a noexcept function", gInsightEduCategory)
 #undef INSIGHTS_OPT

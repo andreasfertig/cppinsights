@@ -111,14 +111,19 @@ public:
 
         // Check whether we had static local variables which we transformed. Then for the placement-new we need to
         // include the header <new>.
-        if(CodeGenerator::NeedToInsertNewHeader()) {
+        if(CodeGenerator::NeedToInsertNewHeader() || CodeGenerator::NeedToInsertExceptionHeader()) {
             const auto& sm         = context.getSourceManager();
             const auto& mainFileId = sm.getMainFileID();
             const auto  loc        = sm.translateFileLineCol(sm.getFileEntryForID(mainFileId), 1, 1);
 
-            mRewriter.InsertText(loc,
-                                 "#include <new> // for thread-safe static's placement new\n#include <stdint.h> // for "
-                                 "uint64_t under Linux/GCC\n");
+            if(CodeGenerator::NeedToInsertNewHeader()) {
+                mRewriter.InsertText(
+                    loc,
+                    "#include <new> // for thread-safe static's placement new\n#include <stdint.h> // for "
+                    "uint64_t under Linux/GCC\n");
+            } else {
+                mRewriter.InsertText(loc, "#include <exception> // for noexcept transformation\n");
+            }
         }
     }
 
