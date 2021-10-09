@@ -32,14 +32,10 @@ inline constexpr bool is_same_v = std::is_same<T, U>::value;  // NOLINT
 class OutputFormatHelper
 {
 public:
-    explicit OutputFormatHelper()
-    : OutputFormatHelper{0}
-    {
-    }
+    OutputFormatHelper() = default;
 
     explicit OutputFormatHelper(const unsigned indent)
     : mDefaultIndent{indent}
-    , mOutput{}
     {
     }
 
@@ -206,8 +202,8 @@ public:
 
 private:
     static constexpr unsigned SCOPE_INDENT{2};
-    unsigned                  mDefaultIndent;
-    std::string               mOutput;
+    unsigned                  mDefaultIndent{};
+    std::string               mOutput{};
 
     void Indent(unsigned count);
     void NewLine()
