@@ -76,13 +76,15 @@ public:
     /// Append a single character to the buffer
     void Append(const char c) { mOutput += c; }
 
+    void Append(const std::string_view& arg) { mOutput += arg; }
+
     /// \brief Append a variable number of data
     ///
     /// The \c StrCat function which is used ensures, that a \c StringRef or a char are converted appropriately.
     template<typename... Args>
-    void Append(Args&&... args)
+    void Append(const Args&... args)
     {
-        details::StrCat(mOutput, std::forward<Args>(args)...);
+        details::StrCat(mOutput, args...);
     }
 
     /// \brief Same as \ref Append but adds a newline after the last argument.
@@ -94,12 +96,18 @@ public:
         NewLine();
     }
 
+    void AppendNewLine(const std::string_view& arg)
+    {
+        mOutput += arg;
+        NewLine();
+    }
+
     /// \brief Same as \ref Append but adds a newline after the last argument.
     template<typename... Args>
-    void AppendNewLine(Args&&... args)
+    void AppendNewLine(const Args&... args)
     {
         if constexpr(0 < sizeof...(args)) {
-            details::StrCat(mOutput, std::forward<Args>(args)...);
+            details::StrCat(mOutput, args...);
         }
 
         NewLine();
@@ -151,12 +159,18 @@ public:
 
     /// \brief Append a semicolon and a newline.
     template<typename... Args>
-    void AppendSemiNewLine(Args&&... args)
+    void AppendSemiNewLine(const Args&... args)
     {
         if constexpr(0 < sizeof...(args)) {
-            details::StrCat(mOutput, std::forward<Args>(args)...);
+            details::StrCat(mOutput, args...);
         }
 
+        AppendNewLine(';');
+    }
+
+    void AppendSemiNewLine(const std::string_view& arg)
+    {
+        mOutput += arg;
         AppendNewLine(';');
     }
 
