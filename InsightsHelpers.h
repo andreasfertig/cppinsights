@@ -212,7 +212,7 @@ const std::string      GetNoExcept(const FunctionDecl& decl);
 const std::string_view GetConst(const FunctionDecl& decl);
 //-----------------------------------------------------------------------------
 
-std::string_view GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
+std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
 //-----------------------------------------------------------------------------
 
 template<typename T, typename TFunc>
