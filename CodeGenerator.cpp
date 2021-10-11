@@ -2046,6 +2046,7 @@ std::string CodeGenerator::GetValueOfValueInit(const QualType& t)
                         // Type::STK_Floating
                         case BuiltinType::Half:
                         case BuiltinType::Float: return "0.0f";
+                        case BuiltinType::Double: return "0.0";
                         default: break;
                     }
                 }
