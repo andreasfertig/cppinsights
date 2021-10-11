@@ -37,7 +37,7 @@ ScopeHandler::ScopeHandler(const Decl* d)
         }
 
     } else if(const auto* namespaceDecl = dyn_cast_or_null<NamespaceDecl>(d)) {
-        mScope.append(namespaceDecl->getNameAsString());
+        mScope.append(namespaceDecl->getName());
     }
 
     if(not mScope.empty()) {
@@ -60,7 +60,7 @@ std::string ScopeHandler::RemoveCurrentScope(std::string name)
             if(const auto startPos = name.find(scope, 0); std::string::npos != startPos) {
                 if(const auto pos = startPos + scope.length();
                    (pos > name.length()) || (name[pos] != '*')) {  // keep member points (See #374)
-                    name.replace(startPos, scope.length(), "");
+                    name.replace(startPos, scope.length(), ""sv);
                     return true;
                 }
             }
@@ -133,21 +133,19 @@ static void BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier
     }
 
     switch(stmt->getKind()) {
-        case NestedNameSpecifier::Identifier: fullNamespace.append(stmt->getAsIdentifier()->getName().str()); break;
+        case NestedNameSpecifier::Identifier: fullNamespace.append(stmt->getAsIdentifier()->getName()); break;
 
         case NestedNameSpecifier::Namespace:
             if(stmt->getAsNamespace()->isAnonymousNamespace()) {
                 return;
             }
 
-            fullNamespace.append(stmt->getAsNamespace()->getName().str());
+            fullNamespace.append(stmt->getAsNamespace()->getName());
             break;
 
-        case NestedNameSpecifier::NamespaceAlias:
-            fullNamespace.append(stmt->getAsNamespaceAlias()->getName().str());
-            break;
+        case NestedNameSpecifier::NamespaceAlias: fullNamespace.append(stmt->getAsNamespaceAlias()->getName()); break;
 
-        case NestedNameSpecifier::TypeSpecWithTemplate: fullNamespace.append("template "); [[fallthrough]];
+        case NestedNameSpecifier::TypeSpecWithTemplate: fullNamespace.append(kwTemplateSpace); [[fallthrough]];
 
         case NestedNameSpecifier::TypeSpec:
             fullNamespace.append(GetUnqualifiedScopelessName(stmt->getAsType(), InsightsSuppressScope::Yes));
@@ -157,7 +155,7 @@ static void BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier
         default: break;
     }
 
-    fullNamespace.append("::");
+    fullNamespace.append("::"sv);
 }
 //-----------------------------------------------------------------------------
 }  // namespace details
@@ -180,13 +178,14 @@ static const std::string GetAsCPPStyleString(const QualType& t, const CppInsight
 }
 //-----------------------------------------------------------------------------
 
-std::string BuildInternalVarName(const std::string& varName)
+std::string BuildInternalVarName(const std::string_view& varName)
 {
     return StrCat("__", varName);
 }
 //-----------------------------------------------------------------------------
 
-static std::string BuildInternalVarName(const std::string& varName, const SourceLocation& loc, const SourceManager& sm)
+static std::string
+BuildInternalVarName(const std::string_view& varName, const SourceLocation& loc, const SourceManager& sm)
 {
     const auto lineNo = sm.getSpellingLineNumber(loc);
 
@@ -258,7 +257,7 @@ SourceRange GetSourceRangeAfterSemi(const SourceRange                           
 }
 //-----------------------------------------------------------------------------
 
-void InsertBefore(std::string& source, const std::string& find, const std::string& replace)
+void InsertBefore(std::string& source, const std::string_view& find, const std::string_view& replace)
 {
     const std::string::size_type i = source.find(find, 0);
 
@@ -268,7 +267,7 @@ void InsertBefore(std::string& source, const std::string& find, const std::strin
 }
 //-----------------------------------------------------------------------------
 
-static void InsertAfter(std::string& source, const std::string& find, const std::string& replace)
+static void InsertAfter(std::string& source, const std::string_view& find, const std::string_view& replace)
 {
     const std::string::size_type i = source.find(find, 0);
 
@@ -278,7 +277,7 @@ static void InsertAfter(std::string& source, const std::string& find, const std:
 }
 //-----------------------------------------------------------------------------
 
-static std::string MakeLineColumnName(const Decl& decl, const std::string& prefix)
+static std::string MakeLineColumnName(const Decl& decl, const std::string_view prefix)
 {
     const auto& sm       = GetSM(decl);
     const auto  locBegin = GetBeginLoc(decl);
@@ -287,27 +286,27 @@ static std::string MakeLineColumnName(const Decl& decl, const std::string& prefi
     const auto columnNo =
         locBegin.isMacroID() ? sm.getExpansionColumnNumber(locBegin) : sm.getSpellingColumnNumber(locBegin);
 
-    return StrCat(prefix, lineNo, "_", columnNo);
+    return StrCat(prefix, lineNo, "_"sv, columnNo);
 }
 //-----------------------------------------------------------------------------
 
 std::string GetLambdaName(const CXXRecordDecl& lambda)
 {
-    static const std::string lambdaPrefix{"__lambda_"};
+    static constexpr std::string_view lambdaPrefix{"__lambda_"};
     return MakeLineColumnName(lambda, lambdaPrefix);
 }
 //-----------------------------------------------------------------------------
 
 static std::string GetAnonymStructOrUnionName(const CXXRecordDecl& cxxRecordDecl)
 {
-    static const std::string prefix{"__anon_"};
+    static constexpr std::string_view prefix{"__anon_"};
     return MakeLineColumnName(cxxRecordDecl, prefix);
 }
 //-----------------------------------------------------------------------------
 
 std::string BuildRetTypeName(const Decl& decl)
 {
-    static const std::string retTypePrefix{"retType_"};
+    static constexpr std::string_view retTypePrefix{"retType_"};
     return MakeLineColumnName(decl, retTypePrefix);
 }
 //-----------------------------------------------------------------------------
@@ -335,7 +334,7 @@ const std::string EvaluateAsFloat(const FloatingLiteral& expr)
     if(std::string::npos == str.find('.')) {
         /* in case it is a number like 10.0 toString() seems to leave out the .0. However, as this distinguished
          * between an integer and a floating point literal we need that dot. */
-        str.append(".0");
+        str.append(".0"sv);
     }
 
 #if IS_CLANG_NEWER_THAN(10)
@@ -387,14 +386,14 @@ std::string GetDeclContext(const DeclContext* ctx)
                 continue;
             }
 
-            mOutputFormatHelper.Append(nd->getNameAsString());
+            mOutputFormatHelper.Append(nd->getName());
 
         } else if(const auto* rd = dyn_cast<RecordDecl>(declContext)) {
             if(!rd->getIdentifier()) {
                 continue;
             }
 
-            mOutputFormatHelper.Append(rd->getNameAsString());
+            mOutputFormatHelper.Append(rd->getName());
 
         } else if(dyn_cast<FunctionDecl>(declContext)) {
             continue;
@@ -404,13 +403,13 @@ std::string GetDeclContext(const DeclContext* ctx)
                 continue;
             }
 
-            mOutputFormatHelper.Append(ed->getNameAsString());
+            mOutputFormatHelper.Append(ed->getName());
 
         } else {
-            mOutputFormatHelper.Append(cast<NamedDecl>(declContext)->getNameAsString());
+            mOutputFormatHelper.Append(cast<NamedDecl>(declContext)->getName());
         }
 
-        mOutputFormatHelper.Append("::");
+        mOutputFormatHelper.Append("::"sv);
     }
 
     return mOutputFormatHelper.GetString();
@@ -428,7 +427,7 @@ static std::string GetQualifiedName(const NamedDecl&         decl,
 {
     std::string scope{GetDeclContext(decl.getDeclContext())};
 
-    scope += decl.getName().str();
+    scope += decl.getName();
 
     if(RemoveCurrentScope::Yes == removeCurrentScope) {
         return ScopeHandler::RemoveCurrentScope(scope);
@@ -452,7 +451,7 @@ static std::string GetScope(const DeclContext*       declCtx,
         if(declCtx->isNamespace() || declCtx->getParent()->isTranslationUnit()) {
             if(const auto* namedDecl = dyn_cast_or_null<NamedDecl>(declCtx)) {
                 name = GetQualifiedName(*namedDecl, removeCurrentScope);
-                name.append("::");
+                name.append("::"sv);
             }
         }
     }
@@ -499,21 +498,21 @@ private:
 
     bool HandleType(const LValueReferenceType* type)
     {
-        mDataAfter += " &";
+        mDataAfter += " &"sv;
 
         return HandleType(type->getPointeeType().getTypePtrOrNull());
     }
 
     bool HandleType(const RValueReferenceType* type)
     {
-        mDataAfter += " &&";
+        mDataAfter += " &&"sv;
 
         return HandleType(type->getPointeeType().getTypePtrOrNull());
     }
 
     bool HandleType(const PointerType* type)
     {
-        mDataAfter += " *";
+        mDataAfter += " *"sv;
 
         return HandleType(type->getPointeeType().getTypePtrOrNull());
     }
@@ -592,8 +591,8 @@ private:
     {
         mData.Append(GetElaboratedTypeKeyword(type->getKeyword()),
                      GetNestedName(type->getQualifier()),
-                     "template ",
-                     type->getIdentifier()->getName().str());
+                     kwTemplateSpace,
+                     type->getIdentifier()->getName());
 
         CodeGenerator codeGenerator{mData};
         codeGenerator.InsertTemplateArgs(*type);
@@ -620,7 +619,7 @@ private:
                 StringStream sstream{};
                 sstream.Print(arg);
 
-                if(Contains(sstream.str(), "type-parameter")) {
+                if(Contains(sstream.str(), "type-parameter"sv)) {
                     return true;
                 }
             }
@@ -648,7 +647,7 @@ private:
 
         const bool ret = HandleType(type->getClass());
 
-        mData.Append("::*)");
+        mData.Append("::*)"sv);
 
         HandleTypeAfter(type->getPointeeType().getTypePtrOrNull());
 
@@ -665,7 +664,7 @@ private:
         mSkipSpace = true;
         for(const auto& t : type->getParamTypes()) {
             if(needsComma) {
-                mData.Append(", ");
+                mData.Append(", "sv);
             }
 
             HandleType(t.getTypePtrOrNull());
@@ -677,7 +676,7 @@ private:
 
 #if IS_CLANG_NEWER_THAN(8)
         if(not type->getMethodQuals().empty()) {
-            mData.Append(" ", type->getMethodQuals().getAsString());
+            mData.Append(" "sv, type->getMethodQuals().getAsString());
         }
 #else
         if(not type->getTypeQuals().empty()) {
@@ -705,9 +704,9 @@ private:
         if(const auto* decl = type->getDecl()) {
             /// Another filter place for type-parameter where it is contained in the FQN but leads to none compiling
             /// code. Remove it to keep the code valid.
-            if(Contains(decl->getQualifiedNameAsString(), "type-parameter")) {
+            if(Contains(decl->getQualifiedNameAsString(), "type-parameter"sv)) {
                 auto* identifierInfo = decl->getIdentifier();
-                mData.Append(identifierInfo->getName().str());
+                mData.Append(identifierInfo->getName());
 
                 return true;
             }
@@ -722,7 +721,7 @@ private:
     {
         const bool ret = HandleType(type->getElementType().getTypePtrOrNull());
 
-        mData.Append("[", type->getSize().getZExtValue(), "]");
+        mData.Append("["sv, type->getSize().getZExtValue(), "]"sv);
 
         return ret;
     }
@@ -732,7 +731,7 @@ private:
         const bool ret = HandleType(type->getPattern().getTypePtrOrNull());
 
         if(ret) {
-            mData.Append("...");
+            mData.Append(kwElipsis);
         }
 
         return ret;
@@ -906,7 +905,7 @@ std::string GetName(const NamedDecl& nd)
         name = details::GetScope(nd.getDeclContext(), details::RemoveCurrentScope::No);
     }
 
-    name += nd.getNameAsString();
+    name += nd.getNameAsString();  // Must be getNameAsString because NamedDecl is no identifier.
 
     return ScopeHandler::RemoveCurrentScope(name);
 }
@@ -925,8 +924,8 @@ std::string GetName(const CXXRecordDecl& RD)
 
     std::string ret{GetNestedName(RD.getQualifier())};
 
-    if(auto&& name = RD.getNameAsString(); not name.empty()) {
-        ret += RD.getNameAsString();
+    if(auto name = RD.getName(); not name.empty()) {
+        ret += name;
 
     } else {
         ret += GetAnonymStructOrUnionName(RD);
@@ -969,7 +968,7 @@ static bool HasTypeWithSubType(const QualType& t)
 }
 //-----------------------------------------------------------------------------
 
-std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName, const Unqualified unqualified)
+std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqualified unqualified)
 {
     const bool isFunctionPointer = HasTypeWithSubType<ReferenceType, FunctionProtoType>(t);
     const bool isArrayRef        = HasTypeWithSubType<ReferenceType, ArrayType>(t);
@@ -982,66 +981,66 @@ std::string GetTypeNameAsParameter(const QualType& t, const std::string& varName
 
     // Sometimes we get char const[2]. If we directly insert the typename we end up with char const__var[2] which is not
     // a valid type name. Hence check for this condition and, if necessary, insert a space before __var.
-    auto getSpaceOrEmpty = [&](const std::string& needle) -> std::string {
+    auto getSpaceOrEmpty = [&](const std::string_view& needle) -> std::string_view {
         if(not Contains(typeName, needle)) {
             return " ";
         }
 
-        return "";
+        return {};
     };
 
     if(t->isArrayType() && !t->isLValueReferenceType()) {
-        std::string space = getSpaceOrEmpty(" [");
-        InsertBefore(typeName, "[", StrCat(space, varName));
+        const auto space = getSpaceOrEmpty(" ["sv);
+        InsertBefore(typeName, "["sv, StrCat(space, varName));
 
     } else if(isArrayRef) {
-        const bool        isRValueRef{HasTypeWithSubType<RValueReferenceType, ArrayType>(t)};
-        const std::string contains{isRValueRef ? "(&&" : "(&"};
+        const bool             isRValueRef{HasTypeWithSubType<RValueReferenceType, ArrayType>(t)};
+        const std::string_view contains{isRValueRef ? "(&&" : "(&"};
 
         if(Contains(typeName, contains)) {
             InsertAfter(typeName, contains, varName);
         } else {
-            const std::string insertBefore{isRValueRef ? "&&[" : "&["};
+            const std::string_view insertBefore{isRValueRef ? "&&[" : "&["};
 
-            InsertBefore(typeName, insertBefore, "(");
+            InsertBefore(typeName, insertBefore, "("sv);
 
             // check whether we are dealing with a function or an array
             if(Contains(typeName, contains)) {
-                InsertAfter(typeName, contains, StrCat(varName, ")"));
+                InsertAfter(typeName, contains, StrCat(varName, ")"sv));
             } else {
-                InsertAfter(typeName, typeName, StrCat(" ", varName));
+                InsertAfter(typeName, typeName, StrCat(" "sv, varName));
             }
         }
 
     } else if(isFunctionPointer) {
-        const bool        isRValueRef{HasTypeWithSubType<RValueReferenceType, FunctionProtoType>(t)};
-        const std::string contains{isRValueRef ? "(&&" : "(&"};
+        const bool             isRValueRef{HasTypeWithSubType<RValueReferenceType, FunctionProtoType>(t)};
+        const std::string_view contains{isRValueRef ? "(&&" : "(&"};
 
         if(Contains(typeName, contains)) {
             InsertAfter(typeName, contains, varName);
         } else {
-            typeName += StrCat(" ", varName);
+            typeName += StrCat(" "sv, varName);
         }
 
     } else if(isa<MemberPointerType>(t)) {
-        InsertAfter(typeName, "::*", varName);
+        InsertAfter(typeName, "::*"sv, varName);
 
     } else if(isPointerToArray) {
-        if(Contains(typeName, "(*")) {
-            InsertAfter(typeName, "(*", varName);
-        } else if(Contains(typeName, "*")) {
-            InsertBefore(typeName, "*", "(");
-            InsertAfter(typeName, "*", StrCat(varName, ")"));
+        if(Contains(typeName, "(*"sv)) {
+            InsertAfter(typeName, "(*"sv, varName);
+        } else if(Contains(typeName, "*"sv)) {
+            InsertBefore(typeName, "*"sv, "("sv);
+            InsertAfter(typeName, "*"sv, StrCat(varName, ")"sv));
         }
     } else if(t->isFunctionPointerType()) {
-        if(Contains(typeName, "(*")) {
-            InsertAfter(typeName, "(*", varName);
+        if(Contains(typeName, "(*"sv)) {
+            InsertAfter(typeName, "(*"sv, varName);
         } else {
-            typeName += StrCat(" ", varName);
+            typeName += StrCat(" "sv, varName);
         }
 
     } else if(!t->isArrayType() && !varName.empty()) {
-        typeName += StrCat(" ", varName);
+        typeName += StrCat(" "sv, varName);
     }
 
     return typeName;
@@ -1058,14 +1057,14 @@ void AppendTemplateTypeParamName(OutputFormatHelper&         ofm,
             StringStream sstream{};
             sstream.Print(*typeConstraint);
 
-            ofm.Append(sstream.str(), " ");
+            ofm.Append(sstream.str(), " "sv);
         }
     }
 
     const auto depth = [&] { return decl ? decl->getDepth() : type->getDepth(); }();
     const auto index = [&] { return decl ? decl->getIndex() : type->getIndex(); }();
 
-    ofm.Append("type_parameter_", depth, "_", index);
+    ofm.Append("type_parameter_"sv, depth, "_"sv, index);
 }
 //-----------------------------------------------------------------------------
 
@@ -1152,19 +1151,19 @@ f(args, args, args);
  * The expected type for \c T currently is \c ValueDecl or \c VarDecl.
  */
 template<typename T>
-static std::string GetTemplateParameterPackArgumentName(std::string& name, const T* decl)
+static std::string GetTemplateParameterPackArgumentName(std::string_view name, const T* decl)
 {
     if(const auto* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(decl)) {
         if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {
             if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull())) {
                 if(substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
-                    name = StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
+                    return StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
                 }
             }
         }
     }
 
-    return name;
+    return std::string{name};
 }
 //-----------------------------------------------------------------------------
 
@@ -1191,8 +1190,13 @@ std::string GetName(const DeclRefExpr& declRefExpr)
         if(IsTrivialStaticClassVarDecl(declRefExpr)) {
             if(const VarDecl* vd = GetVarDeclFromDeclRefExpr(declRefExpr)) {
                 if(const auto* cxxRecordDecl = vd->getType()->getAsCXXRecordDecl()) {
-                    plainName = StrCat(
-                        "*reinterpret_cast<", GetName(vd->getType()), "*>(", BuildInternalVarName(plainName), ")");
+                    plainName = StrCat("*"sv,
+                                       kwReinterpretCast,
+                                       "<"sv,
+                                       GetName(vd->getType()),
+                                       "*>("sv,
+                                       BuildInternalVarName(plainName),
+                                       ")"sv);
                 }
             }
         }
@@ -1242,9 +1246,8 @@ std::string GetName(const VarDecl& VD)
             if(const auto* declName = FindDeclRef(decompositionDeclStmt->getInit())) {
                 std::string name = GetPlainName(*declName);
 
-                const std::string operatorName{"operator"};
-                if(Contains(name, operatorName)) {
-                    return operatorName;
+                if(Contains(name, kwOperator)) {
+                    return std::string{kwOperator};
                 }
 
                 return name;
@@ -1257,7 +1260,7 @@ std::string GetName(const VarDecl& VD)
         return {BuildInternalVarName(baseVarName, GetBeginLoc(decompositionDeclStmt), GetSM(*decompositionDeclStmt))};
     }
 
-    std::string name{VD.getNameAsString()};
+    std::string_view name{VD.getName()};
 
     return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, &VD));
 }
@@ -1297,15 +1300,7 @@ const std::string GetNoExcept(const FunctionDecl& decl)
                 return false;
             }();
 
-            ret += "(";
-
-            if(value) {
-                ret += "true";
-            } else {
-                ret += "false";
-            }
-
-            ret += ")";
+            ret += StrCat("("sv, details::ConvertToBoolString(value), ")"sv);
         }
 
         return ret;
@@ -1315,7 +1310,7 @@ const std::string GetNoExcept(const FunctionDecl& decl)
 }
 //-----------------------------------------------------------------------------
 
-const char* GetConst(const FunctionDecl& decl)
+const std::string_view GetConst(const FunctionDecl& decl)
 {
     if(const auto* methodDecl = dyn_cast_or_null<CXXMethodDecl>(&decl)) {
         if(methodDecl->isConst()) {
@@ -1323,14 +1318,20 @@ const char* GetConst(const FunctionDecl& decl)
         }
     }
 
-    return "";
+    return {};
 }
 //-----------------------------------------------------------------------------
 
-std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
+std::string_view GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
 {
-    if(ETK_None != keyword) {
-        return TypeWithKeyword::getKeywordName(keyword).str() + " ";
+    switch(keyword) {
+        case ETK_Struct: return kwStructSpace;
+        case ETK_Union: return kwUnionSpace;
+        case ETK_Class: return kwClassSpace;
+        case ETK_Enum: return kwEnumSpace;
+        case ETK_Typename: return kwTypeNameSpace;
+        case ETK_Interface: break;
+        case ETK_None: break;
     }
 
     return {};

@@ -125,9 +125,9 @@ inline void Error(const Stmt* stmt, const char* fmt, Args&&... args)
 //-----------------------------------------------------------------------------
 
 /// \brief Helper function to generate TODO comments for an unsupported \ref Stmt.
-void ToDo(const class Stmt* stmt, class OutputFormatHelper& outputFormatHelper, const char* file, const int line);
+void ToDo(const class Stmt* stmt, class OutputFormatHelper& outputFormatHelper, std::string_view file, const int line);
 /// \brief Helper function to generate TODO comments for an unsupported \ref Decl.
-void ToDo(const class Decl* stmt, class OutputFormatHelper& outputFormatHelper, const char* file, const int line);
+void ToDo(const class Decl* stmt, class OutputFormatHelper& outputFormatHelper, std::string_view file, const int line);
 //-----------------------------------------------------------------------------
 
 /// \brief Convenience marco to get file-name and line-number for better analysis.

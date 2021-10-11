@@ -48,9 +48,9 @@ static inline std::string Normalize(const llvm::APSInt& arg)
 }
 //-----------------------------------------------------------------------------
 
-static inline std::string Normalize(StringRef&& arg)
+static inline std::string_view Normalize(const StringRef& arg)
 {
-    return arg.str();
+    return arg;
 }
 //-----------------------------------------------------------------------------
 

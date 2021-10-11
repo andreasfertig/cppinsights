@@ -9,7 +9,9 @@
 #define OUTPUT_FORMAT_HELPER_H
 //-----------------------------------------------------------------------------
 
+#include <string_view>
 #include <utility>
+using namespace std::literals;
 
 #include "InsightsOnce.h"
 #include "InsightsStrCat.h"
@@ -118,7 +120,7 @@ public:
     /// \brief Open a scope by inserting a '{' followed by an indented newline.
     void OpenScope()
     {
-        Append("{");
+        Append('{');
         IncreaseIndent();
         NewLine();
     }
@@ -133,19 +135,30 @@ public:
     void CloseScopeWithSemi(const NoNewLineBefore newLineBefore = NoNewLineBefore::No)
     {
         CloseScope(newLineBefore);
-        Append(";");
+        Append(';');
     }
 
     /// \brief Append a comma if needed.
     void AppendComma(OnceFalse& needsComma)
     {
         if(needsComma) {
-            Append(", ");
+            Append(", "sv);
         }
     }
 
     /// \brief Append a semicolon and a newline.
     void AppendSemiNewLine() { AppendNewLine(';'); }
+
+    /// \brief Append a semicolon and a newline.
+    template<typename... Args>
+    void AppendSemiNewLine(Args&&... args)
+    {
+        if constexpr(0 < sizeof...(args)) {
+            details::StrCat(mOutput, std::forward<Args>(args)...);
+        }
+
+        AppendNewLine(';');
+    }
 
     /// \brief Append a argument list to the buffer.
     ///
@@ -158,7 +171,7 @@ public:
     /// });
     /// \endcode
     template<typename T, typename Lambda>
-    static inline void ForEachArg(const T& arguments, OutputFormatHelper& outputFormatHelper, Lambda&& lambda)
+    inline void ForEachArg(const T& arguments, Lambda&& lambda)
     {
         OnceFalse needsComma{};
         for(const auto& arg : arguments) {
@@ -168,16 +181,14 @@ public:
                 }
             }
 
-            if(needsComma) {
-                outputFormatHelper.Append(", ");
-            }
+            AppendComma(needsComma);
 
             lambda(arg);
         }
     }
 
-    void InsertIfDefTemplateGuard() { AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE"); }
-    void InsertEndIfTemplateGuard() { AppendNewLine("#endif"); }
+    void InsertIfDefTemplateGuard() { AppendNewLine("#ifdef INSIGHTS_USE_TEMPLATE"sv); }
+    void InsertEndIfTemplateGuard() { AppendNewLine("#endif"sv); }
 
 private:
     static constexpr unsigned SCOPE_INDENT{2};
@@ -192,12 +203,6 @@ private:
     }
 
     void RemoveIndent();
-
-    template<typename T, typename Lambda>
-    inline void ForEachArg(const T& arguments, Lambda&& lambda)
-    {
-        ForEachArg(arguments, *this, lambda);
-    }
 };
 //-----------------------------------------------------------------------------
 

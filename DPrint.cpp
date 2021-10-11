@@ -6,6 +6,7 @@
  ****************************************************************************/
 
 #include "DPrint.h"
+#include "InsightsStaticStrings.h"
 #include "OutputFormatHelper.h"
 
 #include "clang/AST/AST.h"
@@ -15,21 +16,21 @@
 
 namespace clang::insights {
 
-static void ToDo(const char* name, OutputFormatHelper& outputFormatHelper, const char* file, const int line)
+static void ToDo(const char* name, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
 {
     const auto fileName = [&]() {
         if(llvm::sys::path::is_separator(file[0])) {
-            return llvm::sys::path::filename(file).data();
+            return std::string_view{llvm::sys::path::filename(file)};
         }
 
         return file;
     }();
 
-    outputFormatHelper.Append("/* INSIGHTS-TODO: ", fileName, ":", line, " stmt: ", name, " */");
+    outputFormatHelper.Append("/* INSIGHTS-TODO: "sv, fileName, ":"sv, line, " stmt: "sv, name, kwSpaceCCommentEnd);
 }
 //-----------------------------------------------------------------------------
 
-void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, const char* file, const int line)
+void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
 {
     const char* name = [&]() {
         if(stmt && stmt->getStmtClassName()) {
@@ -47,7 +48,7 @@ void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, const char* 
 }
 //-----------------------------------------------------------------------------
 
-void ToDo(const Decl* stmt, OutputFormatHelper& outputFormatHelper, const char* file, const int line)
+void ToDo(const Decl* stmt, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
 {
     const char* name = [&]() {
         if(stmt && stmt->getDeclKindName()) {

@@ -48,12 +48,12 @@ const InsightsOptions& GetInsightsOptions()
 }
 //-----------------------------------------------------------------------------
 
-static llvm::cl::OptionCategory gInsightCategory("Insights");
+static llvm::cl::OptionCategory gInsightCategory("Insights"sv);
 //-----------------------------------------------------------------------------
 
 static llvm::cl::OptionCategory gInsightEduCategory(
-    "Insights- Educational",
-    "This transformations are only for education purposes. The resulting code most likely does not compile.");
+    "Insights- Educational"sv,
+    "This transformations are only for education purposes. The resulting code most likely does not compile."sv);
 //-----------------------------------------------------------------------------
 
 static llvm::cl::opt<bool> gStdinMode("stdin",
@@ -61,18 +61,18 @@ static llvm::cl::opt<bool> gStdinMode("stdin",
                                                      "virtual file system) with input from <stdin> and run\n"
                                                      "the tool on the new content with the compilation\n"
                                                      "options of the source file. This mode is currently\n"
-                                                     "used for editor integration."),
+                                                     "used for editor integration."sv),
                                       llvm::cl::init(false),
                                       llvm::cl::cat(gInsightCategory));
 //-----------------------------------------------------------------------------
 
 static llvm::cl::opt<bool>
-    gUseLibCpp("use-libc++", llvm::cl::desc("Use libc++."), llvm::cl::init(false), llvm::cl::cat(gInsightCategory));
+    gUseLibCpp("use-libc++", llvm::cl::desc("Use libc++."sv), llvm::cl::init(false), llvm::cl::cat(gInsightCategory));
 //-----------------------------------------------------------------------------
 
 #define INSIGHTS_OPT(option, name, deflt, description, category)                                                       \
     static llvm::cl::opt<bool, true> g##name(option,                                                                   \
-                                             llvm::cl::desc(description),                                              \
+                                             llvm::cl::desc(std::string_view{description}),                            \
                                              llvm::cl::NotHidden,                                                      \
                                              llvm::cl::location(gInsightsOptions.name),                                \
                                              llvm::cl::init(deflt),                                                    \
@@ -120,9 +120,9 @@ public:
                 mRewriter.InsertText(
                     loc,
                     "#include <new> // for thread-safe static's placement new\n#include <stdint.h> // for "
-                    "uint64_t under Linux/GCC\n");
+                    "uint64_t under Linux/GCC\n"sv);
             } else {
-                mRewriter.InsertText(loc, "#include <exception> // for noexcept transformation\n");
+                mRewriter.InsertText(loc, "#include <exception> // for noexcept transformation\n"sv);
             }
         }
     }

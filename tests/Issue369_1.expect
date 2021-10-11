@@ -41,7 +41,7 @@ const foo & create()
   {
     if( __cxa_guard_acquire(&__valueGuard) )
     {
-      try
+      try 
       {
         new (&__value) foo(std::move(__lambda_4_23.operator()()));
         __valueGuard = true;
