@@ -82,18 +82,18 @@ static inline decltype(auto) Normalize(const T& arg)
 
 namespace details {
 template<typename... Args>
-void StrCat(std::string& ret, Args&&... args)
+inline void StrCat(std::string& ret, const Args&... args)
 {
-    (ret += ... += ::clang::insights::Normalize(std::forward<Args>(args)));
+    (ret += ... += ::clang::insights::Normalize(args));
 }
 //-----------------------------------------------------------------------------
 }  // namespace details
 
 template<typename... Args>
-std::string StrCat(Args&&... args)
+std::string StrCat(const Args&... args)
 {
     std::string ret{};
-    details::StrCat(ret, std::forward<Args>(args)...);
+    details::StrCat(ret, args...);
 
     return ret;
 }

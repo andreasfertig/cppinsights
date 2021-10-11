@@ -53,10 +53,10 @@ static inline const T& Normalize(const T& arg)
 //-----------------------------------------------------------------------------
 
 template<typename... Args>
-inline void FPrintf(const char* fmt, Args&&... args)
+inline void FPrintf(const char* fmt, const Args&... args)
 {
     if constexpr(0 < (sizeof...(args))) {
-        fprintf(stderr, fmt, Normalize(std::forward<Args>(args))...);
+        fprintf(stderr, fmt, Normalize(args)...);
     } else {
         fprintf(stderr, "%s", fmt);
     }
@@ -69,19 +69,19 @@ inline void FPrintf(const char* fmt, Args&&... args)
 ///
 /// It takes a variable number of parameters which are normalized if they are a \ref std::string or a \ref StringRef.
 template<typename... Args>
-inline void DPrint([[maybe_unused]] const char* fmt, [[maybe_unused]] Args&&... args)
+inline void DPrint([[maybe_unused]] const char* fmt, [[maybe_unused]] const Args&... args)
 {
 #ifdef INSIGHTS_DEBUG
-    details::FPrintf(fmt, std::forward<Args>(args)...);
+    details::FPrintf(fmt, args...);
 #endif /* INSIGHTS_DEBUG */
 }
 //-----------------------------------------------------------------------------
 
 /// \brief Log an error.
 template<typename... Args>
-inline void Error(const char* fmt, Args&&... args)
+inline void Error(const char* fmt, const Args&... args)
 {
-    details::FPrintf(fmt, std::forward<Args>(args)...);
+    details::FPrintf(fmt, args...);
 }
 //-----------------------------------------------------------------------------
 
@@ -100,13 +100,13 @@ inline void Dump([[maybe_unused]] const T* stmt)
 ///
 /// In debug-mode this dumps the \ref Decl which caused the error and the error message.
 template<typename... Args>
-inline void Error(const Decl* stmt, const char* fmt, Args&&... args)
+inline void Error(const Decl* stmt, const char* fmt, const Args&... args)
 {
     if(stmt) {
         Dump(stmt);
     }
 
-    Error(fmt, std::forward<Args>(args)...);
+    Error(fmt, args...);
 }
 //-----------------------------------------------------------------------------
 
@@ -114,13 +114,13 @@ inline void Error(const Decl* stmt, const char* fmt, Args&&... args)
 ///
 /// In debug-mode this dumps the \ref Stmt which caused the error and the error message.
 template<typename... Args>
-inline void Error(const Stmt* stmt, const char* fmt, Args&&... args)
+inline void Error(const Stmt* stmt, const char* fmt, const Args&... args)
 {
     if(stmt) {
         Dump(stmt);
     }
 
-    Error(fmt, std::forward<Args>(args)...);
+    Error(fmt, args...);
 }
 //-----------------------------------------------------------------------------
 
