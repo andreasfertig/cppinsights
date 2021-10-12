@@ -1,0 +1,40 @@
+// cmdline:-std=c++20
+
+template<typename T>
+concept C = true;
+
+
+class __lambda_6_15
+{
+  public: 
+  template<C type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0 container) const
+  {
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ void operator()(int container) const
+  {
+  }
+  #endif
+  
+  private: 
+  template<C type_parameter_0_0>
+  static inline auto __invoke(type_parameter_0_0 container)
+  {
+  }
+  
+  public:
+  // /*constexpr */ __lambda_6_15() = default;
+  
+};
+
+__lambda_6_15 lambda = __lambda_6_15{};
+
+
+int main()
+{
+  lambda.operator()(4);
+}
+
