@@ -61,6 +61,12 @@ inline std::string_view Normalize(const StringRef& arg)
 }
 //-----------------------------------------------------------------------------
 
+static inline std::string Normalize(const CharUnits& arg)
+{
+    return std::to_string(arg.getQuantity());
+}
+//-----------------------------------------------------------------------------
+
 template<class T>
 inline decltype(auto) Normalize(const T& arg)
 {
