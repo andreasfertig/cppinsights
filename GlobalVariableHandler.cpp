@@ -68,9 +68,12 @@ void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
         const auto sr = GetSourceRangeAfterSemi(matchedDecl->getSourceRange(), result, RequireSemi::Yes);
 
         // Check whether we already have rewritten this location. If so, insert the text after the location. This is the
-        // case for an anonymous struct declared with TU as root.
+        // case for:
+        // - an anonymous struct declared with TU as root
+        // - a out-of-line static member variable of a class template
         if(not IsMacroLocation(matchedDecl->getSourceRange()) && (mRewrite.buffer_begin() != mRewrite.buffer_end()) &&
-           IsAnonymousStructOrUnion(matchedDecl->getType()->getAsCXXRecordDecl())) {
+           (isTemplateInstantiation(matchedDecl->getTemplateSpecializationKind()) ||
+            IsAnonymousStructOrUnion(matchedDecl->getType()->getAsCXXRecordDecl()))) {
             if(auto&& text = mRewrite.getRewrittenText(sr); not text.empty()) {
                 const char* data = result.SourceManager->getCharacterData(matchedDecl->getSourceRange().getBegin());
 

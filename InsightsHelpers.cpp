@@ -362,7 +362,7 @@ std::string GetNameAsWritten(const QualType& t)
 //-----------------------------------------------------------------------------
 
 // own implementation due to lambdas
-std::string GetDeclContext(const DeclContext* ctx)
+std::string GetDeclContext(const DeclContext* ctx, WithTemplateParameters withTemplateParameters)
 {
     OutputFormatHelper                 mOutputFormatHelper{};
     SmallVector<const DeclContext*, 8> contexts{};
@@ -394,6 +394,28 @@ std::string GetDeclContext(const DeclContext* ctx)
             }
 
             mOutputFormatHelper.Append(rd->getName());
+
+            // A special case at least for out-of-line static member variables of a class template. They need to carry
+            // the template parameters of the class template.
+            if(WithTemplateParameters::Yes == withTemplateParameters /*declContext->isNamespace() || declContext->getLexicalParent()->isNamespace() || declContext->getLexicalParent()->isTranslationUnit()*/) {
+                if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(rd)) {
+                    if(const auto* classTmpl = cxxRecordDecl->getDescribedClassTemplate()) {
+                        const auto* tmplParams = classTmpl->getTemplateParameters();
+
+                        CodeGenerator codeGenerator{mOutputFormatHelper};
+                        mOutputFormatHelper.Append('<');
+
+                        mOutputFormatHelper.ForEachArg(*tmplParams, [&](const auto* param) {
+                            mOutputFormatHelper.Append(GetName(*param));
+                            if(param->isParameterPack()) {
+                                mOutputFormatHelper.Append("..."sv);
+                            }
+                        });
+
+                        mOutputFormatHelper.Append('>');
+                    }
+                }
+            }
 
         } else if(dyn_cast<FunctionDecl>(declContext)) {
             continue;

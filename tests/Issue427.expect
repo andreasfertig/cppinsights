@@ -1,0 +1,74 @@
+#include <iostream>
+
+template<int val>
+class MyClass
+{
+public:
+    static int var;
+};
+
+/* First instantiated from: Issue427.cpp:14 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class MyClass<5>
+{
+  
+  public: 
+  static int var;
+  // inline constexpr MyClass() noexcept = default;
+};
+
+#endif
+
+
+/* First instantiated from: Issue427.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class MyClass<7>
+{
+  
+  public: 
+  static int var;
+  // inline constexpr MyClass() noexcept = default;
+};
+
+#endif
+
+
+/* First instantiated from: Issue427.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class MyClass<9>
+{
+  
+  public: 
+  static int var;
+  // inline constexpr MyClass() noexcept = default;
+};
+
+#endif
+
+
+template<int val>
+int MyClass<val>::var = val;
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<5>::var = 5;
+#endif
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<7>::var = 7;
+#endif
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<9>::var = 9;
+#endif
+
+
+int main(int argc, char ** argv)
+{
+  MyClass<5> a = MyClass<5>();
+  MyClass<7> b = MyClass<7>();
+  MyClass<9> c = MyClass<9>();
+  std::operator<<(std::operator<<(std::cout.operator<<(a.var), " , ").operator<<(b.var), " , ").operator<<(c.var).operator<<(std::endl);
+  return 0;
+}
+
+

@@ -834,8 +834,24 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         mOutputFormatHelper.Append(',');
     }
 
+    // If we are looking at a static member variable of a class template which is defined out-of-line we need to protect
+    // the resulting instantiations.
+    const bool needsGuard = stmt->isOutOfLine() && isTemplateInstantiation(stmt->getTemplateSpecializationKind());
+
+    // We are looking at the primary definition of a out-of-line member variable of a class template. We need to add the
+    // template head.
+    if(stmt->isOutOfLine()) {
+        if(const auto* recordDecl = dyn_cast_or_null<CXXRecordDecl>(stmt->getDeclContext())) {
+            if(const auto* classTmpl = recordDecl->getDescribedClassTemplate()) {
+                InsertTemplateParameters(*classTmpl->getTemplateParameters());
+            }
+        }
+    }
+
     if(isa<VarTemplateSpecializationDecl>(stmt)) {
         InsertTemplateSpecializationHeader();
+    } else if(needsGuard) {
+        mOutputFormatHelper.InsertIfDefTemplateGuard();
     }
 
     InsertAttributes(stmt->attrs());
@@ -864,8 +880,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                 const auto scope = [&] {
                     if(const auto* ctx = stmt->getDeclContext(); stmt->getLexicalDeclContext() != ctx) {
                         OutputFormatHelper scopeOfm{};
-                        CodeGenerator      codeGenerator{scopeOfm};
-                        codeGenerator.ParseDeclContext(ctx);
+                        scopeOfm.Append(GetDeclContext(ctx, WithTemplateParameters::Yes));
 
                         return ScopeHandler::RemoveCurrentScope(scopeOfm.GetString());
                     }
@@ -914,6 +929,10 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
             codeGenerator.InsertDecompositionBindings(*decompDecl);
         }
+    }
+
+    if(needsGuard) {
+        mOutputFormatHelper.InsertEndIfTemplateGuard();
     }
 }
 //-----------------------------------------------------------------------------
