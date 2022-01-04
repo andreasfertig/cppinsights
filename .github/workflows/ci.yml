@@ -324,6 +324,9 @@ jobs:
       shell: cmake -P {0}
       run: |
         set(ENV{CXX} ${{ matrix.config.cxx }})
+        if ("${{ runner.os }}" STREQUAL "macOS")
+          set(ENV{SDKROOT} "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
+        endif()
 
         set(path_separator ":")
         if ("${{ runner.os }}" STREQUAL "Windows")
@@ -378,8 +381,9 @@ jobs:
       shell: cmake -P {0}
       continue-on-error: false
       run: |
-        if (NOT "${{ runner.os }}" STREQUAL "Windows")
-          set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include")
+        if ("${{ runner.os }}" STREQUAL "macOS")
+          set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk/usr/include")
+          set(ENV{SDKROOT} "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
         endif()
 
         set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
@@ -397,8 +401,9 @@ jobs:
       shell: cmake -P {0}
       continue-on-error: false
       run: |
-        if (NOT "${{ runner.os }}" STREQUAL "Windows")
-          set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include")
+        if ("${{ runner.os }}" STREQUAL "macOS")
+          set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk/usr/include")
+          set(ENV{SDKROOT} "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
         endif()
 
         set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
