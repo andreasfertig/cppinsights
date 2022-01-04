@@ -200,8 +200,11 @@ std::string
 GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqualified unqualified = Unqualified::No);
 //-----------------------------------------------------------------------------
 
+STRONG_BOOL(WithTemplateParameters);
+
 std::string GetNestedName(const NestedNameSpecifier* nns);
-std::string GetDeclContext(const DeclContext* ctx);
+std::string GetDeclContext(const DeclContext*     ctx,
+                           WithTemplateParameters withTemplateParameters = WithTemplateParameters::No);
 //-----------------------------------------------------------------------------
 
 const std::string      EvaluateAsFloat(const FloatingLiteral& expr);
