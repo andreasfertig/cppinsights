@@ -188,8 +188,15 @@ int main(int argc, const char** argv)
     llvm::cl::HideUnrelatedOptions(gInsightCategory);
     llvm::cl::SetVersionPrinter(&PrintVersion);
 
+#if IS_CLANG_NEWER_THAN(12)
+    // XXX handle errors?
+    auto                 opExpected = CommonOptionsParser::create(argc, argv, gInsightCategory);
+    CommonOptionsParser& op         = opExpected.get();
+#else
     CommonOptionsParser op(argc, argv, gInsightCategory);
-    ClangTool           tool(op.getCompilations(), op.getSourcePathList());
+#endif
+
+    ClangTool tool(op.getCompilations(), op.getSourcePathList());
 
     llvm::StringRef sourceFilePath = op.getSourcePathList().front();
     // In STDINMode, we override the file content with the <stdin> input.
