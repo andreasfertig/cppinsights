@@ -18,6 +18,7 @@
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/Path.h"
 //-----------------------------------------------------------------------------
 
@@ -675,7 +676,11 @@ void CodeGenerator::InsertArg(const IntegerLiteral* stmt)
     const auto& type     = stmt->getType();
     const bool  isSigned = type->isSignedIntegerType();
 
+#if IS_CLANG_NEWER_THAN(12)
+    mOutputFormatHelper.Append(llvm::toString(stmt->getValue(), 10, isSigned));
+#else
     mOutputFormatHelper.Append(stmt->getValue().toString(10, isSigned));
+#endif
     InsertSuffix(type);
 }
 //-----------------------------------------------------------------------------
@@ -2871,7 +2876,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                         fname = ofm.GetString();
 
                     } else if(exprWithoutImpCasts
+#if IS_CLANG_NEWER_THAN(12)
+                                  ->isPRValue()
+#else
                                   ->isRValue()  // If we are looking at an rvalue (temporary) we need a const ref
+#endif
                               || exprWithoutImpCasts->getType().isConstQualified()  // If the captured variable is const
                                                                                     // we can take it only by const ref
 

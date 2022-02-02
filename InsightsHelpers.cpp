@@ -1362,7 +1362,13 @@ std::string_view GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
 
 void StringStream::Print(const TemplateArgument& arg)
 {
-    arg.print(CppInsightsPrintingPolicy{}, *this);
+    arg.print(CppInsightsPrintingPolicy{},
+              *this
+#if IS_CLANG_NEWER_THAN(12)
+              ,
+              false
+#endif
+    );
 }
 //-----------------------------------------------------------------------------
 
