@@ -1,19 +1,21 @@
 // cmdline:-std=c++2a
 template<typename T>
-concept C = (f(T()), true);
+concept C = requires(T t) { f(t); };
 
 template<typename T>
 constexpr bool foo() { return false; }
 
 
 template<typename T>
-requires (b(T()), true)
-constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires (f(T()), true) { return true; }
+requires requires(T t) { b(t); }
+constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires requires(T t) { f(t); } { return true; }
 
 /* First instantiated from: conceptsTest.cpp:84 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn<a::A>() requires (a::f(a::A()) , true)
+inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn<a::A>() requires requires(a::A t) {
+  a::f(a::A(t));
+}
 {
   return true;
 }
@@ -22,7 +24,7 @@ inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn<a::A>()
 
 
 template<typename T>
-requires (f(T()), true)
+requires requires(T t) { f(t); }
 constexpr bool FunctionWithRequiresForTemplateParameters() { return true; }
 
 /* First instantiated from: conceptsTest.cpp:85 */
@@ -36,12 +38,14 @@ inline constexpr bool FunctionWithRequiresForTemplateParameters<a::A>()
 
 
 template<typename T>
-constexpr bool FunctionWithRequiresForReturn() requires (f(T()), true) { return true; }
+constexpr bool FunctionWithRequiresForReturn() requires requires(T t) { f(t); } { return true; }
 
 /* First instantiated from: conceptsTest.cpp:86 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline constexpr bool FunctionWithRequiresForReturn<a::A>() requires (a::f(a::A()) , true)
+inline constexpr bool FunctionWithRequiresForReturn<a::A>() requires requires(a::A t) {
+  a::f(a::A(t));
+}
 {
   return true;
 }
@@ -62,13 +66,17 @@ struct test
     return true;
   }
   template<typename T>
-  inline constexpr bool FunctionWithRequiresForReturn() requires (f(T()) , true)
+  inline constexpr bool FunctionWithRequiresForReturn() requires requires(T t) {
+    f(t);
+  }
   {
     return true;
   }
   template<typename T>
   requires (b(T()) , true)
-  inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires (f(T()) , true)
+  inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires requires(T t) {
+    f(t);
+  }
   {
     return true;
   }

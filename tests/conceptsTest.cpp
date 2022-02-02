@@ -1,22 +1,22 @@
 // cmdline:-std=c++2a
 template<typename T>
-concept C = (f(T()), true);
+concept C = requires(T t) { f(t); };
 
 template<typename T>
 constexpr bool foo() { return false; }
 
 
 template<typename T>
-requires (b(T()), true)
-constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires (f(T()), true) { return true; }
+requires requires(T t) { b(t); }
+constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires requires(T t) { f(t); } { return true; }
 
 
 template<typename T>
-requires (f(T()), true)
+requires requires(T t) { f(t); }
 constexpr bool FunctionWithRequiresForTemplateParameters() { return true; }
 
 template<typename T>
-constexpr bool FunctionWithRequiresForReturn() requires (f(T()), true) { return true; }
+constexpr bool FunctionWithRequiresForReturn() requires requires(T t) { f(t); } { return true; }
 
 struct test 
 {
@@ -29,11 +29,11 @@ struct test
 
 
     template<typename T>
-    constexpr bool FunctionWithRequiresForReturn() requires (f(T()), true) { return true; }
+    constexpr bool FunctionWithRequiresForReturn() requires requires(T t) { f(t); } { return true; }
     
     template<typename T>
     requires (b(T()), true)
-    constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires (f(T()), true) { return true; }
+    constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires requires(T t) { f(t); } { return true; }
 };
 
 

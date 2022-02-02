@@ -93,7 +93,7 @@ struct generator
 
 generator simpleReturn(int v)
 {
-  co_return v;
+  co_return static_cast<int &&>(v);
 }
 
 

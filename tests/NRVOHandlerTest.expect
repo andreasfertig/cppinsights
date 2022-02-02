@@ -15,7 +15,7 @@ struct C
 C f()
 {
   C namedC = C{} /* NRVO variable */;
-  return C(namedC);
+  return C(static_cast<const C &&>(namedC));
 }
 
 
@@ -23,7 +23,7 @@ C f2()
 {
   C namedC = C{};
   C namedC2 = C{namedC} /* NRVO variable */;
-  return C(namedC2);
+  return C(static_cast<const C &&>(namedC2));
 }
 
 
