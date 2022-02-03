@@ -3419,6 +3419,7 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
 
         // Tests show that the compiler does better than std::move
         mOutputFormatHelper.Append(typeName, "(std::move("sv);
+        mHaveMovedLambda = true;
     }
 
     InsertArg(init);

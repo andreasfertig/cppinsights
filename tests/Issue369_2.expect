@@ -1,5 +1,6 @@
 #include <new> // for thread-safe static's placement new
 #include <stdint.h> // for uint64_t under Linux/GCC
+#include <utility> // std::move
 struct foo
 {
   foo();
