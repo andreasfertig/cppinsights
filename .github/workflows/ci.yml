@@ -222,10 +222,9 @@ jobs:
       with:
         path: |
             ${{ github.workspace }}/ninja*
-            ${{ github.workspace }}/current
             ${{ github.workspace }}/grcov.exe
             ${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}
-        key: ${{ runner.os }}-ninja-cmake-${{ hashFiles('${{ github.workspace }}/ninja.exe') }}-${{ hashFiles('${{ github.workspace }}/current') }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}-${{ hashFiles('${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}') }}
+        key: ${{ runner.os }}-ninja-cmake-${{ hashFiles('${{ github.workspace }}/ninja.exe') }}-${{ hashFiles('${{ github.workspace }}/current') }}-${{ hashFiles('${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}') }}
         restore-keys: |
             ${{ runner.os }}-ninja-cmake-grcov
 
@@ -254,18 +253,27 @@ jobs:
           )
         endif()
 
+    - name: Cache Clang
+      id: cache-clang-binary
+      uses: actions/cache@v2
+      with:
+        path: |
+            ${{ github.workspace }}/current
+        key: ${{ runner.os }}-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/current') }}
+
     - name: Install Clang 13
-      if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-ninja-and-cmake.outputs.cache-hit != 'true'"
+      if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-clang-binary.outputs.cache-hit != 'true'"
       shell: cmake -P {0}
       run: |
         set(llvm_version ${{ matrix.config.llvm_version }})
         set(path_separator ":")
         set(archive_name "clang+llvm-${llvm_version}-x86_64-apple-darwin")
         if ("${{ runner.os }}" STREQUAL "Windows")
-            set(archive_name "llvm+clang-${llvm_version}-win64-msvc-release")
+            set(archive_name "llvm+clang+lld-${llvm_version}-x86_64-windows-msvc-release-mt")
             set(path_separator ";")
         endif()
 
+        file(REMOVE_RECURSE "./current")
         file(DOWNLOAD "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${llvm_version}/${archive_name}.tar.xz" ./llvm.tar.xz)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./llvm.tar.xz)
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm.tar.xz)
@@ -292,13 +300,20 @@ jobs:
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm-utils.zip)
         execute_process(COMMAND $ENV{GITHUB_WORKSPACE}/LLVM_VS2017/install.bat)
 
+    - name: Cache grcov
+      id: cache-grcov-binary
+      uses: actions/cache@v2
+      with:
+        path: |
+            ${{ github.workspace }}/grcov.exe
+        key: ${{ runner.os }}-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}
+
     - name: Install LLVM compiler-rt and grcov
-      #      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && (steps.cache-ninja-and-cmake.outputs.cache-hit != 'true'))"
-      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes'))"
+      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && ((steps.cache-grcov-binary.outputs.cache-hit != 'true') || (steps.cache-clang-binary.outputs.cache-hit != 'true')))"
       shell: cmake -P {0}
       run: |
         set(llvm_version ${{ matrix.config.llvm_version }})
-        file(DOWNLOAD "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${llvm_version}/clang-compiler-rt-win64-${llvm_version}.zip" ./compiler-rt.zip)
+        file(DOWNLOAD "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${llvm_version}/compiler-rt-${llvm_version}.zip" ./compiler-rt.zip)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./compiler-rt.zip)
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./compiler-rt.zip)
         file(COPY lib DESTINATION "$ENV{GITHUB_WORKSPACE}/current/lib/clang/${llvm_version}/")
