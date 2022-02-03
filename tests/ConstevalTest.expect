@@ -1,0 +1,55 @@
+// cmdline:-std=c++20
+
+inline consteval bool ConstantFun()
+{
+  return true;
+}
+
+
+/* PASSED: static_assert(ConstantFun()); */
+
+
+struct Test
+{
+  inline consteval bool Fun()
+  {
+    return true;
+  }
+  
+};
+
+
+
+/* PASSED: static_assert(Test{}.Fun()); */
+
+
+
+class __lambda_16_15
+{
+  public: 
+  inline consteval bool operator()() const
+  {
+    return true;
+  }
+  
+  using retType_16_15 = bool (*)();
+  inline /*constexpr */ operator retType_16_15 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline bool __invoke()
+  {
+    return true;
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_16_15() = default;
+  
+} __lambda_16_15{};
+
+/* PASSED: static_assert(__lambda_16_15.operator()()); */
+
+

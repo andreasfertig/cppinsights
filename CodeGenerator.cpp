@@ -2436,6 +2436,8 @@ void CodeGenerator::InsertArg(const AccessSpecDecl* stmt)
 
 void CodeGenerator::InsertArg(const StaticAssertDecl* stmt)
 {
+    LAMBDA_SCOPE_HELPER(CallExpr);
+
     if(!stmt->isFailed()) {
         mOutputFormatHelper.Append("/* PASSED: "sv);
     } else {
