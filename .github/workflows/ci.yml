@@ -14,7 +14,7 @@ on:
 env:
   CMAKE_VERSION: 3.16.2
   NINJA_VERSION: 1.10.0
-  LLVM_VERSION: 12.0.0
+  LLVM_VERSION: 13.0.0
 
 jobs:
   checks:
@@ -24,12 +24,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # Clang 12
+        # Clang 13
         - {
-            name: "Linux Clang 12 - Format check",
+            name: "Linux Clang 13 - Format check",
             os: ubuntu-latest,
             build_type: Release,
-            cformat_name: 'clang-format-12'
+            cformat_name: 'clang-format-13'
           }
 
     steps:
@@ -37,13 +37,13 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Install Clang 12
+    - name: Install Clang 13
       shell: bash
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 12
-        sudo apt-get install clang-format-12
+        sudo ./llvm.sh 13
+        sudo apt-get install clang-format-13
 
     - name: clang-format check
       id: clang_format_check
@@ -64,11 +64,11 @@ jobs:
         config:
         # AppleClang
         - {
-            name: "Clang 12 / LLVM 12 @ macOS Release",
+            name: "Clang 13 / LLVM 13 @ macOS Release",
             os: macos-latest,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "12.0.0",
+            llvm_version: "13.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -82,11 +82,11 @@ jobs:
 
         # AppleClang
         - {
-            name: "Clang 12 / LLVM 12 @ macOS Debug",
+            name: "Clang 13 / LLVM 13 @ macOS Debug",
             os: macos-latest,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "12.0.0",
+            llvm_version: "13.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -100,11 +100,11 @@ jobs:
 
         # # AppleClang
         # - {
-        #     name: "Clang 12 / LLVM 12 @ macOS Coveage & Debug",
+        #     name: "Clang 13 / LLVM 13 @ macOS Coveage & Debug",
         #     os: macos-latest,
         #     build_type: Release,
         #     cxx: "clang++",
-        #     llvm_version: "12.0.0",
+        #     llvm_version: "13.0.0",
         #     llvm_config: "llvm-config",
         #     coverage: "Yes",
         #     static: "No",
@@ -118,11 +118,11 @@ jobs:
 
           # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 12 @ Windows Release",
+            name: "MSVC 2019 / LLVM 13 @ Windows Release",
             os: windows-latest,
             build_type: Release,
             cxx: "cl",
-            llvm_version: "12.0.0",
+            llvm_version: "13.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             static: "Yes",
             debug: "No",
@@ -137,11 +137,11 @@ jobs:
 
         # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 12 @ Windows Debug",
+            name: "MSVC 2019 / LLVM 13 @ Windows Debug",
             os: windows-latest,
             build_type: Release,
             cxx: "cl",
-            llvm_version: "12.0.0",
+            llvm_version: "13.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             static: "Yes",
             debug: "Yes",
@@ -155,11 +155,11 @@ jobs:
 
         # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 12 @ Windows Code Coverage & Debug",
+            name: "MSVC 2019 / LLVM 13 @ Windows Code Coverage & Debug",
             os: windows-latest,
             build_type: Release,
             cxx: "clang-cl.exe",
-            llvm_version: "12.0.0",
+            llvm_version: "13.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             coverage: "Yes",
             static: "Yes",
@@ -254,7 +254,7 @@ jobs:
           )
         endif()
 
-    - name: Install Clang 12
+    - name: Install Clang 13
       if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-ninja-and-cmake.outputs.cache-hit != 'true'"
       shell: cmake -P {0}
       run: |
@@ -271,7 +271,7 @@ jobs:
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm.tar.xz)
         execute_process(COMMAND ${CMAKE_COMMAND} -E rename "./${archive_name}" "./current")
 
-    - name: Set Clang 12 Path
+    - name: Set Clang 13 Path
       if: "startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')"
       shell: cmake -P {0}
       run: |
@@ -313,7 +313,7 @@ jobs:
         export HOMEBREW_NO_AUTO_UPDATE=1
         brew update > /dev/null
         brew install lcov || brew upgrade lcov
-        brew install gcc@10 || brew upgrade gcc@10 # for Clang 12 and newer gcov
+        brew install gcc@10 || brew upgrade gcc@10 # for Clang 13 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
@@ -456,13 +456,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # GCC 11 / LLVM 12
+        # GCC 11 / LLVM 13
         - {
-            name: "GCC 11 / LLVM 12 @ Ubuntu Release @docker",
+            name: "GCC 11 / LLVM 13 @ Ubuntu Release @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "12.0.0",
-            llvm_config: "/usr/bin/llvm-config-12",
+            llvm_version: "13.0.0",
+            llvm_config: "/usr/bin/llvm-config-13",
             coverage: "No",
             static: "Yes",
             debug: "No",
@@ -475,13 +475,13 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 11 / LLVM 12
+        # GCC 11 / LLVM 13
         - {
-            name: "GCC 11 / LLVM 12 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 11 / LLVM 13 @ Ubuntu Code Coverage & Debug @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "12.0.0",
-            llvm_config: "/usr/bin/llvm-config-12",
+            llvm_version: "13.0.0",
+            llvm_config: "/usr/bin/llvm-config-13",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -492,13 +492,13 @@ jobs:
             archive_name: "insights-ubuntu-14.04",
           }
 
-        # GCC 11 / LLVM 12
+        # GCC 11 / LLVM 13
         - {
-            name: "GCC 11 / LLVM 12 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 11 / LLVM 13 @ Ubuntu Code Coverage (libc++) @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "12.0.0",
-            llvm_config: "/usr/bin/llvm-config-12",
+            llvm_version: "13.0.0",
+            llvm_config: "/usr/bin/llvm-config-13",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
