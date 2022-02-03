@@ -177,6 +177,9 @@ public:
     /// Track whether we have a noexcept transformation which needs the exception header.
     static bool NeedToInsertExceptionHeader() { return mHaveException; }
 
+    /// Track whether we inserted a std::move due, to a static transformation, this means we need the utility header.
+    static bool NeedToInsertUtilityHeader() { return mHaveMovedLambda; }
+
     template<typename T>
     void InsertTemplateArgs(const ArrayRef<T>& array)
     {
@@ -352,7 +355,8 @@ protected:
     NoEmptyInitList       mNoEmptyInitList{
         NoEmptyInitList::No};  //!< At least in case if a requires-clause containing T{} we don't want to get T{{}}.
     const LambdaExpr*  mLambdaExpr{};
-    static inline bool mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code. This
+    static inline bool mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code.
+    static inline bool mHaveMovedLambda;  //!< Track whether there was a std::move inserted.
     static inline bool
         mHaveException;  //!< Track whether there was a noexcept transformation requireing the exception header.
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
