@@ -37,39 +37,39 @@ SourceRange    GetSourceRangeAfterSemi(const SourceRange                        
                                        RequireSemi                                   requireSemi = RequireSemi::No);
 //-----------------------------------------------------------------------------
 
-static inline bool IsMacroLocation(const SourceLocation& loc)
+inline bool IsMacroLocation(const SourceLocation& loc)
 {
     return loc.isMacroID();
 }
 //-----------------------------------------------------------------------------
 
-static inline bool IsMacroLocation(const SourceRange& range)
+inline bool IsMacroLocation(const SourceRange& range)
 {
     return IsMacroLocation(range.getBegin()) || IsMacroLocation(range.getEnd());
 }
 //-----------------------------------------------------------------------------
 
 template<typename T, typename... Args>
-static inline bool IsMacroLocation(const T& t, Args... args)
+inline bool IsMacroLocation(const T& t, Args... args)
 {
     return (IsMacroLocation(t) || IsMacroLocation(args...));
 }
 //-----------------------------------------------------------------------------
 
-static inline bool IsInvalidLocation(const SourceLocation& loc)
+inline bool IsInvalidLocation(const SourceLocation& loc)
 {
     return loc.isInvalid();
 }
 //-----------------------------------------------------------------------------
 
-static inline bool IsInvalidLocation(const SourceRange& range)
+inline bool IsInvalidLocation(const SourceRange& range)
 {
     return IsInvalidLocation(range.getBegin()) || IsInvalidLocation(range.getEnd());
 }
 //-----------------------------------------------------------------------------
 
 template<typename T, typename... Args>
-static inline bool IsInvalidLocation(const T& t, Args... args)
+inline bool IsInvalidLocation(const T& t, Args... args)
 {
     return (IsInvalidLocation(t) || IsInvalidLocation(args...));
 }
@@ -88,7 +88,7 @@ std::string BuildRetTypeName(const Decl& decl);
     }
 //-----------------------------------------------------------------------------
 
-static inline bool Contains(const std::string_view source, const std::string_view search)
+inline bool Contains(const std::string_view source, const std::string_view search)
 {
     return std::string::npos != source.find(search, 0);
 }
@@ -97,19 +97,19 @@ static inline bool Contains(const std::string_view source, const std::string_vie
 void InsertBefore(std::string& source, const std::string_view& find, const std::string_view& replace);
 //-----------------------------------------------------------------------------
 
-static inline const SourceManager& GetSM(const ast_matchers::MatchFinder::MatchResult& Result)
+inline const SourceManager& GetSM(const ast_matchers::MatchFinder::MatchResult& Result)
 {
     return Result.Context->getSourceManager();
 }
 //-----------------------------------------------------------------------------
 
-static inline const SourceManager& GetSM(const Decl& decl)
+inline const SourceManager& GetSM(const Decl& decl)
 {
     return decl.getASTContext().getSourceManager();
 }
 //-----------------------------------------------------------------------------
 
-static inline const LangOptions& GetLangOpts(const Decl& decl)
+inline const LangOptions& GetLangOpts(const Decl& decl)
 {
     return decl.getASTContext().getLangOpts();
 }
@@ -149,7 +149,7 @@ std::string GetNameAsFunctionPointer(const QualType& t);
 
 std::string GetLambdaName(const CXXRecordDecl& lambda);
 
-static inline std::string GetLambdaName(const LambdaExpr& lambda)
+inline std::string GetLambdaName(const LambdaExpr& lambda)
 {
     return GetLambdaName(*lambda.getLambdaClass());
 }
@@ -162,7 +162,7 @@ std::string GetName(const CXXRecordDecl& RD);
 ///
 /// There is a dedicated function `isAnonymousStructOrUnion` which at this point no longer returns true. Hence this
 /// method uses an empty record decl name as indication for an anonymous struct/union.
-static inline bool IsAnonymousStructOrUnion(const CXXRecordDecl* cxxRecordDecl)
+inline bool IsAnonymousStructOrUnion(const CXXRecordDecl* cxxRecordDecl)
 {
     if(cxxRecordDecl) {
         return cxxRecordDecl->getName().empty();
@@ -182,7 +182,7 @@ void AppendTemplateTypeParamName(class OutputFormatHelper&   ofm,
 const QualType GetDesugarType(const QualType& QT);
 // -----------------------------------------------------------------------------
 
-static inline QualType GetDesugarReturnType(const FunctionDecl& FD)
+inline QualType GetDesugarReturnType(const FunctionDecl& FD)
 {
     return GetDesugarType(FD.getReturnType());
 }
@@ -212,7 +212,7 @@ const std::string      GetNoExcept(const FunctionDecl& decl);
 const std::string_view GetConst(const FunctionDecl& decl);
 //-----------------------------------------------------------------------------
 
-std::string_view GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
+std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
 //-----------------------------------------------------------------------------
 
 template<typename T, typename TFunc>

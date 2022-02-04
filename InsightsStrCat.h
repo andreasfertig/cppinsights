@@ -22,14 +22,14 @@ namespace clang::insights {
 
 namespace details {
 /// \brief Convert a boolean value to a string representation of "true" or "false"
-static inline std::string ConvertToBoolString(bool b)
+inline std::string ConvertToBoolString(bool b)
 {
     return b ? std::string{"true"} : std::string{"false"};
 }
 
 }  // namespace details
 
-static inline std::string ToString(const llvm::APSInt& val)
+inline std::string ToString(const llvm::APSInt& val)
 {
     if(1 == val.getBitWidth()) {
         return details::ConvertToBoolString(0 != val.getExtValue());
@@ -43,19 +43,19 @@ static inline std::string ToString(const llvm::APSInt& val)
 }
 //-----------------------------------------------------------------------------
 
-static inline uint64_t Normalize(const llvm::APInt& arg)
+inline uint64_t Normalize(const llvm::APInt& arg)
 {
     return arg.getZExtValue();
 }
 //-----------------------------------------------------------------------------
 
-static inline std::string Normalize(const llvm::APSInt& arg)
+inline std::string Normalize(const llvm::APSInt& arg)
 {
     return ToString(arg);
 }
 //-----------------------------------------------------------------------------
 
-static inline std::string_view Normalize(const StringRef& arg)
+inline std::string_view Normalize(const StringRef& arg)
 {
     return arg;
 }
@@ -72,7 +72,7 @@ using remove_cvref_t = typename remove_cvref<T>::type;
 //-----------------------------------------------------------------------------
 
 template<class T>
-static inline decltype(auto) Normalize(const T& arg)
+inline decltype(auto) Normalize(const T& arg)
 {
     // Handle bool's first, we like their string representation.
     if constexpr(std::is_same_v<remove_cvref_t<T>, bool>) {
@@ -97,7 +97,7 @@ inline void StrCat(std::string& ret, const Args&... args)
 }  // namespace details
 
 template<typename... Args>
-std::string StrCat(const Args&... args)
+inline std::string StrCat(const Args&... args)
 {
     std::string ret{};
     details::StrCat(ret, args...);

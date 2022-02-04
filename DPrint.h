@@ -15,7 +15,7 @@ namespace clang::insights {
 
 namespace details {
 
-static inline const char* Normalize(const std::string& arg)
+inline const char* Normalize(const std::string& arg)
 {
     static constexpr const char emptyString[]{""};
 
@@ -27,26 +27,26 @@ static inline const char* Normalize(const std::string& arg)
 }
 //-----------------------------------------------------------------------------
 
-static inline uint64_t Normalize(const llvm::APInt& arg)
+inline uint64_t Normalize(const llvm::APInt& arg)
 {
     return arg.getZExtValue();
 }
 //-----------------------------------------------------------------------------
 
-static inline const char* Normalize(const llvm::APSInt& arg)
+inline const char* Normalize(const llvm::APSInt& arg)
 {
     return Normalize(ToString(arg));
 }
 //-----------------------------------------------------------------------------
 
-static inline const char* Normalize(const StringRef& arg)
+inline const char* Normalize(const StringRef& arg)
 {
     return Normalize(arg.str());
 }
 //-----------------------------------------------------------------------------
 
 template<class T>
-static inline const T& Normalize(const T& arg)
+inline const T& Normalize(const T& arg)
 {
     return arg;
 }

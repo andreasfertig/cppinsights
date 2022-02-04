@@ -1344,19 +1344,15 @@ const std::string_view GetConst(const FunctionDecl& decl)
 }
 //-----------------------------------------------------------------------------
 
-std::string_view GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
+std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
 {
-    switch(keyword) {
-        case ETK_Struct: return kwStructSpace;
-        case ETK_Union: return kwUnionSpace;
-        case ETK_Class: return kwClassSpace;
-        case ETK_Enum: return kwEnumSpace;
-        case ETK_Typename: return kwTypeNameSpace;
-        case ETK_Interface: break;
-        case ETK_None: break;
+    std::string ret{TypeWithKeyword::getKeywordName(keyword)};
+
+    if(not ret.empty()) {
+        ret += ' ';
     }
 
-    return {};
+    return ret;
 }
 //-----------------------------------------------------------------------------
 
