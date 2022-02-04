@@ -1,8 +1,14 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 # 3.8* is required because of C++17 support
 
+# For better control enable MSVC_RUNTIME_LIBRARY target property
+# see https://cmake.org/cmake/help/latest/policy/CMP0091.html
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+
 set(CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(CMakePrintHelpers)
 
@@ -169,7 +175,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             else()
                 if(IS_MSVC_CL)
                     # See https://devblogs.microsoft.com/cppblog/broken-warnings-theory/
-                    string(REGEX REPLACE "-I" "/external:I" CONFIG_OUTPUT "${CONFIG_OUTPUT}")
+                    string(REGEX REPLACE "-I" "/external:I " CONFIG_OUTPUT "${CONFIG_OUTPUT}")
                 endif()
             endif()
         endif()
