@@ -308,7 +308,8 @@ jobs:
         key: ${{ runner.os }}-grcov-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}
 
     - name: Install LLVM compiler-rt and grcov
-      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && ((steps.cache-grcov-binary.outputs.cache-hit != 'true') || (steps.cache-clang-binary.outputs.cache-hit != 'true')))"
+      #      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && ((steps.cache-grcov-binary.outputs.cache-hit != 'true') || (steps.cache-clang-binary.outputs.cache-hit != 'true')))"
+      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes'))"
       shell: cmake -P {0}
       run: |
         set(llvm_version ${{ matrix.config.llvm_version }})
