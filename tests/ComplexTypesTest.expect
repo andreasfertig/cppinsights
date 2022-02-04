@@ -1,0 +1,6 @@
+int main()
+{
+  _Complex float fc = {};
+  _Complex int ic = {};
+}
+

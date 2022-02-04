@@ -12,9 +12,10 @@ This is a list of things I plan to do. If you like to jump in that's great. Plea
 - [ ] Improve tests on other platforms than macOS
 - [ ] Temporary execute tests and check only for signals on other platforms than macOS
 - [X] Publish doxygen output -> see [https://docs.cppinsights.io](https://docs.cppinsights.io)
-- [ ] Switch between libc++ and libstdc++ headers?
+- [X]  Switch between libc++ and libstdc++ headers?
 - [ ] Add more headers like boost
 - [ ] Catch insights crashes and provide easy issue reporting including error output.
-- [ ] Short links (public database?)
-- [ ] Provide easy local installation (via docker)
+- [X] Short links (public database?)
+- [X] Provide easy local installation (via docker)
+- [ ] Use libc++ on Windows
 

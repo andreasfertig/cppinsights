@@ -1,0 +1,30 @@
+#define INSIGHTS_USE_TEMPLATE
+
+void f(int, int, int)
+{
+}
+
+
+template<typename F, typename ...Types>
+void forward(F ff, Types &&...args) {
+  ff(args...);
+}
+
+/* First instantiated from: VariadicTemplateArgsTest.cpp:14 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void forward<void (*)(int, int, int), int, int, int>(void (*ff)(int, int, int), int && __args1, int && __args2, int && __args3)
+{
+  ff(__args1, __args2, __args3);
+}
+#endif
+
+
+
+int main()
+{
+  forward(f, 1, 2, 3);
+}
+
+
+

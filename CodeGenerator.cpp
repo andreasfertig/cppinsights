@@ -1590,7 +1590,7 @@ void CodeGenerator::InsertArg(const CompoundStmt* stmt)
 //-----------------------------------------------------------------------------
 
 template<typename... Args>
-static bool IsStmtRequieringSemi(const Stmt* stmt)
+static bool IsStmtRequiringSemi(const Stmt* stmt)
 {
     return (... && !isa<Args>(stmt));
 }
@@ -1601,7 +1601,7 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
     for(const auto* item : stmt->body()) {
         InsertArg(item);
 
-        if(IsStmtRequieringSemi<IfStmt, NullStmt, ForStmt, DeclStmt, WhileStmt, DoStmt, CXXForRangeStmt, SwitchStmt>(
+        if(IsStmtRequiringSemi<IfStmt, NullStmt, ForStmt, DeclStmt, WhileStmt, DoStmt, CXXForRangeStmt, SwitchStmt>(
                item)) {
             mOutputFormatHelper.AppendSemiNewLine();
         }
@@ -3771,7 +3771,7 @@ void CodeGenerator::WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAft
         InsertArg(stmt);
 
         // Add semi-colon if necessary. A do{} while does already add one.
-        if(IsStmtRequieringSemi<IfStmt, CompoundStmt, NullStmt, WhileStmt, DoStmt>(stmt)) {
+        if(IsStmtRequiringSemi<IfStmt, CompoundStmt, NullStmt, WhileStmt, DoStmt>(stmt)) {
             mOutputFormatHelper.AppendSemiNewLine();
         }
     }
