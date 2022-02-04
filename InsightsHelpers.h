@@ -49,8 +49,7 @@ inline bool IsMacroLocation(const SourceRange& range)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T, typename... Args>
-inline bool IsMacroLocation(const T& t, Args... args)
+inline bool IsMacroLocation(const auto& t, auto... args)
 {
     return (IsMacroLocation(t) || IsMacroLocation(args...));
 }
@@ -68,8 +67,7 @@ inline bool IsInvalidLocation(const SourceRange& range)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T, typename... Args>
-inline bool IsInvalidLocation(const T& t, Args... args)
+inline bool IsInvalidLocation(const auto& t, auto... args)
 {
     return (IsInvalidLocation(t) || IsInvalidLocation(args...));
 }
@@ -338,11 +336,8 @@ template<typename T>
 struct is
 {
     T t;
-    template<typename... Ts>
-    constexpr bool any_of(const Ts&... ts) const
-    {
-        return ((t == ts) || ...);
-    }
+
+    constexpr bool any_of(const auto&... ts) const { return ((t == ts) || ...); }
 };
 
 template<typename T>

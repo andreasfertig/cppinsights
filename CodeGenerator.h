@@ -17,6 +17,7 @@
 #include "ClangCompat.h"
 #include "InsightsStaticStrings.h"
 #include "InsightsStrongTypes.h"
+#include "InsightsUtility.h"
 #include "OutputFormatHelper.h"
 #include "StackList.h"
 //-----------------------------------------------------------------------------
@@ -131,30 +132,27 @@ public:
     virtual void InsertArg(const Stmt* stmt);
 
     template<typename T>
-    auto InsertTemplateArgs(const T& t) -> decltype((void)t.template_arguments(), void())
+    void InsertTemplateArgs(const T& t)
     {
-        if constexpr(std::is_same_v<DeclRefExpr, T>) {
-            if(0 == t.getNumTemplateArgs()) {
-                return;
+        if constexpr(std::is_same_v<T, FunctionDecl>) {
+            if(const auto* tmplArgs = t.getTemplateSpecializationArgs()) {
+                InsertTemplateArgs(*tmplArgs);
             }
+        } else if constexpr(requires { t.template_arguments(); }) {
+            if constexpr(std::is_same_v<DeclRefExpr, T>) {
+                if(0 == t.getNumTemplateArgs()) {
+                    return;
+                }
+            }
+
+            InsertTemplateArgs(t.template_arguments());
+
+        } else if constexpr(requires { t.asArray(); }) {
+            InsertTemplateArgs(t.asArray());
         }
-
-        InsertTemplateArgs(t.template_arguments());
-    }
-
-    template<typename T>
-    auto InsertTemplateArgs(const T& t) -> decltype((void)t.asArray(), void())
-    {
-        InsertTemplateArgs(t.asArray());
     }
 
     void InsertTemplateArgs(const ClassTemplateSpecializationDecl& clsTemplateSpe);
-    void InsertTemplateArgs(const FunctionDecl& FD)
-    {
-        if(const auto* tmplArgs = FD.getTemplateSpecializationArgs()) {
-            InsertTemplateArgs(*tmplArgs);
-        }
-    }
 
     STRONG_BOOL(SkipAccess);
 
@@ -224,11 +222,7 @@ protected:
                     const Expr*            SubExpr,
                     const CastKind&        castKind);
 
-    template<typename T, typename Lambda>
-    void ForEachArg(const T& arguments, Lambda&& lambda)
-    {
-        mOutputFormatHelper.ForEachArg(arguments, lambda);
-    }
+    void ForEachArg(const auto& arguments, auto&& lambda) { mOutputFormatHelper.ForEachArg(arguments, lambda); }
 
     void InsertArgWithParensIfNeeded(const Stmt* stmt);
     void InsertSuffix(const QualType& type);
@@ -245,8 +239,7 @@ protected:
     void InsertConceptConstraint(const VarDecl* varDecl);
     void InsertConceptConstraint(const TemplateParameterList& tmplDecl);
 
-    template<typename T>
-    void InsertQualifierAndNameWithTemplateArgs(const DeclarationName& declName, const T* stmt)
+    void InsertQualifierAndNameWithTemplateArgs(const DeclarationName& declName, const auto* stmt)
     {
         InsertQualifierAndName(declName, stmt->getQualifier(), stmt->hasTemplateKeyword());
 
@@ -297,23 +290,20 @@ protected:
         Curlys
     };
 
-    template<typename T>
-    void WrapInParens(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+    void WrapInParens(void_func_ref lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
-    template<typename T>
-    void
-    WrapInParensIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+    void WrapInParensIfNeeded(bool                   needsParens,
+                              void_func_ref          lambda,
+                              const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
-    template<typename T>
-    void
-    WrapInCurliesIfNeeded(bool needsParens, T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+    void WrapInCurliesIfNeeded(bool                   needsParens,
+                               void_func_ref          lambda,
+                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
-    template<typename T>
-    void WrapInCurlys(T&& lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
+    void WrapInCurlys(void_func_ref lambda, const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
-    template<typename T>
     void WrapInParensOrCurlys(const BraceKind        curlys,
-                              T&&                    lambda,
+                              void_func_ref          lambda,
                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
     void UpdateCurrentPos() { mCurrentPos = mOutputFormatHelper.CurrentPos(); }

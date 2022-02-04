@@ -1166,8 +1166,7 @@ f(args, args, args);
  *
  * The expected type for \c T currently is \c ValueDecl or \c VarDecl.
  */
-template<typename T>
-static std::string GetTemplateParameterPackArgumentName(std::string_view name, const T* decl)
+static std::string GetTemplateParameterPackArgumentName(std::string_view name, const Decl* decl)
 {
     if(const auto* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(decl)) {
         if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {

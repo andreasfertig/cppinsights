@@ -45,15 +45,13 @@ inline const char* Normalize(const StringRef& arg)
 }
 //-----------------------------------------------------------------------------
 
-template<class T>
-inline const T& Normalize(const T& arg)
+inline const auto& Normalize(const auto& arg)
 {
     return arg;
 }
 //-----------------------------------------------------------------------------
 
-template<typename... Args>
-inline void FPrintf(const char* fmt, const Args&... args)
+inline void FPrintf(const char* fmt, const auto&... args)
 {
     if constexpr(0 < (sizeof...(args))) {
         fprintf(stderr, fmt, Normalize(args)...);
@@ -68,8 +66,7 @@ inline void FPrintf(const char* fmt, const Args&... args)
 /// \brief Debug print which is disabled in release-mode.
 ///
 /// It takes a variable number of parameters which are normalized if they are a \ref std::string or a \ref StringRef.
-template<typename... Args>
-inline void DPrint([[maybe_unused]] const char* fmt, [[maybe_unused]] const Args&... args)
+inline void DPrint([[maybe_unused]] const char* fmt, [[maybe_unused]] const auto&... args)
 {
 #ifdef INSIGHTS_DEBUG
     details::FPrintf(fmt, args...);
@@ -78,15 +75,13 @@ inline void DPrint([[maybe_unused]] const char* fmt, [[maybe_unused]] const Args
 //-----------------------------------------------------------------------------
 
 /// \brief Log an error.
-template<typename... Args>
-inline void Error(const char* fmt, const Args&... args)
+inline void Error(const char* fmt, const auto&... args)
 {
     details::FPrintf(fmt, args...);
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-inline void Dump([[maybe_unused]] const T* stmt)
+inline void Dump([[maybe_unused]] const auto* stmt)
 {
 #ifdef INSIGHTS_DEBUG
     if(stmt) {
@@ -99,8 +94,7 @@ inline void Dump([[maybe_unused]] const T* stmt)
 /// \brief Log an error.
 ///
 /// In debug-mode this dumps the \ref Decl which caused the error and the error message.
-template<typename... Args>
-inline void Error(const Decl* stmt, const char* fmt, const Args&... args)
+inline void Error(const Decl* stmt, const char* fmt, const auto&... args)
 {
     if(stmt) {
         Dump(stmt);
@@ -113,8 +107,7 @@ inline void Error(const Decl* stmt, const char* fmt, const Args&... args)
 /// \brief Log an error.
 ///
 /// In debug-mode this dumps the \ref Stmt which caused the error and the error message.
-template<typename... Args>
-inline void Error(const Stmt* stmt, const char* fmt, const Args&... args)
+inline void Error(const Stmt* stmt, const char* fmt, const auto&... args)
 {
     if(stmt) {
         Dump(stmt);

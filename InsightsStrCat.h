@@ -78,16 +78,14 @@ inline decltype(auto) Normalize(const T& arg)
 //-----------------------------------------------------------------------------
 
 namespace details {
-template<typename... Args>
-inline void StrCat(std::string& ret, const Args&... args)
+void StrCat(std::string& ret, const auto&... args)
 {
     (ret += ... += ::clang::insights::Normalize(args));
 }
 //-----------------------------------------------------------------------------
 }  // namespace details
 
-template<typename... Args>
-inline std::string StrCat(const Args&... args)
+inline std::string StrCat(const auto&... args)
 {
     std::string ret{};
     details::StrCat(ret, args...);
