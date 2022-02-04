@@ -21,7 +21,7 @@ struct Spaceship
   
   inline constexpr bool operator==(const int & value) const
   {
-    return std::operator==((*this).operator<=>(value), std::_CmpUnspecifiedParam(0));
+    return operator==((*this).operator<=>(value), std::_CmpUnspecifiedParam(0));
   }
   
 };
@@ -32,8 +32,8 @@ int main()
 {
   constexpr const int y = 2;
   constexpr const Spaceship millenniumFalcon = {3};
-  /* PASSED: static_assert(std::operator>=(millenniumFalcon.operator<=>(y), std::_CmpUnspecifiedParam(0))); */
-  /* PASSED: static_assert(std::operator<=(std::_CmpUnspecifiedParam(0), millenniumFalcon.operator<=>(y))); */
+  /* PASSED: static_assert(operator>=(millenniumFalcon.operator<=>(y), std::_CmpUnspecifiedParam(0))); */
+  /* PASSED: static_assert(operator<=(std::_CmpUnspecifiedParam(0), millenniumFalcon.operator<=>(y))); */
   /* PASSED: static_assert(!(millenniumFalcon.operator==(y))); */
   /* PASSED: static_assert(!(millenniumFalcon.operator==(y))); */
 }
