@@ -50,15 +50,14 @@ AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPE
 {
     SILENCE;
 
-    return (insights::IsMacroLocation(insights::GetBeginLoc(Node)) ||
-            insights::IsInvalidLocation(insights::GetBeginLoc(Node)));
+    return (insights::IsMacroLocation(Node.getBeginLoc()) || insights::IsInvalidLocation(Node.getBeginLoc()));
 }
 
 AST_POLYMORPHIC_MATCHER(isInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl, Stmt))
 {
     SILENCE;
 
-    return insights::IsInvalidLocation(insights::GetBeginLoc(Node));
+    return insights::IsInvalidLocation(Node.getBeginLoc());
 }
 
 }  // namespace ast_matchers

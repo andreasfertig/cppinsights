@@ -119,7 +119,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(functionDecl);
         const auto         endOfCond          = FindLocationAfterRBrace(
-            GetEndLoc(endLocDecl),
+            endLocDecl->getEndLoc(),
             result,
             isa<CXXDeductionGuideDecl>(
                 functionDecl));  // if we lift the "not getBody()" restriction above we need to take this in account
@@ -136,7 +136,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(clsTmplSpecDecl);
 
         if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl")) {
-            const auto endOfCond = FindLocationAfterSemi(GetEndLoc(clsTmplDecl), result);
+            const auto endOfCond = FindLocationAfterSemi(clsTmplDecl->getEndLoc(), result);
             InsertIndentedText(endOfCond, outputFormatHelper);
 
         } else {  // explicit specialization, we have to remove the specialization
@@ -145,7 +145,7 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
     } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(vd);
-        const auto         endOfCond          = FindLocationAfterSemi(GetEndLoc(vd), result);
+        const auto         endOfCond          = FindLocationAfterSemi(vd->getEndLoc(), result);
 
         mRewrite.ReplaceText({vd->getSourceRange().getBegin(), endOfCond.getLocWithOffset(1)},
                              outputFormatHelper.GetString());

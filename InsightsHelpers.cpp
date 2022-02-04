@@ -280,7 +280,7 @@ static void InsertAfter(std::string& source, const std::string_view& find, const
 static std::string MakeLineColumnName(const Decl& decl, const std::string_view prefix)
 {
     const auto& sm       = GetSM(decl);
-    const auto  locBegin = GetBeginLoc(decl);
+    const auto  locBegin = decl.getBeginLoc();
     // In case of a macro expansion the expansion(line/column) number gives a unique value.
     const auto lineNo = locBegin.isMacroID() ? sm.getExpansionLineNumber(locBegin) : sm.getSpellingLineNumber(locBegin);
     const auto columnNo =
@@ -696,15 +696,9 @@ private:
 
         mData.Append(')');
 
-#if IS_CLANG_NEWER_THAN(8)
         if(not type->getMethodQuals().empty()) {
             mData.Append(" "sv, type->getMethodQuals().getAsString());
         }
-#else
-        if(not type->getTypeQuals().empty()) {
-            mData.Append(" ", type->getTypeQuals().getAsString());
-        }
-#endif
 
         /// Currently, we are skipping `T->getRefQualifier()` and the exception specification, as well as the trailing
         /// return type.
@@ -1279,7 +1273,7 @@ std::string GetName(const VarDecl& VD)
             return std::string{};
         }()};
 
-        return {BuildInternalVarName(baseVarName, GetBeginLoc(decompositionDeclStmt), GetSM(*decompositionDeclStmt))};
+        return {BuildInternalVarName(baseVarName, decompositionDeclStmt->getBeginLoc(), GetSM(*decompositionDeclStmt))};
     }
 
     std::string_view name{VD.getName()};
