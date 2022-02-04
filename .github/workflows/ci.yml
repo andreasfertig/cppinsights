@@ -118,8 +118,8 @@ jobs:
 
           # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 13 @ Windows Release",
-            os: windows-latest,
+            name: "MSVC 2022 / LLVM 13 @ Windows Release",
+            os: windows-2022,
             build_type: Release,
             cxx: "cl",
             llvm_version: "13.0.0",
@@ -131,14 +131,14 @@ jobs:
             bin_name: "insights.exe",
             archive_name: "insights-windows",
             upload: "Yes",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
             #            cmake_args: "-A x64 -T LLVM_v142",
           }
 
         # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 13 @ Windows Debug",
-            os: windows-latest,
+            name: "MSVC 2022 / LLVM 13 @ Windows Debug",
+            os: windows-2022,
             build_type: Release,
             cxx: "cl",
             llvm_version: "13.0.0",
@@ -150,13 +150,13 @@ jobs:
             bin_name: "insights.exe",
             archive_name: "insights-windows",
             upload: "No",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
           }
 
         # MSVC 2019
         - {
-            name: "MSVC 2019 / LLVM 13 @ Windows Code Coverage & Debug",
-            os: windows-latest,
+            name: "MSVC 2022 / LLVM 13 @ Windows Code Coverage & Debug",
+            os: windows-2022,
             build_type: Release,
             cxx: "clang-cl.exe",
             llvm_version: "13.0.0",
@@ -169,7 +169,7 @@ jobs:
             bin_name: "insights.exe",
             archive_name: "insights-windows",
             upload: "No",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
           }
 
     steps:
