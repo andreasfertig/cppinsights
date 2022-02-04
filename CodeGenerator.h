@@ -222,10 +222,7 @@ protected:
                     const Expr*            SubExpr,
                     const CastKind&        castKind);
 
-    void ForEachArg(const auto& arguments, auto&& lambda)
-    {
-        mOutputFormatHelper.ForEachArg(arguments, lambda);
-    }
+    void ForEachArg(const auto& arguments, auto&& lambda) { mOutputFormatHelper.ForEachArg(arguments, lambda); }
 
     void InsertArgWithParensIfNeeded(const Stmt* stmt);
     void InsertSuffix(const QualType& type);
