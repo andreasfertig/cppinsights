@@ -222,11 +222,10 @@ jobs:
       with:
         path: |
             ${{ github.workspace }}/ninja*
-            ${{ github.workspace }}/grcov.exe
             ${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}
         key: ${{ runner.os }}-ninja-cmake-${{ hashFiles('${{ github.workspace }}/ninja.exe') }}-${{ hashFiles('${{ github.workspace }}/current') }}-${{ hashFiles('${{ steps.cmake_and_ninja_setup.outputs.cmake_base_dir }}') }}
         restore-keys: |
-            ${{ runner.os }}-ninja-cmake-grcov
+            ${{ runner.os }}-ninja-cmake
 
     - name: Download Ninja and CMake
       id: cmake_and_ninja
@@ -259,7 +258,7 @@ jobs:
       with:
         path: |
             ${{ github.workspace }}/current
-        key: ${{ runner.os }}-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/current') }}
+        key: ${{ runner.os }}-clang-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/current') }}
 
     - name: Install Clang 13
       if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-clang-binary.outputs.cache-hit != 'true'"
@@ -306,7 +305,7 @@ jobs:
       with:
         path: |
             ${{ github.workspace }}/grcov.exe
-        key: ${{ runner.os }}-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}
+        key: ${{ runner.os }}-grcov-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}
 
     - name: Install LLVM compiler-rt and grcov
       if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && ((steps.cache-grcov-binary.outputs.cache-hit != 'true') || (steps.cache-clang-binary.outputs.cache-hit != 'true')))"
