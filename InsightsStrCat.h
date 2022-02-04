@@ -62,20 +62,10 @@ inline std::string_view Normalize(const StringRef& arg)
 //-----------------------------------------------------------------------------
 
 template<class T>
-struct remove_cvref
-{
-    using type = std::remove_cv_t<std::remove_reference_t<T>>;
-};
-
-template<class T>
-using remove_cvref_t = typename remove_cvref<T>::type;
-//-----------------------------------------------------------------------------
-
-template<class T>
 inline decltype(auto) Normalize(const T& arg)
 {
     // Handle bool's first, we like their string representation.
-    if constexpr(std::is_same_v<remove_cvref_t<T>, bool>) {
+    if constexpr(std::is_same_v<std::remove_cvref_t<T>, bool>) {
         return details::ConvertToBoolString(arg);
 
     } else if constexpr(std::is_integral_v<T>) {
