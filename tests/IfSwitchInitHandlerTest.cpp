@@ -18,6 +18,14 @@ auto Foo()
 }
 
 
+void Fun()
+{
+    if(Open(); true) {}
+
+    switch(Open(); 1) {
+        default: break;
+    }
+}
 
 
 int main()

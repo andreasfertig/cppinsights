@@ -278,6 +278,8 @@ protected:
     /// \brief Check whether or not this statement will add curlys or parentheses and add them only if required.
     void InsertCurlysIfRequired(const Stmt* stmt);
 
+    void InsertIfOrSwitchInitVariables(same_as_any_of<const IfStmt, const SwitchStmt> auto* stmt);
+
     STRONG_BOOL(AddNewLineAfter);
 
     void WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAfter addNewLineAfter);

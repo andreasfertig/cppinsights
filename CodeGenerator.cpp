@@ -502,13 +502,7 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
     if(hasInit) {
         mOutputFormatHelper.OpenScope();
 
-        if(const auto* conditionVar = stmt->getConditionVariable()) {
-            InsertArg(conditionVar);
-        }
-
-        if(const auto* init = stmt->getInit()) {
-            InsertArg(init);
-        }
+        InsertIfOrSwitchInitVariables(stmt);
     }
 
     mOutputFormatHelper.Append(kwSwitch);
@@ -1609,6 +1603,21 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertIfOrSwitchInitVariables(same_as_any_of<const IfStmt, const SwitchStmt> auto* stmt)
+{
+    if(const auto* conditionVar = stmt->getConditionVariable()) {
+        InsertArg(conditionVar);
+    }
+
+    if(const auto* init = stmt->getInit()) {
+        InsertArg(init);
+        if(not isa<DeclStmt>(init)) {
+            mOutputFormatHelper.AppendSemiNewLine();
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const IfStmt* stmt)
 {
     auto       cexpr{stmt->isConstexpr() ? kwSpaceConstExpr : emptySV};
@@ -1617,13 +1626,7 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
     if(hasInit) {
         mOutputFormatHelper.OpenScope();
 
-        if(const auto* conditionVar = stmt->getConditionVariable()) {
-            InsertArg(conditionVar);
-        }
-
-        if(const auto* init = stmt->getInit()) {
-            InsertArg(init);
-        }
+        InsertIfOrSwitchInitVariables(stmt);
     }
 
     mOutputFormatHelper.Append("if"sv, cexpr);
