@@ -35,6 +35,23 @@ int Foo()
 
 
 
+void Fun()
+{
+  {
+    Open();
+    if(true) {
+    } 
+    
+  }
+  
+  {
+    Open();
+    switch(1) {
+      default: break;
+    }
+  }
+}
+
 
 
 int main()
