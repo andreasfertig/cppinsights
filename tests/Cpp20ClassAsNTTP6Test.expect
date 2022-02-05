@@ -1,0 +1,46 @@
+#define INSIGHTS_USE_TEMPLATE
+
+struct X
+{
+  inline int Fun() const
+  {
+    return 2;
+  }
+  
+  int alfa;
+  double beta;
+};
+
+
+static constexpr X X_2_0_000000e_00_{2, 0.000000e+00};
+template<X I = X_2_0_000000e_00_>
+struct Test
+{
+  int x;
+};
+
+/* First instantiated from: Cpp20ClassAsNTTP6Test.cpp:20 */
+#ifdef INSIGHTS_USE_TEMPLATE
+static constexpr X X_45_3_140000e_00_{45, 3.140000e+00};
+template<>
+struct Test<X_45_3_140000e_00_>
+{
+  int x;
+};
+
+#endif
+/* First instantiated from: Cpp20ClassAsNTTP6Test.cpp:21 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Test<X_2_0_000000e_00_>
+{
+  int x;
+};
+
+#endif
+
+void test()
+{
+  Test<X_45_3_140000e_00_> t1 = {0};
+  Test<X_2_0_000000e_00_> t2 = {0};
+}

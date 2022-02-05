@@ -1215,6 +1215,56 @@ void CodeGenerator::InsertArg(const LinkageSpecDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertTemplateArgsObjectParam(const TemplateParamObjectDecl& param)
+{
+    PrintingPolicy pp{GetGlobalAST().getLangOpts()};
+    pp.adjustForCPlusPlus();
+
+    if(auto varName = GetName(param); not mSeenDecls.contains(varName)) {
+        std::string                init{};
+        ::llvm::raw_string_ostream stream{init};
+        param.printAsInit(stream, pp);
+
+        // https://eel.is/c++draft/temp.param#8 says the variable is `static const`. However, to make the
+        // compiler accept the generated code the storage object must be constexpr.
+        // The initialization itself is on the lowest level, int's, floating point or nested structs with them. For
+        // classes this could fail a all fields even the hidden ones are observed. However, for NTTPs the rule is that
+        // only structs/classes with _only_ public data members are accepted.
+        mOutputFormatHelper.AppendSemiNewLine(
+            "static constexpr ", GetName(param.getType().getUnqualifiedType()), " ", varName, init);
+        mSeenDecls[varName] = true;
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertTemplateArgsObjectParam(const ArrayRef<TemplateArgument>& array)
+{
+    for(const auto& arg : array) {
+        if(TemplateArgument::Declaration != arg.getKind()) {
+            continue;
+        } else if(const auto decl = dyn_cast_or_null<TemplateParamObjectDecl>(arg.getAsDecl())) {
+            InsertTemplateArgsObjectParam(*decl);
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertTemplateSpecializationHeader(const Decl& decl)
+{
+    if(const auto* fd = dyn_cast_or_null<FunctionDecl>(&decl)) {
+        if(const auto* specArgs = fd->getTemplateSpecializationArgs()) {
+            InsertTemplateArgsObjectParam(specArgs->asArray());
+        }
+    } else if(const auto* vd = dyn_cast_or_null<VarTemplateSpecializationDecl>(&decl)) {
+        InsertTemplateArgsObjectParam(vd->getTemplateArgs().asArray());
+    } else if(const auto* clsTemplateSpe = dyn_cast_or_null<ClassTemplateSpecializationDecl>(&decl)) {
+        InsertTemplateArgsObjectParam(clsTemplateSpe->getTemplateArgs().asArray());
+    }
+
+    mOutputFormatHelper.AppendNewLine(kwTemplate, "<>"sv);
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const VarDecl* stmt)
 {
     if(auto* init = stmt->getInit();
@@ -1258,7 +1308,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
     }
 
     if(isa<VarTemplateSpecializationDecl>(stmt)) {
-        InsertTemplateSpecializationHeader();
+        InsertTemplateSpecializationHeader(*stmt);
     } else if(needsGuard) {
         mOutputFormatHelper.InsertIfDefTemplateGuard();
     }
@@ -1693,12 +1743,42 @@ static std::string_view EllipsisSpace(bool b)
 }
 //-----------------------------------------------------------------------------
 
+/// \brief Evaluates a potential NTTP as a constant expression.
+///
+/// Used for C++20's struct/class as NTTP.
+static std::optional<std::pair<QualType, APValue>> EvaluateNTTPAsConstantExpr(const Expr* expr)
+{
+    expr = expr->IgnoreParenImpCasts();
+
+    // The marker when it is a C++20 class as NTTP seems to be CXXFunctionalCastExpr
+    if(Expr::EvalResult evalResult{};
+       isa<CXXFunctionalCastExpr>(expr) and
+       expr->EvaluateAsConstantExpr(evalResult, GetGlobalAST(), ConstantExprKind::Normal)) {
+        return std::pair<QualType, APValue>{expr->getType(), evalResult.Val};
+    }
+
+    return {};
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
                                              const TemplateParamsOnly     templateParamsOnly)
 {
     const bool full{TemplateParamsOnly::No == templateParamsOnly};
 
     if(full) {
+        for(const auto* param : list) {
+            if(const auto* nonTmplParam = dyn_cast_or_null<NonTypeTemplateParmDecl>(param);
+               nonTmplParam and nonTmplParam->hasDefaultArgument()) {
+                if(auto val =
+                       EvaluateNTTPAsConstantExpr(nonTmplParam->getDefaultArgument().getArgument().getAsExpr())) {
+                    auto* init = GetGlobalAST().getTemplateParamObjectDecl(val->first, val->second);
+
+                    InsertTemplateArgsObjectParam(*init);
+                }
+            }
+        }
+
         mOutputFormatHelper.Append(kwTemplate);
     }
 
@@ -2283,8 +2363,11 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 
 void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
 {
-    if(const auto* vd = dyn_cast_or_null<VarDecl>(stmt->getDecl());
-       GetInsightsOptions().UseShow2C and IsReferenceType(vd)) {
+    if(const auto* tmplObjParam = dyn_cast_or_null<TemplateParamObjectDecl>(stmt->getDecl())) {
+        mOutputFormatHelper.Append(GetName(*tmplObjParam));
+
+    } else if(const auto* vd = dyn_cast_or_null<VarDecl>(stmt->getDecl());
+              GetInsightsOptions().UseShow2C and IsReferenceType(vd)) {
         const auto* init = vd->getInit();
 
         if(const auto* dref = dyn_cast_or_null<DeclRefExpr>(init)) {
@@ -3564,7 +3647,7 @@ void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
     const auto* deducedTemplate = stmt->getDeducedTemplate();
 
     if(isSpecialization) {
-        InsertTemplateSpecializationHeader();
+        InsertTemplateSpecializationHeader(*stmt);
     } else if(const auto* e = stmt->getDescribedFunctionTemplate()) {
         InsertTemplateParameters(*e->getTemplateParameters());
     }
@@ -3749,7 +3832,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         if(classTemplatePartialSpecializationDecl) {
             InsertTemplateParameters(*classTemplatePartialSpecializationDecl->getTemplateParameters());
         } else {
-            InsertTemplateSpecializationHeader();
+            InsertTemplateSpecializationHeader(*stmt);
         }
         // Render a out-of-line struct declared inside a class template
     } else if(stmt->getLexicalDeclContext() != stmt->getDeclContext()) {
@@ -4460,7 +4543,11 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
         case TemplateArgument::Type: mOutputFormatHelper.Append(GetName(arg.getAsType())); break;
         case TemplateArgument::Declaration:
             // TODO: handle pointers
-            mOutputFormatHelper.Append("&"sv, GetName(*arg.getAsDecl(), QualifiedName::Yes));
+            if(const auto decl = dyn_cast_or_null<TemplateParamObjectDecl>(arg.getAsDecl())) {
+                mOutputFormatHelper.Append(GetName(*decl));
+            } else {
+                mOutputFormatHelper.Append("&"sv, GetName(*arg.getAsDecl(), QualifiedName::Yes));
+            }
             break;
         case TemplateArgument::NullPtr: mOutputFormatHelper.Append(kwNullptr); break;
         case TemplateArgument::Integral:
@@ -4473,7 +4560,17 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             }
 
             break;
-        case TemplateArgument::Expression: InsertArg(arg.getAsExpr()); break;
+        case TemplateArgument::Expression: {
+            if(auto val = EvaluateNTTPAsConstantExpr(arg.getAsExpr()->IgnoreParenImpCasts())) {
+                mOutputFormatHelper.Append(
+                    GetName(val->first),
+                    BuildTemplateParamObjectName(val->second.getAsString(GetGlobalAST(), val->first)));
+            } else {
+                InsertArg(arg.getAsExpr());
+            }
+        }
+
+        break;
         case TemplateArgument::Pack: HandleTemplateParameterPack(arg.pack_elements()); break;
         case TemplateArgument::Template:
             mOutputFormatHelper.Append(GetName(*arg.getAsTemplate().getAsTemplateDecl()));
@@ -4482,7 +4579,7 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             mOutputFormatHelper.Append(GetName(*arg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()));
             break;
         case TemplateArgument::Null: mOutputFormatHelper.Append("null"sv); break;
-        case TemplateArgument::StructuralValue: ToDo(arg, mOutputFormatHelper); break;
+        case TemplateArgument::StructuralValue: mOutputFormatHelper.Append(arg.getAsStructuralValue()); break;
     }
 }
 //-----------------------------------------------------------------------------
@@ -4733,7 +4830,7 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
 
     } else if(decl.isFunctionTemplateSpecialization() or (isClassTemplateSpec and decl.isOutOfLine() and
                                                           (decl.getLexicalDeclContext() != methodDecl->getParent()))) {
-        InsertTemplateSpecializationHeader();
+        InsertTemplateSpecializationHeader(decl);
     }
 
     InsertAttributes(decl.attrs());

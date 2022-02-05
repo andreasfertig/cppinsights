@@ -1,0 +1,36 @@
+#define INSIGHTS_USE_TEMPLATE
+
+struct X
+{
+  inline int Fun() const
+  {
+    return 2;
+  }
+  
+  int alfa;
+  double beta;
+};
+
+
+template<X I>
+int Apple()
+{
+  return I.Fun();
+}
+
+/* First instantiated from: Cpp20ClassAsNTTPTest.cpp:19 */
+#ifdef INSIGHTS_USE_TEMPLATE
+static constexpr X X_45_3_140000e_00_{45, 3.140000e+00};
+template<>
+int Apple<X_45_3_140000e_00_>()
+{
+  return X_45_3_140000e_00_.Fun();
+}
+#endif
+
+
+void test()
+{
+  Apple<X_45_3_140000e_00_>();
+  Apple<X_45_3_140000e_00_>();
+}

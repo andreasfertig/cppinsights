@@ -1,0 +1,29 @@
+template<double D>
+void Fun()
+{
+}
+
+/* First instantiated from: FloatAsNTTPTest.cpp:9 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Fun<0.0>()
+{
+}
+#endif
+
+
+/* First instantiated from: FloatAsNTTPTest.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Fun<-0.0>()
+{
+}
+#endif
+
+
+int main()
+{
+  Fun<+0.0>();
+  Fun<-0.0>();
+  return 0;
+}

@@ -1,0 +1,7 @@
+.tmp.cpp:48:17: error: no function template matches function template specialization 'Func'
+   48 | void Foo<A_2_>::Func()
+      |                 ^
+.tmp.cpp:54:17: error: no function template matches function template specialization 'Func'
+   54 | void Foo<A_3_>::Func()
+      |                 ^
+2 errors generated.
