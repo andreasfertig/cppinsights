@@ -500,8 +500,9 @@ private:
     std::string                      mDataAfter{};
     bool                             mHasData{false};
     bool                             mSkipSpace{false};
-    std::string                      mScope{};  //!< A scope coming from an ElaboratedType which is used for a
-                                                //!< ClassTemplateSpecializationDecl if there is no other scope
+    bool mScanningArrayDimension{};  //!< Only the outer most ConstantArrayType handles the array dimensions and size
+    std::string mScope{};            //!< A scope coming from an ElaboratedType which is used for a
+                                     //!< ClassTemplateSpecializationDecl if there is no other scope
 
     bool HandleType(const TemplateTypeParmType* type)
     {
@@ -735,9 +736,23 @@ private:
 
     bool HandleType(const ConstantArrayType* type)
     {
+        // Only the outer most ConstantArrayType generates the aary dimensions, block others.
+        bool scanningArrayDimension = false;
+        if(not mScanningArrayDimension) {
+            mScanningArrayDimension = true;
+            scanningArrayDimension  = true;
+        }
+
         const bool ret = HandleType(type->getElementType().getTypePtrOrNull());
 
-        mData.Append("["sv, type->getSize().getZExtValue(), "]"sv);
+        // Handle the array dimension after the type has been parsed.
+        if(scanningArrayDimension) {
+            do {
+                mData.Append("["sv, type->getSize().getZExtValue(), "]"sv);
+            } while((type = dyn_cast_or_null<ConstantArrayType>(type->getElementType().getTypePtrOrNull())));
+
+            mScanningArrayDimension = false;
+        }
 
         return ret;
     }

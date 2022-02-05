@@ -1,0 +1,25 @@
+struct S
+{
+  // inline constexpr S() noexcept = default;
+};
+
+
+template<typename> struct T {};
+
+/* First instantiated from: Issue404.cpp:6 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct T<int>
+{
+  // inline constexpr T() noexcept = default;
+};
+
+#endif
+
+
+   int arr1[3][2];
+
+     S arr2[3][2] = S [3][2]();
+
+T<int> arr3[3][2] = T<int>[3][2]();
+
