@@ -23,7 +23,7 @@ int main()
   } __lambda_7_17{x};
   
   for(int i = __lambda_7_17.operator()(); i < 20; ++i) {
-    x += i;
+    x = x + i;
   }
   
       
@@ -65,7 +65,7 @@ int main()
   } __lambda_11_43{x};
   
   for(int i = __lambda_11_17.operator()(), z = __lambda_11_43.operator()(); i < 20; ++i) {
-    x += i;
+    x = x + i;
   }
   
       

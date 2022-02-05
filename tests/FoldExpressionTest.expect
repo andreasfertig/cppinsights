@@ -178,7 +178,7 @@ int main()
   /* PASSED: static_assert(static_cast<int>(true) == static_cast<int>(logicalOr(true, true, true, false))); */
   /* PASSED: static_assert(4 == comma(1, 2, 3, 4)); */
   int x = 4;
-  x /= 2;
+  x = x / 2;
 }
 
 

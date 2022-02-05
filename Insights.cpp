@@ -89,6 +89,13 @@ const ASTContext&        GetGlobalAST()
 }
 //-----------------------------------------------------------------------------
 
+static const CompilerInstance* gCI{};
+const CompilerInstance&        GetGlobalCI()
+{
+    return *gCI;
+}
+//-----------------------------------------------------------------------------
+
 class CppInsightASTConsumer final : public ASTConsumer
 {
 public:
@@ -156,6 +163,7 @@ public:
 
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& CI, StringRef /*file*/) override
     {
+        gCI = &CI;
         mRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
         return std ::make_unique<CppInsightASTConsumer>(mRewriter);
     }

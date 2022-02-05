@@ -35,13 +35,13 @@ class Test
   
   inline Test & operator+=(const Test & rhs)
   {
-    this->mX += rhs.mX;
+    this->mX = this->mX + rhs.mX;
     return *this;
   }
   
   inline Test & operator<<(const Test & rhs)
   {
-    this->mX += rhs.mX;
+    this->mX = this->mX + rhs.mX;
     return *this;
   }
   
@@ -123,7 +123,7 @@ namespace Hello
       
       inline Fest & operator<<(const Fest & rhs)
       {
-        this->mX += rhs.mX;
+        this->mX = this->mX + rhs.mX;
         return *this;
       }
       
