@@ -82,6 +82,21 @@ endif()
 #     IS_MSVC_CL
 #     MSVC)
 
+if (MSVC)
+  # For MSVC, CMake sets certain flags to defaults we want to override.
+  # This replacement code is taken from sample in the CMake Wiki at
+  # https://gitlab.kitware.com/cmake/community/wikis/FAQ#dynamic-replace.
+  foreach (flag_var
+         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+         CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+    string(REPLACE "/MD" "" ${flag_var} "${${flag_var}}")
+
+    string(REPLACE "/EHsc" "" ${flag_var} "${${flag_var}}")
+
+    string(REPLACE "/GR" "" ${flag_var} "${${flag_var}}")
+  endforeach()
+endif()
+
 if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     function(check_compiler COMPILER version)
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "${COMPILER}")
@@ -281,18 +296,6 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     if(WIN32)
         # Ignore deprecated std::iterator<> usage from Clang's sources
         add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
-
-        # For Debug configuration - link against Release version of CRT
-        # since we link with only Release version of LLVM/Clang libraries
-        # and don't have Debug versions.
-        set(CompilerFlags CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_DEBUG)
-        foreach(CompilerFlag ${CompilerFlags})
-            if(INSIGHTS_STATIC)
-              string(REPLACE "/MTd" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-            else()
-              string(REPLACE "/MDd" "/MD" ${CompilerFlag} "${${CompilerFlag}}")
-            endif()
-        endforeach()
     endif()
 
     if(IS_MSVC_CL)
@@ -492,6 +495,10 @@ add_clang_tool(insights
     TemplateHandler.cpp
 )
 
+if(IS_MSVC_CL)
+    # TODO figure out what llvm-config reports and use this configuration
+    set_property(TARGET insights PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 if(CLANG_LINK_CLANG_DYLIB)
     if (NOT LLVM_LINK_LLVM_DYLIB)
