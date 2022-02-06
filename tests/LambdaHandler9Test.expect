@@ -100,5 +100,6 @@ int main()
   
   __lambda_45_15 f2 = __lambda_45_15{};
   f2.operator()();
+  return 0;
 }
 

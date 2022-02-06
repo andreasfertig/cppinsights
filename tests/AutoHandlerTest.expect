@@ -70,6 +70,7 @@ int main()
   unsigned int uu = u;
   [[maybe_unused]] unsigned int mu = 0U;
   [[maybe_unused]] unsigned int muu = u;
+  return 0;
 }
 
 

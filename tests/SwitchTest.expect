@@ -21,5 +21,6 @@ int main()
       case static_cast<int>(FOO): return 1;
     }
   }
+  return 0;
 }
 

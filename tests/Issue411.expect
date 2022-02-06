@@ -28,5 +28,6 @@ struct ns::foo<double>
 
 int main()
 {
+  return 0;
 }
 

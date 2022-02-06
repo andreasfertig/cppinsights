@@ -55,5 +55,6 @@ int main()
   std::basic_string<char, std::char_traits<char>, std::allocator<char> > str = operator""_str("abcd", 4UL);
   std::chrono::duration<long long, std::ratio<1, 1> > sec = operator""_s(4ULL);
   int cookedTemplateLiteral = operator""_cs<'4', '5', '6', '7'>();
+  return 0;
 }
 

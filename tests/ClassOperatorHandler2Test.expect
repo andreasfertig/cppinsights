@@ -162,5 +162,6 @@ int main()
   ff--;
   ----ff;
   printf("%d\n", f.Get());
+  return 0;
 }
 

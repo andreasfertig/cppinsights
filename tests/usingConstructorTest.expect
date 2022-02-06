@@ -57,5 +57,6 @@ int main()
   Bar bar1 = Bar(100.0);
   Bar bar2 = Bar(1, 2);
   Bla bla = Bla(1, 2);
+  return 0;
 }
 

@@ -33,5 +33,6 @@ int main()
 {
   std::string x = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{" ashj a a a aaa"};
   std::string b = trim(x);
+  return 0;
 }
 

@@ -6,5 +6,6 @@ int main()
     int v2 = 828;
   };
   
+  return 0;
 }
 

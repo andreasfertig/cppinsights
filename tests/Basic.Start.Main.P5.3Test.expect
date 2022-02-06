@@ -1,0 +1,31 @@
+int main()
+{
+      
+  class __lambda_3_13
+  {
+    public: 
+    inline /*constexpr */ int operator()() const
+    {
+      return 2;
+    }
+    
+    using retType_3_13 = auto (*)() -> int;
+    inline /*constexpr */ operator retType_3_13 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline int __invoke()
+    {
+      return 2;
+    }
+    
+    
+  } __lambda_3_13{};
+  
+  int x = __lambda_3_13.operator()();
+  return 0;
+}
+
+

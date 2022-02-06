@@ -20,5 +20,6 @@ int main()
   delete p1;
   int * p2 = new int[10];
   delete[] p2;
+  return 0;
 }
 

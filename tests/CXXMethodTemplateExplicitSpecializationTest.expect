@@ -50,5 +50,6 @@ int main()
 {
   Foo<int> f = Foo<int>();
   Foo<char> fc = Foo<char>();
+  return 0;
 }
 

@@ -6,5 +6,6 @@ int main()
   std::pair<const int, int> __operator6 = std::pair<const int, int>(map.begin().operator*());
   const int key = std::get<0UL>(static_cast<std::pair<const int, int> &&>(__operator6));
   int value = std::get<1UL>(static_cast<std::pair<const int, int> &&>(__operator6));
+  return 0;
 }
 

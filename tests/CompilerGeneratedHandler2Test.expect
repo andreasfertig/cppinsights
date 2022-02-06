@@ -39,5 +39,6 @@ int main()
   C c = C{};
   C c2 = C(c);
   C c3 = C(static_cast<const C &&>(std::move(c)));
+  return 0;
 }
 

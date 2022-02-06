@@ -20,5 +20,6 @@ int main()
   using T3 = const Point *;
   using T4 = Point &;
   using T5 = Point &&;
+  return 0;
 }
 

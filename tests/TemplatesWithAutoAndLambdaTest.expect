@@ -68,5 +68,6 @@ int main()
 {
   std::string str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >("world");
   print("hi", 7.5, str);
+  return 0;
 }
 

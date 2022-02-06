@@ -129,5 +129,6 @@ int main()
   namespace myInner = Test::Inner;
   using vzz = Test::Inner::type;
   using Test::Inner::Void;
+  return 0;
 }
 

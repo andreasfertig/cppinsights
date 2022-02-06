@@ -27,5 +27,6 @@ void f<int>(int)
 int main()
 {
   f(0, 1);
+  return 0;
 }
 

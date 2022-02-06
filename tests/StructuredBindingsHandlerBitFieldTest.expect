@@ -33,5 +33,6 @@ int main()
 {
   Func(pt.x);
   ++a2x;
+  return 0;
 }
 

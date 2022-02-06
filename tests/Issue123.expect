@@ -43,5 +43,6 @@ int main()
 {
   Person<int> f = Person<int>();
   int x = f.run(2, true);
+  return 0;
 }
 

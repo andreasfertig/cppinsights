@@ -13,5 +13,6 @@ int main()
   if(ptr2) {
   } 
   
+  return 0;
 }
 

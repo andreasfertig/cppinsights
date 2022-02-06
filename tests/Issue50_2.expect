@@ -48,5 +48,6 @@ int main()
   foo(i);
   long l;
   foo(std::move(l));
+  return 0;
 }
 

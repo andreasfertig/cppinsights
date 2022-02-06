@@ -30,6 +30,7 @@ int main()
 {
   Foo<int> f = Foo<int>();
   f.bar();
+  return 0;
 }
 
 

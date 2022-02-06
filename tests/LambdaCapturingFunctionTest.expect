@@ -33,5 +33,6 @@ int main()
   
   __lambda_15_14 l = __lambda_15_14{d};
   l.operator()();
+  return 0;
 }
 

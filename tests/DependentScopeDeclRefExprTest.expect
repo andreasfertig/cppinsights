@@ -129,5 +129,6 @@ int main()
   bool b = Test::dependentScope2<int>::result;
   bool c = Test::dependentScope3<int>::result<char>;
   bool d = Test::dependentScope4<bool>::result;
+  return 0;
 }
 

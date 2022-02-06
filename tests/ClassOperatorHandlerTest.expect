@@ -187,5 +187,6 @@ int main()
   } 
   
   Hello::Bello::sF.operator<<(Hello::Bello::sF).operator<<(Hello::Bello::sF);
+  return 0;
 }
 

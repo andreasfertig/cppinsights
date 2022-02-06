@@ -299,5 +299,6 @@ int main()
   };
   
   __lambda_48_20 lambda9 = __lambda_48_20{foo, b};
+  return 0;
 }
 

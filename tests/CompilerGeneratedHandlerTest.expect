@@ -83,5 +83,6 @@ int main()
   D * dd = new D{3};
   delete dd;
   E e = E{6};
+  return 0;
 }
 

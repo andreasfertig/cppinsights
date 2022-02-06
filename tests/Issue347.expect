@@ -22,5 +22,6 @@ int main()
   };
   
   __lambda_5_12 foo = __lambda_5_12{str};
+  return 0;
 }
 

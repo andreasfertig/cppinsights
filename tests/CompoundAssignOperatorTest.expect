@@ -30,5 +30,6 @@ int main()
   d = d + static_cast<double>(i);
   d = d + static_cast<double>(f);
   d = d + d;
+  return 0;
 }
 

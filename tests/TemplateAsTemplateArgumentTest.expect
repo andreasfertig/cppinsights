@@ -37,5 +37,6 @@ class Map<int, int, my_array>
 int main()
 {
   Map<int, int> x = Map<int, int, my_array>();
+  return 0;
 }
 

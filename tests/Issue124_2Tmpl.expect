@@ -37,5 +37,6 @@ int main()
   f(l);
   int i;
   f(i);
+  return 0;
 }
 

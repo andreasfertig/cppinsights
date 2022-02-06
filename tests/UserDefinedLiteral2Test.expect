@@ -11,5 +11,6 @@ inline constexpr std::chrono::duration<long long, std::ratio<1, 1> > operator""_
 int main()
 {
   std::chrono::duration<long long, std::ratio<1, 1> > s = operator""_s(1ULL);
+  return 0;
 }
 

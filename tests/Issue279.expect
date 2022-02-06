@@ -10,5 +10,6 @@ int main()
 {
   using MemberVarPtr_5 = void (S::*)();
   MemberVarPtr_5 p = &S::f;
+  return 0;
 }
 

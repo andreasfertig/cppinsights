@@ -17,6 +17,7 @@ class FinalTest<int> final
 int main()
 {
   FinalTest<int> a = {};
+  return 0;
 }
 
 

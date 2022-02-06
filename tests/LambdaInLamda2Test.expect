@@ -58,6 +58,7 @@ int main()
   
   __lambda_4_5 l = __lambda_4_5{__lambda_5_7.operator()()};
   __lambda_4_5 l2 = __lambda_4_5(l);
+  return 0;
 }
 
 

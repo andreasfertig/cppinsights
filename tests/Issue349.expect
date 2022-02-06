@@ -11,5 +11,6 @@ int main()
   S s = S();
   using MemberVarPtr_8 = int S::*;
   MemberVarPtr_8 m = &S::mem;
+  return 0;
 }
 

@@ -167,6 +167,7 @@ int main()
   testIntegral<2> integral = testIntegral<2>();
   testExpr<2 * 2, 1> expr = testExpr<4, 1>();
   testPack<0, 1, 2, 4> pack = testPack<0, 1, 2, 4>();
+  return 0;
 }
 
 

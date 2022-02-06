@@ -45,6 +45,7 @@ int main()
   Foo f = {};
   cout.operator<<((operator==(f, is_v<int>)));
   cout.operator<<((operator==(is_v<int>, f)));
+  return 0;
 }
 
 

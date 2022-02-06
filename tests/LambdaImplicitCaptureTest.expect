@@ -25,5 +25,6 @@ int main()
   
   int z = __lambda_7_14.operator()();
   printf("x: %d z: %d\n", x, z);
+  return 0;
 }
 

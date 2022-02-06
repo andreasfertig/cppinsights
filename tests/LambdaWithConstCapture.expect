@@ -20,5 +20,6 @@ int main()
   };
   
   __lambda_4_11 && l = __lambda_4_11{a};
+  return 0;
 }
 

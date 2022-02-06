@@ -9,6 +9,7 @@ int main()
     x = x + *i;
   }
   
+  return 0;
 }
 
 

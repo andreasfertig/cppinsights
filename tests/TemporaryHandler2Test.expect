@@ -59,6 +59,7 @@ int main()
   f5().operator=(X(1));
   f5().modify();
   f8(false, 5).operator=(X(2));
+  return 0;
 }
   ///:~
 

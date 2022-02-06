@@ -91,5 +91,6 @@ int main()
   Log("And the number is %d\n", result);
   std::string test = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"Hello"};
   Log("%s\n", test);
+  return 0;
 }
 

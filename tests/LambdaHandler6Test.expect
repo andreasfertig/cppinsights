@@ -24,5 +24,6 @@ int main()
   } __lambda_5_5{l1, l2};
   
   __lambda_5_5.operator()();
+  return 0;
 }
 

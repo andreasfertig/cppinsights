@@ -27,5 +27,6 @@ int main()
   int i = 1;
   IntegralToBoolean(static_cast<bool>(i));
   int ii = int(A().operator int());
+  return 0;
 }
 

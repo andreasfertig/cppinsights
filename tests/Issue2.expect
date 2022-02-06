@@ -68,5 +68,6 @@ int main()
   
   __lambda_24_16 bun = __lambda_24_16{std::move(e)};
   bun.operator()();
+  return 0;
 }
 

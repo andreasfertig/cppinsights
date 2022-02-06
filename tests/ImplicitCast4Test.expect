@@ -23,6 +23,7 @@ int main()
   using simple = std::chrono::duration<double, std::ratio<60, 1> >;
   using withCalculation = std::chrono::duration<double, std::ratio<31536000, 1> >;
   Test<int>();
+  return 0;
 }
 
 

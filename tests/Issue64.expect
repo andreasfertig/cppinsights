@@ -29,5 +29,6 @@ int main()
 {
   std::string b = std::basic_string<char, std::char_traits<char>, std::allocator<char> >();
   func(b);
+  return 0;
 }
 

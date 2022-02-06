@@ -8,5 +8,6 @@ struct DefaultedCtorAndConstexpr
 int main()
 {
   DefaultedCtorAndConstexpr t = DefaultedCtorAndConstexpr();
+  return 0;
 }
 

@@ -45,5 +45,6 @@ int main()
   
   __lambda_12_14 l = __lambda_12_14{y};
   FunctionArgs<decltype(&decltype(l)::operator())> a = FunctionArgs<int (__lambda_12_14::*)(int, int) const>();
+  return 0;
 }
 

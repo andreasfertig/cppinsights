@@ -47,6 +47,7 @@ int main()
   };
   
   __lambda_22_19 lambda = __lambda_22_19{NonMoveable(static_cast<NonMoveable &&>(x))};
+  return 0;
 }
 
 

@@ -232,6 +232,7 @@ int main()
   for(__lambda_19_9.operator()() , __lambda_20_9.operator()(); static_cast<bool>(__lambda_20_37.operator()()); __lambda_20_59.operator()()) {
   }
   
+  return 0;
 }
 
 

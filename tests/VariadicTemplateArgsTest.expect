@@ -24,6 +24,7 @@ void forward<void (*)(int, int, int), int, int, int>(void (*ff)(int, int, int), 
 int main()
 {
   forward(f, 1, 2, 3);
+  return 0;
 }
 
 

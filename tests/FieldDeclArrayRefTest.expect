@@ -42,5 +42,6 @@ int main()
 {
   array<int, 2> a = array<int, 2>();
   array<int, 2> ab = array<int, 2>{x};
+  return 0;
 }
 

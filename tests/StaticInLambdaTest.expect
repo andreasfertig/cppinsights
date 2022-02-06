@@ -192,6 +192,7 @@ int main()
   };
   
   __lambda_62_14 y = __lambda_62_14{};
+  return 0;
 }
 
 

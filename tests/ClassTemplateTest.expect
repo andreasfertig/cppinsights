@@ -49,6 +49,7 @@ int main()
 {
   Bar bar = Bar();
   bar.Do();
+  return 0;
 }
 
 

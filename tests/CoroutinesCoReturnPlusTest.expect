@@ -123,5 +123,6 @@ int main()
   generator aar = additionAwaitReturn(2);
   generator ar = awaitReturn(44);
   generator br = bracedReturn(5);
+  return 0;
 }
 

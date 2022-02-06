@@ -28,5 +28,6 @@ void Test(int n)
 int main()
 {
   Test(2);
+  return 0;
 }
 

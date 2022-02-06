@@ -58,5 +58,6 @@ int main()
   visitor<__lambda_8_7, __lambda_9_7> my_visitor = visitor{__lambda_8_7(__lambda_8_7{}), __lambda_9_7(__lambda_9_7{})};
   static_cast<const __lambda_9_7&>(my_visitor).operator()("hello");
   static_cast<const __lambda_8_7&>(my_visitor).operator()(2);
+  return 0;
 }
 

@@ -40,5 +40,6 @@ int main()
   } __lambda_4_5{buffer};
   
   __lambda_4_5.operator()();
+  return 0;
 }
 

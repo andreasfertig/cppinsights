@@ -382,6 +382,7 @@ int main()
   std::cout.operator<<(test("RR")).operator<<(std::endl);
   std::cout.operator<<(test(std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"ARR"})).operator<<(std::endl);
   std::cout.operator<<(test(2.0F)).operator<<(std::endl);
+  return 0;
 }
 
 

@@ -37,5 +37,6 @@ int main()
   ++c3;
   ++c4;
   printf("c3: %d c4: %d\n", cp.x, cp.y);
+  return 0;
 }
 

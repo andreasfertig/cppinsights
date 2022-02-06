@@ -34,5 +34,6 @@ int main()
   std::set<int> s = std::set<int, std::less<int>, std::allocator<int> >();
   foo(m);
   foo(s);
+  return 0;
 }
 

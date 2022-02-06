@@ -16,5 +16,6 @@ int main()
   const Foo & __foo10 = foo;
   int const (&a2)[5] = __foo10.a;
   float const (&b2)[] = __foo10.b;
+  return 0;
 }
 

@@ -25,5 +25,6 @@ int main()
   };
   
   __lambda_7_19 lambda = __lambda_7_19{std::unique_ptr<int, std::default_delete<int> >(std::move(x))};
+  return 0;
 }
 

@@ -43,5 +43,6 @@ int main()
 {
   f(S{}, 0);
   f(T{}, 0);
+  return 0;
 }
 

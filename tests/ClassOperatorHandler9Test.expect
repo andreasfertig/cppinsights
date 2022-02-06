@@ -125,5 +125,6 @@ int main()
   vec_t res = Foo(vecA, vecB);
   operator+(vecA, vecB);
   operator*(vecA, vecB);
+  return 0;
 }
 

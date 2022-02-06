@@ -62,6 +62,7 @@ int main()
   double md = min(ad, bd);
   int ma1 = max(1, 2);
   double ma2 = max(2.0, 4.0);
+  return 0;
 }
 
 

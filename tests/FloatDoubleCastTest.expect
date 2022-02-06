@@ -5,6 +5,7 @@ int main()
   float fl = static_cast<float>(dl);
   int i = static_cast<int>(fl);
   fl = static_cast<float>(i);
+  return 0;
 }
 
 

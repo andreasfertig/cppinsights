@@ -21,6 +21,7 @@ int main()
 {
   std::cout.operator<<(sizeof(Color)).operator<<(std::endl);
   std::cout.operator<<(sizeof(State)).operator<<(std::endl);
+  return 0;
 }
 
 

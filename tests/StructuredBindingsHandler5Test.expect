@@ -162,5 +162,6 @@ int main()
   const Point & __p273 = p2;
   const double & x2 = __p273.get<0>();
   const double y2 = static_cast<const double>(__p273.get<1>());
+  return 0;
 }
 

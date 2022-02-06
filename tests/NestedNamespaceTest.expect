@@ -26,5 +26,6 @@ int main()
   One one = One();
   One::Two two = One::Two();
   One::Two::Three three = One::Two::Three();
+  return 0;
 }
 

@@ -48,5 +48,6 @@ int main()
 {
   Test<Other> t = {};
   t.fun<double, int, double>(&Other::Callback);
+  return 0;
 }
 

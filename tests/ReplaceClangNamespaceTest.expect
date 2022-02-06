@@ -36,5 +36,6 @@ int main()
   } __lambda_11_5{};
   
   __lambda_11_5.operator()();
+  return 0;
 }
 
