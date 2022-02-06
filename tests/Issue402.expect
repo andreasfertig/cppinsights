@@ -43,5 +43,6 @@ int main()
   } __lambda_2_3{__lambda_2_3::__lambda_2_8{}};
   
   ;
+  return 0;
 }
 

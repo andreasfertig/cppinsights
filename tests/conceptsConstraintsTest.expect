@@ -48,5 +48,6 @@ namespace Constraints
 int main()
 {
   Constraints::f(2);
+  return 0;
 }
 

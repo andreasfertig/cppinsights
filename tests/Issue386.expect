@@ -48,5 +48,6 @@ namespace tnt
 
 int main()
 {
+  return 0;
 }
 

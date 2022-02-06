@@ -38,5 +38,6 @@ int main()
   Test tc = Test();
   ti.operator=(2);
   tc.operator=('a');
+  return 0;
 }
 

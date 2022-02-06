@@ -13,6 +13,7 @@ int main()
     FuncPtr_7 add1 = foo;
   } 
   
+  return 0;
 }
 
 

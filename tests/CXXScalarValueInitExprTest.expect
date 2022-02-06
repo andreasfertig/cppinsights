@@ -18,6 +18,7 @@ double create<double>()
 int main()
 {
   double doub = create<double>();
+  return 0;
 }
 
 

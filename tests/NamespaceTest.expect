@@ -4,6 +4,7 @@ int main()
 {
   std::multimap<int, char> mm = std::multimap<int, char, std::less<int>, std::allocator<std::pair<const int, char> > >{std::initializer_list<std::pair<const int, char> >{std::pair<const int, char>{2019, 'A'}}, std::less<int>()};
   std::__basic_node_handle<std::__tree_node<std::__value_type<int, char>, void *>, std::allocator<std::pair<const int, char> >, std::__map_node_handle_specifics> jandle = mm.extract(2019);
+  return 0;
 }
 
 

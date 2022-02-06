@@ -6,5 +6,6 @@ int main()
     mutable int x;
   };
   
+  return 0;
 }
 

@@ -95,6 +95,7 @@ int main()
   ti.operator=(tc);
   ti.operator=(tf);
   tc.operator=(ti);
+  return 0;
 }
 
 

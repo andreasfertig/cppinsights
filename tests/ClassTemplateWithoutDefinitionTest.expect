@@ -21,5 +21,6 @@ typedef Foo<double> DoubleFoo;
 int main()
 {
   DoubleFoo df = Foo<double>();
+  return 0;
 }
 

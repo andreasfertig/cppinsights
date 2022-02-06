@@ -126,6 +126,7 @@ int main()
   const bool b12 = f1.operator==(new Woo{1, 'a'});
   const bool b13 = f1.operator==(Woo{1, 'a'});
   Foo f3 = Foo{'c'};
+  return 0;
 }
 
 

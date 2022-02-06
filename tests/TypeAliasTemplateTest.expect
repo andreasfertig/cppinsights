@@ -42,5 +42,6 @@ struct F<int>
 int main()
 {
   F<int> f1 = F<int>(3);
+  return 0;
 }
 

@@ -23,5 +23,6 @@ static out cout = out();
 int main()
 {
   cout.operator<<(is_v<void (int)>);
+  return 0;
 }
 

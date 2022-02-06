@@ -168,6 +168,7 @@ int main(int argc, char ** argv)
   Test::MyClass3<int, 5> a4 = {};
   Test::MyClass3<char, 7> b4 = {};
   int s4 = a4.var + b4.var;
+  return 0;
 }
 
 

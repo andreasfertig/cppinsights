@@ -79,5 +79,6 @@ int main()
   Foo<int> f = Foo<int>{1, 2};
   Foo<int> f2 = Foo<int>{1};
   Bar<char> b = Bar<char>{1};
+  return 0;
 }
 

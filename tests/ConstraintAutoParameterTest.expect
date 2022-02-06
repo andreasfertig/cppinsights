@@ -36,5 +36,6 @@ __lambda_6_15 lambda = __lambda_6_15{};
 int main()
 {
   lambda.operator()(4);
+  return 0;
 }
 

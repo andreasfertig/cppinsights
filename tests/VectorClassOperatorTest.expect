@@ -9,6 +9,7 @@ int main()
   for(std::__wrap_iter<int *> it1 = vec.begin(); std::operator!=(it1, vec.end()); it1.operator++()) {
   }
   
+  return 0;
 }
 
 

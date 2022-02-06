@@ -52,6 +52,7 @@ int main(int argc, const char **)
   
   __lambda_14_18 lamb2 = __lambda_14_18{i, x};
   std::initializer_list<int> l2 = lamb2.operator()();
+  return 0;
 }
 
 

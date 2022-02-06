@@ -44,6 +44,7 @@ void foo(B &)
 int main()
 {
   foo(static_cast<A>(static_cast<const B&>(C()).operator A()));
+  return 0;
 }
  
 

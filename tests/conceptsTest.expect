@@ -184,5 +184,6 @@ int main()
   ClsWithRequires<int> c = {};
   a::ClsWithRequires<int> ac = {};
   RequiresWithParens::f(Value{0});
+  return 0;
 }
 

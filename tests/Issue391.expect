@@ -190,5 +190,6 @@ int main()
   tnt::printer<my_type> p = tnt::printer<my_type>{t};
   tnt::serializer<my_type>::get_visit(p);
   std::operator<<(std::cout, "};\n");
+  return 0;
 }
 

@@ -35,5 +35,6 @@ int main()
   } __lambda_13_12{};
   
   t.foo<__lambda_13_12>(__lambda_13_12);
+  return 0;
 }
 

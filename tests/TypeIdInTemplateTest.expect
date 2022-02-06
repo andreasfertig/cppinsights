@@ -38,6 +38,7 @@ int main()
 {
   Foo<int> i = Foo<int>();
   i.Get();
+  return 0;
 }
 
 

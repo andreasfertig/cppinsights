@@ -25,5 +25,6 @@ int main()
 {
   X x = X(0);
   x.modify();
+  return 0;
 }
 

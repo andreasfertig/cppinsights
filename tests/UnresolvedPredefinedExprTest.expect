@@ -37,5 +37,6 @@ int main()
 {
   const char * f = "main";
   UnresolvedLookupExprTest::Test<int> t = UnresolvedLookupExprTest::Test<int>();
+  return 0;
 }
 

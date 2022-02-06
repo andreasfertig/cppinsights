@@ -179,6 +179,7 @@ int main()
   /* PASSED: static_assert(4 == comma(1, 2, 3, 4)); */
   int x = 4;
   x = x / 2;
+  return 0;
 }
 
 

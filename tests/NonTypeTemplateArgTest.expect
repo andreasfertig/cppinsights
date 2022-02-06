@@ -30,6 +30,7 @@ int main()
 {
   SC<c> sc = SC<&c>();
   sc.Print();
+  return 0;
 }
 
 

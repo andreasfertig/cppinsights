@@ -22,5 +22,6 @@ class Foo<int>
 int main()
 {
   Foo<int> f = Foo<int>();
+  return 0;
 }
 

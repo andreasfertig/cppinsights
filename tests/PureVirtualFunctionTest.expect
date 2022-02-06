@@ -26,5 +26,6 @@ int main()
 {
   West w = West();
   w.Pure();
+  return 0;
 }
 

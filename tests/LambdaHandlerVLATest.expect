@@ -109,5 +109,6 @@ int main()
 {
   int d;
   SA<2> iso = SA<2>(d);
+  return 0;
 }
 

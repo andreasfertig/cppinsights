@@ -36,6 +36,7 @@ int main()
   /* PASSED: static_assert(operator<=(std::_CmpUnspecifiedParam(0), millenniumFalcon.operator<=>(y))); */
   /* PASSED: static_assert(!(millenniumFalcon.operator==(y))); */
   /* PASSED: static_assert(!(millenniumFalcon.operator==(y))); */
+  return 0;
 }
 
 

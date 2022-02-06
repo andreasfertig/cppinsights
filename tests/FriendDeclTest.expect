@@ -49,5 +49,6 @@ int main()
   sPoint.Print();
   ChangePrivate(sPoint);
   sPoint.Print();
+  return 0;
 }
 

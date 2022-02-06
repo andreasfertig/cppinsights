@@ -49,5 +49,6 @@ __lambda_5_11 x2 = __lambda_5_11{5};
 
 int main()
 {
+  return 0;
 }
 

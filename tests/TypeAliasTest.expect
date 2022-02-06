@@ -18,5 +18,6 @@ int main()
   } __lambda_3_12{};
   
   int w = __lambda_3_12.operator()();
+  return 0;
 }
 

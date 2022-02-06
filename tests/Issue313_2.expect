@@ -24,5 +24,6 @@ int main()
   if(a.operator!=(static_cast<const A>(a))) {
   } 
   
+  return 0;
 }
 

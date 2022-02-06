@@ -27,5 +27,6 @@ constinit int x = 3;
 int main()
 {
   x = 4;
+  return 0;
 }
 

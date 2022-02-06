@@ -10,6 +10,7 @@ int main()
   FuncPtr_4 add = foo;
   using FuncPtr_6 = int (*)(int, int);
   FuncPtr_6 add1 = foo;
+  return 0;
 }
 
 

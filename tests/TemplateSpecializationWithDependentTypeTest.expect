@@ -41,5 +41,6 @@ struct A<T *>
 int main()
 {
   A<int *> a = A<int *>();
+  return 0;
 }
 

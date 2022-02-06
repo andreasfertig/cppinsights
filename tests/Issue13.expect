@@ -16,5 +16,6 @@ int main()
   const volatile std::shared_ptr<int> && cvcart = create();
   volatile std::shared_ptr<int> && vcart = create();
   volatile std::shared_ptr<int> && vcarte = create();
+  return 0;
 }
 

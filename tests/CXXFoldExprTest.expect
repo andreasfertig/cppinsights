@@ -70,6 +70,7 @@ int main()
   cxxFoldExprTest.UnaryLeftFold<int, int, int, int>(2, 3, 4, 5);
   cxxFoldExprTest.BinaryRightFold<int, int, int, int>(2, 3, 4, 5);
   cxxFoldExprTest.BinaryLeftFold<int, int, int, int>(2, 3, 4, 5);
+  return 0;
 }
 
 

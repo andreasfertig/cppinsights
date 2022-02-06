@@ -12,5 +12,6 @@ int (*gu)[3][4] = new int [2][3][4];
 
 int main()
 {
+  return 0;
 }
 

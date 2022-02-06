@@ -79,5 +79,6 @@ int main()
   s.count.operator+=(Test(static_cast<int>(sizeof(p))));
   s.count.operator+=(Test(static_cast<int>(alignof(p))));
   s.count.operator+=(Test(p ? 1 : 2));
+  return 0;
 }
 

@@ -123,5 +123,6 @@ int main()
 {
   Test t = Test();
   t.Apply();
+  return 0;
 }
 

@@ -35,5 +35,6 @@ int main()
   };
   
   std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
+  return 0;
 }
 

@@ -19,6 +19,7 @@ inline constexpr int min<2, int>(const int & b)
 int main()
 {
   int m = min<2>(3);
+  return 0;
 }
 
 

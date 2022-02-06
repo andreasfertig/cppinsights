@@ -24,5 +24,6 @@ int main()
   f.bar();
   std::move(f).bar();
   Foo().bar();
+  return 0;
 }
 

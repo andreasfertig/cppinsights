@@ -31,5 +31,6 @@ int main()
 {
   Test::West w = Test::West();
   std::operator<<(std::operator<<(std::cout, "test: ").operator<<(w.load(Test::OrderA)), "\n");
+  return 0;
 }
 

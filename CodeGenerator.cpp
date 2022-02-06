@@ -1107,6 +1107,15 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
                     mOutputFormatHelper.Append(kwTrySpace);
                 }
 
+                // handle C++ [basic.start.main] §5: main can have no return statement
+                if(stmt->hasImplicitReturnZero()) {
+                    // TODO replace with ranges::find_if
+                    const auto cmpBody = dyn_cast<CompoundStmt>(stmt->getBody())->body();
+                    mRequiresImplicitReturnZero =
+                        std::end(cmpBody) ==
+                        std::find_if(cmpBody.begin(), cmpBody.end(), [](const Stmt* e) { return isa<ReturnStmt>(e); });
+                }
+
                 InsertArg(stmt->getBody());
 
                 if(showNoexcept) {
@@ -1619,7 +1628,14 @@ void CodeGenerator::InsertArg(const CompoundStmt* stmt)
 {
     mOutputFormatHelper.OpenScope();
 
+    // prevent nested CompoundStmt's to insert a return on each leave. Only insert it before closing the most outer one.
+    const bool requiresImplicitReturnZero{std::exchange(mRequiresImplicitReturnZero, false)};
+
     HandleCompoundStmt(stmt);
+
+    if(requiresImplicitReturnZero) {
+        mOutputFormatHelper.AppendSemiNewLine(kwReturn, " 0"sv);
+    }
 
     mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
 }
@@ -3083,6 +3099,7 @@ void CodeGenerator::InsertArg(const SizeOfPackExpr* stmt)
 void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 {
     LAMBDA_SCOPE_HELPER(ReturnStmt);
+
     mCurrentReturnPos = mOutputFormatHelper.CurrentPos();
 
     mOutputFormatHelper.Append(kwReturn);

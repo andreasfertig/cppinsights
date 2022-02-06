@@ -33,5 +33,6 @@ class array<int, 2>
 int main()
 {
   array<int, 2> a = array<int, 2>();
+  return 0;
 }
 

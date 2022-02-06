@@ -121,5 +121,6 @@ int main()
   foo<int>();
   foo<int *>();
   foo2<int>();
+  return 0;
 }
 

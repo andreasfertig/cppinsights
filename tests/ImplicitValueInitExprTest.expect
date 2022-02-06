@@ -66,5 +66,6 @@ int main()
   Pointer p = {nullptr};
   Ints i = {0, 0};
   Complex cc[5] = {{0.0f, 22}, {0.0f, 0}, {static_cast<float>(1.0), 3}, {0.0f, 0}, {0.0f, 0}};
+  return 0;
 }
 

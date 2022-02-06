@@ -1,0 +1,35 @@
+int main(int argc, const char ** argv)
+{
+  if(0 == argc) {
+    return 1;
+  } 
+  
+      
+  class __lambda_5_13
+  {
+    public: 
+    inline /*constexpr */ int operator()() const
+    {
+      return 2;
+    }
+    
+    using retType_5_13 = auto (*)() -> int;
+    inline /*constexpr */ operator retType_5_13 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline int __invoke()
+    {
+      return 2;
+    }
+    
+    
+  } __lambda_5_13{};
+  
+  int x = __lambda_5_13.operator()();
+  return 0;
+}
+
+

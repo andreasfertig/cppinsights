@@ -8,5 +8,6 @@ int main()
   std::string_view s2 = std::operator""sv("abc\000\000def", 8UL);
   std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "s1: ").operator<<(s1.size()), " \""), std::basic_string_view<char, std::char_traits<char> >(s1)), "\"\n");
   std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "s2: ").operator<<(s2.size()), " \""), std::basic_string_view<char, std::char_traits<char> >(s2)), "\"\n");
+  return 0;
 }
 

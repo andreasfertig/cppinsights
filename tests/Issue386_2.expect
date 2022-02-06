@@ -78,5 +78,6 @@ int main()
     __lambda_7_18.operator()();
   }
   
+  return 0;
 }
 

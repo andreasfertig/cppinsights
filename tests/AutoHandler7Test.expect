@@ -14,5 +14,6 @@ static const char * c = Foo();
 
 int main()
 {
+  return 0;
 }
 

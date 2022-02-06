@@ -19,5 +19,6 @@ struct Foo
 int main()
 {
   Foo f = Foo();
+  return 0;
 }
 

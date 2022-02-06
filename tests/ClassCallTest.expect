@@ -57,6 +57,7 @@ int main()
   Foo foo = Foo(10);
   Bar bar = Bar(10, 5);
   printf("%d %d %d\n", foo.Mul(2), bar.Sum(), static_cast<Foo&>(bar).Mul(3));
+  return 0;
 }
 
 

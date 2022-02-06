@@ -9,5 +9,6 @@ struct templateTypeAliasTest
 int main()
 {
   templateTypeAliasTest::result<int> x;
+  return 0;
 }
 

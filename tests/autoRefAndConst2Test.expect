@@ -8,5 +8,6 @@ const int & getTheData()
 int main()
 {
   const int & x = getTheData();
+  return 0;
 }
 

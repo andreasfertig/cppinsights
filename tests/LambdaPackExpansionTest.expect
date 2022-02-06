@@ -71,5 +71,6 @@ void f2<int, int, int, int, int>(int __args0, int __args1, int __args2, int __ar
 int main()
 {
   f2(1, 2, 3, 4, 5);
+  return 0;
 }
 

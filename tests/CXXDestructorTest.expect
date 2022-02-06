@@ -102,5 +102,6 @@ int main()
 {
   Alloc<int, false> a = Alloc<int, false>();
   Alloc<char, true> b = Alloc<char, true>();
+  return 0;
 }
 

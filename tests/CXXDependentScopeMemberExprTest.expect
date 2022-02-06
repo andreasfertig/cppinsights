@@ -49,5 +49,6 @@ int main()
 {
   Test<int> t = Test<int>();
   t.func<S>();
+  return 0;
 }
 

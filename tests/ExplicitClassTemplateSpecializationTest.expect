@@ -27,5 +27,6 @@ struct Base<bool>
 
 int main()
 {
+  return 0;
 }
 

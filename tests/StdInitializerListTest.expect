@@ -30,6 +30,7 @@ int main(int argc, const char **)
     
   }
   std::initializer_list<int> ff = f1(2);
+  return 0;
 }
 
 

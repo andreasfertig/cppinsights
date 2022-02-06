@@ -29,5 +29,6 @@ class Test
 int main()
 {
   Test::Tmpl<int> x = Test::Tmpl<int>();
+  return 0;
 }
 

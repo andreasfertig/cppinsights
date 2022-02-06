@@ -146,5 +146,6 @@ int main()
   int ii = std::get<0UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
   char cc = std::get<1UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
   double dd = std::get<2UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
+  return 0;
 }
 

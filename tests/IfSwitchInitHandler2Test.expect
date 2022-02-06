@@ -28,6 +28,7 @@ int Foo()
 int main()
 {
   Foo();
+  return 0;
 }
 
 

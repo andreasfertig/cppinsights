@@ -10,5 +10,6 @@ int main()
   const wchar_t * s2 = L"hello";
   const char16_t * s3 = u"hello";
   const char32_t * s4 = U"hello";
+  return 0;
 }
   

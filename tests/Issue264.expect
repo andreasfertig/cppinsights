@@ -62,5 +62,6 @@ int main()
 {
   f.operator()(1, 2, 3);
   g.operator()(1, 2, 3);
+  return 0;
 }
 

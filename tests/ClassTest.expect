@@ -57,6 +57,7 @@ int main()
   t.operator=(Test(3 * 2));
   Test tt = Test(4);
   t.operator+=(Test(static_cast<int>(tt.operator int()) * 2));
+  return 0;
 }
 
 

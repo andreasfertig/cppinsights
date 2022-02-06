@@ -26,5 +26,6 @@ int main()
 {
   std::function<void ()> x = std::function<void ()>(Func);
   Test(x);
+  return 0;
 }
 

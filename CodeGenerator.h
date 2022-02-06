@@ -361,7 +361,8 @@ protected:
     llvm::Optional<size_t> mCurrentFieldPos{};   //!< The position in mOutputFormatHelper in a class where where a
                                                  //!< potential std::initializer_list expansion must be inserted.
     OutputFormatHelper* mOutputFormatHelperOutside{
-        nullptr};  //!< Helper output buffer for std::initializer_list expansion.
+        nullptr};                        //!< Helper output buffer for std::initializer_list expansion.
+    bool mRequiresImplicitReturnZero{};  //!< Track whether this is a function with an imlpicit return 0.
 };
 //-----------------------------------------------------------------------------
 
