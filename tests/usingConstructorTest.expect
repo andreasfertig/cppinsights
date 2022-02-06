@@ -20,12 +20,12 @@ class Bar : public Foo
   public: 
   int mX;
   // inline Bar() = delete;
-  public: inline Bar(double amount) noexcept(false)
+  inline Bar(double amount) noexcept(false)
   : Foo(amount)
   {
   }
   
-  public: inline Bar(int x, int y) noexcept(false)
+  inline Bar(int x, int y) noexcept(false)
   : Foo(x, y)
   {
   }
@@ -41,7 +41,7 @@ class Bla : public Foo
   int mX;
   public: 
   // inline Bla() = delete;
-  public: inline Bla(int x, int y) noexcept(false)
+  inline Bla(int x, int y) noexcept(false)
   : Foo(x, y)
   {
   }

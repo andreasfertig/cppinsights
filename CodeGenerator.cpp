@@ -1091,7 +1091,7 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
         }
 
         InsertTemplateGuardBegin(stmt);
-        InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes);
+        InsertAccessModifierAndNameWithReturnType(*stmt);
 
         if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
             if(stmt->doesThisDeclarationHaveABody()) {
@@ -2315,7 +2315,7 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
     }
 
     InsertTemplateGuardBegin(stmt);
-    InsertAccessModifierAndNameWithReturnType(*stmt, SkipAccess::Yes, cxxInheritedCtorDecl);
+    InsertAccessModifierAndNameWithReturnType(*stmt, cxxInheritedCtorDecl);
 
     if(stmt->isDeleted()) {
         mOutputFormatHelper.AppendNewLine(kwSpaceEqualsDelete);
@@ -3609,7 +3609,6 @@ void CodeGenerator::InsertConceptConstraint(const VarDecl* varDecl)
 //-----------------------------------------------------------------------------
 
 void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl&       decl,
-                                                              const SkipAccess          skipAccess,
                                                               const CXXConstructorDecl* cxxInheritedCtorDecl)
 {
     bool        isLambda{false};
@@ -3627,10 +3626,6 @@ void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl
 
         isLambda             = methodDecl->getParent()->isLambda();
         isFirstCxxMethodDecl = (nullptr == methodDecl->getPreviousDecl());
-    }
-
-    if((isFirstCxxMethodDecl && (SkipAccess::No == skipAccess)) || cxxInheritedCtorDecl) {
-        mOutputFormatHelper.Append(AccessToStringWithColon(decl));
     }
 
     // types of conversion decls can be invalid to type at this place. So introduce a using
