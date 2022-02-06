@@ -1091,7 +1091,7 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
         }
 
         InsertTemplateGuardBegin(stmt);
-        InsertAccessModifierAndNameWithReturnType(*stmt);
+        InsertFunctionNameWithReturnType(*stmt);
 
         if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
             if(stmt->doesThisDeclarationHaveABody()) {
@@ -2315,7 +2315,7 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
     }
 
     InsertTemplateGuardBegin(stmt);
-    InsertAccessModifierAndNameWithReturnType(*stmt, cxxInheritedCtorDecl);
+    InsertFunctionNameWithReturnType(*stmt, cxxInheritedCtorDecl);
 
     if(stmt->isDeleted()) {
         mOutputFormatHelper.AppendNewLine(kwSpaceEqualsDelete);
@@ -3608,8 +3608,8 @@ void CodeGenerator::InsertConceptConstraint(const VarDecl* varDecl)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertAccessModifierAndNameWithReturnType(const FunctionDecl&       decl,
-                                                              const CXXConstructorDecl* cxxInheritedCtorDecl)
+void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       decl,
+                                                     const CXXConstructorDecl* cxxInheritedCtorDecl)
 {
     bool        isLambda{false};
     bool        isFirstCxxMethodDecl{true};
