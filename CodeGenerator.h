@@ -162,8 +162,8 @@ public:
     /// @param decl The FunctionDecl to process.
     /// @param skipAccess Show or hide access modifiers (public, private, protected). The default is to show them.
     /// @param cxxInheritedCtorDecl If not null, the type and name of this decl is used for the parameters.
-    void InsertAccessModifierAndNameWithReturnType(const FunctionDecl&       decl,
-                                                   const CXXConstructorDecl* cxxInheritedCtorDecl = nullptr);
+    void InsertFunctionNameWithReturnType(const FunctionDecl&       decl,
+                                          const CXXConstructorDecl* cxxInheritedCtorDecl = nullptr);
 
     /// Track whether we have at least one local static variable in this TU.
     /// If so we need to insert the <new> header for the placement-new.
