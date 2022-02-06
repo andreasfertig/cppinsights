@@ -154,8 +154,6 @@ public:
 
     void InsertTemplateArgs(const ClassTemplateSpecializationDecl& clsTemplateSpe);
 
-    STRONG_BOOL(SkipAccess);
-
     /// \brief Insert the code for a FunctionDecl.
     ///
     /// This inserts the code of a FunctionDecl (and everything which is derived from one). It takes care of
@@ -165,7 +163,6 @@ public:
     /// @param skipAccess Show or hide access modifiers (public, private, protected). The default is to show them.
     /// @param cxxInheritedCtorDecl If not null, the type and name of this decl is used for the parameters.
     void InsertAccessModifierAndNameWithReturnType(const FunctionDecl&       decl,
-                                                   const SkipAccess          skipAccess           = SkipAccess::No,
                                                    const CXXConstructorDecl* cxxInheritedCtorDecl = nullptr);
 
     /// Track whether we have at least one local static variable in this TU.
