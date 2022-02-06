@@ -1411,7 +1411,9 @@ void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
 
     mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
     WrapInParens([&]() {
-        mOutputFormatHelper.AppendParameterList(constructorDecl.parameters(), OutputFormatHelper::NameOnly::Yes);
+        mOutputFormatHelper.AppendParameterList(constructorDecl.parameters(),
+                                                OutputFormatHelper::NameOnly::Yes,
+                                                OutputFormatHelper::GenMissingParamName::Yes);
     });
 }
 //-----------------------------------------------------------------------------
@@ -3723,7 +3725,9 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
 
     // if a CXXInheritedCtorDecl was passed as a pointer us this to get the parameters from.
     if(cxxInheritedCtorDecl) {
-        outputFormatHelper.AppendParameterList(cxxInheritedCtorDecl->parameters());
+        outputFormatHelper.AppendParameterList(cxxInheritedCtorDecl->parameters(),
+                                               OutputFormatHelper::NameOnly::No,
+                                               OutputFormatHelper::GenMissingParamName::Yes);
     } else {
         outputFormatHelper.AppendParameterList(decl.parameters());
     }
