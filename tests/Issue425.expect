@@ -1,0 +1,11 @@
+#include <utility>
+
+int main()
+{
+  std::pair<int, char> p = std::pair<int, char>();
+  std::pair<int, char> __p6 = std::pair<int, char>(p);
+  int && a = std::get<0UL>(static_cast<std::pair<int, char> &&>(__p6));
+  char && b = std::get<1UL>(static_cast<std::pair<int, char> &&>(__p6));
+  return 0;
+}
+

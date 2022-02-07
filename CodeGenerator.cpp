@@ -3895,7 +3895,6 @@ void CodeGenerator::InsertArg(const BindingDecl*)
 
 void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
 {
-    // Assume that we are looking at a builtin type. We have to construct the variable declaration information.
     const auto* bindingStmt = stmt->getBinding();
 
     // In a dependent context we have no binding and with that no type. Leave this as it is, we are looking at a
@@ -3907,17 +3906,20 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
     // Assume that we are looking at a builtin type. We have to construct the variable declaration information.
     auto type = stmt->getType();
 
-    // If we have holding var we are looking at a user defined type like tuple and those the defaults from above are
+    // If we have a holding var we are looking at a user defined type like tuple and those the defaults from above are
     // wrong. This type contains the variable declaration so we insert this.
     if(const auto* holdingVar = stmt->getHoldingVar()) {
-        // A rvalue reference boils down to just the type. If it is a reference then it is a lvalue reference at this
-        // point. Hence we need to strip the &&.
+        // Initial paper: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0144r0.pdf
+
+        // The type of the binding depends on the initializer. In case the initializer is an lvalue we get a T&,
+        // otherwise a T&&. We typically look at an lvalue if the decomposition declaration was auto& [a,b]. Note the &
+        // here We have a rvalue in case the decomposition declaration was auto [a,b]. Note no reference. The standard
+        // std::get returns a lvalue reference in case e in get(e) is an lvalue, otherwise it returns an rvalue
+        // reference because then the call is get(std::move(e))
         type = holdingVar->getType().getCanonicalType();
-        if(type->isRValueReferenceType()) {
-            type = type.getNonReferenceType();
-        }
 
         bindingStmt = holdingVar->getAnyInitializer();
+
     } else if(not type->isLValueReferenceType()) {
         type = stmt->getASTContext().getLValueReferenceType(type);
     }

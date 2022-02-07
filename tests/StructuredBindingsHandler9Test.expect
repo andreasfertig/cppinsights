@@ -4,8 +4,8 @@ std::tuple<int, float> foo = std::tuple<int, float>();
 
  
 std::tuple<int, float> __foo5 = std::tuple<int, float>(foo);
-int a = std::get<0UL>(static_cast<std::tuple<int, float> &&>(__foo5));
-float b = std::get<1UL>(static_cast<std::tuple<int, float> &&>(__foo5));
+int && a = std::get<0UL>(static_cast<std::tuple<int, float> &&>(__foo5));
+float && b = std::get<1UL>(static_cast<std::tuple<int, float> &&>(__foo5));
 
 std::tuple<int, float> & __foo6 = foo;
 int & ra = std::get<0UL>(__foo6);
