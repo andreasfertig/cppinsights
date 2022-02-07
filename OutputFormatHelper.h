@@ -100,11 +100,14 @@ public:
     }
 
     STRONG_BOOL(NameOnly);
+    STRONG_BOOL(GenMissingParamName);
 
     /// \brief Append a \c ParamVarDecl array.
     ///
     /// The parameter name is always added as well.
-    void AppendParameterList(const ArrayRef<ParmVarDecl*> parameters, const NameOnly nameOnly = NameOnly::No);
+    void AppendParameterList(const ArrayRef<ParmVarDecl*> parameters,
+                             const NameOnly               nameOnly            = NameOnly::No,
+                             const GenMissingParamName    genMissingParamName = GenMissingParamName::No);
 
     /// \brief Increase the current indention by \c SCOPE_INDENT
     void IncreaseIndent() { mDefaultIndent += SCOPE_INDENT; }

@@ -20,10 +20,21 @@ void OutputFormatHelper::Indent(unsigned count)
 }
 //-----------------------------------------------------------------------------
 
-void OutputFormatHelper::AppendParameterList(const ArrayRef<ParmVarDecl*> parameters, const NameOnly nameOnly)
+void OutputFormatHelper::AppendParameterList(const ArrayRef<ParmVarDecl*> parameters,
+                                             const NameOnly               nameOnly,
+                                             const GenMissingParamName    genMissingParamName)
 {
+    int count{};
+
     ForEachArg(parameters, [&](const auto& p) {
-        const auto& name{GetName(*p)};
+        auto name{GetName(*p)};
+
+        // A special case for CXXInheritedCtor. A user can omit the parameters name, but wihtout a name the call to the
+        // base constructor may look like calling the default constructor. In such a case we create a name.
+        if((GenMissingParamName::Yes == genMissingParamName) && (0 == name.length())) {
+            name = BuildInternalVarName(StrCat("param", count));
+            ++count;
+        }
 
         // Get the attributes and insert them, if there are any
         CodeGenerator codeGenerator{*this};
