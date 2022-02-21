@@ -53,12 +53,6 @@ static std::string AccessToStringWithColon(const AccessSpecifier& access)
 }
 //-----------------------------------------------------------------------------
 
-static std::string AccessToStringWithColon(const FunctionDecl& decl)
-{
-    return AccessToStringWithColon(decl.getAccess());
-}
-//-----------------------------------------------------------------------------
-
 static std::string_view GetCastName(const CastKind castKind)
 {
     if(is{castKind}.any_of(CastKind::CK_BitCast, CastKind::CK_IntegralToPointer)) {
