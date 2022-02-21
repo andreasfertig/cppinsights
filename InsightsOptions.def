@@ -18,4 +18,5 @@ INSIGHTS_OPT("alt-syntax-subscription",
 INSIGHTS_OPT("show-all-implicit-casts", ShowAllImplicitCasts, false, "Show all implicit casts which can be noisy.", gInsightCategory)
 INSIGHTS_OPT("edu-show-initlist", UseShowInitializerList, false, "Transform a std::initializer list", gInsightEduCategory)
 INSIGHTS_OPT("edu-show-noexcept", UseShowNoexcept, false, "Transform a noexcept function", gInsightEduCategory)
+INSIGHTS_OPT("edu-show-padding", UseShowPadding, false, "Show the padding bytes in a struct/class", gInsightEduCategory)
 #undef INSIGHTS_OPT

@@ -17,6 +17,7 @@
 #include "InsightsOnce.h"
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
+#include "clang/AST/RecordLayout.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Sema/Sema.h"
 #include "llvm/ADT/StringExtras.h"
@@ -2444,8 +2445,29 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+static auto& GetRecordLayout(const RecordDecl* recordDecl)
+{
+    auto& astContext = GetGlobalAST();
+    return astContext.getASTRecordLayout(recordDecl);
+}
+//-----------------------------------------------------------------------------
+
+// XXX: replace with std::format once it is available in all std-libs
+auto GetSpaces(std::string::size_type offset)
+{
+    static const std::string_view spaces{"                              "sv};
+
+    if(offset >= spaces.size()) {
+        return ""sv;
+    } else {
+        return spaces.substr(0, spaces.size() - offset);
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
+    const auto initialSize{mOutputFormatHelper.GetString().size()};
     InsertAttributes(stmt->attrs());
 
     if(stmt->isMutable()) {
@@ -2480,7 +2502,52 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
         }
     }
 
-    mOutputFormatHelper.AppendSemiNewLine();
+    mOutputFormatHelper.Append(';');
+
+    if(GetInsightsOptions().UseShowPadding) {
+        const auto* fieldClass   = stmt->getParent();
+        const auto& recordLayout = GetRecordLayout(fieldClass);
+        auto        effectiveFieldSize{GetGlobalAST().getTypeInfoInChars(stmt->getType()).Width.getQuantity()};
+        auto        getFieldOffsetInBytes = [&recordLayout](const FieldDecl* field) {
+            return recordLayout.getFieldOffset(field->getFieldIndex()) / 8;  // this is in bits
+        };
+        auto       fieldOffset = getFieldOffsetInBytes(stmt);
+        const auto offset      = mOutputFormatHelper.GetString().size() - initialSize;
+
+        mOutputFormatHelper.Append(GetSpaces(offset), "  /* offset: "sv, fieldOffset, ", size: "sv, effectiveFieldSize);
+
+        // - get next field
+        // - if this fields offset + size is equal to the next fields offset we are good,
+        // - if not we insert padding bytes
+        // - in case there is no next field this is the last field, check this field's offset + size against the records
+        //   size. If unequal padding is needed
+
+        const auto expectedOffset = fieldOffset + effectiveFieldSize;
+        const auto nextOffset     = [&]() -> uint64_t {
+            // find previous field
+            if(const auto next = stmt->getFieldIndex() + 1; recordLayout.getFieldCount() > next) {
+                // We are in bounds, means we expect to get back a valid iterator
+                const auto* field = *std::next(fieldClass->fields().begin(), next);
+
+                return getFieldOffsetInBytes(field);
+            }
+
+            // no field found means we are the last field
+            return recordLayout.getSize().getQuantity();
+        }();
+
+        if(expectedOffset != nextOffset) {
+            const auto padding = nextOffset - expectedOffset;
+            mOutputFormatHelper.AppendNewLine();
+            std::string s = StrCat("char "sv, BuildInternalVarName("padding"sv), "["sv, padding, "];"sv);
+            mOutputFormatHelper.Append(s, GetSpaces(s.length()), "                size: ", padding);
+        }
+
+        mOutputFormatHelper.AppendNewLine(" */"sv);
+
+    } else {
+        mOutputFormatHelper.AppendNewLine();
+    }
 }
 //-----------------------------------------------------------------------------
 
@@ -2810,8 +2877,30 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         });
     }
 
-    mOutputFormatHelper.AppendNewLine();
+    if(GetInsightsOptions().UseShowPadding) {
+        const auto& recordLayout = GetRecordLayout(stmt);
+        mOutputFormatHelper.AppendNewLine(
+            "  /* size: "sv, recordLayout.getSize(), ", align: "sv, recordLayout.getAlignment(), " */"sv);
+
+    } else {
+        mOutputFormatHelper.AppendNewLine();
+    }
+
     mOutputFormatHelper.OpenScope();
+
+    if(GetInsightsOptions().UseShowPadding) {
+        size_t offset{};
+        for(const auto& base : stmt->bases()) {
+            const auto& baseRecordLayout = GetRecordLayout(base.getType()->getAsRecordDecl());
+            const auto  baseVar          = StrCat("/* base ("sv, GetName(base.getType()), ")"sv);
+            const auto  size             = baseRecordLayout.getSize().getQuantity();
+
+            mOutputFormatHelper.AppendNewLine(
+                baseVar, GetSpaces(baseVar.size()), "     offset: "sv, offset, ", size: "sv, size, " */"sv);
+
+            offset += size;
+        }
+    }
 
     mCurrentFieldPos = mOutputFormatHelper.CurrentPos();
 
