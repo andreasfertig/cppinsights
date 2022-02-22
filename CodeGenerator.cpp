@@ -1070,6 +1070,47 @@ void CodeGenerator::InsertArg(const CoreturnStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertMethodBody(const FunctionDecl* stmt)
+{
+    if(stmt->doesThisDeclarationHaveABody()) {
+        mOutputFormatHelper.AppendNewLine();
+
+        const auto exSpec = stmt->getExceptionSpecType();
+        const bool showNoexcept =
+            GetInsightsOptions().UseShowNoexcept && is{exSpec}.any_of(EST_BasicNoexcept, EST_NoexceptTrue);
+
+        if(showNoexcept) {
+            mHaveException = true;
+            mOutputFormatHelper.OpenScope();
+            mOutputFormatHelper.Append(kwTrySpace);
+        }
+
+        // handle C++ [basic.start.main] §5: main can have no return statement
+        if(stmt->hasImplicitReturnZero()) {
+            // TODO replace with ranges::find_if
+            const auto cmpBody = dyn_cast<CompoundStmt>(stmt->getBody())->body();
+            mRequiresImplicitReturnZero =
+                std::end(cmpBody) ==
+                std::find_if(cmpBody.begin(), cmpBody.end(), [](const Stmt* e) { return isa<ReturnStmt>(e); });
+        }
+
+        InsertArg(stmt->getBody());
+
+        if(showNoexcept) {
+            mOutputFormatHelper.Append(" catch(...) "sv);
+            mOutputFormatHelper.OpenScope();
+            mOutputFormatHelper.Append("std::terminate();"sv);
+            mOutputFormatHelper.CloseScope();
+            mOutputFormatHelper.CloseScope();
+        }
+
+        mOutputFormatHelper.AppendNewLine();
+    } else {
+        mOutputFormatHelper.AppendSemiNewLine();
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 {
     //    LAMBDA_SCOPE_HELPER(VarDecl);
@@ -1089,42 +1130,7 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
         InsertFunctionNameWithReturnType(*stmt);
 
         if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
-            if(stmt->doesThisDeclarationHaveABody()) {
-                mOutputFormatHelper.AppendNewLine();
-
-                const auto exSpec = stmt->getExceptionSpecType();
-                const bool showNoexcept =
-                    GetInsightsOptions().UseShowNoexcept && is{exSpec}.any_of(EST_BasicNoexcept, EST_NoexceptTrue);
-
-                if(showNoexcept) {
-                    mHaveException = true;
-                    mOutputFormatHelper.OpenScope();
-                    mOutputFormatHelper.Append(kwTrySpace);
-                }
-
-                // handle C++ [basic.start.main] §5: main can have no return statement
-                if(stmt->hasImplicitReturnZero()) {
-                    // TODO replace with ranges::find_if
-                    const auto cmpBody = dyn_cast<CompoundStmt>(stmt->getBody())->body();
-                    mRequiresImplicitReturnZero =
-                        std::end(cmpBody) ==
-                        std::find_if(cmpBody.begin(), cmpBody.end(), [](const Stmt* e) { return isa<ReturnStmt>(e); });
-                }
-
-                InsertArg(stmt->getBody());
-
-                if(showNoexcept) {
-                    mOutputFormatHelper.Append(" catch(...) "sv);
-                    mOutputFormatHelper.OpenScope();
-                    mOutputFormatHelper.Append("std::terminate();"sv);
-                    mOutputFormatHelper.CloseScope();
-                    mOutputFormatHelper.CloseScope();
-                }
-
-                mOutputFormatHelper.AppendNewLine();
-            } else {
-                mOutputFormatHelper.AppendSemiNewLine();
-            }
+            InsertMethodBody(stmt);
         }
 
         InsertTemplateGuardEnd(stmt);
@@ -2350,9 +2356,7 @@ void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skip
     }
 
     if((SkipBody::No == skipBody) && stmt->doesThisDeclarationHaveABody() && not stmt->isLambdaStaticInvoker()) {
-        mOutputFormatHelper.AppendNewLine();
-        InsertArg(stmt->getBody());
-        mOutputFormatHelper.AppendNewLine();
+        InsertMethodBody(stmt);
 
     } else if(not InsertLambdaStaticInvoker(stmt) || (SkipBody::Yes == skipBody)) {
         mOutputFormatHelper.AppendSemiNewLine();

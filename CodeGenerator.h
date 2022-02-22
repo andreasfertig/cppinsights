@@ -267,6 +267,7 @@ protected:
 
     STRONG_BOOL(SkipBody);
     void InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody);
+    void InsertMethodBody(const FunctionDecl* stmt);
 
     /// \brief Generalized function to insert either a \c CXXConstructExpr or \c CXXUnresolvedConstructExpr
     template<typename T>
