@@ -65,7 +65,18 @@ void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
     if(const auto* matchedDecl = result.Nodes.getNodeAs<VarDecl>("varDecl")) {
         OutputFormatHelper outputFormatHelper{};
 
-        const auto sr = GetSourceRangeAfterSemi(matchedDecl->getSourceRange(), result, RequireSemi::Yes);
+        // Take a preceding attribute into account
+        const auto sr = [&] {
+            auto tmpSr = GetSourceRangeAfterSemi(matchedDecl->getSourceRange(), result, RequireSemi::Yes);
+
+            const auto&    attrs = matchedDecl->attrs();
+            SourceLocation start = tmpSr.getBegin();
+
+            std::for_each(
+                attrs.begin(), attrs.end(), [&](const auto* attr) { start = std::min(attr->getLocation(), start); });
+
+            return SourceRange{start, tmpSr.getEnd()};
+        }();
 
         // Check whether we already have rewritten this location. If so, insert the text after the location. This is the
         // case for:

@@ -5,7 +5,7 @@ struct alignas(16) AlignedStruct
 
 
  
-alignas(128) alignas(128) char alignedArray[128];
+alignas(128) char alignedArray[128];
 
  
 template <typename... Ts>
