@@ -2726,7 +2726,7 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
             return recordLayout.getSize().getQuantity();
         }();
 
-        if(expectedOffset != nextOffset) {
+        if(expectedOffset < nextOffset) {
             const auto padding = nextOffset - expectedOffset;
             mOutputFormatHelper.AppendNewLine();
             std::string s = StrCat("char "sv, BuildInternalVarName("padding"sv), "["sv, padding, "];"sv);
