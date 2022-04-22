@@ -6,7 +6,7 @@ void func(const std::basic_string<char, std::char_traits<char>, std::allocator<c
   class __lambda_5_11
   {
     public: 
-    inline /*constexpr */ unsigned long operator()() const
+    inline /*constexpr */ std::basic_string<char>::size_type operator()() const
     {
       return arg.size();
     }
@@ -27,7 +27,7 @@ void func(const std::basic_string<char, std::char_traits<char>, std::allocator<c
 
 int main()
 {
-  std::string b = std::basic_string<char, std::char_traits<char>, std::allocator<char> >();
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > b = std::basic_string<char, std::char_traits<char>, std::allocator<char> >();
   func(b);
   return 0;
 }

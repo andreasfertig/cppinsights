@@ -13,14 +13,14 @@ void fillTuples(std::vector<Tuple_t> tuples) {
 template<>
 void fillTuples<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int> >(std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int> > > tuples)
 {
-  tuples.emplace_back<char const (&)[6], int>("hello", 1);
+  tuples.emplace_back<const char (&)[6], int>("hello", 1);
 }
 #endif
 
 
 int main()
 {
-  std::vector<std::tuple<std::string, int> > tuples = std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int> > >();
+  std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int> > > tuples = std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int> > >();
   fillTuples(std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int> > >(tuples));
   {
     std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, int> > > & __range1 = tuples;

@@ -11,16 +11,15 @@
 #elif __has_include(<experimental/coroutine>)
 #include <experimental/coroutine>
 
-namespace std
-{
-  using namespace experimental;
-  
+namespace std {
+    using namespace std::experimental;
 }
 #else
 #error "No coroutine header"
 #endif
 
 #include <new>
+#include <utility>
 
 struct generator
 {
@@ -68,8 +67,8 @@ struct generator
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    if(static_cast<bool>(this->p.operator bool())) {
+      this->p.destroy();
     } 
     
   }
@@ -77,11 +76,11 @@ struct generator
   
   private: 
   inline explicit generator(promise_type * _p)
-  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*_p)}
+  : p{std::coroutine_handle<promise_type>::from_promise(*_p)}
   {
   }
   
-  std::experimental::coroutine_handle<promise_type> p;
+  std::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator &) /* noexcept */ = delete;
   // inline generator & operator=(const generator &) /* noexcept */ = delete;
@@ -93,11 +92,11 @@ struct __funFrame
 {
   void (*resume_fn)(__funFrame *);
   void (*destroy_fn)(__funFrame *);
-  std::experimental::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
-  std::suspend_never __suspend_44_11;
-  std::suspend_always __suspend_44_11_1;
+  std::suspend_never __suspend_45_11;
+  std::suspend_always __suspend_45_11_1;
 };
 
 generator fun()
@@ -108,7 +107,7 @@ generator fun()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::experimental::__coroutine_traits_sfinae<generator>::promise_type{};
+  new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
   
   generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
   
@@ -140,18 +139,18 @@ void __funResume(__funFrame * __f)
       case 1: goto __resume_fun_1;
     }
     
-    /* co_await EduCoroutineSimpleTest.cpp:44 */
-    __f->__suspend_44_11 = __f->__promise.initial_suspend();
-    if(!__f->__suspend_44_11.await_ready()) {
-      __f->__suspend_44_11.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+    /* co_await EduCoroutineSimpleTest.cpp:45 */
+    __f->__suspend_45_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_45_11.await_ready()) {
+      __f->__suspend_45_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
     } 
     
     __resume_fun_1:
-    __f->__suspend_44_11.await_resume();
-    /* co_return EduCoroutineSimpleTest.cpp:45 */
+    __f->__suspend_45_11.await_resume();
+    /* co_return EduCoroutineSimpleTest.cpp:46 */
     __f->__promise.return_value(2);
     goto __final_suspend;
   } catch(...) {
@@ -164,10 +163,10 @@ void __funResume(__funFrame * __f)
   
   __final_suspend:
   
-  /* co_await EduCoroutineSimpleTest.cpp:44 */
-  __f->__suspend_44_11_1 = __f->__promise.final_suspend();
-  if(!__f->__suspend_44_11_1.await_ready()) {
-    __f->__suspend_44_11_1.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+  /* co_await EduCoroutineSimpleTest.cpp:45 */
+  __f->__suspend_45_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_45_11_1.await_ready()) {
+    __f->__suspend_45_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
   } 
   
   ;

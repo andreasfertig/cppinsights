@@ -94,6 +94,9 @@ std::string GetPlainName(const DeclRefExpr& DRE)
 STRONG_BOOL(InsightsSuppressScope);
 //-----------------------------------------------------------------------------
 
+STRONG_BOOL(InsightsCanonicalTypes);
+//-----------------------------------------------------------------------------
+
 static std::string GetUnqualifiedScopelessName(const Type* type, const InsightsSuppressScope supressScope);
 //-----------------------------------------------------------------------------
 
@@ -102,7 +105,9 @@ struct CppInsightsPrintingPolicy : PrintingPolicy
     unsigned              CppInsightsUnqualified : 1;  // NOLINT
     InsightsSuppressScope CppInsightsSuppressScope;    // NOLINT
 
-    CppInsightsPrintingPolicy(const Unqualified unqualified, const InsightsSuppressScope supressScope)
+    CppInsightsPrintingPolicy(const Unqualified            unqualified,
+                              const InsightsSuppressScope  supressScope,
+                              const InsightsCanonicalTypes insightsCanonicalTypes = InsightsCanonicalTypes::No)
     : PrintingPolicy{LangOptions{}}
     {
         adjustForCPlusPlus();
@@ -110,6 +115,7 @@ struct CppInsightsPrintingPolicy : PrintingPolicy
         Alignof                = true;
         ConstantsAsWritten     = true;
         AnonymousTagLocations  = false;  // does remove filename and line for from lambdas in parameters
+        PrintCanonicalTypes    = InsightsCanonicalTypes::Yes == insightsCanonicalTypes;
 
         CppInsightsUnqualified   = (Unqualified::Yes == unqualified);
         CppInsightsSuppressScope = supressScope;
@@ -511,7 +517,7 @@ private:
 
     bool HandleType(const TemplateTypeParmType* type)
     {
-        TemplateTypeParmDecl* decl = type->getDecl();
+        const TemplateTypeParmDecl* decl = type->getDecl();
 
         if((nullptr == type->getIdentifier()) ||
            (decl && decl->isImplicit()) /* this fixes auto operator()(type_parameter_0_0 container) const */) {
@@ -592,6 +598,9 @@ private:
 
                 return true;
             }
+
+            // we need a name here, as DecltypeType always says true
+            mData.Append(GetName(*cxxRecordDecl));
         }
 
         return false;
@@ -630,6 +639,11 @@ private:
         codeGenerator.InsertTemplateArgs(*type);
 
         return true;
+    }
+
+    bool HandleType(const DeducedTemplateSpecializationType* type)
+    {
+        return HandleType(type->getDeducedType().getTypePtrOrNull());
     }
 
     bool HandleType(const TemplateSpecializationType* type)
@@ -818,6 +832,7 @@ private:
         HANDLE_TYPE(SubstTemplateTypeParmType);
         HANDLE_TYPE(ElaboratedType);
         HANDLE_TYPE(TemplateSpecializationType);
+        HANDLE_TYPE(DeducedTemplateSpecializationType);
         HANDLE_TYPE(MemberPointerType);
         HANDLE_TYPE(BuiltinType);
         HANDLE_TYPE(TypedefType);
@@ -861,7 +876,10 @@ public:
     {
     }
 
-    std::string& GetString() { return mData.GetString(); }
+    std::string& GetString()
+    {
+        return mData.GetString();
+    }
 
     bool GetTypeString()
     {
@@ -894,11 +912,14 @@ public:
 };
 //-----------------------------------------------------------------------------
 
-static std::string GetName(const QualType&             t,
+static std::string GetName(QualType                    t,
                            const Unqualified           unqualified  = Unqualified::No,
                            const InsightsSuppressScope supressScope = InsightsSuppressScope::No)
 {
-    const CppInsightsPrintingPolicy printingPolicy{unqualified, supressScope};
+    const CppInsightsPrintingPolicy printingPolicy{unqualified,
+                                                   supressScope,
+                                                   (isa<AutoType>(t.getTypePtrOrNull())) ? InsightsCanonicalTypes::Yes
+                                                                                         : InsightsCanonicalTypes::No};
 
     if(SimpleTypePrinter st{t, printingPolicy}; st.GetTypeString()) {
         return ScopeHandler::RemoveCurrentScope(st.GetString());
@@ -977,7 +998,7 @@ std::string GetName(const CXXRecordDecl& RD)
 
 std::string GetName(const QualType& t, const Unqualified unqualified)
 {
-    return details::GetName(GetDesugarType(t), unqualified);
+    return details::GetName(t, unqualified);
 }
 //-----------------------------------------------------------------------------
 
@@ -993,7 +1014,7 @@ std::string GetUnqualifiedScopelessName(const Type* type)
 }
 //-----------------------------------------------------------------------------
 
-template<typename QT, typename SUB_T>
+template<typename QT, typename SUB_T, typename SUB_T2 = void>
 static bool HasTypeWithSubType(const QualType& t)
 {
     if(const auto* lref = dyn_cast_or_null<QT>(t.getTypePtrOrNull())) {
@@ -1001,7 +1022,18 @@ static bool HasTypeWithSubType(const QualType& t)
         const auto& ct           = subType.getCanonicalType();
         const auto* plainSubType = ct.getTypePtrOrNull();
 
-        return isa<SUB_T>(plainSubType);
+        if(const auto* st = dyn_cast_or_null<SUB_T>(plainSubType)) {
+            if constexpr(std::is_same_v<void, SUB_T2>) {
+                return true;
+
+            } else {
+                const auto  subType      = GetDesugarType(st->getPointeeType());
+                const auto& ct           = subType.getCanonicalType();
+                const auto* plainSubType = ct.getTypePtrOrNull();
+
+                return isa<SUB_T2>(plainSubType);
+            }
+        }
     }
 
     return false;
@@ -1010,8 +1042,10 @@ static bool HasTypeWithSubType(const QualType& t)
 
 std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqualified unqualified)
 {
-    const bool isFunctionPointer = HasTypeWithSubType<ReferenceType, FunctionProtoType>(t);
-    const bool isArrayRef        = HasTypeWithSubType<ReferenceType, ArrayType>(t);
+    const bool isFunctionPointer =
+        HasTypeWithSubType<ReferenceType, FunctionProtoType>(t.getCanonicalType()) ||
+        HasTypeWithSubType<ReferenceType, PointerType, FunctionProtoType>(t.getCanonicalType());
+    const bool isArrayRef = HasTypeWithSubType<ReferenceType, ArrayType>(t);
     // Special case for Issue81, auto returns an array-ref and to catch auto deducing an array (Issue106)
     const bool isAutoType             = (nullptr != dyn_cast_or_null<AutoType>(t.getTypePtrOrNull()));
     const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
@@ -1053,8 +1087,18 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
         }
 
     } else if(isFunctionPointer) {
-        const bool             isRValueRef{HasTypeWithSubType<RValueReferenceType, FunctionProtoType>(t)};
-        const std::string_view contains{isRValueRef ? "(&&" : "(&"};
+        const bool isRValueRef{HasTypeWithSubType<RValueReferenceType, FunctionProtoType>(t)};
+        const auto contains{[&]() {
+            if(isRValueRef) {
+                return "(&&"sv;
+            }
+
+            else if(HasTypeWithSubType<LValueReferenceType, PointerType, FunctionProtoType>(t)) {
+                return "(*&"sv;
+            } else {
+                return "(&"sv;
+            }
+        }()};
 
         if(Contains(typeName, contains)) {
             InsertAfter(typeName, contains, varName);

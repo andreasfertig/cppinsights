@@ -5,7 +5,8 @@ struct Foo
 
 
 // invalid use of decltype() leads to locEnd.isInvalid()
-decltype(auto) (Foo::*)() bar;
+using MemberVarPtr_4 = decltype(auto) (Foo::*)();
+MemberVarPtr_4 bar;
 
 decltype(auto) (Foo::*bar)();
 

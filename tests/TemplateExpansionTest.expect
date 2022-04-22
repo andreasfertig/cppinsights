@@ -77,7 +77,7 @@ void foo2()
   /* First instantiated from: TemplateExpansionTest.cpp:46 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  class testDecl<int (*)()>
+  class testDecl<nullptr>
   {
   };
   
@@ -162,10 +162,10 @@ int main()
 {
   C<Test, Test> te = C<Test, Test>();
   testType<int> type = testType<int>();
-  testDecl<foo> a = {};
+  testDecl<&foo> a = {};
   testDecl<nullptr> b = {};
   testIntegral<2> integral = testIntegral<2>();
-  testExpr<2 * 2, 1> expr = testExpr<4, 1>();
+  testExpr<4, 1> expr = testExpr<4, 1>();
   testPack<0, 1, 2, 4> pack = testPack<0, 1, 2, 4>();
   return 0;
 }

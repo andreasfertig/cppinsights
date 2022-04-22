@@ -30,8 +30,8 @@ void foo<std::set<int, std::less<int>, std::allocator<int> > >(std::set<int, std
 
 int main()
 {
-  std::map<int, int> m = std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > >();
-  std::set<int> s = std::set<int, std::less<int>, std::allocator<int> >();
+  std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > m = std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > >();
+  std::set<int, std::less<int>, std::allocator<int> > s = std::set<int, std::less<int>, std::allocator<int> >();
   foo(m);
   foo(s);
   return 0;

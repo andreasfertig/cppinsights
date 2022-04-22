@@ -109,7 +109,7 @@ int main()
     }
     
   }
-  std::vector<int> v = std::vector<int, std::allocator<int> >{std::initializer_list<int>{1, 2, 3, 5}};
+  std::vector<int, std::allocator<int> > v = std::vector<int, std::allocator<int> >{std::initializer_list<int>{1, 2, 3, 5}};
   {
     std::vector<int, std::allocator<int> > & __range1 = v;
     std::__wrap_iter<int *> __begin1 = __range1.begin();

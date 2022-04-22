@@ -17,7 +17,7 @@ int match<int &, __lambda_13_4, __lambda_14_4, __lambda_15_4>(int & value, const
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int match<char const (&)[3], __lambda_13_4, __lambda_14_4, __lambda_15_4>(char const (&value)[3], const __lambda_13_4 & _case, const __lambda_14_4 & __cases2, const __lambda_15_4 & __cases3)
+int match<const char (&)[3], __lambda_13_4, __lambda_14_4, __lambda_15_4>(const char (&value)[3], const __lambda_13_4 & _case, const __lambda_14_4 & __cases2, const __lambda_15_4 & __cases3)
 {
   return 1;
 }
@@ -132,7 +132,7 @@ int test<int>(int && value)
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int test<char const (&)[3]>(char const (&value)[3])
+int test<const char (&)[3]>(const char (&value)[3])
 {
       
   class __lambda_13_4

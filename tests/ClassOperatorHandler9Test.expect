@@ -73,7 +73,7 @@ using vec_t = MyVector<int>;
 
 MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
 {
-  vec_t result = MyVector<int>(a.size()) /* NRVO variable */;
+  MyVector<int> result = MyVector<int>(a.size()) /* NRVO variable */;
   for(std::size_t s = 0; s <= a.size(); ++s) {
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
@@ -109,7 +109,7 @@ MyVector<int> operator*<int>(const MyVector<int> & a, const MyVector<int> & b)
 
 MyVector<int> Foo(const MyVector<int> & a, const MyVector<int> & b)
 {
-  vec_t result = MyVector<int>{a.size()} /* NRVO variable */;
+  MyVector<int> result = MyVector<int>{a.size()} /* NRVO variable */;
   for(std::size_t s = 0; s <= a.size(); ++s) {
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
@@ -120,9 +120,9 @@ MyVector<int> Foo(const MyVector<int> & a, const MyVector<int> & b)
 
 int main()
 {
-  vec_t vecA = MyVector<int>(4, 2);
-  vec_t vecB = MyVector<int>(6, 7);
-  vec_t res = Foo(vecA, vecB);
+  MyVector<int> vecA = MyVector<int>(4, 2);
+  MyVector<int> vecB = MyVector<int>(6, 7);
+  MyVector<int> res = Foo(vecA, vecB);
   operator+(vecA, vecB);
   operator*(vecA, vecB);
   return 0;

@@ -146,7 +146,7 @@ int main()
 {
   Test t = Test();
   t.summ<int, int, int>(1, 2, 3);
-  Test::Map<int, int> a = Test::Map<int, int, my_array>();
+  Test::Map<int, int, my_array> a = Test::Map<int, int, my_array>();
   return t.sum<1>();
 }
 

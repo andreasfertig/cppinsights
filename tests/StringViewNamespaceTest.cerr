@@ -1,4 +1,4 @@
-.tmp.cpp:8:110: error: unknown type name 'basic_string_view'
-  std::string_view strView = static_cast<std::basic_string_view<char, std::char_traits<char> >>(str.operator basic_string_view());
-                                                                                                             ^
+.tmp.cpp:8:147: error: unknown type name 'basic_string_view'
+  std::basic_string_view<char, std::char_traits<char> > strView = static_cast<std::basic_string_view<char, std::char_traits<char> >>(str.operator basic_string_view());
+                                                                                                                                                  ^
 1 error generated.

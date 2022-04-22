@@ -102,7 +102,7 @@ bool foo2() {
 template<>
 bool foo2<int>()
 {
-  std::vector<int> vec = std::vector<int, std::allocator<int> >();
+  std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >();
   return vec.empty();
 }
 #endif
@@ -110,7 +110,7 @@ bool foo2<int>()
 
 bool bar()
 {
-  std::vector<int> vec = std::vector<int, std::allocator<int> >();
+  std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >();
   return vec.empty();
 }
 

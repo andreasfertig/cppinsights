@@ -5,10 +5,10 @@
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from .tmp.cpp:1:
-In file included from ... vector:275:
+In file included from ... vector:274:
 In file included from ... __bit_reference:15:
-In file included from ... algorithm:683:
-... find_if.h:28:9: error: no matching function for call to object of type '__lambda_12_26'
+In file included from ... algorithm:695:
+... find_if.h:25:9: error: no matching function for call to object of type '__lambda_12_26'
     if (__pred(*__first))
         ^~~~~~
 .tmp.cpp:37:104: note: in instantiation of function template specialization 'std::find_if<std::__wrap_iter<std::string *>, __lambda_12_26>' requested here

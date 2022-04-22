@@ -19,7 +19,7 @@ void print(const T1& arg1, const Types&... args)
 /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void print<' ', char [3], double, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(char const (&arg1)[3], const double & __args1, const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & __args2)
+void print<' ', char[3], double, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(const char (&arg1)[3], const double & __args1, const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & __args2)
 {
   std::operator<<(std::cout, arg1);
     
@@ -66,7 +66,7 @@ void print<' ', char [3], double, std::basic_string<char, std::char_traits<char>
 
 int main()
 {
-  std::string str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >("world");
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >("world");
   print("hi", 7.5, str);
   return 0;
 }

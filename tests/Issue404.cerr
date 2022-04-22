@@ -1,5 +1,5 @@
 .tmp.cpp:22:21: error: 'S' does not refer to a value
-     S arr2[3][2] = S [3][2]();
+     S arr2[3][2] = S[3][2]();
                     ^
 .tmp.cpp:1:8: note: declared here
 struct S

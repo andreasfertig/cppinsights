@@ -12,7 +12,7 @@ static inline decltype(auto) Normalize(const T& arg)
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline char const (&Normalize<char [8]>(char const (&arg)[8]))[8]
+inline const char (&Normalize<char[8]>(const char (&arg)[8]))[8]
 {
   if constexpr(false) {
   } else /* constexpr */ {
@@ -38,7 +38,7 @@ inline const int & Normalize<int>(const int & arg)
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline const char * Normalize<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & arg)
+inline const std::basic_string<char>::value_type * Normalize<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & arg)
 {
   if constexpr(true) {
     return arg.c_str();
@@ -57,7 +57,7 @@ void Log(const char* fmt, const Ts&... ts)
 /* First instantiated from: TemplateArgumentsTest.cpp:23 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void Log<char [8]>(const char * fmt, char const (&__ts1)[8])
+void Log<char[8]>(const char * fmt, const char (&__ts1)[8])
 {
   printf(fmt, Normalize(__ts1));
 }
@@ -89,7 +89,7 @@ int main()
   int result = 34;
   Log("Hello World %s\n", "nothing");
   Log("And the number is %d\n", result);
-  std::string test = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"Hello"};
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > test = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"Hello"};
   Log("%s\n", test);
   return 0;
 }

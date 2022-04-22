@@ -17,7 +17,7 @@ namespace Test
 
 int main()
 {
-  Test::A<> a = {};
+  Test::A<void> a = {};
   return 0;
 }
 
