@@ -41,18 +41,19 @@ Here is the transformed code:
 template<typename U>
 class X
 {
-public:
-    X()           = default;
-    X(const X& x) = default;
-
-    template<typename T>
-    X(T&& x)
-    : mX{}
-    {
-    }
-
-private:
-    U mX;
+  
+  public: 
+  inline X() = default;
+  inline X(const X<U> & x) = default;
+  template<typename T>
+  inline X(T && x)
+  : mX{}
+  {
+  }
+  
+  
+  private: 
+  U mX;
 };
 
 /* First instantiated from: implicit-conversions.cpp:21 */
@@ -74,8 +75,6 @@ class X<int>
 };
 
 #endif
-
-
 /* First instantiated from: implicit-conversions.cpp:26 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

@@ -1,0 +1,31 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Test
+{
+  int mX;
+} Test;
+
+inline bool operatorEqualEqual(const Test * __this, int rhs)
+{
+  return rhs == __this->mX;
+}
+
+
+
+Test __temporary11_15;
+bool b = operatorEqualEqual(&__temporary11_15, 3);
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

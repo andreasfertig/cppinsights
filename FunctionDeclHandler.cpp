@@ -88,11 +88,11 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
     if(const auto* funcDecl = result.Nodes.getNodeAs<FunctionDecl>(idFunc)) {
         RETURN_IF(isa<CXXDeductionGuideDecl>(funcDecl));
 
-        const auto         columnNr = GetSM(result).getSpellingColumnNumber(funcDecl->getBeginLoc()) - 1;
-        OutputFormatHelper outputFormatHelper{columnNr};
-        CodeGenerator      codeGenerator{outputFormatHelper};
+        const auto           columnNr = GetSM(result).getSpellingColumnNumber(funcDecl->getBeginLoc()) - 1;
+        OutputFormatHelper   outputFormatHelper{columnNr};
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
 
-        codeGenerator.InsertArg(funcDecl);
+        codeGenerator->InsertArg(funcDecl);
 
         // Find the correct ending of the source range. In case of a declaration we need to find the ending semi,
         // otherwise the provided source range is correct.

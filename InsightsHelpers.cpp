@@ -6,12 +6,15 @@
  ****************************************************************************/
 
 #include "InsightsHelpers.h"
+#include "ASTHelpers.h"
 #include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "DPrint.h"
 #include "Insights.h"
 #include "InsightsStaticStrings.h"
 #include "OutputFormatHelper.h"
+#include "clang/Frontend/CompilerInstance.h"
+#include "clang/Sema/Lookup.h"
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
@@ -85,9 +88,28 @@ std::string ScopeHandler::RemoveCurrentScope(std::string name)
 }
 //-----------------------------------------------------------------------------
 
+static std::string GetNamePlain(const NamedDecl& decl)
+{
+    if(const auto* fd = dyn_cast_or_null<FunctionDecl>(&decl); fd and GetInsightsOptions().UseShow2C) {
+        if(fd->isOverloadedOperator()) {
+            switch(fd->getOverloadedOperator()) {
+#define OVERLOADED_OPERATOR(Name, Spelling, Token, Unary, Binary, MemberOnly)                                          \
+    case OO_##Name: return "operator" #Name;
+
+#include "clang/Basic/OperatorKinds.def"
+
+#undef OVERLOADED_OPERATOR
+                default: break;
+            }
+        }
+    }
+
+    return decl.getDeclName().getAsString();
+}
+
 std::string GetPlainName(const DeclRefExpr& DRE)
 {
-    return ScopeHandler::RemoveCurrentScope(DRE.getNameInfo().getAsString());
+    return ScopeHandler::RemoveCurrentScope(GetNamePlain(*DRE.getDecl()));
 }
 //-----------------------------------------------------------------------------
 
@@ -126,6 +148,16 @@ struct CppInsightsPrintingPolicy : PrintingPolicy
     {
     }
 };
+//-----------------------------------------------------------------------------
+
+void ReplaceAll(std::string& str, std::string_view from, std::string_view to)
+{
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();  // Handles case where 'to' is a substring of 'from'
+    }
+}
 //-----------------------------------------------------------------------------
 
 namespace details {
@@ -757,7 +789,7 @@ private:
         // Handle the array dimension after the type has been parsed.
         if(scanningArrayDimension) {
             do {
-                mData.Append("["sv, type->getSize().getZExtValue(), "]"sv);
+                mData.Append("["sv, GetSize(type), "]"sv);
             } while((type = dyn_cast_or_null<ConstantArrayType>(type->getElementType().getTypePtrOrNull())));
 
             mScanningArrayDimension = false;
@@ -932,6 +964,96 @@ static std::string GetName(QualType                    t,
 }  // namespace details
 //-----------------------------------------------------------------------------
 
+static bool HasOverload(const FunctionDecl* fd)
+{
+    auto* ncfd = const_cast<FunctionDecl*>(fd);
+
+    Sema&        sema = GetGlobalCI().getSema();
+    LookupResult result{sema, ncfd->getDeclName(), {}, Sema::LookupOrdinaryName};
+
+    if(sema.LookupName(result, sema.getScopeForContext(ncfd->getDeclContext()))) {
+        return LookupResult::FoundOverloaded == result.getResultKind();
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
+std::string GetSpecialMemberName(const ValueDecl* vd);
+//-----------------------------------------------------------------------------
+
+std::string GetCfrontOverloadedFunctionName(const FunctionDecl* fd)
+{
+    std::string name{};
+
+    if(fd and GetInsightsOptions().UseShow2C and HasOverload(fd) and not fd->isMain()) {
+        name = GetSpecialMemberName(fd);
+
+        if(not fd->param_empty()) {
+            name += "_";
+
+            for(const auto& param : fd->parameters()) {
+                QualType t         = param->getType();
+                QualType plainType = t.getNonReferenceType();
+                plainType.removeLocalConst();
+                plainType.removeLocalVolatile();
+
+                std::string ptr{};
+
+                while(plainType->isPointerType()) {
+                    ptr += "p";
+                    plainType = plainType->getPointeeType();
+
+                    auto quals  = plainType.getQualifiers();
+                    auto lquals = plainType.getLocalQualifiers();
+
+                    if(quals.hasConst() or lquals.hasConst()) {
+                        ptr += "c";
+                    }
+
+                    plainType.removeLocalConst();
+                }
+
+                if(t.isCanonical()) {
+                    t = t.getCanonicalType();
+                }
+
+                if(plainType->isBuiltinType() and plainType->hasUnsignedIntegerRepresentation()) {
+                    std::string tmp{GetName(plainType)};
+
+                    ReplaceAll(tmp, "unsigned ", "u");
+
+                    name += tmp;
+                } else {
+                    name += GetName(plainType);
+                }
+
+                auto quals  = t.getQualifiers();
+                auto lquals = t.getLocalQualifiers();
+
+                if(t->isPointerType()) {
+                    name += ptr;
+                }
+
+                if(quals.hasConst() or lquals.hasConst()) {
+                    name += "c";
+                }
+
+                if(t->isLValueReferenceType()) {
+                    name += "r";
+                }
+
+                if(t->isRValueReferenceType()) {
+                    name += "R";
+                }
+            }
+        }
+    }
+
+    return name;
+}
+//-----------------------------------------------------------------------------
+
 STRONG_BOOL(UseLexicalParent);
 //-----------------------------------------------------------------------------
 
@@ -1066,7 +1188,9 @@ std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName)
         name += details::GetScope(nd.getDeclContext(), details::RemoveCurrentScope::No);
     }
 
-    name += nd.getNameAsString();  // Must be getNameAsString because NamedDecl is no identifier.
+    name += GetNamePlain(nd);
+
+    name += GetCfrontOverloadedFunctionName(dyn_cast_or_null<FunctionDecl>(&nd));
 
     return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, &nd));
 }
@@ -1096,6 +1220,18 @@ std::string GetName(const CXXRecordDecl& RD)
 }
 //-----------------------------------------------------------------------------
 
+std::string GetTemporaryName(const Expr& tmp)
+{
+    return BuildInternalVarName(MakeLineColumnName(GetGlobalAST().getSourceManager(), tmp.getEndLoc(), "temporary"sv));
+}
+//-----------------------------------------------------------------------------
+
+std::string GetName(const CXXTemporaryObjectExpr& tmp)
+{
+    return GetTemporaryName(tmp);
+}
+//-----------------------------------------------------------------------------
+
 std::string GetName(const QualType& t, const Unqualified unqualified)
 {
     return details::GetName(t, unqualified);
@@ -1111,6 +1247,16 @@ static std::string GetUnqualifiedScopelessName(const Type* type, const InsightsS
 std::string GetUnqualifiedScopelessName(const Type* type)
 {
     return GetUnqualifiedScopelessName(type, InsightsSuppressScope::No);
+}
+//-----------------------------------------------------------------------------
+
+QualType GetType(QualType t)
+{
+    if(GetInsightsOptions().UseShow2C and t->isReferenceType()) {
+        return GetGlobalAST().getPointerType(t.getNonReferenceType());
+    }
+
+    return t;
 }
 //-----------------------------------------------------------------------------
 
@@ -1366,6 +1512,8 @@ std::string GetName(const DeclRefExpr& declRefExpr)
         name.append(plainName);
     }
 
+    name += GetCfrontOverloadedFunctionName(dyn_cast_or_null<FunctionDecl>(declRefDecl));
+
     return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, declRefDecl));
 }
 //-----------------------------------------------------------------------------
@@ -1496,6 +1644,12 @@ std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
     }
 
     return ret;
+}
+//-----------------------------------------------------------------------------
+
+uint64_t GetSize(const ConstantArrayType* arrayType)
+{
+    return arrayType->getSize().getZExtValue();
 }
 //-----------------------------------------------------------------------------
 

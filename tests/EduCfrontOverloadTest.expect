@@ -1,0 +1,98 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+void Fun_uintr(unsigned int * x)
+{
+}
+
+void Fun_intr(int * x)
+{
+}
+
+void Fun_double(double d)
+{
+}
+
+void Fun_intr(const int * x)
+{
+}
+
+void Fun_charppc(const char ** x)
+{
+}
+
+void Fun_intp(int *)
+{
+}
+
+void Fun_intpc(const int *)
+{
+}
+
+
+void Run_intr(int *)
+{
+}
+
+void Run_intR(int *)
+{
+}
+
+
+void Bun(int)
+{
+}
+
+
+int __main(void)
+{
+  int * p = nullptr;
+  const int * cp = nullptr;
+  const int __temporary21_9 = 2;
+  Fun_intr(&__temporary21_9);
+  /* __temporary21_9 // lifetime ends here */
+  ;
+  Fun_double(3.1400000000000001);
+  Fun_intp(p);
+  Fun_intpc(cp);
+  int r = 0;
+  Fun_intr(&r);
+  unsigned int ur = 0;
+  Fun_uintr(&ur);
+  int __temporary32_9 = 4;
+  Run_intR(&__temporary32_9);
+  /* __temporary32_9 // lifetime ends here */
+  ;
+  int i = 0;
+  Run_intr(&i);
+  Bun(4);
+  return 0;
+  /* i // lifetime ends here */
+  /* ur // lifetime ends here */
+  /* r // lifetime ends here */
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

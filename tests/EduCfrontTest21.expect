@@ -1,0 +1,38 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+#define INSIGHTS_USE_TEMPLATE
+
+template<typename T>
+typedef struct Foo
+{
+  char _x;
+  int _y;
+} Foo;
+
+inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, char x, int y)
+{
+  __this->_x = x;
+  __this->_y = y;
+  return __this;
+}
+
+inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, int y)
+{
+  return __this;
+}
+
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

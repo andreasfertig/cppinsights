@@ -1,0 +1,142 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Test
+{
+  char __dummy;
+} Test;
+
+inline void Destructor_Test(Test * __this)
+{
+}
+
+inline Test * Constructor_Test(Test * __this)
+{
+  return __this;
+}
+
+
+
+void Basic(void)
+{
+  Test t;
+  ;
+  int x = 2;
+  ++x;
+  /* x // lifetime ends here */
+  Destructor_Test(&t);
+}
+
+
+void Simple(void)
+{
+  Test t;
+  ;
+  int x = 2;
+  if((bool)x) {
+  } else {
+  } 
+  
+  /* x // lifetime ends here */
+  Destructor_Test(&t);
+}
+
+
+void Next(void)
+{
+  Test t;
+  ;
+  int x = 2;
+  if((bool)x) {
+    Test t2;
+    ;
+    ++x;
+    Destructor_Test(&t2);
+  } else {
+    Test t3;
+    ;
+    ++x;
+    Destructor_Test(&t3);
+  } 
+  
+  /* x // lifetime ends here */
+  Destructor_Test(&t);
+}
+
+
+void Fun(void)
+{
+  Test t;
+  ;
+  Test * t2;
+  int x = 2;
+  ++x;
+  if((bool)x) {
+    Test y;
+    return;
+    Destructor_Test(&y);
+    /* x // lifetime ends here */
+    Destructor_Test(&t);
+    ;
+  } 
+  
+  if((bool)x % 2) {
+    return;
+    /* x // lifetime ends here */
+    Destructor_Test(&t);
+    ;
+  } else {
+    ++x;
+  } 
+  
+  ++x;
+  /* x // lifetime ends here */
+  Destructor_Test(&t);
+}
+
+
+int Fun2(void)
+{
+  Test t;
+  ;
+  Test * t2;
+  int x = 2;
+  ++x;
+  if((bool)x) {
+    Test y;
+    return 3;
+    Destructor_Test(&y);
+    /* x // lifetime ends here */
+    Destructor_Test(&t);
+    ;
+  } 
+  
+  if((bool)x % 2) {
+    return 3;
+    /* x // lifetime ends here */
+    Destructor_Test(&t);
+    ;
+  } else {
+    ++x;
+  } 
+  
+  ++x;
+  return 3;
+  /* x // lifetime ends here */
+  Destructor_Test(&t);
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

@@ -67,6 +67,7 @@ using namespace std::literals;
 #define KW_ELIPSIS "..."
 #define KW_FALSE "false"
 #define KW_TRY "try"
+#define KW_TYPEDEF "typedef"
 
 #define HLP_ASSIGN " = "
 #define HLP_ARROW " -> "
@@ -168,6 +169,8 @@ inline constexpr std::string_view kwCCommentStartSpace{BUILD_WITH_SPACE_AFTER("/
 inline constexpr std::string_view kwCCommentEndSpace{BUILD_WITH_SPACE_AFTER("*/")};
 inline constexpr std::string_view kwElipsisSpace{BUILD_WITH_SPACE_AFTER(KW_ELIPSIS)};
 inline constexpr std::string_view kwTrySpace{BUILD_WITH_SPACE_AFTER(KW_TRY)};
+inline constexpr std::string_view kwReturnSpace{BUILD_WITH_SPACE_AFTER(KW_RETURN)};
+inline constexpr std::string_view kwTypedefSpace{BUILD_WITH_SPACE_AFTER(KW_TYPEDEF)};
 //-----------------------------------------------------------------------------
 
 inline constexpr std::string_view kwSpaceNoexcept{BUILD_WITH_SPACE_BEFORE(KW_NOEXCEPT)};
@@ -185,6 +188,10 @@ inline constexpr std::string_view kwSpaceConstEvalSpace{BUILD_WITH_SPACE_BEFORE(
 
 inline constexpr std::string_view memberVariablePointerPrefix{"MemberVarPtr_"};
 inline constexpr std::string_view functionPointerPrefix{"FuncPtr_"};
+//-----------------------------------------------------------------------------
+
+inline constexpr std::string_view cxaStart{"__cxa_start"};
+inline constexpr std::string_view cxaAtExit{"__cxa_atexit"};
 //-----------------------------------------------------------------------------
 
 #endif /* INSIGHTS_STATIC_STRINGS_H */

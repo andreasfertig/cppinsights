@@ -29,4 +29,6 @@ INSIGHTS_OPT("edu-show-coroutine-transformation",
              false,
              "Show transformations of coroutines.",
              gInsightEduCategory)
+INSIGHTS_OPT("edu-show-cfront", UseShow2C, false, "Show transformation to C", gInsightEduCategory)
+INSIGHTS_OPT("edu-show-lifetime", ShowLifetime, false, "Show lifetime of objects", gInsightEduCategory)
 #undef INSIGHTS_OPT

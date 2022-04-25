@@ -151,7 +151,12 @@ public:
     /// \brief Increase the current indention by \c SCOPE_INDENT
     void IncreaseIndent() { mDefaultIndent += SCOPE_INDENT; }
     /// \brief Decrease the current indention by \c SCOPE_INDENT
-    void DecreaseIndent() { mDefaultIndent -= SCOPE_INDENT; }
+    void DecreaseIndent()
+    {
+        if(mDefaultIndent >= SCOPE_INDENT) {
+            mDefaultIndent -= SCOPE_INDENT;
+        }
+    }
 
     /// \brief Open a scope by inserting a '{' followed by an indented newline.
     void OpenScope()

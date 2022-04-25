@@ -1,0 +1,52 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+void* malloc(unsigned int);
+extern "C" void free(void*);
+// cmdlineinsights:-edu-show-cfront
+
+int __main(void)
+{
+  int * i = (int *)malloc(sizeof(int));
+  long double * d = (long double *)malloc(sizeof(long double));
+  if(d) {
+    *d = (long double)22.399999999999999;
+  } 
+  
+  double * db = (double *)malloc(sizeof(double));
+  if(db) {
+    *db = 22.399999999999999;
+  } 
+  
+  if(i) {
+    free(i);
+  } 
+  
+  if(db) {
+    free(db);
+  } 
+  
+  return 0;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

@@ -1,0 +1,27 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+extern "C" void* memset(void*, int, unsigned int);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct A
+{
+  char __dummy;
+} A;
+
+
+
+A a;
+
+void __cxa_start(void)
+{
+  memset(&a, 0, sizeof(A));
+}
+
+void __cxa_atexit(void)
+{
+}
+

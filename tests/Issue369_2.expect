@@ -38,15 +38,15 @@ const void withNoexcept()
   static uint64_t __valueGuard;
   alignas(foo) static char __value[sizeof(foo)];
   
-  if( ! __valueGuard )
-  {
-    if( __cxa_guard_acquire(&__valueGuard) )
-    {
-      new (&__value) foo(std::move(__lambda_4_23.operator()()));
+  if(!__valueGuard) {
+    if(__cxa_guard_acquire(&__valueGuard)) {
+      new (&__value)foo{std::move(__lambda_4_23.operator()())};
       __valueGuard = true;
       __cxa_guard_release(&__valueGuard);
-    }
-  }
+    } 
+    
+  } 
+  
 }
 
 
@@ -79,24 +79,21 @@ const void withNoexceptFalse()
   static uint64_t __valueGuard;
   alignas(foo) static char __value[sizeof(foo)];
   
-  if( ! __valueGuard )
-  {
-    if( __cxa_guard_acquire(&__valueGuard) )
-    {
+  if(!__valueGuard) {
+    if(__cxa_guard_acquire(&__valueGuard)) {
       try 
       {
-        new (&__value) foo(std::move(__lambda_8_23.operator()()));
+        new (&__value)foo{std::move(__lambda_8_23.operator()())};
         __valueGuard = true;
-      }
-      catch(...)
-      {
+      } catch(...) {
         __cxa_guard_abort(&__valueGuard);
-        throw;
+        throw ;
       }
-      
       __cxa_guard_release(&__valueGuard);
-    }
-  }
+    } 
+    
+  } 
+  
 }
 
 
@@ -129,15 +126,15 @@ const void withNoexceptTrue()
   static uint64_t __valueGuard;
   alignas(foo) static char __value[sizeof(foo)];
   
-  if( ! __valueGuard )
-  {
-    if( __cxa_guard_acquire(&__valueGuard) )
-    {
-      new (&__value) foo(std::move(__lambda_12_23.operator()()));
+  if(!__valueGuard) {
+    if(__cxa_guard_acquire(&__valueGuard)) {
+      new (&__value)foo{std::move(__lambda_12_23.operator()())};
       __valueGuard = true;
       __cxa_guard_release(&__valueGuard);
-    }
-  }
+    } 
+    
+  } 
+  
 }
 
 
@@ -191,23 +188,20 @@ void viaFunction()
   static uint64_t __fGuard;
   alignas(foo) static char __f[sizeof(foo)];
   
-  if( ! __fGuard )
-  {
-    if( __cxa_guard_acquire(&__fGuard) )
-    {
+  if(!__fGuard) {
+    if(__cxa_guard_acquire(&__fGuard)) {
       try 
       {
-        new (&__f) foo(std::move(func()));
+        new (&__f)foo{std::move(func())};
         __fGuard = true;
-      }
-      catch(...)
-      {
+      } catch(...) {
         __cxa_guard_abort(&__fGuard);
-        throw;
+        throw ;
       }
-      
       __cxa_guard_release(&__fGuard);
-    }
-  }
+    } 
+    
+  } 
+  
 }
 

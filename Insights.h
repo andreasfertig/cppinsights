@@ -35,4 +35,35 @@ extern const clang::ASTContext& GetGlobalAST();
 extern const clang::CompilerInstance& GetGlobalCI();
 //-----------------------------------------------------------------------------
 
+namespace clang::insights {
+enum class GlobalInserts
+{               // Headers go first
+    HeaderNew,  //!< Track whether we have at least one local static variable in this TU. If so we need to insert the
+                //!< <new> header for the placement-new.
+    HeaderException,  //!< Track whether there was a noexcept transformation requireing the exception header.
+    HeaderUtility,    //!< Track whether there was a std::move inserted.
+    HeaderStddef,     //!< Track whether we need to insert <stddef.h> in Cfront mode
+    HeaderAssert,     //!< Track whether we need to insert <assert.h> in Cfront mode
+
+    // Now all the forward declared functions
+    FuncCxaStart,
+    FuncCxaAtExit,
+    FuncMalloc,
+    FuncFree,
+    FuncMemset,
+    FuncMemcpy,
+    FuncCxaVecNew,
+    FuncCxaVecCtor,
+    FuncCxaVecDel,
+    FuncCxaVecDtor,
+
+    // The traditional enum element count
+    MAX
+};
+//-----------------------------------------------------------------------------
+
+void EnableGlobalInsert(GlobalInserts);
+//-----------------------------------------------------------------------------
+}  // namespace clang::insights
+
 #endif /* INSIGHTS_H */

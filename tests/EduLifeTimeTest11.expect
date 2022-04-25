@@ -1,0 +1,36 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+// cmdlineinsights:-edu-show-lifetime
+
+struct Outer
+{
+  inline Outer()
+  {
+  }
+  
+};
+
+
+
+struct Inner
+{
+  inline Inner(Outer)
+  {
+  }
+  
+};
+
+
+
+Inner Test()
+{
+  Outer __temporary15_24 = Outer{};
+  Inner __temporary15_25 = Inner{__temporary15_24};
+  return __temporary15_25;
+  /* __temporary15_24 // lifetime ends here */
+  /* __temporary15_25 // lifetime ends here */
+  ;
+}
+

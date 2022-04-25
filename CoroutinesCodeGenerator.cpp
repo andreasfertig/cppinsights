@@ -8,6 +8,7 @@
 #include <iterator>
 #include <optional>
 #include <vector>
+#include "ASTHelpers.h"
 #include "CodeGenerator.h"
 #include "DPrint.h"
 #include "Insights.h"
@@ -28,256 +29,12 @@ const std::string          RESUME_LABEL_PREFIX{BuildInternalVarName("resume"sv)}
 const std::string          FINAL_SUSPEND_NAME{BuildInternalVarName("final_suspend"sv)};
 //-----------------------------------------------------------------------------
 
-namespace asthelpers {
-
-auto* mkLabelDecl(std::string_view name)
-{
-    auto& ctx = GetGlobalAST();
-
-    return LabelDecl::Create(const_cast<ASTContext&>(ctx), ctx.getTranslationUnitDecl(), {}, &ctx.Idents.get(name));
-}
-
-LabelStmt* mkLabelStmt(std::string_view name)
-{
-    return new(GetGlobalAST()) LabelStmt({}, mkLabelDecl(name), nullptr);
-}
-
-CompoundStmt* mkCompoundStmt(ArrayRef<Stmt*> bodyStmts, SourceLocation beginLoc = {}, SourceLocation endLoc = {})
-{
-    return CompoundStmt::Create(GetGlobalAST(),
-                                bodyStmts,
-#if IS_CLANG_NEWER_THAN(14)
-                                FPOptionsOverride{},
-#endif
-                                beginLoc,
-                                endLoc);
-}
-
-auto* mkIfStmt(Expr* condition, ArrayRef<Stmt*> bodyStmts)
-{
-    return IfStmt::Create(GetGlobalAST(),
-                          {},
-                          IfStatementKind::Ordinary,
-                          nullptr,
-                          nullptr,
-                          condition,
-                          {},
-                          {},
-                          mkCompoundStmt(bodyStmts),
-                          {},
-                          /*else*/ nullptr);
-}
-
-auto* mkUnaryOperator(Expr* stmt, UnaryOperatorKind kind, QualType type)
-{
-    return UnaryOperator::Create(GetGlobalAST(), stmt, kind, type, VK_PRValue, OK_Ordinary, {}, false, {});
-}
-
-auto* mkNotIfStmt(Expr* stmt, ArrayRef<Stmt*> bodyStmts)
-{
-    auto* opNot = mkUnaryOperator(stmt, UO_LNot, stmt->getType());
-
-    return mkIfStmt(opNot, bodyStmts);
-}
-
-auto* mkIntegerLiteral32(uint64_t value)
-{
-    auto&       ctx = GetGlobalAST();
-    llvm::APInt v{32, value, true};
-
-    return IntegerLiteral::Create(ctx, v, ctx.IntTy, {});
-}
-
-auto* mkBoolLiteral(bool value)
-{
-    auto& ctx = GetGlobalAST();
-
-    return new(ctx) CXXBoolLiteralExpr(value, ctx.BoolTy, {});
-}
-
-auto* mkMemberExpr(Expr* expr, ValueDecl* vd, bool isArrow = true)
-{
-    return MemberExpr::CreateImplicit(
-        GetGlobalAST(), expr, isArrow, vd, vd->getType().getNonReferenceType(), VK_LValue, OK_Ordinary);
-}
-
-auto* mkBinaryOperator(Expr* lhs, Expr* rhs, BinaryOperator::Opcode opc, QualType resType)
-{
-    return BinaryOperator::Create(
-        GetGlobalAST(), lhs, rhs, opc, resType.getNonReferenceType(), VK_LValue, OK_Ordinary, {}, {});
-}
-
-auto* mkAssign(DeclRefExpr* declRef, FieldDecl* field, Expr* assignExpr)
-{
-    auto* me = mkMemberExpr(declRef, field);
-
-    return mkBinaryOperator(me, assignExpr, BO_Assign, field->getType());
-}
-
-GotoStmt* mkGotoStmt(std::string_view labelName)
-{
-    return new(GetGlobalAST()) GotoStmt(asthelpers::mkLabelDecl(labelName), {}, {});
-}
-
-using params_vector = std::vector<std::pair<std::string_view, QualType>>;
-
-auto* mkFunctionDeclBase(std::string_view     name,
-                         QualType             returnType,
-                         const params_vector& parameters,
-                         DeclContext*         declCtx)
-{
-    auto&                    ctx = GetGlobalAST();
-    SmallVector<QualType, 8> argTypes{};
-
-    for(const auto& [_, type] : parameters) {
-        argTypes.push_back(type);
-    }
-
-    FunctionDecl* fdd = FunctionDecl::Create(
-        const_cast<ASTContext&>(ctx),
-        declCtx,
-        {},
-        {},
-        &ctx.Idents.get(name),
-        ctx.getFunctionType(returnType, ArrayRef<QualType>{argTypes}, FunctionProtoType::ExtProtoInfo{}),
-        nullptr,
-        SC_None,  // SC_Static,
-        false,
-        false,
-        false,
-        ConstexprSpecKind::Unspecified,
-        nullptr);
-    fdd->setImplicit(true);
-
-    SmallVector<ParmVarDecl*, 16> paramVarDecls{};
-
-    for(const auto& [name, type] : parameters) {
-        ParmVarDecl* param = ParmVarDecl::Create(
-            const_cast<ASTContext&>(ctx), fdd, {}, {}, &ctx.Idents.get(name), type, nullptr, SC_None, nullptr);
-        param->setScopeInfo(0, 0);
-        paramVarDecls.push_back(param);
-    }
-
-    fdd->setParams(paramVarDecls);
-
-    return fdd;
-}
-
-auto* mkFunctionDecl(std::string_view name, QualType returnType, const params_vector& parameters)
-{
-    return mkFunctionDeclBase(name, returnType, parameters, GetGlobalAST().getTranslationUnitDecl());
-}
-
-auto* mkStdFunctionDecl(std::string_view name, QualType returnType, const params_vector& parameters)
-{
-    auto&          ctx   = GetGlobalAST();
-    NamespaceDecl* stdNs = NamespaceDecl::Create(const_cast<ASTContext&>(ctx),
-                                                 ctx.getTranslationUnitDecl(),
-                                                 false,
-                                                 {},
-                                                 {},
-                                                 &ctx.Idents.get("std"),
-                                                 nullptr
-#if IS_CLANG_NEWER_THAN(15)
-                                                 ,
-                                                 false
-#endif
-    );
-
-    return mkFunctionDeclBase(name, returnType, parameters, stdNs);
-}
-
-auto* mkDeclRefExpr(ValueDecl* vd)
-{
-    return DeclRefExpr::Create(GetGlobalAST(),
-                               NestedNameSpecifierLoc{},
-                               SourceLocation{},
-                               vd,
-                               false,
-                               SourceLocation{},
-                               vd->getType(),
-                               VK_LValue,
-                               nullptr,
-                               nullptr,
-                               NOUR_None);
-}
-
-auto* mkCallExpr(FunctionDecl* fd, QualType retType, const std::vector<Expr*>& params)
-{
-    auto* fdDref = asthelpers::mkDeclRefExpr(fd);
-
-    return CallExpr::Create(GetGlobalAST(), fdDref, params, retType, VK_LValue, {}, {});
-}
-
-auto* mkMemberCallExpr(MemberExpr* memExpr, QualType retType /*, const std::vector<Expr*>& params*/)
-{
-    return CXXMemberCallExpr::Create(GetGlobalAST(), memExpr, /*params*/ {}, retType, VK_LValue, {}, {});
-}
-
-auto* mkReturnStmt(Expr* stmt = nullptr)
-{
-    return ReturnStmt::Create(GetGlobalAST(), {}, stmt, nullptr);
-}
-
-auto* mkCaseStmt(int value, Stmt* stmt)
-{
-    auto* il       = asthelpers::mkIntegerLiteral32(value);
-    auto* caseStmt = CaseStmt::Create(GetGlobalAST(), il, nullptr, {}, {}, {});
-    caseStmt->setSubStmt(stmt);
-
-    return caseStmt;
-}
-
-auto* mkVarDecl(std::string_view name, QualType type)
-{
-    auto& ctx = GetGlobalAST();
-
-    return VarDecl::Create(const_cast<ASTContext&>(ctx),
-                           ctx.getTranslationUnitDecl(),
-                           {},
-                           {},
-                           &ctx.Idents.get(name),
-                           type,
-                           nullptr,
-                           SC_None);
-}
-
-auto* mkNullStmt()
-{
-    static auto* nstmt = new(GetGlobalAST()) NullStmt({}, false);
-    return nstmt;
-}
-
-auto* mkInsightsComment(std::string_view comment)
-{
-    return new(GetGlobalAST()) CppInsightsCommentStmt{comment};
-}
-
-auto* mkFunctionReference(FunctionDecl* fd)
-{
-    auto* dref = asthelpers::mkDeclRefExpr(fd);
-    return asthelpers::mkUnaryOperator(dref, UO_AddrOf, fd->getType());
-}
-
-auto* mkCXXRecordDecl(std::string_view name)
-{
-    auto& ctx = GetGlobalAST();
-
-    return CXXRecordDecl::Create(
-        ctx, TTK_Struct, ctx.getTranslationUnitDecl(), {}, {}, &ctx.Idents.get(name), nullptr, false);
-}
-}  // namespace asthelpers
-
-UnaryExprOrTypeTraitExpr* Sizeof(QualType toType)
-{
-    const auto& ctx = GetGlobalAST();
-    return new(ctx) UnaryExprOrTypeTraitExpr(UETT_SizeOf, ctx.getTrivialTypeSourceInfo(toType), toType, {}, {});
-}
+using namespace asthelpers;
 //-----------------------------------------------------------------------------
 
 QualType CoroutinesCodeGenerator::GetFramePointerType() const
 {
-    return GetGlobalAST().getPointerType(GetFrameType());
+    return Ptr(GetFrameType());
 }
 //-----------------------------------------------------------------------------
 
@@ -290,38 +47,12 @@ CoroutinesCodeGenerator::~CoroutinesCodeGenerator()
     OutputFormatHelper ofm{};
 
     // Using the "normal" CodeGenerator here as this is only about inserting the made up coroutine-frame.
-    CodeGenerator codeGenerator{ofm};
-    codeGenerator.InsertArg(mASTData.mFrameType);
+    CodeGeneratorVariant codeGenerator{ofm};
+    codeGenerator->InsertArg(mASTData.mFrameType);
 
     // Insert the made-up struct before the function declaration
     mOutputFormatHelper.InsertAt(mPosBeforeFunc, ofm);
 }
-//-----------------------------------------------------------------------------
-
-///! A helper type to have a container for ArrayRef
-struct StmtsContainer
-{
-    std::vector<Stmt*> mStmts{};
-
-    StmtsContainer() = default;
-    StmtsContainer(std::initializer_list<const Stmt*> stmts)
-    {
-        for(const auto& stmt : stmts) {
-            Add(stmt);
-        }
-    }
-
-    void clear() { mStmts.clear(); }
-
-    void Add(const Stmt* stmt)
-    {
-        if(stmt) {
-            mStmts.push_back(const_cast<Stmt*>(stmt));
-        }
-    }
-
-    operator ArrayRef<Stmt*>() { return mStmts; }
-};
 //-----------------------------------------------------------------------------
 
 static FieldDecl* AddField(CoroutineASTData& astData, std::string_view name, QualType type)
@@ -330,11 +61,8 @@ static FieldDecl* AddField(CoroutineASTData& astData, std::string_view name, Qua
         return nullptr;
     }
 
-    auto& ctx       = GetGlobalAST();
-    auto* fieldDecl = FieldDecl::Create(
-        ctx, astData.mFrameType, {}, {}, &ctx.Idents.get(name), type, nullptr, nullptr, false, ICIS_NoInit);
+    auto* fieldDecl = mkFieldDecl(astData.mFrameType, name, type);
 
-    fieldDecl->setAccess(AS_public);
     astData.mFrameType->addDecl(fieldDecl);
 
     return fieldDecl;
@@ -347,26 +75,18 @@ FieldDecl* CoroutinesCodeGenerator::AddField(std::string_view name, QualType typ
 }
 //-----------------------------------------------------------------------------
 
-static void ReplaceAll(std::string& str, std::string_view from, std::string_view to)
+static auto* CreateCoroFunctionDecl(std::string funcName, QualType type)
 {
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length();  // Handles case where 'to' is a substring of 'from'
-    }
-}
-//-----------------------------------------------------------------------------
-
-static auto* CreateFunctionDecl(std::string funcName, asthelpers::params_vector params)
-{
+    params_vector     params{{CORO_FRAME_NAME, type}};
     const std::string coroFsmName{BuildInternalVarName(funcName)};
-    return asthelpers::mkFunctionDecl(coroFsmName, GetGlobalAST().VoidTy, params);
+
+    return Function(coroFsmName, VoidTy(), params);
 }
 //-----------------------------------------------------------------------------
 
 static void SetFunctionBody(FunctionDecl* fd, StmtsContainer& bodyStmts)
 {
-    fd->setBody(asthelpers::mkCompoundStmt(bodyStmts));
+    fd->setBody(mkCompoundStmt(bodyStmts));
 }
 //-----------------------------------------------------------------------------
 
@@ -431,9 +151,9 @@ public:
             mSkip = false;
         }
 
-        auto* comp = asthelpers::mkCompoundStmt(mBodyStmts);
+        auto* comp = mkCompoundStmt(mBodyStmts);
 
-        std::replace(mPrevStmt->child_begin(), mPrevStmt->child_end(), stmt, comp);
+        ReplaceNode(mPrevStmt, stmt, comp);
 
         mBodyStmts.clear();
     }
@@ -480,10 +200,7 @@ public:
             auto* newInit = mBodyStmts.mStmts.back();
             mBodyStmts.mStmts.pop_back();
 
-            std::replace(stmt->child_begin(),
-                         stmt->child_end(),
-                         dyn_cast_or_null<Stmt>(oldInit),
-                         dyn_cast_or_null<Stmt>(newInit));
+            ReplaceNode(stmt, oldInit, newInit);
 
             mSkip = false;
         }
@@ -515,10 +232,7 @@ public:
 
             auto* memberExpr = mVarNamePrefix[vd];
 
-            std::replace(mPrevStmt->child_begin(),
-                         mPrevStmt->child_end(),
-                         dyn_cast_or_null<Stmt>(stmt),
-                         dyn_cast_or_null<Stmt>(memberExpr));
+            ReplaceNode(mPrevStmt, stmt, memberExpr);
         }
     }
 
@@ -529,8 +243,8 @@ public:
                 // add this point a placement-new would be appropriate for at least some cases.
 
                 auto* field  = AddField(mASTData, GetName(*varDecl), varDecl->getType());
-                auto* me     = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, field);
-                auto* assign = asthelpers::mkBinaryOperator(me, varDecl->getInit(), BO_Assign, field->getType());
+                auto* me     = AccessMember(mASTData.mFrameAccessDeclRef, field);
+                auto* assign = Assign(me, field, varDecl->getInit());
 
                 mVarNamePrefix.insert(std::make_pair(varDecl, me));
 
@@ -547,25 +261,10 @@ public:
 
     void VisitCXXThisExpr(CXXThisExpr* stmt)
     {
-        auto& ctx       = GetGlobalAST();
-        auto* fieldDecl = FieldDecl::Create(ctx,
-                                            mASTData.mFrameType,
-                                            {},
-                                            {},
-                                            &ctx.Idents.get(kwInternalThis),
-                                            stmt->getType(),
-                                            nullptr,
-                                            nullptr,
-                                            false,
-                                            ICIS_NoInit);
-        fieldDecl->setAccess(AS_public);
+        auto* fieldDecl              = mkFieldDecl(mASTData.mFrameType, kwInternalThis, stmt->getType());
+        auto* indirectThisMemberExpr = AccessMember(mASTData.mFrameAccessDeclRef, fieldDecl);
 
-        auto* indirectThisMemberExpr = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, fieldDecl);
-
-        std::replace(mPrevStmt->child_begin(),
-                     mPrevStmt->child_end(),
-                     dyn_cast_or_null<Stmt>(stmt),
-                     dyn_cast_or_null<Stmt>(indirectThisMemberExpr));
+        ReplaceNode(mPrevStmt, stmt, indirectThisMemberExpr);
 
         if(0 == mASTData.mThisExprs.size()) {
             mASTData.mThisExprs.push_back(stmt);
@@ -632,13 +331,10 @@ public:
         // Note: Add the this pointer to the name isn't the best but s quick approach
         const std::string name{StrCat(CORO_FRAME_ACCESS, BuildSuspendVarName(stmt->getOpaqueValue()), "_res"sv)};
 
-        auto* resultVar        = asthelpers::mkVarDecl(name, stmt->getType());
-        auto* resultVarDeclRef = asthelpers::mkDeclRefExpr(resultVar);
+        auto* resultVar        = Variable(name, stmt->getType());
+        auto* resultVarDeclRef = mkDeclRefExpr(resultVar);
 
-        std::replace(mPrevStmt->child_begin(),
-                     mPrevStmt->child_end(),
-                     dyn_cast_or_null<Stmt>(stmt),
-                     dyn_cast_or_null<Stmt>(resultVarDeclRef));
+        ReplaceNode(mPrevStmt, stmt, resultVarDeclRef);
 
         Visit(stmt->getCommonExpr());
         Visit(stmt->getOperand());
@@ -652,21 +348,20 @@ public:
         auto* varDecl = stmt->getPromiseDecl();
 
         mASTData.mPromiseField = AddField(mASTData, GetName(*varDecl), varDecl->getType());
-        auto* me               = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
+        auto* me               = AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
 
         mVarNamePrefix.insert(std::make_pair(varDecl, me));
 
         auto& ctx = GetGlobalAST();
 
         // add the suspend index variable
-        mASTData.mSuspendIndexField = AddField(mASTData, SUSPEND_INDEX_NAME, ctx.IntTy);
-        mASTData.mSuspendIndexAccess =
-            asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mSuspendIndexField);
+        mASTData.mSuspendIndexField  = AddField(mASTData, SUSPEND_INDEX_NAME, ctx.IntTy);
+        mASTData.mSuspendIndexAccess = AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mSuspendIndexField);
 
         // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
         mASTData.mInitialAwaitResumeCalledField = AddField(mASTData, INITIAL_AWAIT_SUSPEND_CALLED_NAME, ctx.BoolTy);
         mASTData.mInitialAwaitResumeCalledAccess =
-            asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField);
+            AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField);
 
         for(auto* param : stmt->getParamMoves()) {
             if(auto* declStmt = dyn_cast_or_null<DeclStmt>(param)) {
@@ -676,7 +371,7 @@ public:
                         auto* varDecl = dyn_cast<ParmVarDecl>(declRef->getDecl());
 
                         auto* field = AddField(mASTData, GetName(*varDecl), varDecl->getType());
-                        auto* me    = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, field);
+                        auto* me    = AccessMember(mASTData.mFrameAccessDeclRef, field);
 
                         mVarNamePrefix.insert(std::make_pair(const_cast<ParmVarDecl*>(varDecl), me));
                     }
@@ -721,8 +416,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     auto& ctx = GetGlobalAST();
 
     mFSMName = [&] {
-        OutputFormatHelper ofm{};
-        CodeGenerator      codeGenerator{ofm};
+        OutputFormatHelper   ofm{};
+        CodeGeneratorVariant codeGenerator{ofm};
 
         // Coroutines can be templates and then we end up with the same FSM name but different template parameters.
         // XXX: This will fail with NTTP's like 3.14
@@ -735,7 +430,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
                     ofm.Append('_');
                 }
 
-                codeGenerator.InsertTemplateArg(arg);
+                codeGenerator->InsertTemplateArg(arg);
             }
         }
 
@@ -756,16 +451,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mFrameName = BuildInternalVarName(StrCat(mFSMName, "Frame"sv));
 
     // Insert a made up struct which holds the "captured" parameters stored in the coroutine frame
-    mASTData.mFrameType = asthelpers::mkCXXRecordDecl(mFrameName);
-    mASTData.mFrameType->startDefinition();
-
-    // A "normal" struct has itself attached as a Decl. To make everything work do the same thing here
-    auto* selfDecl = asthelpers::mkCXXRecordDecl(mFrameName);
-    selfDecl->setAccess(AS_public);
-    mASTData.mFrameType->addDecl(selfDecl);
-
-    auto* frameAccess            = asthelpers::mkVarDecl(CORO_FRAME_NAME, GetFrameType());
-    mASTData.mFrameAccessDeclRef = asthelpers::mkDeclRefExpr(frameAccess);
+    mASTData.mFrameType          = Struct(mFrameName);
+    mASTData.mFrameAccessDeclRef = mkVarDeclRefExpr(CORO_FRAME_NAME, GetFrameType());
 
     // The coroutine frame starts with two function pointers to the resume and destroy function. See:
     // https://gcc.gnu.org/legacy-ml/gcc-patches/2020-01/msg01096.html:
@@ -776,21 +463,19 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     //
     // and
     // https://llvm.org/docs/Coroutines.html#id72 "Coroutine Representation"
-    auto* resumeFnFd =
-        asthelpers::mkFunctionDecl(hlpResumeFn, ctx.VoidTy, {{CORO_FRAME_NAME, ctx.getPointerType(GetFrameType())}});
-    auto resumeFnType       = ctx.getPointerType(resumeFnFd->getType());
+    auto* resumeFnFd        = Function(hlpResumeFn, VoidTy(), {{CORO_FRAME_NAME, GetFramePointerType()}});
+    auto  resumeFnType      = Ptr(resumeFnFd->getType());
     mASTData.mResumeFnField = AddField(hlpResumeFn, resumeFnType);
 
-    auto* destroyFnFd =
-        asthelpers::mkFunctionDecl(hlpDestroyFn, ctx.VoidTy, {{CORO_FRAME_NAME, ctx.getPointerType(GetFrameType())}});
-    auto destroyFnType       = ctx.getPointerType(destroyFnFd->getType());
+    auto* destroyFnFd        = Function(hlpDestroyFn, VoidTy(), {{CORO_FRAME_NAME, GetFramePointerType()}});
+    auto  destroyFnType      = Ptr(destroyFnFd->getType());
     mASTData.mDestroyFnField = AddField(hlpDestroyFn, destroyFnType);
 
     // Allocated the made up frame
     mOutputFormatHelper.AppendCommentNewLine("Allocate the frame including the promise"sv);
     mOutputFormatHelper.AppendCommentNewLine("Note: The actual parameter new is __builtin_coro_size"sv);
 
-    auto* coroFrameVar = asthelpers::mkVarDecl(CORO_FRAME_NAME, GetFramePointerType());
+    auto* coroFrameVar = Variable(CORO_FRAME_NAME, GetFramePointerType());
 
     CXXReinterpretCastExpr* reicast =
         CXXReinterpretCastExpr::Create(ctx,
@@ -812,11 +497,10 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     // nullptr. In this case return get_return_object_on_allocation_failure.
     if(stmt->getReturnStmtOnAllocFailure()) {
         auto* nptr = new(ctx) CXXNullPtrLiteralExpr({});
-        auto* bop  = asthelpers::mkBinaryOperator(nptr, mASTData.mFrameAccessDeclRef, BO_EQ, ctx.BoolTy);
 
         // Create an IfStmt.
         StmtsContainer bodyStmts{stmt->getReturnStmtOnAllocFailure()};
-        auto*          ifStmt = asthelpers::mkIfStmt(bop, bodyStmts);
+        auto*          ifStmt = If(Equal(nptr, mASTData.mFrameAccessDeclRef), bodyStmts);
 
         mOutputFormatHelper.AppendNewLine();
         InsertArg(ifStmt);
@@ -826,13 +510,12 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         mASTData, mSuspendsCounter, const_cast<CoroutineBodyStmt*>(stmt), llvm::DenseMap<VarDecl*, MemberExpr*>{}};
 
     // set initial suspend count to zero.
-    auto* setSuspendIndexToZero = asthelpers::mkAssign(
-        mASTData.mFrameAccessDeclRef, mASTData.mSuspendIndexField, asthelpers::mkIntegerLiteral32(0));
+    auto* setSuspendIndexToZero = Assign(mASTData.mFrameAccessDeclRef, mASTData.mSuspendIndexField, Int32(0));
     InsertArgWithNull(setSuspendIndexToZero);
 
     // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
-    auto* initializeInitialAwaitResume = asthelpers::mkAssign(
-        mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField, asthelpers::mkBoolLiteral(false));
+    auto* initializeInitialAwaitResume =
+        Assign(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField, Bool(false));
     InsertArgWithNull(initializeInitialAwaitResume);
 
     // Move the parameters first
@@ -853,14 +536,14 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         }
     }
 
-    std::vector<Expr*> exprs{};
+    SmallVector<Expr*, 16> exprs{};
 
     // According to https://eel.is/c++draft/dcl.fct.def.coroutine#5.7 the promise_type constructor can have
     // parameters. If so, they must be equal to the coroutines function parameters.
     // The code here performs a _simple_ lookup for a matching ctor without using Clang's overload resolution.
-    ArrayRef<ParmVarDecl*>    funParams = fd.parameters();
-    std::vector<ParmVarDecl*> funParamStorage{};
-    QualType                  cxxMethodType{};
+    ArrayRef<ParmVarDecl*>        funParams = fd.parameters();
+    SmallVector<ParmVarDecl*, 16> funParamStorage{};
+    QualType                      cxxMethodType{};
 
     if(const auto* cxxMethodDecl = dyn_cast_or_null<CXXMethodDecl>(&fd)) {
         funParamStorage.reserve(funParams.size() + 1);
@@ -869,15 +552,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
 
         // In case we have a member function the first parameter is a reference to this. The following code injects
         // this parameter.
-        funParamStorage.push_back(ParmVarDecl::Create(const_cast<ASTContext&>(ctx),
-                                                      const_cast<FunctionDecl*>(&fd),
-                                                      {},
-                                                      {},
-                                                      &ctx.Idents.get(CORO_FRAME_ACCESS_THIS),
-                                                      cxxMethodType,
-                                                      nullptr,
-                                                      SC_None,
-                                                      nullptr));
+        funParamStorage.push_back(Parameter(&fd, CORO_FRAME_ACCESS_THIS, cxxMethodType));
 
         // XXX: use ranges once available
         std::copy(funParams.begin(), funParams.end(), std::back_inserter(funParamStorage));
@@ -913,9 +588,9 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
             if(0 == mASTData.mThisExprs.size()) {
                 mASTData.mThisExprs.push_back(
 #if IS_CLANG_NEWER_THAN(17)
-                    CXXThisExpr::Create(ctx, {}, ctx.getPointerType(cxxMethodType), false)
+                    CXXThisExpr::Create(ctx, {}, Ptr(cxxMethodType), false)
 #else
-                    new(ctx) CXXThisExpr{{}, ctx.getPointerType(cxxMethodType), false}
+                    new(ctx) CXXThisExpr{{}, Ptr(cxxMethodType), false}
 #endif
 
                 );
@@ -926,17 +601,16 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
 
         for(const auto& fparam : funParams) {
             if(derefFirstParam) {
-                exprs.push_back(
-                    asthelpers::mkUnaryOperator(asthelpers::mkDeclRefExpr(fparam), UO_Deref, fparam->getType()));
+                exprs.push_back(Dref(mkDeclRefExpr(fparam)));
 
             } else {
-                exprs.push_back(asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, fparam));
+                exprs.push_back(AccessMember(mASTData.mFrameAccessDeclRef, fparam));
             }
         }
 
         if(funParams.size()) {
             // The <new> header needs to be included.
-            mHaveCoroutine = true;
+            EnableGlobalInsert(GlobalInserts::HeaderNew);
         }
 
         break;  // We've found what we were looking for
@@ -949,31 +623,11 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     // Now call the promise ctor, as it may access some of the parameters it comes at this point.
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.AppendCommentNewLine("Construct the promise."sv);
-    auto* me    = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
-    auto* asRef = asthelpers::mkUnaryOperator(me, UO_AddrOf, mASTData.mPromiseField->getType());
+    auto* me = AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
 
-    auto* ctorArgs = new(ctx) InitListExpr{ctx, {}, static_cast<ArrayRef<Expr*>>(exprs), {}};
+    auto* ctorArgs = new(ctx) InitListExpr{ctx, {}, exprs, {}};
 
-    CXXNewExpr* newFrame =
-        CXXNewExpr::Create(ctx,
-                           false,
-                           nullptr,
-                           nullptr,
-                           true,
-                           false,
-                           {asRef},
-                           SourceRange{},
-#if IS_CLANG_NEWER_THAN(15)
-                           std::optional<Expr*>{},
-#else
-                           Optional<Expr*>{},
-#endif
-                           CXXNewExpr::ListInit,
-                           ctorArgs,
-                           ctx.getPointerType(mASTData.mPromiseField->getType()),
-                           ctx.getTrivialTypeSourceInfo(ctx.getPointerType(mASTData.mPromiseField->getType())),
-                           SourceRange{},
-                           SourceRange{});
+    CXXNewExpr* newFrame = New({AddrOf(me)}, ctorArgs, mASTData.mPromiseField->getType());
 
     InsertArgWithNull(newFrame);
 
@@ -991,22 +645,19 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     // [dcl.fct.def.coroutine]
     mOutputFormatHelper.AppendCommentNewLine("Forward declare the resume and destroy function."sv);
 
-    auto* fsmFuncDecl = CreateFunctionDecl(StrCat(mFSMName, "Resume"sv), {{CORO_FRAME_NAME, GetFramePointerType()}});
+    auto* fsmFuncDecl = CreateCoroFunctionDecl(StrCat(mFSMName, "Resume"sv), GetFramePointerType());
     InsertArg(fsmFuncDecl);
-    auto* deallocFuncDecl =
-        CreateFunctionDecl(StrCat(mFSMName, "Destroy"sv), {{CORO_FRAME_NAME, GetFramePointerType()}});
+    auto* deallocFuncDecl = CreateCoroFunctionDecl(StrCat(mFSMName, "Destroy"sv), GetFramePointerType());
     InsertArg(deallocFuncDecl);
 
     mOutputFormatHelper.AppendNewLine();
 
     mOutputFormatHelper.AppendCommentNewLine("Assign the resume and destroy function pointers."sv);
 
-    auto* assignResumeFn = asthelpers::mkAssign(
-        mASTData.mFrameAccessDeclRef, mASTData.mResumeFnField, asthelpers::mkFunctionReference(fsmFuncDecl));
+    auto* assignResumeFn = Assign(mASTData.mFrameAccessDeclRef, mASTData.mResumeFnField, Ref(fsmFuncDecl));
     InsertArgWithNull(assignResumeFn);
 
-    auto* assignDestroyFn = asthelpers::mkAssign(
-        mASTData.mFrameAccessDeclRef, mASTData.mDestroyFnField, asthelpers::mkFunctionReference(deallocFuncDecl));
+    auto* assignDestroyFn = Assign(mASTData.mFrameAccessDeclRef, mASTData.mDestroyFnField, Ref(deallocFuncDecl));
     InsertArgWithNull(assignDestroyFn);
     mOutputFormatHelper.AppendNewLine();
 
@@ -1015,7 +666,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
      This function will be called subsequently by coroutine_handle<>::resume()
      which calls __builtin_coro_resume(__handle_))A"sv);
 
-    auto* callCoroFSM = asthelpers::mkCallExpr(fsmFuncDecl, fsmFuncDecl->getType(), {mASTData.mFrameAccessDeclRef});
+    auto* callCoroFSM = Call(fsmFuncDecl, {mASTData.mFrameAccessDeclRef});
     InsertArgWithNull(callCoroFSM);
 
     mOutputFormatHelper.AppendNewLine();
@@ -1043,16 +694,16 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
 
     // A destructor is only present, if they promise_type or one of its members is non-trivially destructible.
     if(auto* dtor = mASTData.mPromiseField->getType()->getAsCXXRecordDecl()->getDestructor()) {
-        deallocFuncBodyStmts.Add(asthelpers::mkInsightsComment("Deallocating the coroutine promise type"sv));
+        deallocFuncBodyStmts.Add(Comment("Deallocating the coroutine promise type"sv));
 
-        auto* promiseAccess  = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
-        auto* deallocPromise = asthelpers::mkMemberExpr(promiseAccess, dtor, false);
-        auto* dtorCall       = asthelpers::mkMemberCallExpr(deallocPromise, dtor->getType());
+        auto* promiseAccess  = AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
+        auto* deallocPromise = AccessMember(promiseAccess, dtor, false);
+        auto* dtorCall       = CallMemberFun(deallocPromise, dtor->getType());
         deallocFuncBodyStmts.Add(dtorCall);
 
     } else {
         deallocFuncBodyStmts.Add(
-            asthelpers::mkInsightsComment("promise_type is trivially destructible, no dtor required."sv));
+            Comment("promise_type is trivially destructible, no dtor required."sv));
     }
 #endif
 
@@ -1062,17 +713,17 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.AppendCommentNewLine("This function invoked by coroutine_handle<>::destroy()"sv);
 
-    StmtsContainer deallocFuncBodyStmts{asthelpers::mkInsightsComment("destroy all variables with dtors"sv)};
+    StmtsContainer deallocFuncBodyStmts{Comment("destroy all variables with dtors"sv)};
 
-    auto* dtorFuncDecl = asthelpers::mkFunctionDecl(
-        StrCat("~"sv, GetName(*mASTData.mFrameType)), ctx.VoidTy, {{CORO_FRAME_NAME, GetFramePointerType()}});
-    auto* deallocPromise = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, dtorFuncDecl);
-    auto* dtorCall       = asthelpers::mkMemberCallExpr(deallocPromise, GetFrameType());
+    auto* dtorFuncDecl =
+        Function(StrCat("~"sv, GetName(*mASTData.mFrameType)), VoidTy(), {{CORO_FRAME_NAME, GetFramePointerType()}});
+    auto* deallocPromise = AccessMember(mASTData.mFrameAccessDeclRef, dtorFuncDecl);
+    auto* dtorCall       = CallMemberFun(deallocPromise, GetFrameType());
     deallocFuncBodyStmts.Add(dtorCall);
 
-    deallocFuncBodyStmts.Add(asthelpers::mkInsightsComment("Deallocating the coroutine frame"sv));
-    deallocFuncBodyStmts.Add(asthelpers::mkInsightsComment(
-        "Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter"sv));
+    deallocFuncBodyStmts.Add(Comment("Deallocating the coroutine frame"sv));
+    deallocFuncBodyStmts.Add(
+        Comment("Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter"sv));
 
     deallocFuncBodyStmts.Add(stmt->getDeallocate());
 
@@ -1086,22 +737,21 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
     auto& ctx = GetGlobalAST();
 
     // insert a made up switch for continuing a resume
-    SwitchStmt* sstmt = SwitchStmt::Create(ctx, nullptr, nullptr, mASTData.mSuspendIndexAccess, {}, {});
+    SwitchStmt* sstmt = Switch(mASTData.mSuspendIndexAccess);
 
     // insert 0 with break for consistency
-    auto*          initialSuspendCase = asthelpers::mkCaseStmt(0, new(ctx) BreakStmt(SourceLocation{}));
+    auto*          initialSuspendCase = Case(0, Break());
     StmtsContainer switchBodyStmts{initialSuspendCase};
 
     for(const auto& i : NumberIterator{mSuspendsCounter}) {
-        switchBodyStmts.Add(asthelpers::mkCaseStmt(i + 1, asthelpers::mkGotoStmt(BuildResumeLabelName(i + 1))));
+        switchBodyStmts.Add(Case(i + 1, Goto(BuildResumeLabelName(i + 1))));
     }
 
-    auto* switchBody = asthelpers::mkCompoundStmt(switchBodyStmts);
+    auto* switchBody = mkCompoundStmt(switchBodyStmts);
     sstmt->setBody(switchBody);
 
-    StmtsContainer funcBodyStmts{asthelpers::mkInsightsComment("Create a switch to get to the correct resume point"sv),
-                                 sstmt,
-                                 stmt->getInitSuspendStmt()};
+    StmtsContainer funcBodyStmts{
+        Comment("Create a switch to get to the correct resume point"sv), sstmt, stmt->getInitSuspendStmt()};
 
     // insert the init suspend expr
     mState = eState::InitialSuspend;
@@ -1119,23 +769,21 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
 
     // InsertArg(stmt->getFallthroughHandler());
 
-    auto* gotoFinalSuspend = asthelpers::mkGotoStmt(FINAL_SUSPEND_NAME);
+    auto* gotoFinalSuspend = Goto(FINAL_SUSPEND_NAME);
     funcBodyStmts.Add(gotoFinalSuspend);
 
     auto* body = [&]() -> Stmt* {
-        auto* tryBody = asthelpers::mkCompoundStmt(funcBodyStmts);
+        auto* tryBody = mkCompoundStmt(funcBodyStmts);
 
         // First open the try-catch block, as we get an error when jumping across such blocks with goto
         if(const auto* exceptionHandler = stmt->getExceptionHandler()) {
             // If we encounter an exceptionbefore inital_suspend's await_suspend was called we re-throw the
             // exception.
-            auto* throwExpr = new(ctx) CXXThrowExpr(nullptr, {}, {}, false);
-            auto* ifStmt    = asthelpers::mkNotIfStmt(mASTData.mInitialAwaitResumeCalledAccess, throwExpr);
+            auto* ifStmt = If(Not(mASTData.mInitialAwaitResumeCalledAccess), Throw());
 
             StmtsContainer catchBodyStmts{ifStmt, exceptionHandler};
-            auto*          catchAll = new(ctx) CXXCatchStmt({}, nullptr, asthelpers::mkCompoundStmt(catchBodyStmts));
 
-            return CXXTryStmt::Create(ctx, {}, tryBody, {catchAll});
+            return Try(tryBody, Catch(catchBodyStmts));
         }
 
         return tryBody;
@@ -1145,7 +793,7 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
 
     mOutputFormatHelper.AppendNewLine();
 
-    auto* finalSuspendLabel = asthelpers::mkLabelStmt(FINAL_SUSPEND_NAME);
+    auto* finalSuspendLabel = Label(FINAL_SUSPEND_NAME);
     InsertArg(finalSuspendLabel);
     mState = eState::FinalSuspend;
     InsertArg(stmt->getFinalSuspendStmt());
@@ -1180,25 +828,13 @@ void CoroutinesCodeGenerator::InsertArg(const CallExpr* stmt)
 {
     if(const auto* callee = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreCasts())) {
         if(GetPlainName(*callee) == "__builtin_coro_frame"sv) {
-            auto& ctx = GetGlobalAST();
-
-            CXXStaticCastExpr* toVoid = CXXStaticCastExpr::Create(ctx,
-                                                                  ctx.VoidPtrTy,
-                                                                  VK_LValue,
-                                                                  CK_BitCast,
-                                                                  mASTData.mFrameAccessDeclRef,
-                                                                  nullptr,
-                                                                  ctx.getTrivialTypeSourceInfo(ctx.VoidPtrTy),
-                                                                  {},
-                                                                  {},
-                                                                  {},
-                                                                  {});
-
-            CodeGenerator::InsertArg(toVoid);
+            CodeGenerator::InsertArg(StaticCast(VoidTy(), mASTData.mFrameAccessDeclRef, true));
             return;
+
         } else if(GetPlainName(*callee) == "__builtin_coro_free"sv) {
             CodeGenerator::InsertArg(stmt->getArg(0));
             return;
+
         } else if(GetPlainName(*callee) == "__builtin_coro_size"sv) {
             CodeGenerator::InsertArg(Sizeof(GetFrameType()));
             return;
@@ -1248,7 +884,7 @@ void CoroutinesCodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 
         auto*           promiseField = AddField(name, stmt->getType());
         BinaryOperator* assignPromiseSuspend =
-            asthelpers::mkAssign(mASTData.mFrameAccessDeclRef, promiseField, stmt->getSourceExpr());
+            Assign(mASTData.mFrameAccessDeclRef, promiseField, stmt->getSourceExpr());
 
         codeGenerator.InsertArg(assignPromiseSuspend);
         ofm.AppendSemiNewLine();
@@ -1301,9 +937,8 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
     // For why, see the implementation of CoroutinesCodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
     mSupressCasts = true;
 
-    auto* il  = asthelpers::mkIntegerLiteral32(++mSuspendsCount);
-    auto* bop = asthelpers::mkBinaryOperator(
-        mASTData.mSuspendIndexAccess, il, BO_Assign, mASTData.mSuspendIndexField->getType());
+    auto* il  = Int32(++mSuspendsCount);
+    auto* bop = Assign(mASTData.mSuspendIndexAccess, mASTData.mSuspendIndexField, il);
 
     // Find out whether the return type is void or bool. In case of bool, we need to insert an if-statement, to
     // suspend only, if the return value was true.
@@ -1323,9 +958,8 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
             if(eState::InitialSuspend == mState) {
                 mState = eState::Body;
                 // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
-                initializeInitialAwaitResume = asthelpers::mkAssign(mASTData.mFrameAccessDeclRef,
-                                                                    mASTData.mInitialAwaitResumeCalledField,
-                                                                    asthelpers::mkBoolLiteral(true));
+                initializeInitialAwaitResume =
+                    Assign(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField, Bool(true));
                 bodyStmts.Add(initializeInitialAwaitResume);
             }
         }
@@ -1336,24 +970,21 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
         addInitialAwaitSuspendCalled();
 
         if(eState::FinalSuspend != mState) {
-            bodyStmts.Add(asthelpers::mkReturnStmt());
+            bodyStmts.Add(Return());
         }
 
-        auto* ifReady = asthelpers::mkNotIfStmt(stmt->getReadyExpr(), bodyStmts);
-
-        InsertArg(ifReady);
+        InsertArg(If(Not(stmt->getReadyExpr()), bodyStmts));
 
     } else {
         addInitialAwaitSuspendCalled();
 
         if(eState::FinalSuspend != mState) {
-            bodyStmts.Add(asthelpers::mkReturnStmt());
+            bodyStmts.Add(Return());
         }
 
-        auto* ifSuspend = asthelpers::mkIfStmt(stmt->getSuspendExpr(), bodyStmts);
-        auto* ifReady   = asthelpers::mkNotIfStmt(stmt->getReadyExpr(), ifSuspend);
+        auto* ifSuspend = If(stmt->getSuspendExpr(), bodyStmts);
 
-        InsertArg(ifReady);
+        InsertArg(If(Not(stmt->getReadyExpr()), ifSuspend));
     }
 
     if(not returnsVoid and initializeInitialAwaitResume) {
@@ -1364,7 +995,7 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 
     RETURN_IF(eState::FinalSuspend == mState);
 
-    auto* suspendLabel = asthelpers::mkLabelStmt(BuildResumeLabelName(mSuspendsCount));
+    auto* suspendLabel = Label(BuildResumeLabelName(mSuspendsCount));
     InsertArg(suspendLabel);
 
     const auto* resumeExpr = stmt->getResumeExpr();
@@ -1401,7 +1032,7 @@ void CoroutinesCodeGenerator::InsertArg(const CoreturnStmt* stmt)
 void CoroutinesCodeGenerator::InsertArgWithNull(const Stmt* stmt)
 {
     InsertArg(stmt);
-    InsertArg(asthelpers::mkNullStmt());
+    InsertArg(mkNullStmt());
 }
 //-----------------------------------------------------------------------------
 

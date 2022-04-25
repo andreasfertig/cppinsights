@@ -78,8 +78,8 @@ static OutputFormatHelper InsertInstantiatedTemplate(const Decl* decl)
 
     const auto pos{outputFormatHelper.CurrentPos()};
 
-    CodeGenerator codeGenerator{outputFormatHelper};
-    codeGenerator.InsertArg(decl);
+    CodeGeneratorVariant codeGenerator{outputFormatHelper};
+    codeGenerator->InsertArg(decl);
 
     if(outputFormatHelper.CurrentPos() == pos) {
         return {};
@@ -188,8 +188,8 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         OutputFormatHelper outputFormatHelper{};
 
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertPrimaryTemplate(functionTemplateDecl);
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
+        codeGenerator->InsertPrimaryTemplate(functionTemplateDecl);
 
         mRewrite.ReplaceText(functionTemplateDecl->getSourceRange(), outputFormatHelper);
 
@@ -211,8 +211,8 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         OutputFormatHelper outputFormatHelper{};
 
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(clsTmplDecl);
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
+        codeGenerator->InsertArg(clsTmplDecl);
 
         mRewrite.ReplaceText(
             {clsTmplDecl->getSourceRange().getBegin(), FindLocationAfterSemi(clsTmplDecl->getEndLoc(), result)},
@@ -222,8 +222,8 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         OutputFormatHelper outputFormatHelper{};
 
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(conceptDecl);
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
+        codeGenerator->InsertArg(conceptDecl);
 
         mRewrite.ReplaceText({conceptDecl->getSourceRange().getBegin(),
                               FindLocationAfterSemi(conceptDecl->getEndLoc(), result).getLocWithOffset(1)},

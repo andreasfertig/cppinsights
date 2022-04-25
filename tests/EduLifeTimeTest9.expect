@@ -1,0 +1,86 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+// cmdlineinsights:-edu-show-lifetime
+
+typedef struct list
+{
+  char data[5];
+} list;
+
+inline char * begin(list * __this)
+{
+  return __this->data;
+}
+
+inline char * end(list * __this)
+{
+  return &__this->data[5];
+}
+
+
+
+typedef struct Keeper
+{
+  list data;
+} Keeper;
+
+inline list items(const Keeper * __this)
+{
+  list __temporary17_33;
+  return __temporary17_33;
+  /* __temporary17_33 // lifetime ends here */
+  ;
+}
+
+
+
+Keeper get(void)
+{
+  Keeper __temporary22_13 = {'\0', '\0', '\0', '\0', '\0'};
+  return __temporary22_13;
+  /* __temporary22_13 // lifetime ends here */
+  ;
+}
+
+
+int __main(void)
+{
+  {
+    Keeper __temporary27_26 = get();
+    list __temporary27_34 = items(&__temporary27_26);
+    list * __range1 = &__temporary27_34;
+    /* __temporary27_34 // lifetime ends here */
+    /* __temporary27_26 // lifetime ends here */
+    char * __begin1 = begin(__range1);
+    char * __end1 = end(__range1);
+    for(; __begin1 != __end1; ++__begin1) {
+    }
+    
+  }
+  return 0;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

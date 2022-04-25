@@ -25,20 +25,11 @@ Sing & Test()
   static bool __sGuard;
   alignas(Sing) static char __s[sizeof(Sing)];
   
-  if( ! __sGuard )
-  {
-    try 
-    {
-      new (&__s) Sing();
-      __sGuard = true;
-    }
-    catch(...)
-    {
-      __cxa_guard_abort(&__sGuard);
-      throw;
-    }
-    
-  }
+  if(!__sGuard) {
+    new (&__s)Sing();
+    __sGuard = true;
+  } 
+  
   return *reinterpret_cast<Sing*>(__s);
 }
 

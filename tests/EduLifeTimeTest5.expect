@@ -1,0 +1,25 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+// cmdlineinsights:-edu-show-lifetime
+
+struct Data
+{
+  int mData[5]{0, 0, 0, 0, 0};
+};
+
+
+
+int main()
+{
+  const Data __temporary10_33 = Data{{2, 3, 4, 0, 0}};
+  const Data & v = __temporary10_33;
+  int dummy = 4;
+  return 0;
+  /* dummy // lifetime ends here */
+  /* __temporary10_33 // lifetime ends here */
+  /* v // lifetime ends here */
+  ;
+}
+

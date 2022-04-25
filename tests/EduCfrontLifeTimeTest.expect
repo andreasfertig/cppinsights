@@ -1,0 +1,44 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+extern "C" void* __cxa_vec_ctor(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));
+extern "C" void __cxa_vec_dtor(void *, unsigned int, unsigned int, void* (*destructor)(void *) );
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Test
+{
+  char __dummy;
+} Test;
+
+inline void Destructor_Test(Test * __this)
+{
+}
+
+inline Test * Constructor_Test(Test * __this)
+{
+  return __this;
+}
+
+
+
+void Basic(void)
+{
+  Test t[2];
+  __cxa_vec_ctor(t, sizeof(Test), 2, 0, (void *(*)(void *))Constructor_Test, (void *(*)(void *))Destructor_Test);
+  int x = 2;
+  ++x;
+  /* x // lifetime ends here */
+  __cxa_vec_dtor(t, sizeof(Test), 2, (void *(*)(void *))Destructor_Test);
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

@@ -4,15 +4,15 @@
 
 std::initializer_list<int> f(int i, int j, int k)
 {
-  const int __list54[3]{i, j, k};
-  return std::initializer_list<int>{__list54, 3};
+  const int __list7_36[3]{i, j, k};
+  return std::initializer_list<int>{__list7_36, 3};
 }
 
 
 std::initializer_list<int> f1(int i)
 {
-  const int __list41[1]{i};
-  return std::initializer_list<int>{__list41, 1};
+  const int __list12_36[1]{i};
+  return std::initializer_list<int>{__list12_36, 1};
 }
 
 

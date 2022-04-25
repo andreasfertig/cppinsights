@@ -62,7 +62,7 @@ int main()
 {
   A a = A();
   A a2 = A{};
-  B b = B();
+  B b;
   B b2 = {0, 0};
   return 0;
 }

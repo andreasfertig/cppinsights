@@ -53,6 +53,34 @@ public:
     }
 };
 
+struct LifetimeEntry
+{
+    STRONG_BOOL(FuncStart);
+
+    const VarDecl* item{};
+    FuncStart      funcStart{FuncStart::No};
+    int            scope{};
+};
+
+class LifetimeTracker
+{
+    inline static int scopeCounter{};
+
+    SmallVector<LifetimeEntry, 10> objects{};
+
+    void InsertDtorCall(const VarDecl* decl, OutputFormatHelper& ofm);
+
+public:
+    void Add(const VarDecl* decl);
+
+    LifetimeEntry& top() { return objects.back(); }
+
+    void removeTop();
+    void StartScope(bool funcStart);
+    void Return(OutputFormatHelper& ofm);
+    void EndScope(OutputFormatHelper& ofm, bool clear);
+};
+
 /// \brief More or less the heart of C++ Insights.
 ///
 /// This is the place where nearly all of the transformations happen. This class knows the needed types and how to
@@ -60,6 +88,17 @@ public:
 class CodeGenerator
 {
 protected:
+    LifetimeTracker mLifeTimeTracker{};
+    const Stmt*     mLastStmt{};
+    const Expr*     mLastExpr{};  // special case for assignments to class member
+
+public:
+    const Decl* mLastDecl{};
+
+protected:
+    bool mProcessingVarDecl{};
+    friend class CodeGeneratorVariant;
+
     OutputFormatHelper& mOutputFormatHelper;
 
     enum class LambdaCallerType
@@ -203,16 +242,6 @@ public:
     void InsertFunctionNameWithReturnType(const FunctionDecl&       decl,
                                           const CXXConstructorDecl* cxxInheritedCtorDecl = nullptr);
 
-    /// Track whether we have at least one local static variable in this TU.
-    /// If so we need to insert the <new> header for the placement-new.
-    static bool NeedToInsertNewHeader() { return mHaveLocalStatic or mHaveCoroutine; }
-
-    /// Track whether we have a noexcept transformation which needs the exception header.
-    static bool NeedToInsertExceptionHeader() { return mHaveException; }
-
-    /// Track whether we inserted a std::move due, to a static transformation, this means we need the utility header.
-    static bool NeedToInsertUtilityHeader() { return mHaveMovedLambda; }
-
     template<typename T>
     void InsertTemplateArgs(const ArrayRef<T>& array)
     {
@@ -240,6 +269,9 @@ public:
 
     void InsertPrimaryTemplate(const FunctionTemplateDecl*);
 
+    void StartLifetimeScope();
+    void EndLifetimeScope();
+
 protected:
     virtual bool InsertVarDecl() { return true; }
     virtual bool SkipSpaceAfterVarDecl() { return false; }
@@ -262,10 +294,10 @@ protected:
     /// - www.opensource.apple.com/source/libcppabi/libcppabi-14/src/cxa_guard.cxx
     void HandleLocalStaticNonTrivialClass(const VarDecl* stmt);
 
-    void FormatCast(const std::string_view castName,
-                    const QualType&        CastDestType,
-                    const Expr*            SubExpr,
-                    const CastKind&        castKind);
+    virtual void FormatCast(const std::string_view castName,
+                            const QualType&        CastDestType,
+                            const Expr*            SubExpr,
+                            const CastKind&        castKind);
 
     void ForEachArg(const auto& arguments, auto&& lambda) { mOutputFormatHelper.ForEachArg(arguments, lambda); }
 
@@ -315,8 +347,8 @@ protected:
     void ParseDeclContext(const DeclContext* Ctx);
 
     STRONG_BOOL(SkipBody);
-    void InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody);
-    void InsertMethodBody(const FunctionDecl* stmt, const size_t posBeforeFunc);
+    virtual void InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody);
+    void         InsertMethodBody(const FunctionDecl* stmt, const size_t posBeforeFunc);
 
     /// \brief Generalized function to insert either a \c CXXConstructExpr or \c CXXUnresolvedConstructExpr
     template<typename T>
@@ -397,12 +429,7 @@ protected:
     UseCommaInsteadOfSemi mUseCommaInsteadOfSemi{UseCommaInsteadOfSemi::No};
     NoEmptyInitList       mNoEmptyInitList{
         NoEmptyInitList::No};  //!< At least in case if a requires-clause containing T{} we don't want to get T{{}}.
-    const LambdaExpr*  mLambdaExpr{};
-    static inline bool mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code.
-    static inline bool mHaveCoroutine;    //!< Track whether there we have a coroutine and need the new header there.
-    static inline bool mHaveMovedLambda;  //!< Track whether there was a std::move inserted.
-    static inline bool
-        mHaveException;  //!< Track whether there was a noexcept transformation requireing the exception header.
+    const LambdaExpr*     mLambdaExpr{};
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
         uint64_t{100}};  //!< This is the upper limit of elements which will be shown for an array when filled by \c
                          //!< FillConstantArray.
@@ -558,6 +585,86 @@ private:
     FieldDecl*  AddField(std::string_view name, QualType type);
 
     void InsertArgWithNull(const Stmt* stmt);
+};
+//-----------------------------------------------------------------------------
+
+///
+/// \brief A special generator for coroutines. It is only activated, if \c -show-coroutines-transformation is given as a
+/// command line option.
+class CfrontCodeGenerator final : public CodeGenerator
+{
+    bool mInsertSemi{true};  // We need to for int* p = new{5};
+
+public:
+    using CodeGenerator::CodeGenerator;
+
+    using CodeGenerator::InsertArg;
+
+    void InsertArg(const CXXThisExpr*) override;
+    void InsertArg(const CXXDeleteExpr*) override;
+    void InsertArg(const CXXNewExpr*) override;
+    void InsertArg(const CXXOperatorCallExpr*) override;
+    void InsertArg(const CXXNullPtrLiteralExpr*) override;
+    void InsertArg(const StaticAssertDecl*) override;
+    void InsertArg(const CXXRecordDecl*) override;
+    void InsertArg(const CXXMemberCallExpr*) override;
+    void InsertArg(const CXXConstructExpr*) override;
+    void InsertArg(const FunctionDecl* stmt) override;
+    void InsertArg(const TypedefDecl* stmt) override;
+
+    void InsertCXXMethodDecl(const CXXMethodDecl*, CodeGenerator::SkipBody) override;
+
+    void FormatCast(const std::string_view, const QualType&, const Expr*, const CastKind&) override;
+
+protected:
+    bool InsertSemi() override { return std::exchange(mInsertSemi, true); }
+};
+//-----------------------------------------------------------------------------
+
+///
+/// \brief A special container which creates either a \c CodeGenerator or a \c CfrontCodeGenerator depending on the
+/// command line options.
+class CodeGeneratorVariant
+{
+    union CodeGenerators
+    {
+        CodeGenerator       cg;
+        CfrontCodeGenerator cfcg;
+
+        CodeGenerators(OutputFormatHelper& _outputFormatHelper, CodeGenerator::LambdaStackType& lambdaStack);
+        CodeGenerators(OutputFormatHelper& _outputFormatHelper, CodeGenerator::LambdaInInitCapture lambdaInitCapture);
+
+        ~CodeGenerators();
+    } cgs;
+
+    CodeGenerator*      cg;
+    OutputFormatHelper& ofm;
+
+    void Set();
+
+public:
+    CodeGeneratorVariant(OutputFormatHelper& _outputFormatHelper)
+    : CodeGeneratorVariant{_outputFormatHelper, CodeGenerator::LambdaInInitCapture::No}
+    {
+    }
+
+    CodeGeneratorVariant(OutputFormatHelper& _outputFormatHelper, CodeGenerator::LambdaStackType& lambdaStack)
+    : cgs{_outputFormatHelper, lambdaStack}
+    , ofm{_outputFormatHelper}
+    , cg{}
+    {
+        Set();
+    }
+
+    CodeGeneratorVariant(OutputFormatHelper& _outputFormatHelper, CodeGenerator::LambdaInInitCapture lambdaInitCapture)
+    : cgs{_outputFormatHelper, lambdaInitCapture}
+    , ofm{_outputFormatHelper}
+    , cg{}
+    {
+        Set();
+    }
+
+    CodeGenerator* operator->() { return cg; }
 };
 //-----------------------------------------------------------------------------
 

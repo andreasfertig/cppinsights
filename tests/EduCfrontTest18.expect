@@ -1,0 +1,42 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Foo
+{
+  int mFoo;
+} Foo;
+
+inline Foo * Constructor_Foo(Foo * __this, int foo)
+{
+  __this->mFoo = foo;
+  return __this;
+}
+
+
+
+typedef struct Bar
+{
+  int mFoo;
+  int mBar;
+} Bar;
+
+inline Bar * Constructor_Bar(Bar * __this, int foo, int bar)
+{
+  Constructor_Foo((Foo *)__this, foo);
+  return __this;
+}
+
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

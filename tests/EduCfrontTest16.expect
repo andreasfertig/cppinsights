@@ -1,0 +1,64 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+void* malloc(unsigned int);
+extern "C" void free(void*);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Alloc
+{
+  int * data;
+} Alloc;
+
+inline Alloc * Constructor_Alloc(Alloc * __this)
+{
+  __this->data = (int *)malloc(sizeof(int) * 10);
+  if(__this->data) {
+    __this->data[0] = 1;
+    __this->data[1] = 2;
+    __this->data[2] = 3;
+  } 
+  
+  return __this;
+}
+
+inline void Destructor_Alloc(Alloc * __this)
+{
+  if(__this->data) {
+    free(__this->data);
+  } 
+  
+}
+
+
+
+int __main(void)
+{
+  Alloc a;
+  ;
+  return 0;
+  Destructor_Alloc(&a);
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

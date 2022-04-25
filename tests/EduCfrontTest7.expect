@@ -1,0 +1,179 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Type
+{
+  int tint;
+  int oint;
+} Type;
+
+inline Type * Constructor_Type(Type * __this, int v)
+{
+  __this->tint = 7;
+  __this->oint = v;
+  return __this;
+}
+
+inline void Destructor_Type(Type * __this)
+{
+}
+
+inline Type * operatorEqual(Type * __this, const Type * __rhs)
+{
+  __this->tint = __rhs->tint;
+  __this->oint = __rhs->oint;
+  return __this;
+}
+
+
+
+typedef struct DefaultCtorType
+{
+  char __dummy;
+} DefaultCtorType;
+
+inline DefaultCtorType * operatorEqual(DefaultCtorType * __this, const DefaultCtorType * __rhs)
+{
+  return __this;
+}
+
+inline DefaultCtorType * operatorEqual(DefaultCtorType * __this, DefaultCtorType * __rhs)
+{
+  return __this;
+}
+
+
+
+typedef struct Base
+{
+  Type mX;
+} Base;
+
+inline void Destructor_Base(Base * __this)
+{
+}
+
+inline Base * operatorEqual(Base * __this, const Base * __rhs)
+{
+  operatorEqual(&__this->mX, &__rhs->mX);
+  return __this;
+}
+
+inline Base * Constructor_Base(Base * __this)
+{
+  Constructor_Type(&__this->mX, 5);
+  return __this;
+}
+
+
+
+typedef struct BaseSecond
+{
+  Type mX;
+  Type mY;
+} BaseSecond;
+
+inline void Destructor_BaseSecond(BaseSecond * __this)
+{
+  Destructor_Base((Base *)__this);
+}
+
+inline BaseSecond * operatorEqual(BaseSecond * __this, const BaseSecond * __rhs)
+{
+  operatorEqual(&__this->mX, &__rhs->mX);
+  operatorEqual((Base *)__this, (Base *)__rhs);
+  operatorEqual(&__this->mY, &__rhs->mY);
+  return __this;
+}
+
+inline BaseSecond * Constructor_BaseSecond(BaseSecond * __this)
+{
+  Constructor_Base((Base *)__this);
+  Constructor_Type(&__this->mX, 5);
+  Constructor_Type(&__this->mY, 5);
+  return __this;
+}
+
+
+
+typedef struct BaseThird
+{
+  Type mZ;
+} BaseThird;
+
+inline void Destructor_BaseThird(BaseThird * __this)
+{
+}
+
+inline BaseThird * operatorEqual(BaseThird * __this, const BaseThird * __rhs)
+{
+  operatorEqual(&__this->mZ, &__rhs->mZ);
+  return __this;
+}
+
+inline BaseThird * Constructor_BaseThird(BaseThird * __this)
+{
+  Constructor_Type(&__this->mZ, 5);
+  return __this;
+}
+
+
+
+typedef struct Derived
+{
+  Type mY;
+  Type mZ;
+  double mD;
+  DefaultCtorType dt;
+  int g;
+} Derived;
+
+inline void Destructor_Derived(Derived * __this)
+{
+  __this->mD = 7;
+  Destructor_BaseThird((BaseThird *)__this);
+  Destructor_BaseSecond((BaseSecond *)__this);
+}
+
+inline Derived * operatorEqual(Derived * __this, const Derived * __rhs)
+{
+  operatorEqual(&__this->mY, &__rhs->mY);
+  operatorEqual((BaseSecond *)__this, (BaseSecond *)__rhs);
+  operatorEqual(&__this->mZ, &__rhs->mZ);
+  operatorEqual((BaseThird *)__this, (BaseThird *)__rhs);
+  __this->mD = __rhs->mD;
+  operatorEqual(&__this->dt, &__rhs->dt);
+  __this->g = __rhs->g;
+  return __this;
+}
+
+inline Derived * Constructor_Derived(Derived * __this)
+{
+  Constructor_BaseSecond((BaseSecond *)__this);
+  Constructor_Type(&__this->mY, 5);
+  Constructor_BaseThird((BaseThird *)__this);
+  Constructor_Type(&__this->mZ, 5);
+  /* dt // trivial type, maybe uninitialized */
+  __this->g = 4;
+  return __this;
+}
+
+
+
+Derived d;
+
+void __cxa_start(void)
+{
+  Constructor_Derived(&d);
+}
+
+void __cxa_atexit(void)
+{
+  Destructor_Derived(&d);
+}
+
