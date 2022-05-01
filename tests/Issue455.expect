@@ -1,0 +1,56 @@
+#include <cstdio>
+#include <cstdlib>
+
+__attribute__((visibility("default"))) __attribute__((returns_nonnull)) __attribute__((alloc_size(1))) void * operator new(size_t size)
+{
+  return malloc(size);
+}
+
+
+__attribute__((visibility("default"))) void operator delete(void * p) noexcept
+{
+  free(p);
+}
+
+
+class Apple
+{
+  
+  public: 
+  static inline void * operator new(size_t size)
+  {
+    return malloc(size);
+  }
+  
+  static inline void operator delete(void * p) noexcept
+  {
+    free(p);
+  }
+  
+};
+
+
+
+class Orange
+{
+  
+  public: 
+  static inline void * operator new(size_t size)
+  {
+    return malloc(size);
+  }
+  
+  static inline void operator delete(void * p) noexcept
+  {
+    free(p);
+  }
+  
+};
+
+
+
+int main()
+{
+  return 0;
+}
+
