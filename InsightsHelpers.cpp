@@ -1378,7 +1378,14 @@ void StringStream::Print(const TemplateArgument& arg)
 
 void StringStream::Print(const TemplateSpecializationType& arg)
 {
-    arg.getTemplateName().print(*this, CppInsightsPrintingPolicy{}, true);
+    arg.getTemplateName().print(*this,
+                                CppInsightsPrintingPolicy{},
+#if IS_CLANG_NEWER_THAN(13)
+                                TemplateName::Qualified::AsWritten
+#else
+                                true
+#endif
+    );
 }
 //-----------------------------------------------------------------------------
 
