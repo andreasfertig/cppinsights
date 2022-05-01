@@ -3736,6 +3736,16 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
 
     if(!decl.isFunctionTemplateSpecialization() || (isCXXMethodDecl && isFirstCxxMethodDecl)) {
         mOutputFormatHelper.Append(GetStorageClassAsStringWithSpace(decl.getStorageClass()));
+
+        // [class.free]: Any allocation function for a class T is a static member (even if not explicitly declared
+        // static). (https://eel.is/c++draft/class.free#1)
+        // However, Clang does not add `static` to `getStorageClass` so this needs to be check independently.
+        if(isCXXMethodDecl) {
+            // GetStorageClassAsStringWithSpace already carries static, if the method was marked so explicitly
+            if((SC_Static != methodDecl->getStorageClass()) and (methodDecl->isStatic())) {
+                mOutputFormatHelper.Append(kwStaticSpace);
+            }
+        }
     }
 
     if(Decl::FOK_None != decl.getFriendObjectKind()) {
