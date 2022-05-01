@@ -1,0 +1,30 @@
+#include <exception> // for noexcept transformation
+// cmdlineinsights:-edu-show-noexcept
+
+struct Data
+{
+  int i;
+  double d;
+  inline double func() const noexcept
+  {
+    try {
+      return this->d * static_cast<double>(this->i);
+    } catch(...) {
+      std::terminate();
+    }
+  }
+  
+};
+
+
+
+
+int func() noexcept
+{
+  try {
+    return 4 * 6;
+  } catch(...) {
+    std::terminate();
+  }
+}
+
