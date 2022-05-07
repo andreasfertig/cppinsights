@@ -1184,7 +1184,7 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
                 mOutputFormatHelper.Append(typeName);
             }
 
-            if(tt->hasDefaultArgument()) {
+            if(tt->hasDefaultArgument() and not tt->defaultArgumentWasInherited()) {
                 mOutputFormatHelper.Append(hlpAssing, GetName(tt->getDefaultArgument()));
             }
 
