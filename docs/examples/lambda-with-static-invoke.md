@@ -25,7 +25,7 @@ int main()
     }
     
     using retType_3_28 = int (*)(int, char);
-    inline /*constexpr */ operator retType_3_28 () const
+    inline /*constexpr */ operator retType_3_28 () const noexcept
     {
       return __invoke;
     }
@@ -41,6 +41,7 @@ int main()
   
   using FuncPtr_3 = int (*)(int, char);
   FuncPtr_3 fp = static_cast<int (*)(int, char)>(__lambda_3_28.operator __lambda_3_28::retType_3_28());
+  return 0;
 }
 
 

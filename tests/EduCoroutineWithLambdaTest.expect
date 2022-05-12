@@ -1,0 +1,234 @@
+/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+// cmdline:-std=c++20
+// cmdlineinsights:-edu-show-coroutine-transformation
+
+#if __has_include(<coroutine>)
+#include <coroutine>
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+
+namespace std
+{
+  using namespace experimental;
+  
+}
+#else
+#error "No coroutine header"
+#endif
+
+#include <new>
+
+struct generator
+{
+  struct promise_type
+  {
+    int current_value;
+    inline std::suspend_always yield_value(int value)
+    {
+      this->current_value = value;
+      return {};
+    }
+    
+    inline std::suspend_always initial_suspend()
+    {
+      return {};
+    }
+    
+    inline std::suspend_always final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline generator get_return_object()
+    {
+      return generator{this};
+    }
+    
+    inline void unhandled_exception()
+    {
+      std::terminate();
+    }
+    
+    inline void return_value(int v)
+    {
+      this->current_value = v;
+    }
+    
+    // inline constexpr promise_type() noexcept = default;
+  };
+  
+  inline generator(generator && rhs)
+  : p{{std::exchange(rhs.p, nullptr)}}
+  {
+  }
+  
+  inline ~generator() noexcept
+  {
+    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
+      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    } 
+    
+  }
+  
+  
+  private: 
+  inline explicit generator(promise_type * p)
+  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*p)}
+  {
+  }
+  
+  std::experimental::coroutine_handle<promise_type> p;
+  public: 
+  // inline constexpr generator(const generator &) = delete;
+  // inline generator & operator=(const generator &) = delete;
+};
+
+
+
+template<typename _AwrT>
+void SyncAwait(_AwrT&& a)
+{
+    auto asyncLambda = [&]() -> generator { co_await a; };
+
+    asyncLambda();
+}
+
+/* First instantiated from: EduCoroutineWithLambdaTest.cpp:60 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void SyncAwait<std::experimental::suspend_always>(std::experimental::suspend_always && a)
+{
+    
+  class __lambda_53_24
+  {
+    public: 
+    struct __operator_53_43Frame
+{
+  void (*resume_fn)(__operator_53_43Frame *);
+  void (*destroy_fn)(__operator_53_43Frame *);
+  std::experimental::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  std::suspend_always __suspend_53_24;
+  std::experimental::suspend_always __suspend_53_54;
+  std::suspend_always __suspend_53_24_1;
+};
+
+inline generator operator()() const
+    {
+      /* Allocate the frame including the promise */
+      __operator_53_43Frame * __f = reinterpret_cast<__operator_53_43Frame *>(operator new(__builtin_coro_size()));
+      __f->__suspend_index = 0;
+      __f->__initial_await_suspend_called = false;
+      
+      /* Construct the promise. */
+      new (&__f->__promise)std::experimental::__coroutine_traits_sfinae<generator>::promise_type{};
+      
+      generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
+      
+      /* Forward declare the resume and destroy function. */
+      void __operator_53_43Resume(__operator_53_43Frame * __f);
+      void __operator_53_43Destroy(__operator_53_43Frame * __f);
+      
+      /* Assign the resume and destroy function pointers. */
+      __f->resume_fn = &__operator_53_43Resume;
+      __f->destroy_fn = &__operator_53_43Destroy;
+      
+      /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+      __operator_53_43Resume(__f);
+      
+      
+      return __coro_gro;
+    }
+    
+    /* This function invoked by coroutine_handle<>::resume() */
+    void __operator_53_43Resume(__operator_53_43Frame * __f)
+    {
+      try 
+      {
+        /* Create a switch to get to the correct resume point */
+        switch(__f->__suspend_index) {
+          case 0: break;
+          case 1: goto __resume_operator_53_43_1;
+          case 2: goto __resume_operator_53_43_2;
+        }
+        
+        /* co_await EduCoroutineWithLambdaTest.cpp:53 */
+        __f->__suspend_53_24 = __f->__promise.initial_suspend();
+        if(!__f->__suspend_53_24.await_ready()) {
+          __f->__suspend_53_24.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+          __f->__suspend_index = 1;
+          __f->__initial_await_suspend_called = true;
+          return;
+        } 
+        
+        __resume_operator_53_43_1:
+        __f->__suspend_53_24.await_resume();
+        
+        /* co_await EduCoroutineWithLambdaTest.cpp:53 */
+        __f->__suspend_53_54 = a;
+        if(!__f->__suspend_53_54.await_ready()) {
+          __f->__suspend_53_54.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+          __f->__suspend_index = 2;
+          return;
+        } 
+        
+        __resume_operator_53_43_2:
+        __f->__suspend_53_54.await_resume();
+        goto __final_suspend;
+      } catch(...) {
+        if(!__f->__initial_await_suspend_called) {
+          throw ;
+        } 
+        
+        __f->__promise.unhandled_exception();
+      }
+      
+      __final_suspend:
+      
+      /* co_await EduCoroutineWithLambdaTest.cpp:53 */
+      __f->__suspend_53_24_1 = __f->__promise.final_suspend();
+      if(!__f->__suspend_53_24_1.await_ready()) {
+        __f->__suspend_53_24_1.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+      } 
+      
+      ;
+    }
+    
+    /* This function invoked by coroutine_handle<>::destroy() */
+    void __operator_53_43Destroy(__operator_53_43Frame * __f)
+    {
+      /* destroy all variables with dtors */
+      __f->~__operator_53_43Frame();
+      /* Deallocating the coroutine frame */
+      operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+    }
+    
+    
+    private: 
+    std::experimental::suspend_always & a;
+    
+    public:
+    __lambda_53_24(std::experimental::suspend_always & _a)
+    : a{_a}
+    {}
+    
+  };
+  
+  __lambda_53_24 asyncLambda = __lambda_53_24{a};
+  asyncLambda.operator()();
+}
+#endif
+
+
+void f()
+{
+  SyncAwait(std::suspend_always{});
+}
+
+

@@ -23,9 +23,10 @@ Here is the transformed code:
 int main()
 {
   int i = 3;
-  auto a;
-  int b = 42;
-  auto c;
+  std::initializer_list<int> a = std::initializer_list<int>{42};
+  int b = {42};
+  std::initializer_list<int> c = std::initializer_list<int>{1, 2};
+  return 0;
 }
 
 

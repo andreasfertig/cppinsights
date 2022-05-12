@@ -9,6 +9,7 @@
 #include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "DPrint.h"
+#include "Insights.h"
 #include "InsightsStaticStrings.h"
 #include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
@@ -277,36 +278,39 @@ static void InsertAfter(std::string& source, const std::string_view& find, const
 }
 //-----------------------------------------------------------------------------
 
-static std::string MakeLineColumnName(const Decl& decl, const std::string_view prefix)
+std::string MakeLineColumnName(const SourceManager& sm, const SourceLocation& loc, const std::string_view& prefix)
 {
-    const auto& sm       = GetSM(decl);
-    const auto  locBegin = decl.getBeginLoc();
     // In case of a macro expansion the expansion(line/column) number gives a unique value.
-    const auto lineNo = locBegin.isMacroID() ? sm.getExpansionLineNumber(locBegin) : sm.getSpellingLineNumber(locBegin);
-    const auto columnNo =
-        locBegin.isMacroID() ? sm.getExpansionColumnNumber(locBegin) : sm.getSpellingColumnNumber(locBegin);
+    const auto lineNo   = loc.isMacroID() ? sm.getExpansionLineNumber(loc) : sm.getSpellingLineNumber(loc);
+    const auto columnNo = loc.isMacroID() ? sm.getExpansionColumnNumber(loc) : sm.getSpellingColumnNumber(loc);
 
     return StrCat(prefix, lineNo, "_"sv, columnNo);
 }
 //-----------------------------------------------------------------------------
 
+static std::string MakeLineColumnName(const Decl& decl, const std::string_view prefix)
+{
+    return MakeLineColumnName(GetSM(decl), decl.getBeginLoc(), prefix);
+}
+//-----------------------------------------------------------------------------
+
 std::string GetLambdaName(const CXXRecordDecl& lambda)
 {
-    static constexpr std::string_view lambdaPrefix{"__lambda_"};
+    static constexpr auto lambdaPrefix{"__lambda_"sv};
     return MakeLineColumnName(lambda, lambdaPrefix);
 }
 //-----------------------------------------------------------------------------
 
 static std::string GetAnonymStructOrUnionName(const CXXRecordDecl& cxxRecordDecl)
 {
-    static constexpr std::string_view prefix{"__anon_"};
+    static constexpr auto prefix{"__anon_"sv};
     return MakeLineColumnName(cxxRecordDecl, prefix);
 }
 //-----------------------------------------------------------------------------
 
 std::string BuildRetTypeName(const Decl& decl)
 {
-    static constexpr std::string_view retTypePrefix{"retType_"};
+    static constexpr auto retTypePrefix{"retType_"sv};
     return MakeLineColumnName(decl, retTypePrefix);
 }
 //-----------------------------------------------------------------------------
@@ -1197,11 +1201,39 @@ static std::string GetTemplateParameterPackArgumentName(std::string_view name, c
 }
 //-----------------------------------------------------------------------------
 
+static llvm::DenseMap<const ValueDecl*, std::string_view> varNamePrefix{};
+static bool                                               skipNamePrefix{};
+
+void AddToVarNamePrefixMap(const VarDecl* vd, std::string_view name)
+{
+    // The name currently is _only_ CORO_FRAME_ACCESS. Known at compile-time
+    varNamePrefix.insert(std::make_pair(vd, name));
+}
+
+void ClearVarNamePrefix()
+{
+    varNamePrefix.clear();
+}
+
+void SkipNamePrefix(bool b)
+{
+    skipNamePrefix = b;
+}
+
+static std::string_view GetPrefixIfAvailable(const ValueDecl* decl)
+{
+    if(Contains(varNamePrefix, decl) && not skipNamePrefix) {
+        return varNamePrefix[decl];
+    }
+
+    return {};
+}
+
 std::string GetName(const DeclRefExpr& declRefExpr)
 {
-    std::string name{};
     const auto* declRefDecl = declRefExpr.getDecl();
-    const auto* declCtx     = declRefDecl->getDeclContext();
+    std::string name{GetPrefixIfAvailable(declRefDecl)};
+    const auto* declCtx = declRefDecl->getDeclContext();
     const bool  needsNamespace{NeedsNamespace(*declRefDecl, UseLexicalParent::No)};
 
     // get the namespace as well
@@ -1241,7 +1273,7 @@ std::string GetName(const DeclRefExpr& declRefExpr)
 /*
  * Go deep in a Stmt if necessary and look to all childs for a DeclRefExpr.
  */
-static const DeclRefExpr* FindDeclRef(const Stmt* stmt)
+const DeclRefExpr* FindDeclRef(const Stmt* stmt)
 {
     if(const auto* dref = dyn_cast_or_null<DeclRefExpr>(stmt)) {
         return dref;
@@ -1290,7 +1322,8 @@ std::string GetName(const VarDecl& VD)
         return {BuildInternalVarName(baseVarName, decompositionDeclStmt->getBeginLoc(), GetSM(*decompositionDeclStmt))};
     }
 
-    std::string_view name{VD.getName()};
+    std::string name{GetPrefixIfAvailable(&VD)};
+    name += VD.getNameAsString();
 
     return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, &VD));
 }

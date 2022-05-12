@@ -26,6 +26,9 @@ namespace clang::insights {
 std::string BuildInternalVarName(const std::string_view& varName);
 //-----------------------------------------------------------------------------
 
+std::string MakeLineColumnName(const SourceManager& sm, const SourceLocation& loc, const std::string_view& prefix);
+//-----------------------------------------------------------------------------
+
 STRONG_BOOL(RequireSemi);
 //-----------------------------------------------------------------------------
 
@@ -92,6 +95,20 @@ inline bool Contains(const std::string_view source, const std::string_view searc
 }
 //-----------------------------------------------------------------------------
 
+template<typename K, typename V, typename U>
+inline bool Contains(const llvm::DenseMap<K, V>& map, const U& key)
+{
+    return map.find(key) != map.end();
+}
+//-----------------------------------------------------------------------------
+
+template<typename T, typename U>
+inline bool Contains(const std::vector<T>& v, const U& key)
+{
+    return std::find(v.begin(), v.end(), key) != v.end();
+}
+//-----------------------------------------------------------------------------
+
 void InsertBefore(std::string& source, const std::string_view& find, const std::string_view& replace);
 //-----------------------------------------------------------------------------
 
@@ -135,7 +152,7 @@ bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl);
  */
 std::string GetPlainName(const DeclRefExpr& DRE);
 
-std::string GetName(const DeclRefExpr& DRE);
+std::string GetName(const DeclRefExpr& declRefExpr);
 std::string GetName(const VarDecl& VD);
 //-----------------------------------------------------------------------------
 
@@ -342,6 +359,9 @@ struct is
 
 template<typename T>
 is(T) -> is<T>;
+
+/// Go deep in a Stmt if necessary and look to all childs for a DeclRefExpr.
+const DeclRefExpr* FindDeclRef(const Stmt* stmt);
 
 }  // namespace clang::insights
 

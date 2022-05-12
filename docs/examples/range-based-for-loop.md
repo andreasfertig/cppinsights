@@ -28,12 +28,13 @@ int main()
     char const (&__range1)[5] = arr;
     const char * __begin1 = __range1;
     const char * __end1 = __range1 + 5L;
-    for(; __begin1 != __end1; ++__begin1) 
-    {
+    for(; __begin1 != __end1; ++__begin1) {
       const char & c = *__begin1;
+      printf("c=%c\n", static_cast<int>(c));
     }
     
   }
+  return 0;
 }
 
 

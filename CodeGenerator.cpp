@@ -716,12 +716,12 @@ void CodeGenerator::InsertArg(const CompoundAssignOperator* stmt)
     const bool needLHSParens{isa<BinaryOperator>(stmt->getLHS()->IgnoreImpCasts())};
     WrapInParensIfNeeded(needLHSParens, [&] { InsertArg(stmt->getLHS()); });
 
-    mOutputFormatHelper.Append(" = ");
+    mOutputFormatHelper.Append(hlpAssing);
 
     // we may need a cast around this back to the src type
     const bool needCast{stmt->getLHS()->getType() != stmt->getComputationLHSType()};
     if(needCast) {
-        mOutputFormatHelper.Append(kwStaticCast, "<", GetName(stmt->getLHS()->getType()), ">(");
+        mOutputFormatHelper.Append(kwStaticCast, "<"sv, GetName(stmt->getLHS()->getType()), ">("sv);
     }
 
     WrapInParensIfNeeded(needLHSParens, [&] {
@@ -739,13 +739,13 @@ void CodeGenerator::InsertArg(const CompoundAssignOperator* stmt)
     });
 
     mOutputFormatHelper.Append(
-        " ", BinaryOperator::getOpcodeStr(BinaryOperator::getOpForCompoundAssignment(stmt->getOpcode())), " ");
+        " "sv, BinaryOperator::getOpcodeStr(BinaryOperator::getOpForCompoundAssignment(stmt->getOpcode())), " "sv);
 
     const bool needRHSParens{isa<BinaryOperator>(stmt->getRHS()->IgnoreImpCasts())};
     WrapInParensIfNeeded(needRHSParens, [&] { InsertArg(stmt->getRHS()); });
 
     if(needCast) {
-        mOutputFormatHelper.Append(")");
+        mOutputFormatHelper.Append(")"sv);
     }
 }
 //-----------------------------------------------------------------------------
@@ -935,6 +935,10 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
             }
         } else {
             const std::string_view pointer = [&]() {
+                if(SkipSpaceAfterVarDecl()) {
+                    return ""sv;
+                }
+
                 if(stmt->getType()->isAnyPointerType()) {
                     return " *"sv;
                 }
@@ -1001,8 +1005,10 @@ bool CodeGenerator::InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl
 /// \brief Inserts the instantiation point of a template.
 //
 // This reveals at which place the template is first used.
-static void
-InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceManager& sm, const SourceLocation& instLoc)
+
+void CodeGenerator::InsertInstantiationPoint(const SourceManager&  sm,
+                                             const SourceLocation& instLoc,
+                                             std::string_view      text)
 {
     const auto  lineNo = sm.getSpellingLineNumber(instLoc);
     const auto& fileId = sm.getFileID(instLoc);
@@ -1011,7 +1017,11 @@ InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceMan
         const auto fileWithDirName = file->getName();
         const auto fileName        = llvm::sys::path::filename(fileWithDirName);
 
-        outputFormatHelper.AppendNewLine("/* First instantiated from: "sv, fileName, ":"sv, lineNo, kwSpaceCCommentEnd);
+        if(text.empty()) {
+            text = "First instantiated from: "sv;
+        }
+
+        mOutputFormatHelper.AppendCommentNewLine(text, fileName, ":"sv, lineNo);
     }
 }
 //-----------------------------------------------------------------------------
@@ -1019,7 +1029,7 @@ InsertInstantiationPoint(OutputFormatHelper& outputFormatHelper, const SourceMan
 void CodeGenerator::InsertTemplateGuardBegin(const FunctionDecl* stmt)
 {
     if(stmt->isTemplateInstantiation() && stmt->isFunctionTemplateSpecialization()) {
-        InsertInstantiationPoint(mOutputFormatHelper, GetSM(*stmt), stmt->getPointOfInstantiation());
+        InsertInstantiationPoint(GetSM(*stmt), stmt->getPointOfInstantiation());
         mOutputFormatHelper.InsertIfDefTemplateGuard();
     }
 }
@@ -1070,38 +1080,47 @@ void CodeGenerator::InsertArg(const CoreturnStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertMethodBody(const FunctionDecl* stmt)
+void CodeGenerator::InsertMethodBody(const FunctionDecl* stmt, const size_t posBeforeFunc)
 {
     if(stmt->doesThisDeclarationHaveABody()) {
         mOutputFormatHelper.AppendNewLine();
 
-        const auto exSpec = stmt->getExceptionSpecType();
-        const bool showNoexcept =
-            GetInsightsOptions().UseShowNoexcept && is{exSpec}.any_of(EST_BasicNoexcept, EST_NoexceptTrue);
+        // If this function has a CoroutineBodyStmt as direct descend and coroutine transformation is enabled use the \c
+        // CoroutinesCodeGenerator, otherwise insert the body as usual.
+        if(const auto* corBody = dyn_cast_or_null<CoroutineBodyStmt>(stmt->getBody());
+           (nullptr != corBody) && GetInsightsOptions().ShowCoroutineTransformation) {
 
-        if(showNoexcept) {
-            mHaveException = true;
-            mOutputFormatHelper.OpenScope();
-            mOutputFormatHelper.Append(kwTrySpace);
-        }
+            CoroutinesCodeGenerator codeGenerator{mOutputFormatHelper, posBeforeFunc};
+            codeGenerator.InsertCoroutine(*stmt, corBody);
+        } else {
+            const auto exSpec = stmt->getExceptionSpecType();
+            const bool showNoexcept =
+                GetInsightsOptions().UseShowNoexcept && is{exSpec}.any_of(EST_BasicNoexcept, EST_NoexceptTrue);
 
-        // handle C++ [basic.start.main] §5: main can have no return statement
-        if(stmt->hasImplicitReturnZero()) {
-            // TODO replace with ranges::find_if
-            const auto cmpBody = dyn_cast<CompoundStmt>(stmt->getBody())->body();
-            mRequiresImplicitReturnZero =
-                std::end(cmpBody) ==
-                std::find_if(cmpBody.begin(), cmpBody.end(), [](const Stmt* e) { return isa<ReturnStmt>(e); });
-        }
+            if(showNoexcept) {
+                mHaveException = true;
+                mOutputFormatHelper.OpenScope();
+                mOutputFormatHelper.Append(kwTrySpace);
+            }
 
-        InsertArg(stmt->getBody());
+            // handle C++ [basic.start.main] §5: main can have no return statement
+            if(stmt->hasImplicitReturnZero()) {
+                // TODO replace with ranges::find_if
+                const auto cmpBody = dyn_cast<CompoundStmt>(stmt->getBody())->body();
+                mRequiresImplicitReturnZero =
+                    std::end(cmpBody) ==
+                    std::find_if(cmpBody.begin(), cmpBody.end(), [](const Stmt* e) { return isa<ReturnStmt>(e); });
+            }
 
-        if(showNoexcept) {
-            mOutputFormatHelper.Append(" catch(...) "sv);
-            mOutputFormatHelper.OpenScope();
-            mOutputFormatHelper.Append("std::terminate();"sv);
-            mOutputFormatHelper.CloseScope();
-            mOutputFormatHelper.CloseScope();
+            InsertArg(stmt->getBody());
+
+            if(showNoexcept) {
+                mOutputFormatHelper.Append(" catch(...) "sv);
+                mOutputFormatHelper.OpenScope();
+                mOutputFormatHelper.Append("std::terminate();"sv);
+                mOutputFormatHelper.CloseScope();
+                mOutputFormatHelper.CloseScope();
+            }
         }
 
         mOutputFormatHelper.AppendNewLine();
@@ -1126,11 +1145,13 @@ void CodeGenerator::InsertArg(const FunctionDecl* stmt)
             return;
         }
 
+        const auto posBeforeFunc = mOutputFormatHelper.CurrentPos();
+
         InsertTemplateGuardBegin(stmt);
         InsertFunctionNameWithReturnType(*stmt);
 
         if(not InsertLambdaStaticInvoker(dyn_cast_or_null<CXXMethodDecl>(stmt))) {
-            InsertMethodBody(stmt);
+            InsertMethodBody(stmt, posBeforeFunc);
         }
 
         InsertTemplateGuardEnd(stmt);
@@ -1656,8 +1677,15 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
     for(const auto* item : stmt->body()) {
         InsertArg(item);
 
-        if(IsStmtRequiringSemi<IfStmt, NullStmt, ForStmt, DeclStmt, WhileStmt, DoStmt, CXXForRangeStmt, SwitchStmt>(
-               item)) {
+        if(IsStmtRequiringSemi<IfStmt,
+                               NullStmt,
+                               ForStmt,
+                               DeclStmt,
+                               WhileStmt,
+                               DoStmt,
+                               CXXForRangeStmt,
+                               SwitchStmt,
+                               CppInsightsCommentStmt>(item)) {
             mOutputFormatHelper.AppendSemiNewLine();
         }
     }
@@ -1785,7 +1813,7 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
             WrapInParens(
                 [&]() {
                     if(const auto* init = stmt->getInit()) {
-                        MultiStmtDeclCodeGenerator codeGenerator{mOutputFormatHelper, mLambdaStack};
+                        MultiStmtDeclCodeGenerator codeGenerator{mOutputFormatHelper, mLambdaStack, InsertVarDecl()};
                         codeGenerator.InsertArg(init);
 
                     } else {
@@ -2334,6 +2362,8 @@ void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skip
     OutputFormatHelper initOutputFormatHelper{};
     initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
 
+    const auto posBeforeFunc = mOutputFormatHelper.CurrentPos();
+
     InsertCXXMethodHeader(stmt, initOutputFormatHelper);
 
     if(not stmt->isUserProvided()) {
@@ -2356,7 +2386,7 @@ void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skip
     }
 
     if((SkipBody::No == skipBody) && stmt->doesThisDeclarationHaveABody() && not stmt->isLambdaStaticInvoker()) {
-        InsertMethodBody(stmt);
+        InsertMethodBody(stmt, posBeforeFunc);
 
     } else if(not InsertLambdaStaticInvoker(stmt) || (SkipBody::Yes == skipBody)) {
         mOutputFormatHelper.AppendSemiNewLine();
@@ -2831,8 +2861,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     if(isClassTemplateSpecialization) {
         if(tmplRequiresIfDef) {
-            InsertInstantiationPoint(mOutputFormatHelper,
-                                     GetSM(*classTemplateSpecializationDecl),
+            InsertInstantiationPoint(GetSM(*classTemplateSpecializationDecl),
                                      classTemplateSpecializationDecl->getPointOfInstantiation());
             mOutputFormatHelper.InsertIfDefTemplateGuard();
         }
@@ -3211,6 +3240,12 @@ void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
 void CodeGenerator::InsertArg(const StmtExpr* stmt)
 {
     WrapInParens([&] { InsertArg(stmt->getSubStmt()); });
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CppInsightsCommentStmt* stmt)
+{
+    mOutputFormatHelper.AppendCommentNewLine(stmt->Comment());
 }
 //-----------------------------------------------------------------------------
 

@@ -37,6 +37,50 @@ struct A
     static const auto value = A<n - 1>::value + n;
 };
 
+/* First instantiated from: recursive-template.cpp:18 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct A<5>
+{
+  static const int value = A<4>::value + 5;
+};
+
+#endif
+
+
+/* First instantiated from: recursive-template.cpp:7 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct A<4>
+{
+  static const int value = A<3>::value + 4;
+};
+
+#endif
+
+
+/* First instantiated from: recursive-template.cpp:7 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct A<3>
+{
+  static const int value = A<2>::value + 3;
+};
+
+#endif
+
+
+/* First instantiated from: recursive-template.cpp:7 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct A<2>
+{
+  static const int value = A<1>::value + 2;
+};
+
+#endif
+
+
 template<>
 struct A<1>
 {
@@ -47,6 +91,8 @@ struct A<1>
 
 int main()
 {
+  printf("c=%c\n", A<5>::value);
+  return 0;
 }
 
 

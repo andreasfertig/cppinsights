@@ -55,9 +55,72 @@ private:
     U mX;
 };
 
+/* First instantiated from: implicit-conversions.cpp:21 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class X<int>
+{
+  
+  public: 
+  inline X() noexcept = default;
+  inline constexpr X(const X<int> & x) = default;
+  template<typename T>
+  inline X(T && x);
+  
+  
+  private: 
+  int mX;
+  public: 
+};
+
+#endif
+
+
+/* First instantiated from: implicit-conversions.cpp:26 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class X<const int>
+{
+  
+  public: 
+  inline X() = delete;
+  inline constexpr X(const X<const int> & x) = default;
+  template<typename T>
+  inline X(T && x);
+  
+  
+  /* First instantiated from: implicit-conversions.cpp:26 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline X<X<int> &>(X<int> & x)
+  : mX{}
+  {
+  }
+  #endif
+  
+  
+  
+  private: 
+  const int mX;
+  public: 
+};
+
+#endif
+
+
 int main()
 {
-  X<int> arr[2];
+  X<int> arr[2] = {X<int>{}, X<int>{}};
+  {
+    X<int>[2] & __range1 = arr;
+    X<int> * __begin1 = __range1;
+    X<int> * __end1 = __range1 + 2L;
+    for(; __begin1 != __end1; ++__begin1) {
+      const X<const int> & x = X<const int>(*__begin1);
+    }
+    
+  }
+  return 0;
 }
 
 

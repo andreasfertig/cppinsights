@@ -24,6 +24,33 @@
 
 namespace clang::insights {
 
+class CppInsightsCommentStmt : public Stmt
+{
+    std::string mComment{};
+
+public:
+    CppInsightsCommentStmt(std::string_view comment)
+    : Stmt{NoStmtClass}
+    , mComment{comment}
+    {
+    }
+
+    std::string_view Comment() const { return mComment; }
+
+    static bool classof(const Stmt* T) { return T->getStmtClass() == NoStmtClass; }
+
+    child_range children()
+    {
+        static child_iterator iter{};
+        return {iter, iter};
+    }
+    const_child_range children() const
+    {
+        static const_child_iterator iter{};
+        return {iter, iter};
+    }
+};
+
 /// \brief More or less the heart of C++ Insights.
 ///
 /// This is the place where nearly all of the transformations happen. This class knows the needed types and how to
@@ -193,8 +220,11 @@ public:
     void InsertAttributes(const Decl::attr_range&);
     void InsertAttribute(const Attr&);
 
+    void InsertTemplateArg(const TemplateArgument& arg);
+
 protected:
     virtual bool InsertVarDecl() { return true; }
+    virtual bool SkipSpaceAfterVarDecl() { return false; }
     virtual bool InsertComma() { return false; }
     virtual bool InsertSemi() { return true; }
     virtual bool InsertNamespace() const { return false; }
@@ -223,7 +253,7 @@ protected:
 
     void InsertArgWithParensIfNeeded(const Stmt* stmt);
     void InsertSuffix(const QualType& type);
-    void InsertTemplateArg(const TemplateArgument& arg);
+
     void InsertTemplateArg(const TemplateArgumentLoc& arg) { InsertTemplateArg(arg.getArgument()); }
     bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
     void InsertTemplateParameters(const TemplateParameterList& list);
@@ -267,7 +297,7 @@ protected:
 
     STRONG_BOOL(SkipBody);
     void InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skipBody);
-    void InsertMethodBody(const FunctionDecl* stmt);
+    void InsertMethodBody(const FunctionDecl* stmt, const size_t posBeforeFunc);
 
     /// \brief Generalized function to insert either a \c CXXConstructExpr or \c CXXUnresolvedConstructExpr
     template<typename T>
@@ -277,6 +307,8 @@ protected:
     void InsertCurlysIfRequired(const Stmt* stmt);
 
     void InsertIfOrSwitchInitVariables(same_as_any_of<const IfStmt, const SwitchStmt> auto* stmt);
+
+    void InsertInstantiationPoint(const SourceManager& sm, const SourceLocation& instLoc, std::string_view text = {});
 
     STRONG_BOOL(AddNewLineAfter);
 
@@ -330,7 +362,9 @@ protected:
     static std::string FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt);
     static std::string GetValueOfValueInit(const QualType& t);
 
-    LambdaStackType  mLambdaStackThis{};
+    //    virtual std::string GetName(const VarDecl& vd);
+
+    LambdaStackType  mLambdaStackThis;
     LambdaStackType& mLambdaStack;
 
     STRONG_BOOL(SkipVarDecl);
@@ -388,7 +422,14 @@ for(int x=2, y=3, z=4; i < x; ++i) {}
 class MultiStmtDeclCodeGenerator final : public CodeGenerator
 {
 public:
-    using CodeGenerator::CodeGenerator;
+    explicit MultiStmtDeclCodeGenerator(OutputFormatHelper& _outputFormatHelper,
+                                        LambdaStackType&    lambdaStack,
+                                        bool                insertVarDecl)
+    : CodeGenerator{_outputFormatHelper, lambdaStack}
+    , mInsertVarDecl{insertVarDecl}
+    , mInsertComma{}
+    {
+    }
 
     // Insert the semi after the last declaration. This implies that this class always requires its own scope.
     ~MultiStmtDeclCodeGenerator() { mOutputFormatHelper.Append("; "sv); }
@@ -403,6 +444,104 @@ protected:
     bool InsertVarDecl() override { return mInsertVarDecl; }
     bool InsertComma() override { return mInsertComma; }
     bool InsertSemi() override { return false; }
+};
+//-----------------------------------------------------------------------------
+
+struct CoroutineASTData
+{
+    CXXRecordDecl* mFrameType{};
+    FieldDecl*     mResumeFnField{};
+    FieldDecl*     mDestroyFnField{};
+    FieldDecl*     mPromiseField{};
+    FieldDecl*     mSuspendIndexField{};
+    FieldDecl*     mInitialAwaitResumeCalledField{};
+    MemberExpr*    mInitialAwaitResumeCalledAccess{};
+    DeclRefExpr*   mFrameAccessDeclRef{};
+    MemberExpr*    mSuspendIndexAccess{};
+    bool           mDoInsertInDtor{};
+};
+
+///
+/// \brief A special generator for coroutines. It is only activated, if \c -show-coroutines-transformation is given as a
+/// command line option.
+class CoroutinesCodeGenerator final : public CodeGenerator
+{
+public:
+    explicit CoroutinesCodeGenerator(OutputFormatHelper& _outputFormatHelper, const size_t posBeforeFunc)
+    : CoroutinesCodeGenerator{_outputFormatHelper, posBeforeFunc, {}, {}, {}}
+    {
+    }
+
+    explicit CoroutinesCodeGenerator(OutputFormatHelper& _outputFormatHelper,
+                                     const size_t        posBeforeFunc,
+                                     std::string_view    fsmName,
+                                     size_t              suspendsCount,
+                                     CoroutineASTData    data)
+    : CodeGenerator{_outputFormatHelper}
+    , mPosBeforeFunc{posBeforeFunc}
+    , mSuspendsCount{suspendsCount}
+    , mFSMName{fsmName}
+    , mASTData{data}
+    {
+    }
+
+    ~CoroutinesCodeGenerator() override;
+
+    using CodeGenerator::InsertArg;
+
+    void InsertArg(const ImplicitCastExpr* stmt) override;
+    void InsertArg(const CallExpr* stmt) override;
+    void InsertArg(const CStyleCastExpr* stmt) override;
+    void InsertArg(const CXXRecordDecl* stmt) override;
+    void InsertArg(const CXXThisExpr* stmt) override;
+    void InsertArg(const OpaqueValueExpr* stmt) override;
+    void InsertArg(const BinaryOperator* stmt) override;
+
+    void InsertArg(const CoroutineBodyStmt* stmt) override;
+    void InsertArg(const CoroutineSuspendExpr* stmt) override;
+    void InsertArg(const CoreturnStmt* stmt) override;
+
+    void InsertCoroutine(const FunctionDecl& fd, const CoroutineBodyStmt* body);
+
+    std::string GetFrameName() const { return mFrameName; }
+
+protected:
+    bool InsertVarDecl() override { return mInsertVarDecl; }
+    bool SkipSpaceAfterVarDecl() override { return not mInsertVarDecl; }
+
+private:
+    enum class eState
+    {
+        Invalid,
+        InitialSuspend,
+        Body,
+        FinalSuspend,
+    };
+
+    eState                            mState{};
+    const size_t                      mPosBeforeFunc;
+    size_t                            mPosBeforeSuspendExpr{};
+    size_t                            mSuspendsCount{};
+    size_t                            mSuspendsCounter{};
+    bool                              mInsertVarDecl{true};
+    bool                              mSupressCasts{};
+    bool                              mSupressRecordDecls{};
+    bool                              mNameOnly{};
+    bool                              mCorosOnly{};
+    std::string                       mFrameName{};
+    std::string                       mFSMName{};
+    CoroutineASTData                  mASTData{};
+    llvm::DenseMap<const Stmt*, bool> mBinaryExprs{};
+    static inline llvm::DenseMap<const Expr*, std::string>
+        mOpaqueValues{};  ///! Keeps track of the current set of opaque value
+
+    QualType GetFrameType() const { return QualType(mASTData.mFrameType->getTypeForDecl(), 0); }
+    QualType GetFramePointerType() const;
+
+    std::string BuildResumeLabelName(int) const;
+    FieldDecl*  AddField(std::string_view name, QualType type);
+
+    void InsertArgWithNull(const Stmt* stmt);
 };
 //-----------------------------------------------------------------------------
 

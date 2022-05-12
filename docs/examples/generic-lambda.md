@@ -29,7 +29,6 @@ int main()
       return x * x;
     }
     
-    /* First instantiated from: generic-lambda.cpp:6 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline /*constexpr */ int operator()(int x) const
@@ -39,7 +38,6 @@ int main()
     #endif
     
     
-    /* First instantiated from: generic-lambda.cpp:7 */
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
     inline /*constexpr */ double operator()(double x) const
@@ -60,6 +58,7 @@ int main()
   __lambda_4_14 x = __lambda_4_14{};
   x.operator()(2);
   x.operator()(3.0);
+  return 0;
 }
 
 

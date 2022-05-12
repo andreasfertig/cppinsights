@@ -120,7 +120,8 @@ def main():
     defaultCppStd = '-std=%s'% (args['std'])
 
     if 0 == len(remainingArgs):
-        cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp'))]
+        cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp') and
+            f.startswith('EduCo') )]
     else:
         cppFiles = remainingArgs
 
@@ -139,12 +140,14 @@ def main():
         cppStd       = defaultCppStd
         insightsOpts = ''
 
-        fileHeader = open(f, 'r', encoding='utf-8').readline().strip()
-        m = regEx.match(fileHeader)
+        fh = open(f, 'r', encoding='utf-8')
+        fileHeader = fh.readline()
+        fileHeader += fh.readline()
+        m = regEx.search(fileHeader)
         if None != m:
             cppStd = m.group(1)
 
-        m = regExInsights.match(fileHeader)
+        m = regExInsights.search(fileHeader)
         if None != m:
             insightsOpts = m.group(1)
 

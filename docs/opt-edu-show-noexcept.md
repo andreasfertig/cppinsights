@@ -1,8 +1,5 @@
 # edu-show-noexcept {#edu_show_noexcept}
-Transform a function marked with `noexcept` showing the `try-catch` the compiler most likely adds.
-
-Please note that this transformation is for educational purposes. The actual transformation happens in the back-end of
-the compiler and is not visible in the AST.
+Transform a noexcept function
 
 __Default:__ Off
 
@@ -23,6 +20,7 @@ void Fun2() noexcept(false)
 transforms into this:
 
 ```.cpp
+#include <exception> // for noexcept transformation
 void Fun() noexcept(true)
 {
   try {
@@ -37,4 +35,6 @@ void Fun2() noexcept(false)
 {
   int i = 3;
 }
+
+
 ```

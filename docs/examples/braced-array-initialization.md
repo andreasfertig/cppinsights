@@ -18,6 +18,7 @@ Here is the transformed code:
 int main()
 {
   int arr[5] = {2, 3, 4, 0, 0};
+  return 0;
 }
 
 
