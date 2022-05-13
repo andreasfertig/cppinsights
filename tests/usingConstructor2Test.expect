@@ -15,7 +15,7 @@ class Derived : public Base
   
   public: 
   int someValue;
-  // inline Derived() = delete;
+  // inline Derived() /* noexcept */ = delete;
   inline Derived(double __param0) noexcept(false)
   : Base(__param0)
   {

@@ -14,7 +14,7 @@ int main()
     private: 
     const std::basic_string<char, std::char_traits<char>, std::allocator<char> > str;
     public: 
-    // inline __lambda_5_12 & operator=(const __lambda_5_12 &) = delete;
+    // inline __lambda_5_12 & operator=(const __lambda_5_12 &) /* noexcept */ = delete;
     __lambda_5_12(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & _str)
     : str{_str}
     {}

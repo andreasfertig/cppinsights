@@ -120,8 +120,7 @@ def main():
     defaultCppStd = '-std=%s'% (args['std'])
 
     if 0 == len(remainingArgs):
-        cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp') and
-            f.startswith('EduCo') )]
+        cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp'))]
     else:
         cppFiles = remainingArgs
 

@@ -1,8 +1,8 @@
 struct C
 {
   int & i;
-  inline C() = delete;
-  inline constexpr C(const C &) = default;
+  inline C() /* noexcept */ = delete;
+  inline constexpr C(const C &) /* noexcept */ = default;
 };
 
 

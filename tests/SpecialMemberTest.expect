@@ -5,7 +5,7 @@ class C
 {
   
   public: 
-  inline C() = delete;
+  inline C() /* noexcept */ = delete;
   
   private: 
   const int i;
@@ -17,13 +17,13 @@ class D
 {
   
   public: 
-  inline constexpr D() = default;
+  inline constexpr D() /* noexcept */ = default;
   
   private: 
   std::unique_ptr<int, std::default_delete<int> > p;
   public: 
-  // inline constexpr D(const D &) = delete;
-  // inline D & operator=(const D &) = delete;
+  // inline constexpr D(const D &) /* noexcept */ = delete;
+  // inline D & operator=(const D &) /* noexcept */ = delete;
 };
 
 

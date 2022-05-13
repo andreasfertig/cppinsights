@@ -22,7 +22,7 @@ namespace mstd
     
     inline constexpr _Head_base(const long & __h);
     
-    inline constexpr _Head_base(const _Head_base<2, long, false> &) = default;
+    inline constexpr _Head_base(const _Head_base<2, long, false> &) /* noexcept */ = default;
     long _M_head_impl;
   };
   
@@ -39,7 +39,7 @@ namespace mstd
     
     inline constexpr _Head_base(const short & __h);
     
-    inline constexpr _Head_base(const _Head_base<1, short, false> &) = default;
+    inline constexpr _Head_base(const _Head_base<1, short, false> &) /* noexcept */ = default;
     short _M_head_impl;
   };
   

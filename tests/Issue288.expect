@@ -82,7 +82,7 @@ namespace expressions
       __lambda_27_16 ex1;
       __lambda_32_16 ex2;
       public: 
-      // inline /*constexpr */ __lambda_20_10 & operator=(const __lambda_20_10 &) = delete;
+      // inline /*constexpr */ __lambda_20_10 & operator=(const __lambda_20_10 &) /* noexcept */ = delete;
       __lambda_20_10(__lambda_27_16 && _ex1, __lambda_32_16 && _ex2)
       : ex1{std::move(_ex1)}
       , ex2{std::move(_ex2)}
@@ -117,7 +117,7 @@ namespace expressions
     
     public: 
     // inline /*constexpr */ __lambda_27_16(__lambda_27_16 &&) noexcept = default;
-    // inline /*constexpr */ __lambda_27_16 & operator=(const __lambda_27_16 &) = delete;
+    // inline /*constexpr */ __lambda_27_16 & operator=(const __lambda_27_16 &) /* noexcept */ = delete;
     
   };
   
@@ -145,7 +145,7 @@ namespace expressions
     
     public: 
     // inline /*constexpr */ __lambda_32_16(__lambda_32_16 &&) noexcept = default;
-    // inline /*constexpr */ __lambda_32_16 & operator=(const __lambda_32_16 &) = delete;
+    // inline /*constexpr */ __lambda_32_16 & operator=(const __lambda_32_16 &) /* noexcept */ = delete;
     
   };
   

@@ -60,7 +60,7 @@ class Test
 struct S
 {
   Test count;
-  // inline constexpr S(S &&) = delete;
+  // inline constexpr S(S &&) /* noexcept */ = delete;
   // inline S() noexcept(false) = default;
 };
 

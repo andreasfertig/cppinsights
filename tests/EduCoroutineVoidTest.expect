@@ -106,8 +106,8 @@ struct generator<int>
   
   std::experimental::coroutine_handle<promise_type> p;
   public: 
-  // inline constexpr generator(const generator<int> &) = delete;
-  // inline generator<int> & operator=(const generator<int> &) = delete;
+  // inline constexpr generator(const generator<int> &) /* noexcept */ = delete;
+  // inline generator<int> & operator=(const generator<int> &) /* noexcept */ = delete;
 };
 
 #endif

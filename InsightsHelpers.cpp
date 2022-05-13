@@ -1367,6 +1367,9 @@ const std::string GetNoExcept(const FunctionDecl& decl)
         }
 
         return ret;
+    } else if(func and isUnresolvedExceptionSpec(func->getExceptionSpecType())) {
+        // For special members the exception specification is unevaluated as long as the special member is unused.
+        return StrCat(" "sv, kwCommentStart, kwSpaceNoexcept, kwSpaceCCommentEnd);
     }
 
     return {};

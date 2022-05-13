@@ -19,7 +19,7 @@ class Bar : public Foo
   
   public: 
   int mX;
-  // inline Bar() = delete;
+  // inline Bar() /* noexcept */ = delete;
   inline Bar(double amount) noexcept(false)
   : Foo(amount)
   {
@@ -40,7 +40,7 @@ class Bla : public Foo
   private: 
   int mX;
   public: 
-  // inline Bla() = delete;
+  // inline Bla() /* noexcept */ = delete;
   inline Bla(int x, int y) noexcept(false)
   : Foo(x, y)
   {
