@@ -86,7 +86,7 @@ struct generator
   
   std::experimental::coroutine_handle<promise_type> p;
   public: 
-  // inline generator & operator=(const generator &) = delete;
+  // inline generator & operator=(const generator &) /* noexcept */ = delete;
 };
 
 

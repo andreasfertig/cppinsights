@@ -17,7 +17,7 @@ class function<void ()>
 {
   
   public: 
-  inline constexpr function() = default;
+  inline constexpr function() /* noexcept */ = default;
   template<typename T>
   inline function(T && f);
   

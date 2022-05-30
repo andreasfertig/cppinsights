@@ -28,14 +28,14 @@ int main()
       }
       
       public: 
-      // inline /*constexpr */ __lambda_2_8 & operator=(const __lambda_2_8 &) = delete;
+      // inline /*constexpr */ __lambda_2_8 & operator=(const __lambda_2_8 &) /* noexcept */ = delete;
       
     };
     
     private: 
     __lambda_2_8 var;
     public: 
-    // inline /*constexpr */ __lambda_2_3 & operator=(const __lambda_2_3 &) = delete;
+    // inline /*constexpr */ __lambda_2_3 & operator=(const __lambda_2_3 &) /* noexcept */ = delete;
     __lambda_2_3(const __lambda_2_8 & _var)
     : var{_var}
     {}

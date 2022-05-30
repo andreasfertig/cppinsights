@@ -36,7 +36,7 @@ struct Foo<int>
     return this->raw;
   }
   
-  inline constexpr Foo<int> & operator=(const Foo<int> & rhs) = default;
+  inline constexpr Foo<int> & operator=(const Foo<int> & rhs) /* noexcept */ = default;
   inline Foo<int> & operator=(int v);
   
   inline void operator=(int v) volatile;
@@ -53,13 +53,13 @@ struct Foo<char>
 {
   char raw;
   inline Foo() noexcept = default;
-  inline constexpr Foo(const Foo<char> & v) = default;
+  inline constexpr Foo(const Foo<char> & v) /* noexcept */ = default;
   inline constexpr Foo(char v);
   
   using retType_12_5 = char;
   inline constexpr operator retType_12_5 () const;
   
-  inline constexpr Foo<char> & operator=(const Foo<char> & rhs) = default;
+  inline constexpr Foo<char> & operator=(const Foo<char> & rhs) /* noexcept */ = default;
   inline Foo<char> & operator=(char v)
   {
     this->raw = v;

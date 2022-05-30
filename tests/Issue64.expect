@@ -14,7 +14,7 @@ void func(const std::basic_string<char, std::char_traits<char>, std::allocator<c
     private: 
     const std::basic_string<char, std::char_traits<char>, std::allocator<char> > arg;
     public: 
-    // inline __lambda_5_11 & operator=(const __lambda_5_11 &) = delete;
+    // inline __lambda_5_11 & operator=(const __lambda_5_11 &) /* noexcept */ = delete;
     __lambda_5_11(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & _arg)
     : arg{_arg}
     {}

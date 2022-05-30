@@ -20,7 +20,7 @@ class EventContainer
     private: 
     EventContainer * __this;
     public: 
-    // inline /*constexpr */ __lambda_6_43 & operator=(const __lambda_6_43 &) = delete;
+    // inline /*constexpr */ __lambda_6_43 & operator=(const __lambda_6_43 &) /* noexcept */ = delete;
     // inline /*constexpr */ __lambda_6_43(const __lambda_6_43 &) noexcept = default;
     // inline /*constexpr */ __lambda_6_43(__lambda_6_43 &&) noexcept = default;
     __lambda_6_43(EventContainer * _this)

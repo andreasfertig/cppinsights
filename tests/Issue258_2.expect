@@ -13,7 +13,7 @@ class NonMoveable
   // inline NonMoveable(const NonMoveable &) = delete;
   // inline NonMoveable & operator=(const NonMoveable &) = delete;
   inline constexpr NonMoveable(NonMoveable &&) noexcept = default;
-  inline NonMoveable & operator=(NonMoveable &&) = default;
+  inline NonMoveable & operator=(NonMoveable &&) /* noexcept */ = default;
   inline int Get() const
   {
     return this->mX;
@@ -38,8 +38,8 @@ int main()
     private: 
     NonMoveable x;
     public: 
-    // inline __lambda_22_19(const __lambda_22_19 &) = delete;
-    // inline __lambda_22_19 & operator=(const __lambda_22_19 &) = delete;
+    // inline __lambda_22_19(const __lambda_22_19 &) /* noexcept */ = delete;
+    // inline __lambda_22_19 & operator=(const __lambda_22_19 &) /* noexcept */ = delete;
     __lambda_22_19(NonMoveable && _x)
     : x{static_cast<NonMoveable &&>(_x)}
     {}

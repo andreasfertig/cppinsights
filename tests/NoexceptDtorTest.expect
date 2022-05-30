@@ -1,0 +1,44 @@
+struct A
+{
+  inline ~A() noexcept
+  {
+  }
+  
+};
+
+
+
+struct C
+{
+  int i;
+  inline ~C() /* noexcept */ = default;
+};
+
+
+
+
+struct D
+{
+  A a{};
+  inline ~D() /* noexcept */ = default;
+};
+
+
+
+
+struct E
+{
+  A a{};
+  inline ~E() noexcept = default;
+};
+
+
+
+int main()
+{
+  C c = {0};
+  E e = {{}};
+  return 0;
+}
+
+
