@@ -1,0 +1,35 @@
+// cmdline:-std=c++20
+
+template<auto SIZE>
+class LambdaInNTTP {
+};
+
+
+class __lambda_7_32
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_7_32 = auto (*)() -> void;
+  inline constexpr operator retType_7_32 () const noexcept
+  {
+    return __invoke;
+  }
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_7_32{}.operator()();
+  }
+  
+  public: 
+  // /*constexpr */ __lambda_7_32() = default;
+  
+};
+
+static LambdaInNTTP<&__lambda_7_32::__invoke> lambdaInNTTP();
+
+
+

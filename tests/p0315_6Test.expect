@@ -1,0 +1,60 @@
+// cmdline:-std=c++20
+
+
+class __lambda_3_47
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_3_47 = auto (*)() -> void;
+  inline constexpr operator retType_3_47 () const noexcept
+  {
+    return __invoke;
+  }
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_3_47{}.operator()();
+  }
+  
+  public: 
+  // /*constexpr */ __lambda_3_47() = default;
+  
+};
+
+using FuncPtr_3 = auto (*)() -> void;
+FuncPtr_3 a = (+static_cast<void (*)()>(__lambda_3_47{}.operator __lambda_3_47::retType_3_47()));
+
+
+
+class __lambda_5_16
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_5_16 = auto (*)() -> void;
+  inline constexpr operator retType_5_16 () const noexcept
+  {
+    return __invoke;
+  }
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_5_16{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_5_16() = default;
+  
+};
+
+using FuncPtr_5 = void (*)();
+FuncPtr_5 fp = static_cast<void (*)()>(__lambda_5_16{}.operator __lambda_5_16::retType_5_16());
+

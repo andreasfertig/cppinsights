@@ -11,11 +11,14 @@
 
 #include "clang/AST/AST.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Lex/Lexer.h"
 
+#include <functional>
 #include <string>
+#include <variant>
 
 #include "InsightsStrongTypes.h"
 #include "StackList.h"
@@ -156,7 +159,8 @@ std::string GetName(const DeclRefExpr& declRefExpr);
 std::string GetName(const VarDecl& VD);
 //-----------------------------------------------------------------------------
 
-std::string GetName(const NamedDecl& ND);
+STRONG_BOOL(QualifiedName);
+std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName = QualifiedName::No);
 //-----------------------------------------------------------------------------
 
 std::string GetNameAsFunctionPointer(const QualType& t);
@@ -304,7 +308,10 @@ private:
 /// \brief Helper to create a \c ScopeHandler on the stack which adds the current \c Decl to it and removes it once the
 /// scope is left.
 #define SCOPE_HELPER(d)                                                                                                \
-    ScopeHandler _scopeHandler { d }
+    ScopeHandler _scopeHandler                                                                                         \
+    {                                                                                                                  \
+        d                                                                                                              \
+    }
 //-----------------------------------------------------------------------------
 
 /// \brief Specialization for \c ::llvm::raw_string_ostream with an internal \c std::string buffer.
@@ -357,12 +364,36 @@ struct is
 
     constexpr bool any_of(const auto&... ts) const { return ((t == ts) || ...); }
 };
+//-----------------------------------------------------------------------------
 
 template<typename T>
 is(T) -> is<T>;
+//-----------------------------------------------------------------------------
 
 /// Go deep in a Stmt if necessary and look to all childs for a DeclRefExpr.
 const DeclRefExpr* FindDeclRef(const Stmt* stmt);
+//-----------------------------------------------------------------------------
+
+///! Find a LambdaExpr inside a Decltype
+class P0315Visitor : public RecursiveASTVisitor<P0315Visitor>
+{
+    std::variant<std::reference_wrapper<class OutputFormatHelper>, std::reference_wrapper<class CodeGenerator>>
+        mConsumer;
+
+public:
+    P0315Visitor(class OutputFormatHelper& ofm)
+    : mConsumer{ofm}
+    {
+    }
+
+    P0315Visitor(class CodeGenerator& cg)
+    : mConsumer{cg}
+    {
+    }
+
+    bool VisitLambdaExpr(const LambdaExpr* expr);
+};
+//-----------------------------------------------------------------------------
 
 }  // namespace clang::insights
 

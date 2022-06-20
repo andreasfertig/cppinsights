@@ -1,0 +1,187 @@
+// cmdline:-std=c++20
+
+#include <array>
+
+
+class __lambda_5_28
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_5_28 = auto (*)() -> void;
+  inline constexpr operator retType_5_28 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_5_28{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_5_28() = default;
+  
+};
+
+static std::array<__lambda_5_28, 2> ff();
+
+
+template<typename T, int SIZE>
+class Container {
+};
+
+
+class __lambda_11_27
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_11_27 = auto (*)() -> void;
+  inline constexpr operator retType_11_27 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_11_27{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_11_27() = default;
+  
+};
+
+static Container<__lambda_11_27, 2> c();
+
+
+
+class __lambda_13_17
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_13_17 = auto (*)() -> void;
+  inline constexpr operator retType_13_17 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_13_17{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_13_17() = default;
+  
+};
+
+static __lambda_13_17 & f();
+
+
+
+class __lambda_15_24
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_15_24 = auto (*)() -> void;
+  inline constexpr operator retType_15_24 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_15_24{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_15_24() = default;
+  
+};
+
+static void h(__lambda_15_24 *)
+{
+}
+
+
+
+class __lambda_17_24
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_17_24 = auto (*)() -> void;
+  inline constexpr operator retType_17_24 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_17_24{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_17_24() = default;
+  
+};
+
+
+class __lambda_17_43
+{
+  public: 
+  inline /*constexpr */ int operator()() const
+  {
+    return 2;
+  }
+  
+  using retType_17_43 = auto (*)() -> int;
+  inline constexpr operator retType_17_43 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ int __invoke()
+  {
+    return __lambda_17_43{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_17_43() = default;
+  
+};
+
+static void w(__lambda_17_24 *, __lambda_17_43 &)
+{
+}
+
+
+// This is invalid syntax!
+//static decltype([] { }) x()[2];
+

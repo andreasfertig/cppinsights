@@ -1,0 +1,63 @@
+// cmdline:-std=c++20
+
+struct Test
+{
+  
+  public: 
+    
+  class __lambda_5_13
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    using retType_5_13 = auto (*)() -> void;
+    inline constexpr operator retType_5_13 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline /*constexpr */ void __invoke()
+    {
+      __lambda_5_13{}.operator()();
+    }
+    
+    
+    public:
+    // /*constexpr */ __lambda_5_13() = default;
+    
+  };
+  
+  __lambda_5_13 a;
+    
+  class __lambda_7_29
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    using retType_7_29 = auto (*)() -> void;
+    inline constexpr operator retType_7_29 () const noexcept
+    {
+      return __invoke;
+    }
+    
+    private: 
+    static inline /*constexpr */ void __invoke()
+    {
+      __lambda_7_29{}.operator()();
+    }
+    
+    public: 
+    // /*constexpr */ __lambda_7_29() = default;
+    
+  };
+  
+  void (*fp)() = (+static_cast<void (*)()>(__lambda_7_29{}.operator __lambda_7_29::retType_7_29()));
+  
+};
+
+

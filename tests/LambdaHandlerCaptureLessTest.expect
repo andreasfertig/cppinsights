@@ -47,10 +47,10 @@ int main()
     #endif
     
     
-  } __lambda_4_28{};
+  };
   
   using FuncPtr_4 = int (*)(int, char);
-  FuncPtr_4 fp = static_cast<int (*)(int, char)>(__lambda_4_28.operator __lambda_4_28::retType_4_28());
+  FuncPtr_4 fp = static_cast<int (*)(int, char)>(__lambda_4_28{}.operator __lambda_4_28::retType_4_28());
   return 0;
 }
 

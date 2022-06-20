@@ -475,13 +475,12 @@ static std::string GetScope(const DeclContext*       declCtx,
 {
     std::string name{};
 
-    if(!declCtx->isTranslationUnit() && !declCtx->isFunctionOrMethod()) {
-
+    if(not declCtx->isTranslationUnit() && not declCtx->isFunctionOrMethod()) {
         while(declCtx->isInlineNamespace()) {
             declCtx = declCtx->getParent();
         }
 
-        if(declCtx->isNamespace() || declCtx->getParent()->isTranslationUnit()) {
+        if(declCtx->isNamespace() or declCtx->getParent()->isTranslationUnit()) {
             if(const auto* namedDecl = dyn_cast_or_null<NamedDecl>(declCtx)) {
                 name = GetQualifiedName(*namedDecl, removeCurrentScope);
                 name.append("::"sv);
@@ -808,6 +807,12 @@ private:
             return true;
         }
 
+        if(const Expr * underlyingExpr{type->getUnderlyingExpr()}; not isa<DeclRefExpr>(underlyingExpr)) {
+            P0315Visitor visitor{mData};
+
+            return not visitor.TraverseStmt(type->getUnderlyingExpr());
+        }
+
         return false;
     }
 
@@ -958,12 +963,18 @@ static bool NeedsNamespace(const Decl& decl, UseLexicalParent useLexicalParent)
 }
 //-----------------------------------------------------------------------------
 
-std::string GetName(const NamedDecl& nd)
+std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName)
 {
     std::string name{};
 
-    if(NeedsNamespace(nd, UseLexicalParent::No)) {
-        name = details::GetScope(nd.getDeclContext(), details::RemoveCurrentScope::No);
+    if(NeedsNamespace(nd, UseLexicalParent::No) || (QualifiedName::Yes == qualifiedName)) {
+        if(const auto* cxxMedthodDecl = dyn_cast_or_null<CXXMethodDecl>(&nd)) {
+            if(cxxMedthodDecl->isLambdaStaticInvoker()) {
+                name = GetName(*cxxMedthodDecl->getParent());
+            }
+        }
+
+        name += details::GetScope(nd.getDeclContext(), details::RemoveCurrentScope::No);
     }
 
     name += nd.getNameAsString();  // Must be getNameAsString because NamedDecl is no identifier.
@@ -1483,6 +1494,26 @@ void StringStream::Print(const TypeConstraint& arg)
 void StringStream::Print(const StringLiteral& arg)
 {
     arg.outputString(*this);
+}
+//-----------------------------------------------------------------------------
+
+template<class... Ts>
+struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+
+bool P0315Visitor::VisitLambdaExpr(const LambdaExpr* expr)
+{
+    std::visit(overloaded{
+                   [&](OutputFormatHelper& ofm) { ofm.Append(GetLambdaName(*expr)); },
+                   [&](CodeGenerator& cg) { cg.InsertArg(expr); },
+               },
+               mConsumer);
+
+    return false;
 }
 //-----------------------------------------------------------------------------
 
