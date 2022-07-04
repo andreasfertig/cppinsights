@@ -21,8 +21,8 @@
 
 ## What
 
-[C++ Insights](https://cppinsights.io) is a [clang](https://clang.llvm.org)-based tool which does a source to source
-transformation. Its goal is it to make things visible which normally, and intentionally, happen behind the scenes.
+[C++ Insights](https://cppinsights.io) is a [Clang](https://clang.llvm.org)-based tool that does a source-to-source
+transformation. The goal of C++ Insights is to make things visible that normally and intentionally happen behind the scenes.
 It's about the magic the compiler does for us to make things work.
 
 Take this piece of code for example:
@@ -62,44 +62,45 @@ int main(){
 }
 ```
 
-You can see all the compiler provided functions. Also the downcast from `Derived` to `Base`.
-
-I do not claim to get all the things right. This is just the initial version of insights I consider good enough to hand
-it to the public. Keep also in mind that is solely based on clang and its understanding of the AST.
+You can see all the compiler-provided functions as well as the downcast from `Derived` to `Base`.
 
 ## Why
 
-[C++ Insights](https://cppinsights.io) is a [clang](https://clang.llvm.org)-based tool which does a source to source transformation.
-Its goal is to make things visible which normally, and intentionally, happen behind the scenes. It's about the magic the compiler does
+[C++ Insights](https://cppinsights.io) is a [Clang](https://clang.llvm.org)-based tool that does a source-to-source transformation.
+The goal of C++ Insights is to make things visible that normally and intentionally happen behind the scenes. It's about the magic the compiler does
 for us to make things work. Or looking through the classes of a compiler.
 
-Some time ago I started looking into some new things we got with C++11, C++14 and C++17. Amazing things like lambdas, range-based for-loops
-and structured bindings. I put it together in a talk. You can find the [slides](https://www.andreasfertig.info/talks_dl/afertig-ndcolo-2017-fast-and-small.pdf)
+In 2017 I started looking into some new things we got with C++11, C++14, and C++17. Amazing things like lambdas, range-based for-loops,
+and structured bindings. I put it together in a talk. You can find the [slides](https://andreasfertig.com/talks/dl/afertig-ndcolo-2017-fast-and-small.pdf)
 and a [video](https://youtu.be/Bt7KzFxcbgc) online.
 
-However, all that research and some of my training and teaching got me start thinking how it would be, if we could see with the eyes of the
-compiler. Sure, there is an AST-dump at least for clang. With tools like Compiler Explorer we can see what code the compiler generates
+However, all that research and some of my training and teaching got me to start thinking about how it would be if we could see with the eyes of the
+compiler. Sure, there is an AST dump, at least for Clang. With tools like Compiler Explorer, we can see what code the compiler generates
 from a C++ source snippet. However, what we see is assembler. Neither the AST nor the Compiler Explorer output is in the language I write
-code and therefore I'm most familiar with. Plus when teaching students C++ showing an AST and explaining that it is all there, was not
+code, and therefore I'm most familiar with. Plus, when teaching students C++ showing an AST and explaining that it is all there was not
 quite satisfying for me.
 
-I started to write a clang-based tool able to transform a range-based for-loop into the compiler-internal version. Then, I did the same
-for structured bindings and lambdas. In the end, I ended up with doing a lot more as initially planned. It shows where operators are
-invoked, places in which the compiler does some casting. C++ Insights is able to deduce the type behind `auto` or `decltype`. The goal
+I started to write a Clang-based tool that can transform a range-based for-loop into the compiler-internal version. Then, I did the same
+for structured bindings and lambdas. In the end, I did much more than initially planned. It shows where operators are
+invoked and places in which the compiler does some casting. C++ Insights can deduce the type behind `auto` or `decltype`. The goal
 is to produce compilable code. However, this is not possible in all places.
+
+You can see, for example, the transformation of a [lambda](https://cppinsights.io/s/e4e19791), [range-based for-loop](https://cppinsights.io/s/0cddd172), or [auto](https://cppinsights.io/s/6c61d601). Of course, you can transform any other C++ snippet.
+
+See yourself. C++ Insights is available online: [cppinsights.io](https://cppinsights.io).
 
 Still, there is work to do.
 
-I do not claim to get all the things right. This is just the initial version of [C++ Insights](https://cppinsights.io) I consider good
-enough to hand it to the public. Also, keep in mind that it is solely based on clang and my understanding of C++ and the AST.
+I do not claim to get all the things right. I'm also working on supporting features from new standards, like C++20, at the moment.
+Please remember that C++ Insights is based on Clang and its understanding of the AST.
 
-You can see, for example the transformation of a [lamda](https://cppinsights.io/lnk?code=aW50IG1haW4oKQp7CiAgaW50ICgqZnApKGludCwgY2hhcikgPSBbXShpbnQgYSwgY2hhciBiKXsgcmV0dXJuIGErYjt9Owp9&rev=1.0), [range-based for-loop](https://cppinsights.io/lnk?code=I2luY2x1ZGUgPGNzdGRpbz4KCmludCBtYWluKCkKewogICAgY29uc3QgY2hhciBhcnJbXXsyLDQsNiw4LDEwfTsKCiAgICBmb3IoY29uc3QgY2hhciYgYyA6IGFycikKICAgIHsKICAgICAgcHJpbnRmKCJjPSVjXG4iLCBjKTsKICAgIH0KfQ==&rev=1.0) or [auto](https://cppinsights.io/lnk?code=Y2xhc3MgQ1Rlc3QKewogICAgYXV0byBUZXN0KCkgeyByZXR1cm4gMjI7IH0KfTsKCmF1dG8gVGVzdCgpCnsKICAgIHJldHVybiAxOwp9CgphdXRvIEJlc3QoKSAtPiBpbnQKewogICAgcmV0dXJuIDE7Cn0KCmNvbnN0ZXhwciBhdXRvIENFQmVzdCgpIC0+IGludAp7CiAgICByZXR1cm4gMTsKfQoKZGVjbHR5cGUoYXV0bykgV2VzdCgpCnsKICAgIHJldHVybiAnYyc7Cn0KCmNvbnN0ZXhwciBkZWNsdHlwZShhdXRvKSBDRVdlc3QoKQp7CiAgICByZXR1cm4gJ2MnOwp9CgpbW21heWJlX3VudXNlZF1dIGlubGluZSBjb25zdGV4cHIgZGVjbHR5cGUoYXV0bykgTVVDRVdlc3QoKQp7CiAgICByZXR1cm4gJ2MnOwp9CgoKaW50IG1haW4oKQp7CiAgaW50IHggPSAyOwogIGNvbnN0IGNoYXIqIHA7CiAgY29uc3RleHByIGF1dG8gY2VpID0gMDsKICBhdXRvIGNvbnN0ZXhwciBjZWkyID0gMDsKICBhdXRvIGkgPSAwOwogIGRlY2x0eXBlKGF1dG8pIHhYID0gKGkpOwogIGF1dG8gaWkgPSAmaTsKICBhdXRvJiBpciA9IGk7CiAgYXV0byAqIGlwID0gJmk7CiAgY29uc3QgYXV0byAqIGNpcCA9ICZpOwogIGF1dG8gKiBwcCA9IHA7CiAgY29uc3QgYXV0byAqIGNwID0gcDsKICB2b2xhdGlsZSBjb25zdCBhdXRvICogdmNwID0gcDsKICBhdXRvIGYgPSAxLjBmOwogIGF1dG8gYyA9ICdjJzsKICBhdXRvIHUgPSAwdTsKICBkZWNsdHlwZSh1KSB1dSA9IHU7CgogIFtbbWF5YmVfdW51c2VkXV0gYXV0byBtdSA9IDB1OwogIFtbbWF5YmVfdW51c2VkXV0gZGVjbHR5cGUodSkgbXV1ID0gdTsKfQ==&rev=1.0). Of course, you can transform any other C++ snippet.
 
-See yourself, C++ Insights is available online: [cppinsights.io](https://cppinsights.io).
+I did a couple of talks about C++ Insights since I released C++ Insights. For example, at C++ now. Here are the [slides](https://andreasfertig.com/talks/dl/afertig-2021-cppnow-cpp-insights.pdf) and the [video](https://youtu.be/p-8wndrTaTs).
+
 
 ## Building
 
-C++ Insights can be build inside the clang-source tree or outside.
+C++ Insights can be built inside the Clang source tree or outside.
 
 ### Building on Windows
 
@@ -113,9 +114,9 @@ See https://github.com/andreasfertig/cppinsights/issues/186 for an explanation o
 
 `extra/clang` and `extra/llvm` provide `/usr/lib/{libclangAST.so,libLLVM*.a,libLLVM.so}`. `libclangAST.so` needs `libLLVM.so` and there would be a conflict if `libLLVM*.a` (instead of `libLLVM.so`) are linked. See https://bugs.archlinux.org/task/60512
 
-### Building outside clang
+### Building outside Clang
 
-You need to have a clang installation in the search path.
+You need to have a Clang installation in the search path.
 
 ```
 git clone https://github.com/andreasfertig/cppinsights.git
@@ -125,9 +126,9 @@ ninja
 ```
 The resulting binary (insights) can be found in the build-folder.
 
-### Building inside clang
+### Building inside Clang
 
-For building it inside the clang-source tree, assuming you have your source-tree already prepared:
+For building it inside the Clang source tree, assuming you have your source tree already prepared:
 
 ```
 cd llvm/tools/clang/tools/extra
@@ -136,7 +137,7 @@ git clone https://github.com/andreasfertig/cppinsights.git
 echo "add_subdirectory(cppinsights)" >> CMakeLists.txt
 ```
 
-Then build clang as you normally do.
+Then build Clang as you normally do.
 
 ### cmake options
 
@@ -171,9 +172,9 @@ Using C++ Insights is fairly simple:
 insights <YOUR_CPP_FILE> -- -std=c++17
 ```
 
-Things get complicated when it comes to the system include paths. There are path hard-coded in the binary which seem
-to come from the compiler C++ Insights was build with. To help with that check out [scripts/getinclude.py](scripts/getinclude.py). It tries to
-collect the system include paths from the compiler. Without an option it uses `g++`, you can also pass another compiler
+Things get complicated when it comes to the system include paths. These paths are hard-coded in the binary, which seems
+to come from the compiler C++ Insights was built with. To help with that, check out [scripts/getinclude.py](scripts/getinclude.py). The script tries to
+collect the system include paths, from the compiler. Without an option, `getinclude.py` uses `g++`. You can also pass another compiler
 as a first argument.
 
 Here is an example:
@@ -190,16 +191,41 @@ insights <YOUR_CPP_FILE> -- -std=c++17 `./scripts/getinclude.py`
 ```
 
 
+### Custom GCC installation
+
+In case you have a custom build of the GCC compiler, for example, gcc-11.2.0, and _NOT_ installed in the compiler in the default system path, then after building, Clang fails to find the correct `libstdc++` path (GCC's STL). If you run into this situation, you can use "`--gcc-toolchain=/path/GCC-1x.x.x/installed/path`" to tell Clang/C++ Insights the location of the STL:
+
+```
+./cppinsights Insights.cpp -- --gcc-toolchain=${GCC_11_2_0_INSTALL_PATH} -std=c++20
+```
+
+Here "`${GCC_11_2_0_INSTALL_PATH}`" is the installation directory of your customized-built GCC. The option for Clang is described [here](https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-gcc-toolchain).
+
+
+### Ready to use Docker container
+
 There is also another GitHub project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
+
+### C++ Insights @ VSCode
 
 An extension for Visual Studio Code is available at the VS Code marketplace: [C++
 Insights - VSCode Extension](https://marketplace.visualstudio.com/items?itemName=devtbi.vscode-cppinsights).
 
 
+
 ## Compatibility
 
-Currently, the most recent stable version of clang is supported as well as the current development branch.
+I aim that the repository compiles with the latest version of Clang and at least the one before. The website tries to
+stay close to the latest release of Clang. However, due to certain issues (building Clang for Windows), the website's
+version is often delayed a few months.
+
+
+## C++ Insights @ YouTube
+
+I created a [YouTube](https://www.youtube.com/c/AndreasFertig-info) channel where I release a new video each month. In
+these videos, I use C++ Insights to show and explain certain C++ constructs, and sometimes I explain C++ Insights as well.
+
 
 ## ToDo's
 
@@ -212,5 +238,5 @@ See [TODO](TODO.md).
 
 ## Support
 
-If you like to support the project consider [submitting](CONTRIBUTING.md) a patch. Another alternative is to become a [Patreon](https://www.patreon.com/cppinsights) supporter.
+If you like to support the project, consider [submitting](CONTRIBUTING.md) a patch. Another alternative is to become a [Patreon](https://www.patreon.com/cppinsights) supporter.
 
