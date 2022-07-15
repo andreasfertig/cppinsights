@@ -63,7 +63,7 @@ class X<int>
   
   public: 
   inline X() noexcept = default;
-  inline constexpr X(const X<int> & x) = default;
+  inline constexpr X(const X<int> & x) /* noexcept */ = default;
   template<typename T>
   inline X(T && x);
   
@@ -83,8 +83,8 @@ class X<const int>
 {
   
   public: 
-  inline X() = delete;
-  inline constexpr X(const X<const int> & x) = default;
+  inline X() /* noexcept */ = delete;
+  inline constexpr X(const X<const int> & x) /* noexcept */ = default;
   template<typename T>
   inline X(T && x);
   
