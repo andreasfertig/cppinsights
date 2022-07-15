@@ -17,6 +17,7 @@ code can be found on [GitHub](https://github.com) at [github.com/andreasfertig/c
 * [Examples](@ref examples)
 * [Getting Started](@ref getting_started)
 * [Docker Containers Overview](@ref docker_containers_overview)
+* [Limitations](@ref limitations)
 
 ##Readme's
 

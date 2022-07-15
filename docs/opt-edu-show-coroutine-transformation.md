@@ -12,7 +12,7 @@ __Examples:__
 #include <experimental/coroutine>
 
 namespace std {
-    using namespace std::experimental;
+using namespace std::experimental;
 }
 #else
 #error "No coroutine header"
@@ -22,8 +22,10 @@ namespace std {
 #include <exception>
 #include <new>
 
-struct generator {
-    struct promise_type {
+struct generator
+{
+    struct promise_type
+    {
         int current_value{};
 
         std::suspend_always yield_value(int value)
@@ -42,16 +44,21 @@ struct generator {
     generator(generator const&) = delete;
     generator(generator&& rhs)
     : p{std::exchange(rhs.p, nullptr)}
-    {}
+    {
+    }
 
     ~generator()
     {
-        if(handle) { handle.destroy(); }
+        if(handle) {
+            handle.destroy();
+        }
     }
 
     void run()
     {
-        if(not handle.done()) { handle.resume(); }
+        if(not handle.done()) {
+            handle.resume();
+        }
     }
 
     auto value() { return handle.promise().current_value; }
@@ -59,7 +66,8 @@ struct generator {
 private:
     explicit generator(promise_type* p)
     : handle{std::coroutine_handle<promise_type>::from_promise(*p)}
-    {}
+    {
+    }
 
     std::coroutine_handle<promise_type> handle;
 };
@@ -101,8 +109,9 @@ transforms into this:
 #elif __has_include(<experimental/coroutine>)
 #include <experimental/coroutine>
 
-namespace std {
-    using namespace std::experimental;
+namespace std
+{
+  
 }
 #else
 #error "No coroutine header"
@@ -201,7 +210,6 @@ int main()
   printf("value: %d\n", s.value());
   return 0;
 }
-
 
 
 ```
