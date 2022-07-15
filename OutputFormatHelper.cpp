@@ -9,6 +9,7 @@
 
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
+#include "InsightsStaticStrings.h"
 #include "OutputFormatHelper.h"
 //-----------------------------------------------------------------------------
 

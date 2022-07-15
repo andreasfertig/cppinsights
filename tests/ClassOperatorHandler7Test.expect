@@ -3,10 +3,11 @@
 //CXXDependentScopeMemberExpr
 // http://lists.llvm.org/pipermail/cfe-dev/2017-January/052433.html
 
-template <typename T>
+template<typename T>
 struct A
 {
-   void foo(int);
+  void foo(int);
+  
 };
 
 /* First instantiated from: ClassOperatorHandler7Test.cpp:22 */
@@ -20,8 +21,6 @@ struct A<int>
 };
 
 #endif
-
-
 /* First instantiated from: ClassOperatorHandler7Test.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

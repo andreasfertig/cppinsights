@@ -1,50 +1,33 @@
 template<typename BT>
 struct Foo
 {
-    BT raw;
-
-    Foo()             = default;
-    Foo(const Foo& v) = default;
-    constexpr Foo(BT v)
-    : BT(v)
-    {
-    }
-    constexpr operator BT() const { return this->raw; }
-    Foo&      operator=(const Foo& rhs) = default;
-
-    Foo& operator=(BT v)
-    {
-        this->raw = v;
-        return *this;
-    }
-    void operator=(BT v) volatile { this->raw = v; }
-};
-
-/* First instantiated from: CharLiteralTest.cpp:61 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct Foo<int>
-{
-  int raw;
-  inline Foo() noexcept = default;
-  inline constexpr Foo(const Foo<int> & v) noexcept = default;
-  inline constexpr Foo(int v);
+  BT raw;
+  inline Foo() = default;
+  inline Foo(const Foo<BT> & v) = default;
+  inline constexpr Foo(BT v)
+  : BT{v}
+  {
+  }
   
-  using retType_12_5 = int;
+  using retType_12_5 = BT;
   inline constexpr operator retType_12_5 () const
   {
     return this->raw;
   }
   
-  inline constexpr Foo<int> & operator=(const Foo<int> & rhs) /* noexcept */ = default;
-  inline Foo<int> & operator=(int v);
+  inline Foo<BT> & operator=(const Foo<BT> & rhs) = default;
+  inline Foo<BT> & operator=(BT v)
+  {
+    this->raw = v;
+    return *this;
+  }
   
-  inline void operator=(int v) volatile;
+  inline void operator=(BT v) volatile
+  {
+    this->raw = v;
+  }
   
 };
-
-#endif
-
 
 /* First instantiated from: CharLiteralTest.cpp:60 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -67,6 +50,30 @@ struct Foo<char>
   }
   
   inline void operator=(char v) volatile;
+  
+};
+
+#endif
+/* First instantiated from: CharLiteralTest.cpp:61 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Foo<int>
+{
+  int raw;
+  inline Foo() noexcept = default;
+  inline constexpr Foo(const Foo<int> & v) noexcept = default;
+  inline constexpr Foo(int v);
+  
+  using retType_12_5 = int;
+  inline constexpr operator retType_12_5 () const
+  {
+    return this->raw;
+  }
+  
+  inline constexpr Foo<int> & operator=(const Foo<int> & rhs) /* noexcept */ = default;
+  inline Foo<int> & operator=(int v);
+  
+  inline void operator=(int v) volatile;
   
 };
 

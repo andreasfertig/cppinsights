@@ -5,28 +5,34 @@
 template<typename T>
 class MyVector
 {
-    std::vector<T> v;
-
-public:
-    // MyVector with initial size
-    MyVector(const std::size_t n)
-    : v(n)
-    {
-    }
-
-    // MyVector with initial size and value
-    MyVector(const std::size_t n, const double initialValue)
-    : v(n, initialValue)
-    {
-    }
-
-    // size of underlying container
-    std::size_t size() const { return v.size(); }
-
-    // index operators
-    T operator[](const std::size_t i) const { return v[i]; }
-
-    T& operator[](const std::size_t i) { return v[i]; }
+  std::vector<T> v;
+  
+  public: 
+  inline MyVector(const std::size_t n)
+  : v{n}
+  {
+  }
+  
+  inline MyVector(const std::size_t n, const double initialValue)
+  : v{n, initialValue}
+  {
+  }
+  
+  inline std::size_t size() const
+  {
+    return this->v.size();
+  }
+  
+  inline T operator[](const std::size_t i) const
+  {
+    return this->v[i];
+  }
+  
+  inline T & operator[](const std::size_t i)
+  {
+    return this->v[i];
+  }
+  
 };
 
 /* First instantiated from: ClassOperatorHandler9Test.cpp:34 */

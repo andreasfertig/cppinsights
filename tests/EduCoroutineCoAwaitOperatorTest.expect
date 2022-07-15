@@ -17,19 +17,40 @@
 template<typename T>
 struct my_future
 {
-	struct promise_type
-	{
-		std::suspend_always initial_suspend() { return {}; }
-		std::suspend_always final_suspend() noexcept { return {}; }
-        auto get_return_object() { return my_future{}; }
-		void unhandled_exception() { std::terminate(); }
-		void return_void() {}
-	};
-
+  struct promise_type
+  {
+    inline std::suspend_always initial_suspend()
+    {
+      return {};
+    }
     
-    bool await_ready();
-    void await_suspend(std::coroutine_handle<>);
-    T    await_resume();
+    inline std::suspend_always final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline auto get_return_object()
+    {
+      return my_future<T>{};
+    }
+    
+    inline void unhandled_exception()
+    {
+      std::terminate();
+    }
+    
+    inline void return_void()
+    {
+    }
+    
+  };
+  
+  bool await_ready();
+  
+  void await_suspend(std::coroutine_handle<void>);
+  
+  T await_resume();
+  
 };
 
 /* First instantiated from: EduCoroutineCoAwaitOperatorTest.cpp:51 */

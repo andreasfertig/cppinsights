@@ -7,7 +7,11 @@ static const char c[12] = "Hello World";
 template<auto C>
 struct SC
 {
-    static void Print() { printf("%s\n", C); }
+  static inline void Print()
+  {
+    printf("%s\n", C);
+  }
+  
 };
 
 /* First instantiated from: NonTypeTemplateArgTest.cpp:14 */

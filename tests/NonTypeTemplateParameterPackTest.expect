@@ -2,7 +2,7 @@ class Test
 {
   
   public: 
-  template<int N, int ... Rest>
+  template<int N, int ...Rest>
   inline int sum()
   {
     if constexpr(sizeof...(Rest) > 0) {

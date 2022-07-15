@@ -44,6 +44,7 @@ SUPPORTED_DECL(ClassTemplateDecl)
 SUPPORTED_DECL(NamespaceDecl)
 SUPPORTED_DECL(VarTemplateDecl)
 SUPPORTED_DECL(ConceptDecl)
+SUPPORTED_DECL(UnresolvedUsingValueDecl)
 
 SUPPORTED_STMT(CXXDeleteExpr)
 SUPPORTED_STMT(CXXDefaultInitExpr)

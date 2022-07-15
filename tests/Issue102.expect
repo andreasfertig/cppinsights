@@ -12,18 +12,10 @@
 #include <tuple>
 #include <utility>
 
-template <typename T>
-struct FunctionArgs : FunctionArgs<decltype(&T::operator())> {};
-
-/* First instantiated from: Issue102.cpp:53 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() const>
+template<typename T>
+struct FunctionArgs : public FunctionArgs<decltype(&T::operator())>
 {
 };
-
-#endif
-
 
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -33,18 +25,6 @@ struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::b
 };
 
 #endif
-
-
-/* First instantiated from: Issue102.cpp:53 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
-{
-};
-
-#endif
-
-
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -53,18 +33,6 @@ struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase
 };
 
 #endif
-
-
-/* First instantiated from: Issue102.cpp:53 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() const>
-{
-};
-
-#endif
-
-
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -73,18 +41,6 @@ struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::b
 };
 
 #endif
-
-
-/* First instantiated from: Issue102.cpp:53 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
-{
-};
-
-#endif
-
-
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -93,8 +49,46 @@ struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase
 };
 
 #endif
+/* First instantiated from: Issue102.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
+{
+};
 
+#endif
+/* First instantiated from: Issue102.cpp:53 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() const>
+{
+};
 
+#endif
+/* First instantiated from: Issue102.cpp:53 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
+{
+};
+
+#endif
+/* First instantiated from: Issue102.cpp:53 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() const>
+{
+};
+
+#endif
+/* First instantiated from: Issue102.cpp:53 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
+{
+};
+
+#endif
 /* First instantiated from: Issue102.cpp:53 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -105,21 +99,12 @@ struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() co
 #endif
 
 
-/* First instantiated from: Issue102.cpp:16 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
+template<typename R, typename ... Args>
+struct FunctionArgsBase
 {
-};
-
-#endif
-
-
-template <typename R, typename... Args>
-struct FunctionArgsBase {
-    using args = std::tuple<Args...>;
-	using arity = std::integral_constant<unsigned, sizeof...(Args)>;
-	using result = R;
+  using args = std::tuple<Args...>;
+  using arity = std::integral_constant<unsigned int, static_cast<unsigned int>(sizeof...(Args))>;
+  using result = R;
 };
 
 /* First instantiated from: Issue102.cpp:30 */
@@ -133,8 +118,6 @@ struct FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::all
 };
 
 #endif
-
-
 /* First instantiated from: Issue102.cpp:30 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

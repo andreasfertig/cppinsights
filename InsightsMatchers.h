@@ -24,20 +24,14 @@ static const auto isTemplate = anyOf(hasAncestor(classTemplateDecl()),
                                      hasAncestor(classTemplateSpecializationDecl()));
 //-----------------------------------------------------------------------------
 
-static const auto isAutoAncestor =
-    hasAncestor(varDecl(anyOf(hasType(autoType().bind("autoType")),
-                              hasType(qualType(hasDescendant(autoType().bind("autoType")))),
-                              /* decltype and decltype(auto) */
-                              hasType(decltypeType().bind("dt")),
-                              hasType(qualType(hasDescendant(decltypeType().bind("dt")))))));
-//-----------------------------------------------------------------------------
-
 /// \brief Shut up a unused variable warnings
 #define SILENCE                                                                                                        \
     (void)Finder;                                                                                                      \
     (void)Builder
+//-----------------------------------------------------------------------------
 
 extern const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;
+//-----------------------------------------------------------------------------
 
 // \brief Matches AST nodes of type \c FunctionDecl which is a template instantiation.
 AST_MATCHER(FunctionDecl, isTemplateInstantiationPlain)
@@ -45,6 +39,7 @@ AST_MATCHER(FunctionDecl, isTemplateInstantiationPlain)
     SILENCE;
     return Node.isTemplateInstantiation();
 }
+//-----------------------------------------------------------------------------
 
 AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl, Stmt))
 {
@@ -52,6 +47,7 @@ AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPE
 
     return (insights::IsMacroLocation(Node.getBeginLoc()) || insights::IsInvalidLocation(Node.getBeginLoc()));
 }
+//-----------------------------------------------------------------------------
 
 AST_POLYMORPHIC_MATCHER(isInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl, Stmt))
 {
@@ -59,6 +55,11 @@ AST_POLYMORPHIC_MATCHER(isInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl,
 
     return insights::IsInvalidLocation(Node.getBeginLoc());
 }
+//-----------------------------------------------------------------------------
+
+inline static const auto hasThisTUParent =
+    allOf(unless(isExpansionInSystemHeader()), unless(isInvalidLocation()), hasParent(translationUnitDecl()));
+//-----------------------------------------------------------------------------
 
 }  // namespace ast_matchers
 }  // namespace clang

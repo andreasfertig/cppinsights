@@ -8,10 +8,10 @@ struct alignas(16) AlignedStruct
 alignas(128) char alignedArray[128];
 
  
-template <typename... Ts>
+template<typename ... Ts>
 struct AlignedStructWithPack
 {
-   char data alignas(Ts...);
+  alignas(alignof(Ts)...) char data;
 };
 
 /* First instantiated from: AlignAsTest.cpp:16 */

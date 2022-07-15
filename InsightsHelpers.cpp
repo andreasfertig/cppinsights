@@ -411,19 +411,9 @@ std::string GetDeclContext(const DeclContext* ctx, WithTemplateParameters withTe
             if(WithTemplateParameters::Yes == withTemplateParameters /*declContext->isNamespace() || declContext->getLexicalParent()->isNamespace() || declContext->getLexicalParent()->isTranslationUnit()*/) {
                 if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(rd)) {
                     if(const auto* classTmpl = cxxRecordDecl->getDescribedClassTemplate()) {
-                        const auto* tmplParams = classTmpl->getTemplateParameters();
-
                         CodeGenerator codeGenerator{mOutputFormatHelper};
-                        mOutputFormatHelper.Append('<');
-
-                        mOutputFormatHelper.ForEachArg(*tmplParams, [&](const auto* param) {
-                            mOutputFormatHelper.Append(GetName(*param));
-                            if(param->isParameterPack()) {
-                                mOutputFormatHelper.Append("..."sv);
-                            }
-                        });
-
-                        mOutputFormatHelper.Append('>');
+                        codeGenerator.InsertTemplateParameters(*classTmpl->getTemplateParameters(),
+                                                               CodeGenerator::TemplateParamsOnly::Yes);
                     }
                 }
             }

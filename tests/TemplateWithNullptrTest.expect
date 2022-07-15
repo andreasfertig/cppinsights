@@ -11,10 +11,9 @@ class A
 
 
 
-template<class T, void(T::*SomeMethod)() = nullptr>
-class B {
-
-
+template<class T, void (T::*SomeMethod)() = static_cast<void (T::*)()>(nullptr)>
+class B
+{
 };
 
 /* First instantiated from: TemplateWithNullptrTest.cpp:15 */

@@ -1,5 +1,7 @@
-template <typename T>
-struct FunctionArgs  {};
+template<typename T>
+struct FunctionArgs
+{
+};
 
 /* First instantiated from: LambdaAsTemplateArgTest.cpp:14 */
 #ifdef INSIGHTS_USE_TEMPLATE

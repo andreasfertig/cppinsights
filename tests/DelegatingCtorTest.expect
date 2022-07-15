@@ -1,14 +1,41 @@
 #define INSIGHTS_USE_TEMPLATE
 
 template<typename T>
-struct Foo {
-  Foo(char x, int y) : _x{x}, _y(y) {}
-  Foo(int y) : Foo('a', y) {}
-
+struct Foo
+{
+  inline Foo(char x, int y)
+  : _x{x}
+  , _y{y}
+  {
+  }
+  
+  inline Foo(int y)
+  : Foo<T>{'a', y}
+  {
+  }
+  
   char _x;
   int _y;
 };
 
+/* First instantiated from: DelegatingCtorTest.cpp:14 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Foo<char>
+{
+  inline Foo(char x, int y)
+  : _x{x}
+  , _y{y}
+  {
+  }
+  
+  inline Foo(int y);
+  
+  char _x;
+  int _y;
+};
+
+#endif
 /* First instantiated from: DelegatingCtorTest.cpp:21 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -32,31 +59,15 @@ struct Foo<int>
 #endif
 
 
-/* First instantiated from: DelegatingCtorTest.cpp:14 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct Foo<char>
+
+template<typename T>
+struct Bar : public Foo<T>
 {
-  inline Foo(char x, int y)
-  : _x{x}
-  , _y{y}
+  inline Bar(int x)
+  : Foo<T>{x, 2}
   {
   }
   
-  inline Foo(int y);
-  
-  char _x;
-  int _y;
-};
-
-#endif
-
-
-
-template<typename T>
-struct Bar : Foo<T>
-{
-    Bar(int x) : Foo<T>(x, 2) {}
 };
 
 /* First instantiated from: DelegatingCtorTest.cpp:24 */

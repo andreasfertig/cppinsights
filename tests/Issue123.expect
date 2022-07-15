@@ -3,13 +3,17 @@
 template<typename T>
 struct Person
 {
-	int age, heightInInches;
-	T distanceTraveled = T(); //default value
-	float hairLength, GPA;
-	unsigned int SATScore;
-
-	T run(T speed, bool startWithLeftFoot);
+  int age;
+  int heightInInches;
+  T distanceTraveled = T();
+  float hairLength;
+  float GPA;
+  unsigned int SATScore;
+  T run(T speed, bool startWithLeftFoot);
+  
 };
+
+
 
 template<typename T>
 T Person<T>::run(T speed, bool left )

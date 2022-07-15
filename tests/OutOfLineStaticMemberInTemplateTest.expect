@@ -3,7 +3,7 @@
 template<int val>
 struct MyClass
 {
-    static int var;
+  static int var;
 };
 
 /* First instantiated from: OutOfLineStaticMemberInTemplateTest.cpp:42 */
@@ -15,8 +15,6 @@ struct MyClass<5>
 };
 
 #endif
-
-
 /* First instantiated from: OutOfLineStaticMemberInTemplateTest.cpp:43 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -42,7 +40,7 @@ int MyClass<7>::var = 7;
 template<typename T, int val>
 struct MyClass2
 {
-    static int var;
+  static int var;
 };
 
 /* First instantiated from: OutOfLineStaticMemberInTemplateTest.cpp:47 */
@@ -54,8 +52,6 @@ struct MyClass2<int, 5>
 };
 
 #endif
-
-
 /* First instantiated from: OutOfLineStaticMemberInTemplateTest.cpp:48 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -78,10 +74,10 @@ int MyClass2<char, 7>::var = 7;
 
 
 
-template<typename T, int val, typename... Ts>
+template<typename T, int val, typename ... Ts>
 struct MyClass3
 {
-    static int var;
+  static int var;
 };
 
 /* First instantiated from: OutOfLineStaticMemberInTemplateTest.cpp:52 */
@@ -93,8 +89,6 @@ struct MyClass3<int, 5>
 };
 
 #endif
-
-
 /* First instantiated from: OutOfLineStaticMemberInTemplateTest.cpp:53 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -107,7 +101,7 @@ struct MyClass3<char, 7>
 
 
 template<typename T, int val, typename ... Ts>
-int MyClass3<T, val, Ts...>::var = val;
+int MyClass3<T, val, Ts... >::var = val;
 #ifdef INSIGHTS_USE_TEMPLATE
 int MyClass3<int, 5>::var = 5;
 #endif
@@ -143,7 +137,7 @@ namespace Test
   
   #endif
   template<typename T, int val, typename ... Ts>
-  int MyClass3<T, val, Ts...>::var = val;
+  int MyClass3<T, val, Ts... >::var = val;
   #ifdef INSIGHTS_USE_TEMPLATE
   int MyClass3<int, 5>::var = 5;
   #endif

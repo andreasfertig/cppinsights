@@ -17,10 +17,10 @@ struct Other
 template<typename T>
 struct Test
 {
-    template <typename R, typename... Args>
-    void fun(R (T::*ptr)(Args...))
-    {
-    }    
+  template<typename R, typename ... Args>
+  inline void fun(R (T::*ptr)(Args...))
+  {
+  }
 };
 
 /* First instantiated from: MemberPointerTest.cpp:21 */

@@ -51,8 +51,9 @@ inline constexpr int fold_minus<0>()
 /* PASSED: static_assert(fold_minus() == -5); */
 
 
-template <int b>
+template<int b>
 class print_int;
+
 
 int i = fold_minus<0>();
 

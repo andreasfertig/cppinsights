@@ -5,71 +5,121 @@
 #include <new>
 #include <tuple>
 
-template <typename T>
+template<typename T>
 struct generator
 {
-	struct promise_type
-	{
-		T current_value;
-		std::suspend_always yield_value(T value)
-		{
-			this->current_value = value;
-			return {};
-		}
-		std::suspend_always initial_suspend() { return {}; }
-		std::suspend_always final_suspend() noexcept { return {}; }
-		generator get_return_object() { return generator{ this }; };
-		void unhandled_exception() { std::terminate(); }
-		void return_void() {}
-        // gets us stmt->getReturnStmtOnAllocFailure()
-    static auto get_return_object_on_allocation_failure() { return generator{nullptr}; }
-	};
-
+  struct promise_type
+  {
+    T current_value;
+    inline std::suspend_always yield_value(T value)
+    {
+      this->current_value = value;
+      return {};
+    }
     
-	struct iterator
-	{
-		std::coroutine_handle<promise_type> hco;
-		bool done = false;
-
-		iterator(std::coroutine_handle<promise_type> hco, bool done)
-		: hco(hco), done(done) {}
-
-		iterator& operator++()
-        {
-			hco.resume();
-			done = hco.done();
-			return *this;
-		}
-
-		bool operator==(const iterator&o) const
-        {
-			return done == o.done;
-		}
-		bool operator!=(const iterator&o) const { return !(*this == o); }
-
-		const T& operator*() const { return hco.promise().current_value; }
-		const T* operator->() const { return &(operator*()); }
-	};
-
-	iterator begin()
+    inline std::suspend_always initial_suspend()
     {
-		p.resume();
-		return { p, p.done() };
-	}
-	iterator end() { return { p, true }; }
-
-	generator(generator&& rhs) : p(rhs.p) { rhs.p = nullptr; }
-	~generator()
+      return {};
+    }
+    
+    inline std::suspend_always final_suspend() noexcept
     {
-		if (p)
-			p.destroy();
-	}
-
-private:
-	explicit generator(promise_type* p)
-	: p(std::coroutine_handle<promise_type>::from_promise(*p)) {}
-
-	std::coroutine_handle<promise_type> p;
+      return {};
+    }
+    
+    inline generator<T> get_return_object()
+    {
+      return generator<T>{{this}};
+    }
+    
+    inline void unhandled_exception()
+    {
+      std::terminate();
+    }
+    
+    inline void return_void()
+    {
+    }
+    
+    static inline auto get_return_object_on_allocation_failure()
+    {
+      return generator<T>{{nullptr}};
+    }
+    
+  };
+  
+  struct iterator
+  {
+    std::coroutine_handle<promise_type> hco;
+    bool done;
+    inline iterator(std::coroutine_handle<promise_type> hco, bool done)
+    : hco{hco}
+    , done{done}
+    {
+    }
+    
+    inline iterator & operator++()
+    {
+      this->hco.resume();
+      this->done = this->hco.done();
+      return *this;
+    }
+    
+    inline bool operator==(const iterator & o) const
+    {
+      return this->done == o.done;
+    }
+    
+    inline bool operator!=(const iterator & o) const
+    {
+      return !(*this == o);
+    }
+    
+    inline const T & operator*() const
+    {
+      return this->hco.promise().current_value;
+    }
+    
+    inline const T * operator->() const
+    {
+      return &(this->operator*());
+    }
+    
+  };
+  
+  inline iterator begin()
+  {
+    this->p.resume();
+    return {this->p, this->p.done()};
+  }
+  
+  inline iterator end()
+  {
+    return {this->p, true};
+  }
+  
+  inline generator(generator<T> && rhs)
+  : p{rhs.p}
+  {
+    rhs.p = nullptr;
+  }
+  
+  inline ~generator()
+  {
+    if(this->p) {
+      this->p.destroy();
+    } 
+    
+  }
+  
+  
+  private: 
+  inline explicit generator(promise_type * p)
+  : p{std::coroutine_handle<promise_type>::from_promise(*p)}
+  {
+  }
+  
+  std::coroutine_handle<promise_type> p;
 };
 
 /* First instantiated from: Issue92.cpp:75 */

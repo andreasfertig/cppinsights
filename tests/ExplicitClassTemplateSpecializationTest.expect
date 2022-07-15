@@ -14,9 +14,11 @@ namespace ExplicitClassTemplateSpecializationTest
 }
 
   template<typename T>
-  struct Base
-  {
-  };
+struct Base
+{
+};
+
+
 
   template<>
 struct Base<bool>

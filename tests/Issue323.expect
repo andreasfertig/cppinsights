@@ -1,5 +1,5 @@
-template<typename... Args> struct count;
-
+template<typename ... Args>
+struct count;
 /* First instantiated from: Issue323.cpp:14 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

@@ -85,22 +85,20 @@ class S : public B
 {
 };
 
-/* First instantiated from: TemplateExpansion2Test.cpp:59 */
+/* First instantiated from: TemplateExpansion2Test.cpp:48 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-class S<int> : public B
+class S<double> : public B
 {
   public: 
   // inline constexpr S() noexcept = default;
 };
 
 #endif
-
-
-/* First instantiated from: TemplateExpansion2Test.cpp:48 */
+/* First instantiated from: TemplateExpansion2Test.cpp:59 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-class S<double> : public B
+class S<int> : public B
 {
   public: 
   // inline constexpr S() noexcept = default;

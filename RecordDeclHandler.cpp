@@ -22,25 +22,13 @@ namespace clang::insights {
 RecordDeclHandler::RecordDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    matcher.addMatcher(cxxRecordDecl(hasDefinition(),
-                                     unless(anyOf(isLambda(),
-                                                  hasAncestor(namespaceDecl()),
-                                                  hasAncestor(functionDecl()),
-                                                  hasAncestor(cxxRecordDecl()),
-                                                  isTemplate,
-                                                  isExpansionInSystemHeader())))
-                           .bind("cxxRecordDecl"),
-                       this);
+    matcher.addMatcher(
+        cxxRecordDecl(hasDefinition(), hasThisTUParent, unless(anyOf(isLambda(), isTemplate))).bind("cxxRecordDecl"),
+        this);
 
-    matcher.addMatcher(namespaceDecl(hasParent(translationUnitDecl()),
-                                     unless(anyOf(isExpansionInSystemHeader(), isMacroOrInvalidLocation())))
-                           .bind("namespaceDecl"),
-                       this);
+    matcher.addMatcher(namespaceDecl(hasThisTUParent).bind("namespaceDecl"), this);
 
-    matcher.addMatcher(enumDecl(hasParent(translationUnitDecl()),
-                                unless(anyOf(isExpansionInSystemHeader(), isMacroOrInvalidLocation())))
-                           .bind("enumDecl"),
-                       this);
+    matcher.addMatcher(enumDecl(hasThisTUParent).bind("enumDecl"), this);
 }
 //-----------------------------------------------------------------------------
 
@@ -65,7 +53,7 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
             const auto startLoc =
                 GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::No).getBegin().getLocWithOffset(-1);
 
-            mRewrite.InsertText(startLoc, outputFormatHelper.GetString());
+            InsertIndentedText(startLoc, outputFormatHelper);
         }
 
     } else if(const auto* namespaceDecl = result.Nodes.getNodeAs<NamespaceDecl>("namespaceDecl")) {

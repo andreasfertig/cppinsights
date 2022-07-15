@@ -16,7 +16,7 @@ namespace tnt
         class __lambda_15_17
         {
           public: 
-          template<std::size_t ... I>
+          template<std::size_t ...I>
           inline auto operator()(std::index_sequence<I...>) const noexcept
           {
             ((__this->data[I] = std::exchange(rhs.data[I], U(0))) , ...);

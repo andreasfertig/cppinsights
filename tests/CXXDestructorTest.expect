@@ -3,27 +3,32 @@
 template<typename T, bool array>
 class Alloc
 {
-    T* data;
+  T * data;
+  
+  public: 
+  inline Alloc()
+  {
+    if(array) {
+      this->data = new T[10];
+      this->data = new T[10]{1, 2, 3};
+    } else {
+      this->data = new T;
+      this->data = new T{2};
+      this->data = new T{2};
+    } 
     
-public:
-    Alloc() {
-        if( array ) {
-            data = new T[10];
-            data = new T[10]{1,2,3};
-        } else {
-            data = new T;
-            data = new T(2);
-            data = new T{2};
-        }
-    }
-
-    ~Alloc() {
-        if( array ) {
-            delete[] data;
-        } else {
-            delete data;
-        }
-    }
+  }
+  
+  inline ~Alloc()
+  {
+    if(array) {
+      delete[] this->data;
+    } else {
+      delete this->data;
+    } 
+    
+  }
+  
 };
 
 /* First instantiated from: CXXDestructorTest.cpp:31 */
@@ -60,8 +65,6 @@ class Alloc<int, false>
 };
 
 #endif
-
-
 /* First instantiated from: CXXDestructorTest.cpp:32 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

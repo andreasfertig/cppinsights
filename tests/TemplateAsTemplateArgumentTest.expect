@@ -1,4 +1,7 @@
-template<typename T> class my_array {};
+template<typename T>
+class my_array
+{
+};
 
 /* First instantiated from: TemplateAsTemplateArgumentTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -13,11 +16,11 @@ class my_array<int>
 
  
 // two type template parameters and one template template parameter:
-template<typename K, typename V, template<typename> typename C = my_array>
+template<typename K, typename V, template <typename> typename C = my_array>
 class Map
 {
-    C<K> key;
-    C<V> value;
+  C<K> key;
+  C<V> value;
 };
 
 /* First instantiated from: TemplateAsTemplateArgumentTest.cpp:13 */

@@ -3,14 +3,17 @@
 #include <string>
 #include <typeinfo>
 
-template <typename T>
-class Foo{
-public:    
-    std::string Get() {
-        std::string typeId{typeid(T).name()};
-        return typeId;
-    }
-
+template<typename T>
+class Foo
+{
+  
+  public: 
+  inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > Get()
+  {
+    std::basic_string<char, std::char_traits<char>, std::allocator<char> > typeId = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{typeid(const std::type_info).name()} /* NRVO variable */;
+    return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(static_cast<std::basic_string<char, std::char_traits<char>, std::allocator<char> > &&>(typeId));
+  }
+  
 };
 
 /* First instantiated from: TypeIdInTemplateTest.cpp:20 */

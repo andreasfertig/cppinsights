@@ -32,8 +32,9 @@ namespace detail
   
 }
 
-template <typename ...>
+template<typename ... type_parameter_0_0>
 struct compose;
+
 
 template<>
 struct compose<>

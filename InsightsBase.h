@@ -9,8 +9,6 @@
 #define INSIGHTS_BASE_H
 //-----------------------------------------------------------------------------
 
-#include <stdint.h>       // for intptr_t
-#include <unordered_map>  // for unordered_map
 namespace clang {
 class Rewriter;
 }
@@ -32,15 +30,11 @@ protected:
 
     explicit InsightsBase(Rewriter& rewriter)
     : mRewrite{rewriter}
-    , mMap{}
     {
     }
 
 protected:
     void InsertIndentedText(SourceLocation loc, OutputFormatHelper& outputFormatHelper);
-
-private:
-    std::unordered_map<intptr_t, bool> mMap;
 };
 //-----------------------------------------------------------------------------
 

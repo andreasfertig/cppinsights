@@ -79,27 +79,6 @@ namespace mstd
   
   template<std::size_t _Idx, typename ... _Elements>
   struct _Tuple_impl;
-  /* First instantiated from: Issue188_2.cpp:70 */
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct _Tuple_impl<1, short, long> : public _Tuple_impl<2, long>, private _Head_base<1, short, false>
-  {
-    using _Inherited = _Tuple_impl<2, long>;
-    using _Base = _Head_base<1, short, false>;
-    inline constexpr _Tuple_impl()
-    : _Tuple_impl<2, long>()
-    , _Head_base<1, short, false>()
-    {
-    }
-    
-    inline explicit constexpr _Tuple_impl(const short & __head, const long & ____tail1);
-    
-    template<typename ... _UElements>
-    inline constexpr _Tuple_impl(const _Tuple_impl<1UL, _UElements...> & __in);
-    
-  };
-  
-  #endif
   /* First instantiated from: Issue188_2.cpp:51 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -136,6 +115,27 @@ namespace mstd
     template<std::size_t , typename ... type_parameter_0_1>
     friend class _Tuple_impl;
     inline constexpr _Tuple_impl() noexcept = default;
+  };
+  
+  #endif
+  /* First instantiated from: Issue188_2.cpp:70 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct _Tuple_impl<1, short, long> : public _Tuple_impl<2, long>, private _Head_base<1, short, false>
+  {
+    using _Inherited = _Tuple_impl<2, long>;
+    using _Base = _Head_base<1, short, false>;
+    inline constexpr _Tuple_impl()
+    : _Tuple_impl<2, long>()
+    , _Head_base<1, short, false>()
+    {
+    }
+    
+    inline explicit constexpr _Tuple_impl(const short & __head, const long & ____tail1);
+    
+    template<typename ... _UElements>
+    inline constexpr _Tuple_impl(const _Tuple_impl<1UL, _UElements...> & __in);
+    
   };
   
   #endif

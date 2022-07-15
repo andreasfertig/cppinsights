@@ -10,9 +10,9 @@ struct T
   void f();
   template<int T::* >
   void f();
-  template<int (S::*)() >
+  template<int (S::*)()>
   void f();
-  template<int (T::*)() >
+  template<int (T::*)()>
   void f();
   struct N
   {

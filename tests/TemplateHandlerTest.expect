@@ -57,15 +57,21 @@ double max<double>(const double & a, const double & b)
 template<typename T>
 class Template
 {
-public:
-    Template(const T& x)
-        : mX{x}
-    {}
-
-    T Get() const { return mX;}
-
-private:
-    const T mX;
+  
+  public: 
+  inline Template(const T & x)
+  : mX{x}
+  {
+  }
+  
+  inline T Get() const
+  {
+    return this->mX;
+  }
+  
+  
+  private: 
+  const T mX;
 };
 
 /* First instantiated from: TemplateHandlerTest.cpp:61 */
@@ -89,8 +95,6 @@ class Template<int>
 };
 
 #endif
-
-
 /* First instantiated from: TemplateHandlerTest.cpp:63 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

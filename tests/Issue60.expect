@@ -26,14 +26,16 @@ template<auto pMember>
 using POD_t = decltype(extractPOD(pMember));
 
 template<auto pmember>
-struct Index {
+struct Index
+{
   using Key = Key_t<pmember>;
-  using POD = POD_t<pmember>;  
-
+  using POD = POD_t<pmember>;
   std::map<Key, int> data;
-  static Key extractKey(POD const& pod) {
-    return pod.*pmember;
+  static inline decltype(extractKey(pmember)) extractKey(const POD & pod)
+  {
+    return pod .* pmember;
   }
+  
 };
 
 /* First instantiated from: Issue60.cpp:34 */

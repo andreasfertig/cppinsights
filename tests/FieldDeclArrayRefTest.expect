@@ -3,14 +3,24 @@
 static int x[2] = {1, 2};
 
 
-template <typename T, unsigned int SIZE>
+template<typename T, unsigned int SIZE>
 class array
 {
-private:
-    T (&data)[SIZE];
-public:
-    array() : data(x) { }
-    array(T (&reference)[SIZE]) : data(reference) { }
+  
+  private: 
+  T (&data)[SIZE];
+  
+  public: 
+  inline array()
+  : data{x}
+  {
+  }
+  
+  inline array(T (&reference)[SIZE])
+  : data{reference}
+  {
+  }
+  
 };
 
 /* First instantiated from: FieldDeclArrayRefTest.cpp:17 */
