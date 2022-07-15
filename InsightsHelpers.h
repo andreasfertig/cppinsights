@@ -216,8 +216,9 @@ GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqual
 //-----------------------------------------------------------------------------
 
 STRONG_BOOL(WithTemplateParameters);
+STRONG_BOOL(IgnoreNamespace);
 
-std::string GetNestedName(const NestedNameSpecifier* nns);
+std::string GetNestedName(const NestedNameSpecifier* nns, const IgnoreNamespace ignoreNamespace = IgnoreNamespace::No);
 std::string GetDeclContext(const DeclContext*     ctx,
                            WithTemplateParameters withTemplateParameters = WithTemplateParameters::No);
 //-----------------------------------------------------------------------------

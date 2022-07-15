@@ -123,21 +123,22 @@ struct CppInsightsPrintingPolicy : PrintingPolicy
 //-----------------------------------------------------------------------------
 
 namespace details {
-static void BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt)
+static void
+BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, const IgnoreNamespace ignoreNamespace)
 {
     if(!stmt) {
         return;
     }
 
     if(const auto* prefix = stmt->getPrefix()) {
-        BuildNamespace(fullNamespace, prefix);
+        BuildNamespace(fullNamespace, prefix, ignoreNamespace);
     }
 
     switch(stmt->getKind()) {
         case NestedNameSpecifier::Identifier: fullNamespace.append(stmt->getAsIdentifier()->getName()); break;
 
         case NestedNameSpecifier::Namespace:
-            if(stmt->getAsNamespace()->isAnonymousNamespace()) {
+            if((IgnoreNamespace::Yes == ignoreNamespace) or (stmt->getAsNamespace()->isAnonymousNamespace())) {
                 return;
             }
 
@@ -161,12 +162,12 @@ static void BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier
 //-----------------------------------------------------------------------------
 }  // namespace details
 
-std::string GetNestedName(const NestedNameSpecifier* nns)
+std::string GetNestedName(const NestedNameSpecifier* nns, const IgnoreNamespace ignoreNamespace)
 {
     std::string ret{};
 
     if(nns) {
-        details::BuildNamespace(ret, nns);
+        details::BuildNamespace(ret, nns, ignoreNamespace);
     }
 
     return ret;
@@ -605,7 +606,11 @@ private:
 
     bool HandleType(const ElaboratedType* type)
     {
-        mScope = GetNestedName(type->getQualifier());
+        const IgnoreNamespace ignoreNamespace = (mPrintingPolicy.CppInsightsSuppressScope == InsightsSuppressScope::Yes)
+                                                    ? IgnoreNamespace::No
+                                                    : IgnoreNamespace::Yes;
+
+        mScope = GetNestedName(type->getQualifier(), ignoreNamespace);
 
         const bool ret = HandleType(type->getNamedType().getTypePtrOrNull());
 

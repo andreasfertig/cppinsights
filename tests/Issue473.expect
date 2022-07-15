@@ -1,0 +1,37 @@
+// cmdline:-std=c++20
+
+#include <type_traits>
+
+template <typename T>
+struct remove_all_pointers : std::conditional_t<
+    std::is_pointer_v<T>,
+    remove_all_pointers<std::remove_pointer_t<T>>,
+    std::type_identity<T>
+> {};
+
+/* First instantiated from: Issue473.cpp:13 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct remove_all_pointers<int *> : public remove_all_pointers<int>
+{
+};
+
+#endif
+
+
+/* First instantiated from: Issue473.cpp:6 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct remove_all_pointers<int> : public std::type_identity<int>
+{
+};
+
+#endif
+
+
+int main()
+{
+  /* PASSED: static_assert(std::is_same_v<int, remove_all_pointers<int *>::type>); */
+  return 0;
+}
+
