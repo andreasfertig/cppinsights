@@ -2261,7 +2261,7 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
     const auto& underlyingType = stmt->getUnderlyingType();
 
     if(auto* templateSpecializationType = underlyingType->getAs<TemplateSpecializationType>()) {
-        if(const auto elaboratedType = underlyingType->getAs<ElaboratedType>()) {
+        if(const auto* elaboratedType = underlyingType->getAs<ElaboratedType>()) {
             InsertNamespace(elaboratedType->getQualifier());
         }
 
