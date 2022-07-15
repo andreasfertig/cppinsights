@@ -67,7 +67,7 @@ int test<int>(int && value)
     }
     
     using retType_13_4 = std::string (*)(std::string);
-    inline /*constexpr */ operator retType_13_4 () const noexcept
+    inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
     };
@@ -75,8 +75,7 @@ int test<int>(int && value)
     private: 
     static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
     {
-      std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return __lambda_13_4{}.operator()(value);
     }
     
     
@@ -93,16 +92,15 @@ int test<int>(int && value)
     }
     
     using retType_14_4 = int (*)(int);
-    inline /*constexpr */ operator retType_14_4 () const noexcept
+    inline constexpr operator retType_14_4 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline int __invoke(int i)
+    static inline /*constexpr */ int __invoke(int i)
     {
-      std::operator<<(std::cout, "This is int ");
-      return i * 100;
+      return __lambda_14_4{}.operator()(i);
     }
     
     
@@ -120,10 +118,9 @@ int test<int>(int && value)
     }
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(type_parameter_0_0 a)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 a)
     {
-      std::operator<<(std::cout, "This is default ");
-      return 0;
+      return __lambda_15_4{}.operator()<type_parameter_0_0>(a);
     }
     
   };
@@ -148,7 +145,7 @@ int test<char const (&)[3]>(char const (&value)[3])
     }
     
     using retType_13_4 = std::string (*)(std::string);
-    inline /*constexpr */ operator retType_13_4 () const noexcept
+    inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
     };
@@ -156,8 +153,7 @@ int test<char const (&)[3]>(char const (&value)[3])
     private: 
     static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
     {
-      std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return __lambda_13_4{}.operator()(value);
     }
     
     
@@ -174,16 +170,15 @@ int test<char const (&)[3]>(char const (&value)[3])
     }
     
     using retType_14_4 = int (*)(int);
-    inline /*constexpr */ operator retType_14_4 () const noexcept
+    inline constexpr operator retType_14_4 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline int __invoke(int i)
+    static inline /*constexpr */ int __invoke(int i)
     {
-      std::operator<<(std::cout, "This is int ");
-      return i * 100;
+      return __lambda_14_4{}.operator()(i);
     }
     
     
@@ -201,10 +196,9 @@ int test<char const (&)[3]>(char const (&value)[3])
     }
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(type_parameter_0_0 a)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 a)
     {
-      std::operator<<(std::cout, "This is default ");
-      return 0;
+      return __lambda_15_4{}.operator()<type_parameter_0_0>(a);
     }
     
   };
@@ -229,7 +223,7 @@ int test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > 
     }
     
     using retType_13_4 = std::string (*)(std::string);
-    inline /*constexpr */ operator retType_13_4 () const noexcept
+    inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
     };
@@ -237,8 +231,7 @@ int test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > 
     private: 
     static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
     {
-      std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return __lambda_13_4{}.operator()(value);
     }
     
     
@@ -255,16 +248,15 @@ int test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > 
     }
     
     using retType_14_4 = int (*)(int);
-    inline /*constexpr */ operator retType_14_4 () const noexcept
+    inline constexpr operator retType_14_4 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline int __invoke(int i)
+    static inline /*constexpr */ int __invoke(int i)
     {
-      std::operator<<(std::cout, "This is int ");
-      return i * 100;
+      return __lambda_14_4{}.operator()(i);
     }
     
     
@@ -282,10 +274,9 @@ int test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > 
     }
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(type_parameter_0_0 a)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 a)
     {
-      std::operator<<(std::cout, "This is default ");
-      return 0;
+      return __lambda_15_4{}.operator()<type_parameter_0_0>(a);
     }
     
   };
@@ -310,7 +301,7 @@ int test<float>(float && value)
     }
     
     using retType_13_4 = std::string (*)(std::string);
-    inline /*constexpr */ operator retType_13_4 () const noexcept
+    inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
     };
@@ -318,8 +309,7 @@ int test<float>(float && value)
     private: 
     static inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
     {
-      std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return __lambda_13_4{}.operator()(value);
     }
     
     
@@ -336,16 +326,15 @@ int test<float>(float && value)
     }
     
     using retType_14_4 = int (*)(int);
-    inline /*constexpr */ operator retType_14_4 () const noexcept
+    inline constexpr operator retType_14_4 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline int __invoke(int i)
+    static inline /*constexpr */ int __invoke(int i)
     {
-      std::operator<<(std::cout, "This is int ");
-      return i * 100;
+      return __lambda_14_4{}.operator()(i);
     }
     
     
@@ -363,10 +352,9 @@ int test<float>(float && value)
     }
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(type_parameter_0_0 a)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 a)
     {
-      std::operator<<(std::cout, "This is default ");
-      return 0;
+      return __lambda_15_4{}.operator()<type_parameter_0_0>(a);
     }
     
   };

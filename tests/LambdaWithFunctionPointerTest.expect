@@ -12,7 +12,7 @@ class __lambda_3_12
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ int operator()(int (*fp)(int), int a) const
+  inline /*constexpr */ int operator()<int>(int (*fp)(int), int a) const
   {
     return fp(a);
   }
@@ -20,9 +20,9 @@ class __lambda_3_12
   
   private: 
   template<class type_parameter_0_0>
-  static inline auto __invoke(int (*fp)(int), type_parameter_0_0 a)
+  static inline /*constexpr */ auto __invoke(int (*fp)(int), type_parameter_0_0 a)
   {
-    return fp(a);
+    return __lambda_3_12{}.operator()<type_parameter_0_0>(fp, a);
   }
   
 };
@@ -42,7 +42,7 @@ class __lambda_5_10
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ int operator()(int a) const
+  inline /*constexpr */ int operator()<int>(int a) const
   {
     return a;
   }
@@ -53,7 +53,7 @@ class __lambda_5_10
   #ifdef INSIGHTS_USE_TEMPLATE
   using retType_5_10 = int (*)(int);
   template<>
-  inline /*constexpr */ operator retType_5_10 () const noexcept
+  inline constexpr operator retType_5_10 () const noexcept
   {
     return __invoke;
   }
@@ -61,16 +61,16 @@ class __lambda_5_10
   
   private: 
   template<class type_parameter_0_0>
-  static inline auto __invoke(type_parameter_0_0 a)
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0 a)
   {
-    return a;
+    return __lambda_5_10{}.operator()<type_parameter_0_0>(a);
   }
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  static inline int __invoke(int a)
+  static inline /*constexpr */ int __invoke<int>(int a)
   {
-    return a;
+    return __lambda_5_10{}.operator()<int>(a);
   }
   #endif
   

@@ -8,8 +8,9 @@ class __lambda_1_10
   }
   private: 
   template<class type_parameter_0_0>
-  static inline auto __invoke(type_parameter_0_0)
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0 __param0)
   {
+    return __lambda_1_10{}.operator()<type_parameter_0_0>(__param0);
   }
   
 };

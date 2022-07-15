@@ -15,7 +15,7 @@ class __lambda_6_12
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ int operator()(int i) const
+  inline /*constexpr */ int operator()<int>(int i) const
   {
     return 1;
   }
@@ -23,9 +23,9 @@ class __lambda_6_12
   
   private: 
   template<typename T>
-  static inline auto __invoke(T i)
+  static inline /*constexpr */ auto __invoke(T i)
   {
-    return 1;
+    return __lambda_6_12{}.operator()<T>(i);
   }
   
   public:

@@ -34,7 +34,7 @@ void print<' ', char [3], double, std::basic_string<char, std::char_traits<char>
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ void operator()(const double & arg) const
+    inline /*constexpr */ void operator()<double>(const double & arg) const
     {
       std::operator<<(std::cout, ' ').operator<<(arg);
     }
@@ -43,7 +43,7 @@ void print<' ', char [3], double, std::basic_string<char, std::char_traits<char>
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ void operator()(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & arg) const
+    inline /*constexpr */ void operator()<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & arg) const
     {
       std::operator<<(std::operator<<(std::cout, ' '), arg);
     }
@@ -51,9 +51,9 @@ void print<' ', char [3], double, std::basic_string<char, std::char_traits<char>
     
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(const type_parameter_0_0 & arg)
+    static inline /*constexpr */ auto __invoke(const type_parameter_0_0 & arg)
     {
-      std::operator<<(std::cout, ' ') << arg;
+      return __lambda_11_28{}.operator()<type_parameter_0_0>(arg);
     }
     
   };

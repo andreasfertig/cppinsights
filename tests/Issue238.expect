@@ -17,15 +17,9 @@ void f()
     }
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(type_parameter_0_0 container)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 container)
     {
-      {
-        auto && __range1 = container;
-        for(; ; ) {
-          auto test;
-        }
-        
-      }
+      return __lambda_1_26{}.operator()<type_parameter_0_0>(container);
     }
     
   };

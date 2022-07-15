@@ -46,6 +46,10 @@ void OutputFormatHelper::AppendParameterList(const ArrayRef<ParmVarDecl*> parame
             Append(GetTypeNameAsParameter(type, name));
         } else {
             Append(name);
+
+            if(isa<PackExpansionType>(p->getType())) {
+                Append(kwElipsis);
+            }
         }
     });
 }

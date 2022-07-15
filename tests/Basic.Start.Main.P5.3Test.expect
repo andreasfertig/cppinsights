@@ -10,15 +10,15 @@ int main()
     }
     
     using retType_3_13 = auto (*)() -> int;
-    inline /*constexpr */ operator retType_3_13 () const noexcept
+    inline constexpr operator retType_3_13 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline int __invoke()
+    static inline /*constexpr */ int __invoke()
     {
-      return 2;
+      return __lambda_3_13{}.operator()();
     }
     
     

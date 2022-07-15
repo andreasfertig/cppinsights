@@ -78,15 +78,15 @@ int main()
     }
     
     using retType_15_9 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_15_9 () const noexcept
+    inline constexpr operator retType_15_9 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("started\n");
+      __lambda_15_9{}.operator()();
     }
     
     
@@ -121,15 +121,15 @@ int main()
     }
     
     using retType_15_59 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_15_59 () const noexcept
+    inline constexpr operator retType_15_59 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("after\n");
+      __lambda_15_59{}.operator()();
     }
     
     
@@ -148,15 +148,15 @@ int main()
     }
     
     using retType_19_9 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_19_9 () const noexcept
+    inline constexpr operator retType_19_9 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("started\n");
+      __lambda_19_9{}.operator()();
     }
     
     
@@ -172,15 +172,15 @@ int main()
     }
     
     using retType_20_9 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_20_9 () const noexcept
+    inline constexpr operator retType_20_9 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("started\n");
+      __lambda_20_9{}.operator()();
     }
     
     
@@ -215,15 +215,15 @@ int main()
     }
     
     using retType_20_59 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_20_59 () const noexcept
+    inline constexpr operator retType_20_59 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("after\n");
+      __lambda_20_59{}.operator()();
     }
     
     

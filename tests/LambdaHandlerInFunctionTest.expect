@@ -35,15 +35,15 @@ int main()
     }
     
     using retType_10_10 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_10_10 () const noexcept
+    inline constexpr operator retType_10_10 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("Hello");
+      __lambda_10_10{}.operator()();
     }
     
     
@@ -61,16 +61,15 @@ int main()
     }
     
     using retType_12_10 = auto (*)() -> int;
-    inline /*constexpr */ operator retType_12_10 () const noexcept
+    inline constexpr operator retType_12_10 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline int __invoke()
+    static inline /*constexpr */ int __invoke()
     {
-      printf("Bello");
-      return 1;
+      return __lambda_12_10{}.operator()();
     }
     
     

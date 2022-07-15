@@ -9,14 +9,15 @@ void foo()
     }
     
     using retType_2_1 = void (*)();
-    inline /*constexpr */ operator retType_2_1 () const noexcept
+    inline constexpr operator retType_2_1 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
+      __lambda_2_1{}.operator()();
     }
     
     

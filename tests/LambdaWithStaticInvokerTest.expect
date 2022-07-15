@@ -1,0 +1,217 @@
+// cmdline:-std=c++20
+
+void NoParams()
+{
+    
+  class __lambda_5_14
+  {
+    public: 
+    inline int operator()() const
+    {
+      static int n = {};
+      return ++n;
+    }
+    
+    using retType_5_14 = int (*)();
+    inline constexpr operator retType_5_14 () const noexcept
+    {
+      return __invoke;
+    }
+    
+    private: 
+    static inline int __invoke()
+    {
+      return __lambda_5_14{}.operator()();
+    }
+    
+    
+    public:
+    // /*constexpr */ __lambda_5_14() = default;
+    
+  };
+  
+  __lambda_5_14 l = __lambda_5_14{};
+  bool res = (1 == l.operator()());
+  bool res2 = (2 == (+static_cast<int (*)()>(l.operator __lambda_5_14::retType_5_14()))());
+}
+
+
+
+class __lambda_14_20
+{
+  public: 
+  inline int operator()(int x, int y) const
+  {
+    static int n = {};
+    return (++n + x) + y;
+  }
+  
+  using retType_14_20 = int (*)(int, int);
+  inline constexpr operator retType_14_20 () const noexcept
+  {
+    return __invoke;
+  }
+  
+  private: 
+  static inline int __invoke(int x, int y)
+  {
+    return __lambda_14_20{}.operator()(x, y);
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_14_20() = default;
+  
+};
+
+__lambda_14_20 lWithParams = __lambda_14_20{};
+
+
+void WithParams()
+{
+  bool res = (6 == lWithParams.operator()(2, 3));
+  bool res2 = (7 == (+static_cast<int (*)(int, int)>(lWithParams.operator __lambda_14_20::retType_14_20()))(2, 3));
+}
+
+
+
+class __lambda_25_16
+{
+  public: 
+  template<class type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0 a) const
+  {
+    return a;
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()<int>(int a) const
+  {
+    return a;
+  }
+  #endif
+  
+  
+  /* First instantiated from: LambdaWithStaticInvokerTest.cpp:29 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  using retType_25_16 = int (*)(int);
+  template<>
+  inline constexpr operator retType_25_16 () const noexcept
+  {
+    return __invoke;
+  }
+  #endif
+  
+  private: 
+  template<class type_parameter_0_0>
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0 a)
+  {
+    return __lambda_25_16{}.operator()<type_parameter_0_0>(a);
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  static inline /*constexpr */ int __invoke<int>(int a)
+  {
+    return __lambda_25_16{}.operator()<int>(a);
+  }
+  #endif
+  
+  
+  public:
+  // /*constexpr */ __lambda_25_16() = default;
+  
+};
+
+__lambda_25_16 glambda = __lambda_25_16{};
+
+
+void WithParamsGeneric()
+{
+  using FuncPtr_29 = int (*)(int);
+  FuncPtr_29 fp = static_cast<int (*)(int)>(glambda.operator __lambda_25_16::retType_25_16());
+}
+
+
+
+class __lambda_32_27
+{
+  public: 
+  template<int X = 3, int Z = 4>
+  inline auto operator()(int x, int y) const
+  {
+    static int n = {};
+    return (((++n + x) + y) + X) + Z;
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int operator()<1, 0>(int x, int y) const
+  {
+    static int n = {};
+    return (((++n + x) + y) + 1) + 0;
+  }
+  #endif
+  
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline int operator()<3, 4>(int x, int y) const
+  {
+    static int n = {};
+    return (((++n + x) + y) + 3) + 4;
+  }
+  #endif
+  
+  
+  /* First instantiated from: LambdaWithStaticInvokerTest.cpp:41 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  using retType_32_27 = int (*)(int, int);
+  template<>
+  inline constexpr operator retType_32_27 () const noexcept
+  {
+    return __invoke;
+  }
+  #endif
+  
+  private: 
+  template<int X = 3, int Z = 4>
+  static inline auto __invoke(int x, int y)
+  {
+    return __lambda_32_27{}.operator()<int X = 3, int Z = 4>(x, y);
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  static inline int __invoke<3, 4>(int x, int y)
+  {
+    return __lambda_32_27{}.operator()<3, 4>(x, y);
+  }
+  #endif
+  
+  
+  public:
+  // /*constexpr */ __lambda_32_27() = default;
+  
+};
+
+__lambda_32_27 lWithParamsAndNTTP = __lambda_32_27{};
+
+
+void WithParamsAndNTTP()
+{
+  int res = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27(2, 3);
+  using FuncPtr_41 = int (*)(int, int);
+  FuncPtr_41 fp = static_cast<int (*)(int, int)>(lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27());
+}
+
+
+int main()
+{
+  NoParams();
+  WithParams();
+  return 0;
+}
+
+

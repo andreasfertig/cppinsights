@@ -11,7 +11,7 @@ class __lambda_2_10
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ int operator()(int __i0, int __i1, int __i2) const
+  inline /*constexpr */ int operator()<int, int, int>(int __i0, int __i1, int __i2) const
   {
     return (__i0 / __i1) / __i2;
   }
@@ -19,9 +19,9 @@ class __lambda_2_10
   
   private: 
   template<class ... type_parameter_0_0>
-  static inline auto __invoke(type_parameter_0_0... i)
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0... i)
   {
-    return (... / i);
+    return __lambda_2_10{}.operator()<type_parameter_0_0...>(i...);
   }
   
 };
@@ -40,7 +40,7 @@ class __lambda_3_10
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ int operator()(int __i0, int __i1, int __i2) const
+  inline /*constexpr */ int operator()<int, int, int>(int __i0, int __i1, int __i2) const
   {
     return __i0 / (__i1 / __i2);
   }
@@ -48,9 +48,9 @@ class __lambda_3_10
   
   private: 
   template<class ... type_parameter_0_0>
-  static inline auto __invoke(type_parameter_0_0... i)
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0... i)
   {
-    return (i / ...);
+    return __lambda_3_10{}.operator()<type_parameter_0_0...>(i...);
   }
   
 };

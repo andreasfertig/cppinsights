@@ -978,34 +978,56 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
 bool CodeGenerator::InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl)
 {
-    if(cxxMethodDecl && cxxMethodDecl->isLambdaStaticInvoker()) {
-        mOutputFormatHelper.AppendNewLine();
-
-        const auto* lambda = cxxMethodDecl->getParent();
-        const auto* callOp = lambda->getLambdaCallOperator();
-        if(lambda->isGenericLambda() && cxxMethodDecl->isFunctionTemplateSpecialization()) {
-            const TemplateArgumentList* tal            = cxxMethodDecl->getTemplateSpecializationArgs();
-            FunctionTemplateDecl*       callOpTemplate = callOp->getDescribedFunctionTemplate();
-            void*                       insertPos      = nullptr;
-            FunctionDecl*               correspondingCallOpSpecialization =
-                callOpTemplate->findSpecialization(tal->asArray(), insertPos);
-            callOp = cast<CXXMethodDecl>(correspondingCallOpSpecialization);
-        }
-
-        InsertArg(callOp->getBody());
-        mOutputFormatHelper.AppendNewLine();
-
-        return true;
+    if(not(cxxMethodDecl and cxxMethodDecl->isLambdaStaticInvoker())) {
+        return false;
     }
 
-    return false;
+    // A special case for a lambda with a static invoker. The standard says, that in such a case invoking the call
+    // operator gives the same result as invoking the function pointer (see [expr.prim.lambda.closure] p9). When it
+    // comes to block local statics having a body for both functions reveals a difference. This special code
+    // generates a forwarding call from the call operator to the static invoker. However, the compiler does better
+    // here. As this way we end up with copies of the parameters which is hard to avoid.
+
+    mOutputFormatHelper.AppendNewLine();
+    mOutputFormatHelper.OpenScope();
+
+    if(not cxxMethodDecl->getReturnType()->isVoidType()) {
+        mOutputFormatHelper.Append(kwReturn, " "sv);
+    }
+
+    mOutputFormatHelper.Append(GetName(*cxxMethodDecl->getParent()), "{}.operator()");
+
+    if(cxxMethodDecl->isFunctionTemplateSpecialization()) {
+        InsertTemplateArgs(*dyn_cast_or_null<FunctionDecl>(cxxMethodDecl));
+    }
+
+    if(cxxMethodDecl->isTemplated()) {
+        if(cxxMethodDecl->getDescribedTemplate()) {
+            InsertTemplateParameters(*cxxMethodDecl->getDescribedTemplate()->getTemplateParameters(),
+                                     TemplateParamsOnly::Yes);
+        }
+        /*else if(decl.isFunctionTemplateSpecialization()) {
+            InsertTemplateSpecializationHeader();
+        }*/
+    }
+
+    WrapInParens([&] {
+        mOutputFormatHelper.AppendParameterList(cxxMethodDecl->parameters(),
+                                                OutputFormatHelper::NameOnly::Yes,
+                                                OutputFormatHelper::GenMissingParamName::Yes);
+    });
+
+    mOutputFormatHelper.AppendSemiNewLine();
+    mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
+    mOutputFormatHelper.AppendNewLine();
+
+    return true;
 }
 //-----------------------------------------------------------------------------
 
 /// \brief Inserts the instantiation point of a template.
 //
 // This reveals at which place the template is first used.
-
 void CodeGenerator::InsertInstantiationPoint(const SourceManager&  sm,
                                              const SourceLocation& instLoc,
                                              std::string_view      text)
@@ -1172,9 +1194,16 @@ static std::string GetTypeConstraintAsString(const TypeConstraint* typeConstrain
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
+void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
+                                             const TemplateParamsOnly     templateParamsOnly)
 {
-    mOutputFormatHelper.Append(kwTemplate, "<"sv);
+    const bool full{TemplateParamsOnly::No == templateParamsOnly};
+
+    if(full) {
+        mOutputFormatHelper.Append(kwTemplate);
+    }
+
+    mOutputFormatHelper.Append("<"sv);
 
     OnceFalse needsComma{};
     for(const auto* param : list) {
@@ -1183,18 +1212,24 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
         const auto& typeName = GetName(*param);
 
         if(const auto* tt = dyn_cast_or_null<TemplateTypeParmDecl>(param)) {
-            if(tt->wasDeclaredWithTypename()) {
-                mOutputFormatHelper.Append(kwTypeNameSpace);
-            } else if(not tt->hasTypeConstraint()) {
-                mOutputFormatHelper.Append(kwClassSpace);
-            }
+            if(full) {
+                if(tt->wasDeclaredWithTypename()) {
+                    mOutputFormatHelper.Append(kwTypeNameSpace);
+                } else if(not tt->hasTypeConstraint()) {
+                    mOutputFormatHelper.Append(kwClassSpace);
+                }
 
-            if(tt->isParameterPack()) {
-                mOutputFormatHelper.Append(kwElipsisSpace);
+                if(tt->isParameterPack()) {
+                    mOutputFormatHelper.Append(kwElipsisSpace);
+                }
             }
 
             if(0 == typeName.size() || tt->isImplicit() /* fixes class container:auto*/) {
-                AppendTemplateTypeParamName(mOutputFormatHelper, tt, false);
+                AppendTemplateTypeParamName(mOutputFormatHelper, tt, not full);
+
+                if(not full and tt->isParameterPack()) {
+                    mOutputFormatHelper.Append(kwElipsis);
+                }
 
             } else {
                 if(auto typeConstraint = GetTypeConstraintAsString(tt->getTypeConstraint());
@@ -1232,9 +1267,12 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list)
         }
     }
 
-    mOutputFormatHelper.AppendNewLine(">"sv);
+    mOutputFormatHelper.Append(">"sv);
 
-    InsertConceptConstraint(list);
+    if(full) {
+        mOutputFormatHelper.AppendNewLine();
+        InsertConceptConstraint(list);
+    }
 }
 //-----------------------------------------------------------------------------
 
@@ -3742,6 +3780,10 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     const bool  isClassTemplateSpec{isCXXMethodDecl && isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
     const bool  requiresComment{isCXXMethodDecl && not methodDecl->isUserProvided() &&
                                not methodDecl->isExplicitlyDefaulted()};
+    // [expr.prim.lambda.closure] p7 consteval/constexpr are obtained from the call operator
+    const bool          isLambdaStaticInvoker{isCXXMethodDecl and methodDecl->isLambdaStaticInvoker()};
+    const FunctionDecl& constExprDecl{not isLambdaStaticInvoker ? decl
+                                                                : *methodDecl->getParent()->getLambdaCallOperator()};
 
     if(methodDecl) {
         if(requiresComment) {
@@ -3803,9 +3845,22 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
         }
     }
 
-    if(decl.isConstexpr()) {
-        if(decl.isConstexprSpecified()) {
-            const bool skipConstexpr{isLambda};
+    if(constExprDecl.isConstexpr()) {
+        const bool skipConstexpr{isLambda and not isa<CXXConversionDecl>(constExprDecl)};
+        // Special treatment for a conversion operator in a captureless lambda. It appears that if the call operator is
+        // consteval the conversion operator must be as well, otherwise it cannot take the address of the invoke
+        // function.
+        const bool isConversionOpWithConstevalCallOp{[&]() {
+            if(methodDecl) {
+                if(const auto callOp = methodDecl->getParent()->getLambdaCallOperator()) {
+                    return callOp->isConsteval();
+                }
+            }
+
+            return false;
+        }()};
+
+        if(not isConversionOpWithConstevalCallOp and constExprDecl.isConstexprSpecified()) {
             if(skipConstexpr) {
                 mOutputFormatHelper.Append(kwCommentStart);
             }
@@ -3816,7 +3871,7 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
                 mOutputFormatHelper.Append(kwCCommentEndSpace);
             }
 
-        } else if(decl.isConsteval()) {
+        } else if(isConversionOpWithConstevalCallOp or constExprDecl.isConsteval()) {
             mOutputFormatHelper.Append(kwConstEvalSpace);
         }
     }
@@ -3847,7 +3902,7 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
             outputFormatHelper.Append(GetName(decl));
         }
 
-        if(!isLambda && isFirstCxxMethodDecl && decl.isFunctionTemplateSpecialization()) {
+        if(isFirstCxxMethodDecl and decl.isFunctionTemplateSpecialization()) {
             CodeGenerator codeGenerator{outputFormatHelper};
             codeGenerator.InsertTemplateArgs(decl);
         }
@@ -3861,7 +3916,14 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
                                                OutputFormatHelper::NameOnly::No,
                                                OutputFormatHelper::GenMissingParamName::Yes);
     } else {
-        outputFormatHelper.AppendParameterList(decl.parameters());
+        // The static invoker needs parameter names to foward parameters to the call operator even when the call
+        // operator doesn't care about them.
+        const OutputFormatHelper::GenMissingParamName genMissingParamName{
+            isLambdaStaticInvoker ? OutputFormatHelper::GenMissingParamName::Yes
+                                  : OutputFormatHelper::GenMissingParamName::No};
+
+        outputFormatHelper.AppendParameterList(
+            decl.parameters(), OutputFormatHelper::NameOnly::No, genMissingParamName);
     }
 
     if(decl.isVariadic()) {

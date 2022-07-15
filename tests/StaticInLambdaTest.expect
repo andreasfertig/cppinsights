@@ -104,7 +104,7 @@ int main()
     }
     
     using retType_52_14 = Bingleton (*)(bool);
-    inline /*constexpr */ operator retType_52_14 () const noexcept
+    inline constexpr operator retType_52_14 () const noexcept
     {
       return __invoke;
     };
@@ -112,23 +112,7 @@ int main()
     private: 
     static inline Bingleton __invoke(bool c)
     {
-      static uint64_t __bbGuard;
-      alignas(Bingleton) static char __bb[sizeof(Bingleton)];
-      
-      if( ! __bbGuard )
-      {
-        if( __cxa_guard_acquire(&__bbGuard) )
-        {
-          new (&__bb) Bingleton();
-          __bbGuard = true;
-          __cxa_guard_release(&__bbGuard);
-        }
-      }
-      if(c) {
-        return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
-      } 
-      
-      return Bingleton(*reinterpret_cast<Bingleton*>(__bb));
+      return __lambda_52_14{}.operator()(c);
     }
     
     
@@ -161,7 +145,7 @@ int main()
     }
     
     using retType_62_14 = Bingleton *(*)(bool);
-    inline /*constexpr */ operator retType_62_14 () const noexcept
+    inline constexpr operator retType_62_14 () const noexcept
     {
       return __invoke;
     };
@@ -169,23 +153,7 @@ int main()
     private: 
     static inline Bingleton * __invoke(bool c)
     {
-      static uint64_t __bbGuard;
-      alignas(Bingleton) static char __bb[sizeof(Bingleton)];
-      
-      if( ! __bbGuard )
-      {
-        if( __cxa_guard_acquire(&__bbGuard) )
-        {
-          new (&__bb) Bingleton();
-          __bbGuard = true;
-          __cxa_guard_release(&__bbGuard);
-        }
-      }
-      if(c) {
-        return &*reinterpret_cast<Bingleton*>(__bb);
-      } 
-      
-      return &*reinterpret_cast<Bingleton*>(__bb);
+      return __lambda_62_14{}.operator()(c);
     }
     
     

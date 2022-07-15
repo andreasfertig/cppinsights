@@ -1,0 +1,39 @@
+#include <iostream>
+
+int main()
+{
+    
+  class __lambda_5_14
+  {
+    public: 
+    inline void operator()() const
+    {
+      static int n = {};
+      std::cout.operator<<(++n);
+    }
+    
+    using retType_5_14 = void (*)();
+    inline constexpr operator retType_5_14 () const noexcept
+    {
+      return __invoke;
+    }
+    
+    private: 
+    static inline void __invoke()
+    {
+      __lambda_5_14{}.operator()();
+    }
+    
+    
+  };
+  
+  __lambda_5_14 l = __lambda_5_14{};
+  l.operator()();
+  l.operator()();
+  l.operator()();
+  l.operator()();
+  (+static_cast<void (*)()>(l.operator __lambda_5_14::retType_5_14()))();
+  (+static_cast<void (*)()>(l.operator __lambda_5_14::retType_5_14()))();
+  return 0;
+}
+

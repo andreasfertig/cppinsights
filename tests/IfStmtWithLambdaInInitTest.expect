@@ -11,15 +11,15 @@ int main()
       }
       
       using retType_3_14 = auto (*)() -> int;
-      inline /*constexpr */ operator retType_3_14 () const noexcept
+      inline constexpr operator retType_3_14 () const noexcept
       {
         return __invoke;
       };
       
       private: 
-      static inline int __invoke()
+      static inline /*constexpr */ int __invoke()
       {
-        return 2;
+        return __lambda_3_14{}.operator()();
       }
       
       
@@ -36,15 +36,15 @@ int main()
       }
       
       using retType_3_34 = auto (*)() -> int;
-      inline /*constexpr */ operator retType_3_34 () const noexcept
+      inline constexpr operator retType_3_34 () const noexcept
       {
         return __invoke;
       };
       
       private: 
-      static inline int __invoke()
+      static inline /*constexpr */ int __invoke()
       {
-        return 3;
+        return __lambda_3_34{}.operator()();
       }
       
       
@@ -61,15 +61,15 @@ int main()
       }
       
       using retType_3_53 = auto (*)() -> int;
-      inline /*constexpr */ operator retType_3_53 () const noexcept
+      inline constexpr operator retType_3_53 () const noexcept
       {
         return __invoke;
       };
       
       private: 
-      static inline int __invoke()
+      static inline /*constexpr */ int __invoke()
       {
-        return 4;
+        return __lambda_3_53{}.operator()();
       }
       
       

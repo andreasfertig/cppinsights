@@ -9,14 +9,15 @@ int main()
     }
     
     using retType_4_5 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_4_5 () const noexcept
+    inline constexpr operator retType_4_5 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
+      __lambda_4_5{}.operator()();
     }
     
     
@@ -33,15 +34,15 @@ int main()
     }
     
     using retType_7_5 = auto (*)() -> void;
-    inline /*constexpr */ operator retType_7_5 () const noexcept
+    inline constexpr operator retType_7_5 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      1 * 2;
+      __lambda_7_5{}.operator()();
     }
     
     
@@ -60,15 +61,15 @@ int main()
     }
     
     using retType_13_5 = void (*)(int &, int &);
-    inline /*constexpr */ operator retType_13_5 () const noexcept
+    inline constexpr operator retType_13_5 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke(int & x, int & y)
+    static inline /*constexpr */ void __invoke(int & x, int & y)
     {
-      x = (x + y);
+      __lambda_13_5{}.operator()(x, y);
     }
     
     

@@ -56,7 +56,7 @@ void f()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ void operator()(MyArrayWrapper<int> container) const
+    inline /*constexpr */ void operator()<MyArrayWrapper<int> >(MyArrayWrapper<int> container) const
     {
       {
         MyArrayWrapper<int> & __range1 = container;
@@ -72,15 +72,9 @@ void f()
     
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(type_parameter_0_0 container)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 container)
     {
-      {
-        auto && __range1 = container;
-        for(; ; ) {
-          auto test;
-        }
-        
-      }
+      return __lambda_15_17{}.operator()<type_parameter_0_0>(container);
     }
     
   };

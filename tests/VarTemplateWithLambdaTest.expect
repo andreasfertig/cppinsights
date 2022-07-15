@@ -17,9 +17,9 @@ class __lambda_8_23
   }
   private: 
   template<class type_parameter_1_0>
-  static inline auto __invoke(type_parameter_1_0 x)
+  static inline /*constexpr */ auto __invoke(type_parameter_1_0 x)
   {
-    return T(x);
+    return __lambda_8_23{}.operator()<type_parameter_1_0>(x);
   }
   
 };
@@ -36,7 +36,7 @@ class __lambda_8_23
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ double operator()(int x) const
+  inline /*constexpr */ double operator()<int>(int x) const
   {
     return double(x);
   }
@@ -44,9 +44,9 @@ class __lambda_8_23
   
   private: 
   template<class type_parameter_0_0>
-  static inline auto __invoke(type_parameter_0_0 x)
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0 x)
   {
-    return double(x);
+    return __lambda_8_23{}.operator()<type_parameter_0_0>(x);
   }
   
 };
@@ -70,9 +70,9 @@ class __lambda_11_29
   }
   private: 
   template<class type_parameter_1_0>
-  static inline auto __invoke(type_parameter_1_0 x)
+  static inline /*constexpr */ auto __invoke(type_parameter_1_0 x)
   {
-    return T{{x}};
+    return __lambda_11_29{}.operator()<type_parameter_1_0>(x);
   }
   
 };
@@ -89,7 +89,7 @@ class __lambda_11_29
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ int operator()(int x) const
+  inline /*constexpr */ int operator()<int>(int x) const
   {
     return int{x};
   }
@@ -97,9 +97,9 @@ class __lambda_11_29
   
   private: 
   template<class type_parameter_0_0>
-  static inline auto __invoke(type_parameter_0_0 x)
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0 x)
   {
-    return int{{x}};
+    return __lambda_11_29{}.operator()<type_parameter_0_0>(x);
   }
   
 };

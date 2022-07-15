@@ -21,3 +21,29 @@ instantiated and the end of its enclosing namespace. While technically, this inf
 this point.
 
 
+## Lambdas with static invoker
+
+### Captureless lambdas
+
+Issue [#467](https://github.com/andreasfertig/cppinsights/issues/467) raised awareness that captureless lambdas are
+more complicated. According to [expr.prim.lambda.closure] p7, the closure type has a conversion to a function pointer
+function:
+
+> The value returned by this conversion function is the address of a function F that, when invoked, has the same effect as invoking the
+> closure type’s function call operator on a default-constructed instance of the closure type. F is a
+> constexpr function if the function call operator is a constexpr function and is an immediate function if the function call operator is an immediate function.
+
+The code in #467 demonstrates a way to observe that C++ Insights generates less efficient code. Initially, the body of
+the call operator was replicated into the invoke function. However, a captureless lambda with a local `static` variable leads to
+different results. The latest version forwards the call from the invoke function to the call operator. This is still
+less optimal as the compiler does it. Even with `move` and `forward`, we get copies of non-moveable members in a parameter.
+At the same time, the compiler seems to be able to directly forward the invoke call to the call operator.
+
+
+### Lambda captures initialization
+
+C++ Insights shows a constructor for a lambda when it has captures. The compiler does better. It doesn't need a
+constructor, it can direct-initialize the members, and by that, the compiler reduces potential copies as they will happen
+with the C++ Insights version.
+
+

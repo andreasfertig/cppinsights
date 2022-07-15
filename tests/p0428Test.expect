@@ -12,7 +12,7 @@ class __lambda_3_10
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ int operator()(int t, int i) const
+  inline /*constexpr */ int operator()<int>(int t, int i) const
   {
     return i;
   }
@@ -20,9 +20,9 @@ class __lambda_3_10
   
   private: 
   template<class T>
-  static inline auto __invoke(T t, int i)
+  static inline /*constexpr */ auto __invoke(T t, int i)
   {
-    return i;
+    return __lambda_3_10{}.operator()<T>(t, i);
   }
   
   public:

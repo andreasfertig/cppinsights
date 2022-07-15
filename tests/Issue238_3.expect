@@ -19,16 +19,9 @@ void f()
     }
     private: 
     template<class type_parameter_0_0, class type_parameter_0_1>
-    static inline auto __invoke(type_parameter_0_0 init, type_parameter_0_1 container)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 init, type_parameter_0_1 container)
     {
-      {
-        auto i = init;
-        auto && __range1 = container;
-        for(; ; ) {
-          auto test;
-        }
-        
-      }
+      return __lambda_2_26{}.operator()<type_parameter_0_0, type_parameter_0_1>(init, container);
     }
     
     public:

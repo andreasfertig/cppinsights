@@ -21,7 +21,7 @@ const void withNoexcept()
     }
     
     using retType_4_23 = foo (*)() noexcept;
-    inline /*constexpr */ operator retType_4_23 () const noexcept
+    inline constexpr operator retType_4_23 () const noexcept
     {
       return __invoke;
     };
@@ -29,7 +29,7 @@ const void withNoexcept()
     private: 
     static inline foo __invoke() noexcept
     {
-      return foo();
+      return __lambda_4_23{}.operator()();
     }
     
     
@@ -62,7 +62,7 @@ const void withNoexceptFalse()
     }
     
     using retType_8_23 = foo (*)() noexcept(false);
-    inline /*constexpr */ operator retType_8_23 () const noexcept
+    inline constexpr operator retType_8_23 () const noexcept
     {
       return __invoke;
     };
@@ -70,7 +70,7 @@ const void withNoexceptFalse()
     private: 
     static inline foo __invoke() noexcept(false)
     {
-      return foo();
+      return __lambda_8_23{}.operator()();
     }
     
     
@@ -112,7 +112,7 @@ const void withNoexceptTrue()
     }
     
     using retType_12_23 = foo (*)() noexcept(true);
-    inline /*constexpr */ operator retType_12_23 () const noexcept
+    inline constexpr operator retType_12_23 () const noexcept
     {
       return __invoke;
     };
@@ -120,7 +120,7 @@ const void withNoexceptTrue()
     private: 
     static inline foo __invoke() noexcept(true)
     {
-      return foo();
+      return __lambda_12_23{}.operator()();
     }
     
     
@@ -160,15 +160,15 @@ const void withNoexceptNoexceptCtor()
     }
     
     using retType_19_23 = buh (*)();
-    inline /*constexpr */ operator retType_19_23 () const noexcept
+    inline constexpr operator retType_19_23 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline buh __invoke()
+    static inline /*constexpr */ buh __invoke()
     {
-      return buh();
+      return __lambda_19_23{}.operator()();
     }
     
     

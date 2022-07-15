@@ -67,15 +67,15 @@ int main()
     }
     
     using retType_24_20 = void (*)();
-    inline /*constexpr */ operator retType_24_20 () const noexcept
+    inline constexpr operator retType_24_20 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("%d\n", 1);
+      __lambda_24_20{}.operator()();
     }
     
     
@@ -181,7 +181,7 @@ int main()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ int operator()(int & x, int b) const
+    inline /*constexpr */ int operator()<int>(int & x, int b) const
     {
       printf("%d\n", foo + x);
       return (foo + x) + b;
@@ -234,7 +234,7 @@ int main()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ int operator()(int & x, const int & b, const int c) const
+    inline /*constexpr */ int operator()<int, int>(int & x, const int & b, const int c) const
     {
       printf("%d\n", foo + x);
       return ((foo + x) + b) + c;
