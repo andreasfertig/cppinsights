@@ -21,7 +21,7 @@ const foo & create()
     }
     
     using retType_4_23 = foo (*)();
-    inline /*constexpr */ operator retType_4_23 () const noexcept
+    inline constexpr operator retType_4_23 () const noexcept
     {
       return __invoke;
     };
@@ -29,7 +29,7 @@ const foo & create()
     private: 
     static inline foo __invoke()
     {
-      return foo();
+      return __lambda_4_23{}.operator()();
     }
     
     

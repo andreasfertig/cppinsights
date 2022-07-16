@@ -14,15 +14,16 @@ class __lambda_6_15
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline /*constexpr */ void operator()(int container) const
+  inline /*constexpr */ void operator()<int>(int container) const
   {
   }
   #endif
   
   private: 
   template<C type_parameter_0_0>
-  static inline auto __invoke(type_parameter_0_0 container)
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0 container)
   {
+    return __lambda_6_15{}.operator()<type_parameter_0_0>(container);
   }
   
   public:

@@ -17,14 +17,15 @@ int main()
       }
       
       using retType_2_8 = auto (*)() -> void;
-      inline /*constexpr */ operator retType_2_8 () const noexcept
+      inline constexpr operator retType_2_8 () const noexcept
       {
         return __invoke;
       };
       
       private: 
-      static inline void __invoke()
+      static inline /*constexpr */ void __invoke()
       {
+        __lambda_2_8{}.operator()();
       }
       
       public: 

@@ -72,7 +72,7 @@ namespace expressions
       
       #ifdef INSIGHTS_USE_TEMPLATE
       template<>
-      inline /*constexpr */ bool operator()(int val) const
+      inline /*constexpr */ bool operator()<int>(int val) const
       {
         return (ex1.operator()(std::forward<int>(val)) && ex2.operator()(std::forward<int>(val)));
       }
@@ -104,15 +104,15 @@ namespace expressions
     }
     
     using retType_27_16 = bool (*)(int);
-    inline /*constexpr */ operator retType_27_16 () const noexcept
+    inline constexpr operator retType_27_16 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline bool __invoke(int val)
+    static inline /*constexpr */ bool __invoke(int val)
     {
-      return val > 10;
+      return __lambda_27_16{}.operator()(val);
     }
     
     public: 
@@ -132,15 +132,15 @@ namespace expressions
     }
     
     using retType_32_16 = bool (*)(int);
-    inline /*constexpr */ operator retType_32_16 () const noexcept
+    inline constexpr operator retType_32_16 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline bool __invoke(int val)
+    static inline /*constexpr */ bool __invoke(int val)
     {
-      return val < 20;
+      return __lambda_32_16{}.operator()(val);
     }
     
     public: 

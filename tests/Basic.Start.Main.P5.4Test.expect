@@ -14,15 +14,15 @@ int main(int argc, const char ** argv)
     }
     
     using retType_5_13 = auto (*)() -> int;
-    inline /*constexpr */ operator retType_5_13 () const noexcept
+    inline constexpr operator retType_5_13 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline int __invoke()
+    static inline /*constexpr */ int __invoke()
     {
-      return 2;
+      return __lambda_5_13{}.operator()();
     }
     
     

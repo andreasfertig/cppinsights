@@ -7,7 +7,4 @@
 .tmp.cpp:15:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
           auto test;
                ^
-.tmp.cpp:28:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
-          auto test;
-               ^
-4 errors generated.
+3 errors generated.

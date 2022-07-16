@@ -256,7 +256,10 @@ protected:
 
     void InsertTemplateArg(const TemplateArgumentLoc& arg) { InsertTemplateArg(arg.getArgument()); }
     bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
-    void InsertTemplateParameters(const TemplateParameterList& list);
+
+    STRONG_BOOL(TemplateParamsOnly);  ///! Skip template, type constraints and class/typename.
+    void InsertTemplateParameters(const TemplateParameterList& list,
+                                  const TemplateParamsOnly     templateParamsOnly = TemplateParamsOnly::No);
 
     STRONG_BOOL(InsertInline);
 

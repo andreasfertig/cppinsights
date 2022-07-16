@@ -30,21 +30,15 @@ int main()
       }
       
       using retType_5_7 = S (*)();
-      inline /*constexpr */ operator retType_5_7 () const noexcept
+      inline constexpr operator retType_5_7 () const noexcept
       {
         return __invoke;
       };
       
       private: 
-      static inline S __invoke()
+      static inline /*constexpr */ S __invoke()
       {
-        struct S
-        {
-          int v{676};
-          // inline constexpr S(const S &) noexcept = default;
-        };
-        
-        return S{{676}};
+        return __lambda_5_7{}.operator()();
       }
       
       

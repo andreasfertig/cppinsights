@@ -33,15 +33,15 @@ class __lambda_16_15
   }
   
   using retType_16_15 = bool (*)();
-  inline /*constexpr */ operator retType_16_15 () const noexcept
+  inline consteval operator retType_16_15 () const noexcept
   {
     return __invoke;
   };
   
   private: 
-  static inline bool __invoke()
+  static inline consteval bool __invoke()
   {
-    return true;
+    return __lambda_16_15{}.operator()();
   }
   
   

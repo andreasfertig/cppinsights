@@ -21,15 +21,15 @@ int main()
     }
     
     using retType_11_5 = void (*)();
-    inline /*constexpr */ operator retType_11_5 () const noexcept
+    inline constexpr operator retType_11_5 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      int x = mine::x;
+      __lambda_11_5{}.operator()();
     }
     
     

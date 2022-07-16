@@ -67,15 +67,15 @@ int main()
     }
     
     using retType_33_10 = void (*)();
-    inline /*constexpr */ operator retType_33_10 () const noexcept
+    inline constexpr operator retType_33_10 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("hello\n");
+      __lambda_33_10{}.operator()();
     }
     
     
@@ -92,15 +92,15 @@ int main()
     }
     
     using retType_35_18 = void (*)();
-    inline /*constexpr */ operator retType_35_18 () const noexcept
+    inline constexpr operator retType_35_18 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("hello\n");
+      __lambda_35_18{}.operator()();
     }
     
     
@@ -117,15 +117,15 @@ int main()
     }
     
     using retType_37_21 = void (*)();
-    inline /*constexpr */ operator retType_37_21 () const noexcept
+    inline constexpr operator retType_37_21 () const noexcept
     {
       return __invoke;
     };
     
     private: 
-    static inline void __invoke()
+    static inline /*constexpr */ void __invoke()
     {
-      printf("hello\n");
+      __lambda_37_21{}.operator()();
     }
     
     

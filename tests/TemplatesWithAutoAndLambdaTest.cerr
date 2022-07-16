@@ -10,4 +10,10 @@
 .tmp.cpp:53:5: error: templates cannot be declared inside of a local class
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-4 errors generated.
+.tmp.cpp:56:42: error: 'type_parameter_0_0' does not refer to a value
+      return __lambda_11_28{}.operator()<type_parameter_0_0>(arg);
+                                         ^
+.tmp.cpp:53:20: note: declared here
+    template<class type_parameter_0_0>
+                   ^
+5 errors generated.

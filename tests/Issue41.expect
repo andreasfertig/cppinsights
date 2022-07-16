@@ -19,7 +19,7 @@ int main()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ bool operator()(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & str) const
+    inline /*constexpr */ bool operator()<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & str) const
     {
       return std::operator==(str, "bbb");
     }
@@ -27,9 +27,9 @@ int main()
     
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(const type_parameter_0_0 & str)
+    static inline /*constexpr */ auto __invoke(const type_parameter_0_0 & str)
     {
-      return operator==(str, "bbb");
+      return __lambda_12_26{}.operator()<type_parameter_0_0>(str);
     }
     
   };
