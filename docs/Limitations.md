@@ -7,8 +7,9 @@ While the goal is to produce valid and correct code, in some instances, this is 
 
 This page documents known limitations where the resulting transformation is inaccurate in terms of the standard.
 
+## Templates
 
-## Point of instantiation of templates
+### Point of instantiation of templates
 
 As [#472](https://github.com/andreasfertig/cppinsights/issues/472) notes correctly, the point of instantiation of
 templates is not at the precise location as the standard describes it in [temp.point](https://eel.is/c++draft/temp.point).
@@ -19,6 +20,13 @@ declaration of the POI. Implementing this in C++ Insights would require knowledg
 instantiated and the end of its enclosing namespace. While technically, this information is present in the form of
 `SourceLocation`, the traversal of the AST, and the straightforward text-dumping of the nodes does not allow sorting at
 this point.
+
+
+### Constant expressions as NTTPs
+
+As [#415](https://github.com/andreasfertig/cppinsights/issues/415) notes, there are cases where C++ Insights is unable to
+show all the implicit conversions. The reason seems to be that Clang folds away expressions that cannot be recovered.
+See [discourse.llvm.org/t/how-to-find-the-ast-node-for-conversion-operator-for-a-nttp](https://discourse.llvm.org/t/how-to-find-the-ast-node-for-conversion-operator-for-a-nttp/62507/3).
 
 
 ## Lambdas with static invoker
