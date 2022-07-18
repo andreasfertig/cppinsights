@@ -14,7 +14,7 @@ on:
 env:
   CMAKE_VERSION: 3.16.2
   NINJA_VERSION: 1.10.0
-  LLVM_VERSION: 13.0.0
+  LLVM_VERSION: 14.0.0
 
 jobs:
   checks:
@@ -24,9 +24,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # Clang 13
+        # Clang
         - {
-            name: "Linux Clang 13 - Format check",
+            name: "Linux Clang - Format check",
             os: ubuntu-latest,
             build_type: Release,
             cformat_name: 'clang-format-13'
@@ -37,13 +37,13 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Install Clang 13
+    - name: Install Clang
       shell: bash
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
         sudo ./llvm.sh 13
-        sudo apt-get install clang-format-13
+        sudo apt-get install ${{ matrix.config.cformat_name }}
 
     - name: clang-format check
       id: clang_format_check
@@ -68,7 +68,7 @@ jobs:
             os: macos-latest,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "13.0.0",
+            llvm_version: ${{ LLVM_VERSION }},
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -159,7 +159,7 @@ jobs:
             os: windows-2022,
             build_type: Release,
             cxx: "clang-cl.exe",
-            llvm_version: "13.0.0",
+            llvm_version: "14.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             coverage: "Yes",
             static: "Yes",
@@ -260,7 +260,7 @@ jobs:
             ${{ github.workspace }}/current
         key: ${{ runner.os }}-clang-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/current') }}
 
-    - name: Install Clang 13
+    - name: Install Clang
       if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-clang-binary.outputs.cache-hit != 'true'"
       shell: cmake -P {0}
       run: |
@@ -268,7 +268,7 @@ jobs:
         set(path_separator ":")
         set(archive_name "clang+llvm-${llvm_version}-x86_64-apple-darwin")
         if ("${{ runner.os }}" STREQUAL "Windows")
-            set(archive_name "llvm+clang+lld-${llvm_version}-x86_64-windows-msvc-release-mt")
+            set(archive_name "clang+llvm-${llvm_version}-win64-msvc")
             set(path_separator ";")
         endif()
 
@@ -278,7 +278,7 @@ jobs:
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm.tar.xz)
         execute_process(COMMAND ${CMAKE_COMMAND} -E rename "./${archive_name}" "./current")
 
-    - name: Set Clang 13 Path
+    - name: Set Clang path
       if: "startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')"
       shell: cmake -P {0}
       run: |
@@ -307,17 +307,11 @@ jobs:
             ${{ github.workspace }}/grcov.exe
         key: ${{ runner.os }}-grcov-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}
 
-    - name: Install LLVM compiler-rt and grcov
+    - name: Install LLVM grcov
       #      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && ((steps.cache-grcov-binary.outputs.cache-hit != 'true') || (steps.cache-clang-binary.outputs.cache-hit != 'true')))"
       if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes'))"
       shell: cmake -P {0}
       run: |
-        set(llvm_version ${{ matrix.config.llvm_version }})
-        file(DOWNLOAD "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${llvm_version}/compiler-rt-${llvm_version}.zip" ./compiler-rt.zip)
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./compiler-rt.zip)
-        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./compiler-rt.zip)
-        file(COPY lib DESTINATION "$ENV{GITHUB_WORKSPACE}/current/lib/clang/${llvm_version}/")
-
         file(DOWNLOAD "https://github.com/mozilla/grcov/releases/download/v0.5.15/grcov-win-x86_64.tar.bz2" ./grcov.tar.bz2)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./grcov.tar.bz2)
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./grcov.tar.bz2)
