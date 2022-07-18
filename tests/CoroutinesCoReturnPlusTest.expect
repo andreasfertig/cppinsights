@@ -1,25 +1,24 @@
 // cmdline:-std=c++2a
-#include <experimental/coroutine>
+#include <coroutine>
+#include <new>
 
-namespace stdx = std::experimental;
- 
 struct generator
 {
   struct promise_type
   {
     int current_value;
-    inline stdx::suspend_always yield_value(int value)
+    inline std::suspend_always yield_value(int value)
     {
       this->current_value = value;
       return {};
     }
     
-    inline stdx::suspend_always initial_suspend()
+    inline std::suspend_always initial_suspend()
     {
       return {};
     }
     
-    inline stdx::suspend_always final_suspend() noexcept
+    inline std::suspend_always final_suspend() noexcept
     {
       return {};
     }
@@ -46,15 +45,15 @@ struct generator
     // inline constexpr promise_type() noexcept = default;
   };
   
-  using coro_handle = stdx::coroutine_handle<promise_type>;
+  using coro_handle = std::coroutine_handle<promise_type>;
   inline bool await_ready()
   {
     return false;
   }
   
-  inline void await_suspend(std::experimental::coroutine_handle<promise_type> waiter)
+  inline void await_suspend(std::coroutine_handle<promise_type> waiter)
   {
-    static_cast<std::experimental::coroutine_handle<void>&>(waiter).resume();
+    waiter.resume();
   }
   
   inline int await_resume()
@@ -64,15 +63,15 @@ struct generator
   
   // inline generator(const generator &) = delete;
   inline generator(generator && rhs)
-  : p{std::experimental::coroutine_handle<promise_type>(rhs.p)}
+  : p{std::coroutine_handle<promise_type>(rhs.p)}
   {
     rhs.p.operator=(nullptr);
   }
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    if(static_cast<bool>(this->p.operator bool())) {
+      this->p.destroy();
     } 
     
   }
@@ -80,11 +79,11 @@ struct generator
   
   private: 
   inline explicit generator(promise_type * p)
-  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*p)}
+  : p{std::coroutine_handle<promise_type>::from_promise(*p)}
   {
   }
   
-  std::experimental::coroutine_handle<promise_type> p;
+  std::coroutine_handle<promise_type> p;
   public: 
   // inline generator & operator=(const generator &) /* noexcept */ = delete;
 };

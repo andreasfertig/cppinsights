@@ -13,9 +13,9 @@ namespace details
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  struct remove_reference<int [16]>
+  struct remove_reference<int[16]>
   {
-    using type = int [16];
+    using type = int[16];
   };
   
   #endif
@@ -41,7 +41,7 @@ namespace details
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  struct extent<int [16], 0>
+  struct extent<int[16], 0>
   {
     inline static constexpr const size_t value = 16UL;
     
@@ -50,7 +50,7 @@ namespace details
   
   #endif
   template<class T, size_t I>
-  struct extent<T [I], 0>
+  struct extent<T[I], 0>
   {
     inline static constexpr const size_t value = I;
     
@@ -130,7 +130,7 @@ class Y<double> : public S<double>, public E
 void test()
 {
   int buffer[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  const unsigned long & xx = details::extent<int [16], 0>::value;
+  const size_t & xx = details::extent<int[16], 0>::value;
   S<int> s = S<int>();
   Y<double> y = Y<double>();
 }

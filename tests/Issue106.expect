@@ -1,6 +1,6 @@
 int main()
 {
-  int (*p)[3][4] = new int [3][3][4];
+  int (*p)[3][4] = new int[3][3][4];
   int * z = new int[1];
   int * x = new int;
   return 0;

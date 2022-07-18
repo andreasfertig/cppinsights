@@ -130,11 +130,11 @@ int main()
   ++a4;
   --a5;
   printf("%d %d\n", static_cast<int>(a4), static_cast<int>(a5));
-  char const (&__ar72)[2] = ar;
+  const char (&__ar72)[2] = ar;
   const char & a8 = __ar72[0];
   const char & a9 = __ar72[1];
   const char aa[2] = {1, 2};
-  char const (&__aa75)[2] = aa;
+  const char (&__aa75)[2] = aa;
   const char & a18 = __aa75[0];
   const char & a19 = __aa75[1];
   std::tuple<int, char, double> muple = std::make_tuple(1, 'a', 2.2999999999999998);

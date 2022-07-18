@@ -20,7 +20,7 @@ typedef Foo<double> DoubleFoo;
 
 int main()
 {
-  DoubleFoo df = Foo<double>();
+  Foo<double> df = Foo<double>();
   return 0;
 }
 

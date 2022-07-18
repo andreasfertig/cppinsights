@@ -19,7 +19,7 @@ class array<int, 2>
   
   public: 
   inline array()
-  : data{*new int [1][2]}
+  : data{*new int[1][2]}
   {
   }
   

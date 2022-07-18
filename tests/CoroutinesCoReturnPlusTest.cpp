@@ -1,18 +1,17 @@
 // cmdline:-std=c++2a
-#include <experimental/coroutine>
+#include <coroutine>
+#include <new>
 
-namespace stdx = std::experimental;
- 
 struct generator {
   struct promise_type {
     int current_value;
-    stdx::suspend_always yield_value(int value) {
+    std::suspend_always yield_value(int value) {
       this->current_value = value;
       return {};
     }
     
-    stdx::suspend_always initial_suspend() { return {}; }
-    stdx::suspend_always final_suspend() noexcept { return {}; }
+    std::suspend_always initial_suspend() { return {}; }
+    std::suspend_always final_suspend() noexcept { return {}; }
     generator get_return_object() { return generator{this}; };
     void unhandled_exception() { std::terminate(); }
     void return_value(int value) { }
@@ -25,7 +24,7 @@ struct generator {
 
     
   // shortening the name
-  using coro_handle = stdx::coroutine_handle<promise_type>;
+  using coro_handle = std::coroutine_handle<promise_type>;
 
   bool await_ready() { return false; }
   void await_suspend(coro_handle waiter) {

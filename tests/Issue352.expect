@@ -14,8 +14,8 @@ int main()
   int (&a1)[5] = __foo9.a;
   float (&b1)[] = __foo9.b;
   const Foo & __foo10 = foo;
-  int const (&a2)[5] = __foo10.a;
-  float const (&b2)[] = __foo10.b;
+  const int (&a2)[5] = __foo10.a;
+  const float (&b2)[] = __foo10.b;
   return 0;
 }
 

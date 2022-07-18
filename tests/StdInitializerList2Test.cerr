@@ -1,7 +1,7 @@
-.tmp.cpp:9:64: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int [2]'
+.tmp.cpp:9:64: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[2]'
   std::initializer_list<int> list = std::initializer_list<int>{__list56, 2};
                                                                ^~~~~~~~
-.tmp.cpp:38:41: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int [2]'
+.tmp.cpp:38:41: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[2]'
       return std::initializer_list<int>{__list127, 2};
                                         ^~~~~~~~~
 2 errors generated.

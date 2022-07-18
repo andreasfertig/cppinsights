@@ -50,7 +50,7 @@ inline constexpr int operator""_x<char, '1', '2', '3', '4', '5'>()
 int main()
 {
   using namespace std::literals;
-  std::chrono::seconds t = std::operator""s(98291919ULL);
+  std::chrono::duration<long long, std::ratio<1, 1> > t = std::operator""s(98291919ULL);
   int t4 = operator""_x<char, '1', '2', '3', '4', '5'>();
   std::basic_string<char, std::char_traits<char>, std::allocator<char> > str = operator""_str("abcd", 4UL);
   std::chrono::duration<long long, std::ratio<1, 1> > sec = operator""_s(4ULL);

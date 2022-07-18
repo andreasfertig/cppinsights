@@ -116,7 +116,7 @@ namespace Test
 int main()
 {
   using std::string;
-  std::string str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >("Example");
+  std::string str = std::string("Example");
   D<int> d = D<int>();
   using namespace std::string_literals;
   std::basic_string<char, std::char_traits<char>, std::allocator<char> > str2 = std::operator""s("abc", 3UL);

@@ -168,6 +168,12 @@ struct tnt::wrapper<my_type> final
     vis("b", &my_type::b);
   }
   
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline constexpr void operator()<tnt::printer<my_type> >(tnt::printer<my_type> && vis) const;
+  #endif
+  
+  
   /* First instantiated from: Issue391.cpp:69 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>

@@ -14,7 +14,7 @@ on:
 env:
   CMAKE_VERSION: 3.16.2
   NINJA_VERSION: 1.10.0
-  LLVM_VERSION: 13.0.0
+  LLVM_VERSION: 14.0.0
 
 jobs:
   checks:
@@ -24,12 +24,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # Clang 13
+        # Clang
         - {
-            name: "Linux Clang 13 - Format check",
-            os: ubuntu-latest,
+            name: "Linux Clang - Format check",
+            os: ubuntu-20.04,
             build_type: Release,
-            cformat_name: 'clang-format-13'
+            cformat_name: 'clang-format-14'
           }
 
     steps:
@@ -37,13 +37,13 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Install Clang 13
+    - name: Install Clang
       shell: bash
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 13
-        sudo apt-get install clang-format-13
+        sudo ./llvm.sh 14
+        sudo apt-get install ${{ matrix.config.cformat_name }}
 
     - name: clang-format check
       id: clang_format_check
@@ -64,11 +64,11 @@ jobs:
         config:
         # AppleClang
         - {
-            name: "Clang 13 / LLVM 13 @ macOS Release",
-            os: macos-latest,
+            name: "Clang 14 / LLVM 14 @ macOS Release",
+            os: macos-11,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "13.0.0",
+            llvm_version: "14.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -82,11 +82,11 @@ jobs:
 
         # AppleClang
         - {
-            name: "Clang 13 / LLVM 13 @ macOS Debug",
-            os: macos-latest,
+            name: "Clang 14 / LLVM 14 @ macOS Debug",
+            os: macos-11,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "13.0.0",
+            llvm_version: "14.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -100,11 +100,11 @@ jobs:
 
         # # AppleClang
         # - {
-        #     name: "Clang 13 / LLVM 13 @ macOS Coveage & Debug",
-        #     os: macos-latest,
+        #     name: "Clang 14 / LLVM 14 @ macOS Coverage & Debug",
+        #     os: macos-11,
         #     build_type: Release,
         #     cxx: "clang++",
-        #     llvm_version: "13.0.0",
+        #     llvm_version: "14.0.0",
         #     llvm_config: "llvm-config",
         #     coverage: "Yes",
         #     static: "No",
@@ -118,11 +118,11 @@ jobs:
 
           # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 13 @ Windows Release",
+          #   name: "MSVC 2022 / LLVM 14 @ Windows Release",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "13.0.0",
+          #   llvm_version: "14.0.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "No",
@@ -137,11 +137,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 13 @ Windows Debug",
+          #   name: "MSVC 2022 / LLVM 14 @ Windows Debug",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "13.0.0",
+          #   llvm_version: "14.0.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "Yes",
@@ -155,11 +155,11 @@ jobs:
 
         # MSVC 2019
         - {
-            name: "MSVC 2022 / LLVM 13 @ Windows Code Coverage & Debug",
+            name: "MSVC 2022 / LLVM 14 @ Windows Code Coverage & Debug",
             os: windows-2022,
             build_type: Release,
             cxx: "clang-cl.exe",
-            llvm_version: "13.0.0",
+            llvm_version: "14.0.0",
             llvm_config: "current/bin/llvm-config.exe",
             coverage: "Yes",
             static: "Yes",
@@ -260,7 +260,7 @@ jobs:
             ${{ github.workspace }}/current
         key: ${{ runner.os }}-clang-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/current') }}
 
-    - name: Install Clang 13
+    - name: Install Clang
       if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-clang-binary.outputs.cache-hit != 'true'"
       shell: cmake -P {0}
       run: |
@@ -268,7 +268,7 @@ jobs:
         set(path_separator ":")
         set(archive_name "clang+llvm-${llvm_version}-x86_64-apple-darwin")
         if ("${{ runner.os }}" STREQUAL "Windows")
-            set(archive_name "llvm+clang+lld-${llvm_version}-x86_64-windows-msvc-release-mt")
+            set(archive_name "clang+llvm-${llvm_version}-win64-msvc")
             set(path_separator ";")
         endif()
 
@@ -278,7 +278,7 @@ jobs:
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./llvm.tar.xz)
         execute_process(COMMAND ${CMAKE_COMMAND} -E rename "./${archive_name}" "./current")
 
-    - name: Set Clang 13 Path
+    - name: Set Clang path
       if: "startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')"
       shell: cmake -P {0}
       run: |
@@ -307,17 +307,11 @@ jobs:
             ${{ github.workspace }}/grcov.exe
         key: ${{ runner.os }}-grcov-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/grcov.exe') }}
 
-    - name: Install LLVM compiler-rt and grcov
+    - name: Install LLVM grcov
       #      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes') && ((steps.cache-grcov-binary.outputs.cache-hit != 'true') || (steps.cache-clang-binary.outputs.cache-hit != 'true')))"
       if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes'))"
       shell: cmake -P {0}
       run: |
-        set(llvm_version ${{ matrix.config.llvm_version }})
-        file(DOWNLOAD "https://github.com/andreasfertig/cppinsights-compiler-binaries/releases/download/${llvm_version}/compiler-rt-${llvm_version}.zip" ./compiler-rt.zip)
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./compiler-rt.zip)
-        execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./compiler-rt.zip)
-        file(COPY lib DESTINATION "$ENV{GITHUB_WORKSPACE}/current/lib/clang/${llvm_version}/")
-
         file(DOWNLOAD "https://github.com/mozilla/grcov/releases/download/v0.5.15/grcov-win-x86_64.tar.bz2" ./grcov.tar.bz2)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./grcov.tar.bz2)
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./grcov.tar.bz2)
@@ -328,7 +322,7 @@ jobs:
         export HOMEBREW_NO_AUTO_UPDATE=1
         brew update > /dev/null
         brew install lcov || brew upgrade lcov
-        brew install gcc@10 || brew upgrade gcc@10 # for Clang 13 and newer gcov
+        brew install gcc@10 || brew upgrade gcc@10 # for Clang 14 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
@@ -463,7 +457,7 @@ jobs:
 # BUILD INSIDE DOCKER
 #------------------------------------------------------------------------------
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: ${{ matrix.config.name }}
     container:
       image: andreasfertig/cppinsights-builder
@@ -471,13 +465,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # GCC 11 / LLVM 13
+        # GCC 11 / LLVM 14
         - {
-            name: "GCC 11 / LLVM 13 @ Ubuntu Release @docker",
+            name: "GCC 11 / LLVM 14 @ Ubuntu Release @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "13.0.0",
-            llvm_config: "/usr/bin/llvm-config-13",
+            llvm_version: "14.0.0",
+            llvm_config: "/usr/bin/llvm-config-14",
             coverage: "No",
             static: "Yes",
             debug: "No",
@@ -490,13 +484,13 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 11 / LLVM 13
+        # GCC 11 / LLVM 14
         - {
-            name: "GCC 11 / LLVM 13 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 11 / LLVM 14 @ Ubuntu Code Coverage & Debug @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "13.0.0",
-            llvm_config: "/usr/bin/llvm-config-13",
+            llvm_version: "14.0.0",
+            llvm_config: "/usr/bin/llvm-config-14",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -507,13 +501,13 @@ jobs:
             archive_name: "insights-ubuntu-14.04",
           }
 
-        # GCC 11 / LLVM 13
+        # GCC 11 / LLVM 14
         - {
-            name: "GCC 11 / LLVM 13 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 11 / LLVM 14 @ Ubuntu Code Coverage (libc++) @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "13.0.0",
-            llvm_config: "/usr/bin/llvm-config-13",
+            llvm_version: "14.0.0",
+            llvm_config: "/usr/bin/llvm-config-14",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -653,7 +647,7 @@ jobs:
     needs: [build, docker]
     if: github.ref == 'refs/heads/main'
     name: Final Deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2

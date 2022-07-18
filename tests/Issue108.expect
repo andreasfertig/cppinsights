@@ -1,4 +1,4 @@
-int (*gp)[3][4] = new int [2][3][4];
+int (*gp)[3][4] = new int[2][3][4];
 
 
 int * gz = new int[1];
@@ -7,7 +7,7 @@ int * gz = new int[1];
 int * gx = new int;
 
 
-int (*gu)[3][4] = new int [2][3][4];
+int (*gu)[3][4] = new int[2][3][4];
 
 
 int main()

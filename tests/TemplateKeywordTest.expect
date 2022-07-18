@@ -64,7 +64,7 @@ struct compose<>
 
 int main()
 {
-  compose<>::to<>::result<int, char> a = compose<>::to<int>::result<int, char>();
+  compose<>::to<int>::result<int, char> a = compose<>::to<int>::result<int, char>();
   return 0;
 }
 

@@ -10,16 +10,15 @@
 #elif __has_include(<experimental/coroutine>)
 #include <experimental/coroutine>
 
-namespace std
-{
-  using namespace experimental;
-  
+namespace std {
+    using namespace std::experimental;
 }
 #else
 #error "No coroutine header"
 #endif
 
 #include <new>
+#include <utility>
 
 struct generator
 {
@@ -67,8 +66,8 @@ struct generator
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    if(static_cast<bool>(this->p.operator bool())) {
+      this->p.destroy();
     } 
     
   }
@@ -76,11 +75,11 @@ struct generator
   
   private: 
   inline explicit generator(promise_type * p)
-  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*p)}
+  : p{std::coroutine_handle<promise_type>::from_promise(*p)}
   {
   }
   
-  std::experimental::coroutine_handle<promise_type> p;
+  std::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator &) /* noexcept */ = delete;
   // inline generator & operator=(const generator &) /* noexcept */ = delete;
@@ -96,90 +95,90 @@ void SyncAwait(_AwrT&& a)
     asyncLambda();
 }
 
-/* First instantiated from: EduCoroutineWithLambdaTest.cpp:60 */
+/* First instantiated from: EduCoroutineWithLambdaTest.cpp:61 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-void SyncAwait<std::experimental::suspend_always>(std::experimental::suspend_always && a)
+void SyncAwait<std::suspend_always>(std::suspend_always && a)
 {
     
-  class __lambda_53_24
+  class __lambda_54_24
   {
     public: 
-    struct __operator_53_43Frame
+    struct __operator_54_43Frame
 {
-  void (*resume_fn)(__operator_53_43Frame *);
-  void (*destroy_fn)(__operator_53_43Frame *);
-  std::experimental::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  void (*resume_fn)(__operator_54_43Frame *);
+  void (*destroy_fn)(__operator_54_43Frame *);
+  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
-  std::suspend_always __suspend_53_24;
-  std::experimental::suspend_always __suspend_53_54;
-  std::suspend_always __suspend_53_24_1;
+  std::suspend_always __suspend_54_24;
+  std::suspend_always __suspend_54_54;
+  std::suspend_always __suspend_54_24_1;
 };
 
 inline generator operator()() const
     {
       /* Allocate the frame including the promise */
-      __operator_53_43Frame * __f = reinterpret_cast<__operator_53_43Frame *>(operator new(__builtin_coro_size()));
+      __operator_54_43Frame * __f = reinterpret_cast<__operator_54_43Frame *>(operator new(__builtin_coro_size()));
       __f->__suspend_index = 0;
       __f->__initial_await_suspend_called = false;
       
       /* Construct the promise. */
-      new (&__f->__promise)std::experimental::__coroutine_traits_sfinae<generator>::promise_type{};
+      new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
       
       generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
       
       /* Forward declare the resume and destroy function. */
-      void __operator_53_43Resume(__operator_53_43Frame * __f);
-      void __operator_53_43Destroy(__operator_53_43Frame * __f);
+      void __operator_54_43Resume(__operator_54_43Frame * __f);
+      void __operator_54_43Destroy(__operator_54_43Frame * __f);
       
       /* Assign the resume and destroy function pointers. */
-      __f->resume_fn = &__operator_53_43Resume;
-      __f->destroy_fn = &__operator_53_43Destroy;
+      __f->resume_fn = &__operator_54_43Resume;
+      __f->destroy_fn = &__operator_54_43Destroy;
       
       /* Call the made up function with the coroutine body for initial suspend.
      This function will be called subsequently by coroutine_handle<>::resume()
      which calls __builtin_coro_resume(__handle_) */
-      __operator_53_43Resume(__f);
+      __operator_54_43Resume(__f);
       
       
       return __coro_gro;
     }
     
     /* This function invoked by coroutine_handle<>::resume() */
-    void __operator_53_43Resume(__operator_53_43Frame * __f)
+    void __operator_54_43Resume(__operator_54_43Frame * __f)
     {
       try 
       {
         /* Create a switch to get to the correct resume point */
         switch(__f->__suspend_index) {
           case 0: break;
-          case 1: goto __resume_operator_53_43_1;
-          case 2: goto __resume_operator_53_43_2;
+          case 1: goto __resume_operator_54_43_1;
+          case 2: goto __resume_operator_54_43_2;
         }
         
-        /* co_await EduCoroutineWithLambdaTest.cpp:53 */
-        __f->__suspend_53_24 = __f->__promise.initial_suspend();
-        if(!__f->__suspend_53_24.await_ready()) {
-          __f->__suspend_53_24.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+        /* co_await EduCoroutineWithLambdaTest.cpp:54 */
+        __f->__suspend_54_24 = __f->__promise.initial_suspend();
+        if(!__f->__suspend_54_24.await_ready()) {
+          __f->__suspend_54_24.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
           __f->__suspend_index = 1;
           __f->__initial_await_suspend_called = true;
           return;
         } 
         
-        __resume_operator_53_43_1:
-        __f->__suspend_53_24.await_resume();
+        __resume_operator_54_43_1:
+        __f->__suspend_54_24.await_resume();
         
-        /* co_await EduCoroutineWithLambdaTest.cpp:53 */
-        __f->__suspend_53_54 = a;
-        if(!__f->__suspend_53_54.await_ready()) {
-          __f->__suspend_53_54.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+        /* co_await EduCoroutineWithLambdaTest.cpp:54 */
+        __f->__suspend_54_54 = a;
+        if(!__f->__suspend_54_54.await_ready()) {
+          __f->__suspend_54_54.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
           __f->__suspend_index = 2;
           return;
         } 
         
-        __resume_operator_53_43_2:
-        __f->__suspend_53_54.await_resume();
+        __resume_operator_54_43_2:
+        __f->__suspend_54_54.await_resume();
         goto __final_suspend;
       } catch(...) {
         if(!__f->__initial_await_suspend_called) {
@@ -191,36 +190,36 @@ inline generator operator()() const
       
       __final_suspend:
       
-      /* co_await EduCoroutineWithLambdaTest.cpp:53 */
-      __f->__suspend_53_24_1 = __f->__promise.final_suspend();
-      if(!__f->__suspend_53_24_1.await_ready()) {
-        __f->__suspend_53_24_1.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+      /* co_await EduCoroutineWithLambdaTest.cpp:54 */
+      __f->__suspend_54_24_1 = __f->__promise.final_suspend();
+      if(!__f->__suspend_54_24_1.await_ready()) {
+        __f->__suspend_54_24_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       } 
       
       ;
     }
     
     /* This function invoked by coroutine_handle<>::destroy() */
-    void __operator_53_43Destroy(__operator_53_43Frame * __f)
+    void __operator_54_43Destroy(__operator_54_43Frame * __f)
     {
       /* destroy all variables with dtors */
-      __f->~__operator_53_43Frame();
+      __f->~__operator_54_43Frame();
       /* Deallocating the coroutine frame */
       operator delete(__builtin_coro_free(static_cast<void *>(__f)));
     }
     
     
     private: 
-    std::experimental::suspend_always & a;
+    std::suspend_always & a;
     
     public:
-    __lambda_53_24(std::experimental::suspend_always & _a)
+    __lambda_54_24(std::suspend_always & _a)
     : a{_a}
     {}
     
   };
   
-  __lambda_53_24 asyncLambda = __lambda_53_24{a};
+  __lambda_54_24 asyncLambda = __lambda_54_24{a};
   asyncLambda.operator()();
 }
 #endif

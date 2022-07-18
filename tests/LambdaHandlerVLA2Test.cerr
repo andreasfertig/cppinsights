@@ -19,13 +19,13 @@ void Test(int n)
 .tmp.cpp:22:5: error: no matching constructor for initialization of 'class __lambda_6_5'
   } __lambda_6_5{buffer};
     ^           ~~~~~~~~
-.tmp.cpp:5:9: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'char [n]' to 'const __lambda_6_5' for 1st argument
+.tmp.cpp:5:9: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'char[n]' to 'const __lambda_6_5' for 1st argument
   class __lambda_6_5
         ^
-.tmp.cpp:5:9: note: candidate constructor (the implicit move constructor) not viable: no known conversion from 'char [n]' to '__lambda_6_5' for 1st argument
+.tmp.cpp:5:9: note: candidate constructor (the implicit move constructor) not viable: no known conversion from 'char[n]' to '__lambda_6_5' for 1st argument
   class __lambda_6_5
         ^
-.tmp.cpp:18:5: note: candidate constructor not viable: no known conversion from 'char [n]' to 'char (&)[n]' for 1st argument
+.tmp.cpp:18:5: note: candidate constructor not viable: no known conversion from 'char[n]' to 'char (&)[n]' for 1st argument
     __lambda_6_5(char (&_buffer)[n])
     ^
 1 warning and 4 errors generated.

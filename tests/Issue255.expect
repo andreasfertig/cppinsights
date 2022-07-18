@@ -22,7 +22,7 @@ struct Iterable
     
     inline access_type operator*()
     {
-      Widget tmp = std::tuple<int, float>(this->m_iterable->m_storage.operator[](this->m_pos));
+      std::tuple<int, float> tmp = std::tuple<int, float>(this->m_iterable->m_storage.operator[](this->m_pos));
       return std::get<access_type>(tmp);
     }
     
@@ -53,7 +53,7 @@ struct Iterable
     
     inline int operator*()
     {
-      Widget tmp = std::tuple<int, float>(this->m_iterable->m_storage.operator[](this->m_pos));
+      std::tuple<int, float> tmp = std::tuple<int, float>(this->m_iterable->m_storage.operator[](this->m_pos));
       return std::get<int>(tmp);
     }
     

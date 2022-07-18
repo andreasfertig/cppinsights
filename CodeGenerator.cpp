@@ -926,12 +926,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                 const auto varName = FormatVarTemplateSpecializationDecl(stmt, StrCat(scope, GetName(*stmt)));
 
                 // TODO: to keep the special handling for lambdas, do this only for template specializations
-                if(stmt->getType()->getAs<TemplateSpecializationType>()) {
-                    mOutputFormatHelper.Append(GetNameAsWritten(stmt->getType()), " "sv, varName);
-
-                } else {
-                    mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), varName));
-                }
+                mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), varName));
             }
         } else {
             const std::string_view pointer = [&]() {
@@ -1380,7 +1375,7 @@ void CodeGenerator::InsertArg(const CXXDeleteExpr* stmt)
 
 void CodeGenerator::InsertConstructorExpr(const auto* stmt)
 {
-    mOutputFormatHelper.Append(GetName(GetDesugarType(stmt->getType()), Unqualified::Yes));
+    mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
 
     const BraceKind braceKind = [&]() {
         if(stmt->isListInitialization()) {
@@ -3111,6 +3106,9 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     }
                 }
 
+                // To avoid seeing the templates stuff from std::move (typename...) the canonical type is used here.
+                fieldDeclType = fieldDeclType.getCanonicalType();
+
                 ctorInitializerList.push_back(StrCat(fieldName, "{"sv, fname, "}"sv));
 
                 if(not isThis && expr) {
@@ -3542,7 +3540,7 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             // TODO: handle pointers
             mOutputFormatHelper.Append("&"sv, arg.getAsDecl()->getQualifiedNameAsString());
             break;
-        case TemplateArgument::NullPtr: mOutputFormatHelper.Append(GetName(arg.getNullPtrType())); break;
+        case TemplateArgument::NullPtr: mOutputFormatHelper.Append(kwNullptr); break;
         case TemplateArgument::Integral:
 
             if(const auto& integral = arg.getAsIntegral(); arg.getIntegralType()->isCharType()) {

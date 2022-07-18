@@ -215,18 +215,18 @@ namespace details
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  int match_call<char const (&)[3], __lambda_73_4, __lambda_74_4, __lambda_75_4>(const __lambda_73_4 & _case, char const (&value)[3], std::integral_constant<bool, false>, const __lambda_74_4 & __other3, const __lambda_75_4 & __other4)
+  int match_call<const char (&)[3], __lambda_73_4, __lambda_74_4, __lambda_75_4>(const __lambda_73_4 & _case, const char (&value)[3], std::integral_constant<bool, false>, const __lambda_74_4 & __other3, const __lambda_75_4 & __other4)
   {
-    return match(std::forward<char const (&)[3]>(value), __other3, __other4);
+    return match(std::forward<const char (&)[3]>(value), __other3, __other4);
   }
   #endif
   
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  int match_call<char const (&)[3], __lambda_74_4, __lambda_75_4>(const __lambda_74_4 & _case, char const (&value)[3], std::integral_constant<bool, false>, const __lambda_75_4 & __other3)
+  int match_call<const char (&)[3], __lambda_74_4, __lambda_75_4>(const __lambda_74_4 & _case, const char (&value)[3], std::integral_constant<bool, false>, const __lambda_75_4 & __other3)
   {
-    return match(std::forward<char const (&)[3]>(value), __other3);
+    return match(std::forward<const char (&)[3]>(value), __other3);
   }
   #endif
   
@@ -270,26 +270,26 @@ int match<int &, __lambda_74_4, __lambda_75_4>(int & value, const __lambda_74_4 
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int match<char const (&)[3], __lambda_73_4, __lambda_74_4, __lambda_75_4>(char const (&value)[3], const __lambda_73_4 & _case, const __lambda_74_4 & __cases2, const __lambda_75_4 & __cases3)
+int match<const char (&)[3], __lambda_73_4, __lambda_74_4, __lambda_75_4>(const char (&value)[3], const __lambda_73_4 & _case, const __lambda_74_4 & __cases2, const __lambda_75_4 & __cases3)
 {
   using namespace std;
   using args = FunctionArgs<__lambda_73_4>::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
   using arg = tuple_element_t<0, std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >;
-  using match = is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, decay_t<char const (&)[3]> >;
-  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, const char *>{{}})), __cases2, __cases3);
+  using match = is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, decay_t<const char (&)[3]> >;
+  return details::match_call(_case, std::forward<const char (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, const char *>{{}})), __cases2, __cases3);
 }
 #endif
 
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int match<char const (&)[3], __lambda_74_4, __lambda_75_4>(char const (&value)[3], const __lambda_74_4 & _case, const __lambda_75_4 & __cases2)
+int match<const char (&)[3], __lambda_74_4, __lambda_75_4>(const char (&value)[3], const __lambda_74_4 & _case, const __lambda_75_4 & __cases2)
 {
   using namespace std;
   using args = FunctionArgs<__lambda_74_4>::tuple<int>;
   using arg = tuple_element_t<0, std::tuple<int> >;
-  using match = is_same<decay_t<arg>, decay_t<char const (&)[3]> >;
-  return details::match_call(_case, std::forward<char const (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<int, const char *>{{}})), __cases2);
+  using match = is_same<decay_t<arg>, decay_t<const char (&)[3]> >;
+  return details::match_call(_case, std::forward<const char (&)[3]>(value), std::integral_constant<bool, false>(static_cast<std::integral_constant<bool, false> &&>(std::is_same<int, const char *>{{}})), __cases2);
 }
 #endif
 
@@ -316,9 +316,9 @@ decltype(auto) match(T&& value, const Case& _case) {
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int match<char const (&)[3], __lambda_75_4>(char const (&value)[3], const __lambda_75_4 & _case)
+int match<const char (&)[3], __lambda_75_4>(const char (&value)[3], const __lambda_75_4 & _case)
 {
-  return _case.operator()(std::forward<char const (&)[3]>(value));
+  return _case.operator()(std::forward<const char (&)[3]>(value));
 }
 #endif
 
@@ -416,7 +416,7 @@ int test<int>(int && value)
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-int test<char const (&)[3]>(char const (&value)[3])
+int test<const char (&)[3]>(const char (&value)[3])
 {
       
   class __lambda_73_4
