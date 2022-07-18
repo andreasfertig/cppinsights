@@ -27,7 +27,7 @@ jobs:
         # Clang
         - {
             name: "Linux Clang - Format check",
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             build_type: Release,
             cformat_name: 'clang-format-14'
           }
@@ -65,7 +65,7 @@ jobs:
         # AppleClang
         - {
             name: "Clang 14 / LLVM 14 @ macOS Release",
-            os: macos-latest,
+            os: macos-11,
             build_type: Release,
             cxx: "clang++",
             llvm_version: "14.0.0",
@@ -83,7 +83,7 @@ jobs:
         # AppleClang
         - {
             name: "Clang 14 / LLVM 14 @ macOS Debug",
-            os: macos-latest,
+            os: macos-11,
             build_type: Release,
             cxx: "clang++",
             llvm_version: "14.0.0",
@@ -100,8 +100,8 @@ jobs:
 
         # # AppleClang
         # - {
-        #     name: "Clang 14 / LLVM 14 @ macOS Coveage & Debug",
-        #     os: macos-latest,
+        #     name: "Clang 14 / LLVM 14 @ macOS Coverage & Debug",
+        #     os: macos-11,
         #     build_type: Release,
         #     cxx: "clang++",
         #     llvm_version: "14.0.0",
@@ -457,7 +457,7 @@ jobs:
 # BUILD INSIDE DOCKER
 #------------------------------------------------------------------------------
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: ${{ matrix.config.name }}
     container:
       image: andreasfertig/cppinsights-builder
@@ -647,7 +647,7 @@ jobs:
     needs: [build, docker]
     if: github.ref == 'refs/heads/main'
     name: Final Deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
