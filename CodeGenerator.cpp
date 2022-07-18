@@ -1701,7 +1701,7 @@ void CodeGenerator::InsertArg(const CompoundStmt* stmt)
 template<typename... Args>
 static bool IsStmtRequiringSemi(const Stmt* stmt)
 {
-    return (... && !isa<Args>(stmt));
+    return (... && not isa<Args>(stmt));
 }
 //-----------------------------------------------------------------------------
 
@@ -1709,6 +1709,10 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
 {
     for(const auto* item : stmt->body()) {
         InsertArg(item);
+
+        // Skip inserting a semicolon, if this is a LambdaExpr and out stack is empty. This addresses a special case
+        // #344.
+        const bool skipSemiForLambda{mLambdaStack.empty() and isa<LambdaExpr>(item)};
 
         if(IsStmtRequiringSemi<IfStmt,
                                NullStmt,
@@ -1718,7 +1722,8 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
                                DoStmt,
                                CXXForRangeStmt,
                                SwitchStmt,
-                               CppInsightsCommentStmt>(item)) {
+                               CppInsightsCommentStmt>(item) and
+           not skipSemiForLambda) {
             mOutputFormatHelper.AppendSemiNewLine();
         }
     }
