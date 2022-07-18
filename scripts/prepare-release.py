@@ -14,9 +14,9 @@ import subprocess
 def main():
     versionH = open('version.h.in', 'r').read()
 
-    oldClangStable = '12'
-    newClangStable = '13'
-    newInsightsVersion = '0.8'
+    oldClangStable = '13'
+    newClangStable = '14'
+    newInsightsVersion = '0.9'
     oldInsightsVersion = re.search('INSIGHTS_VERSION\s+"(.*?)"', versionH, re.DOTALL | re.MULTILINE).group(1)
 
 

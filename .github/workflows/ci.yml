@@ -29,7 +29,7 @@ jobs:
             name: "Linux Clang - Format check",
             os: ubuntu-latest,
             build_type: Release,
-            cformat_name: 'clang-format-13'
+            cformat_name: 'clang-format-14'
           }
 
     steps:
@@ -42,7 +42,7 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 13
+        sudo ./llvm.sh 14
         sudo apt-get install ${{ matrix.config.cformat_name }}
 
     - name: clang-format check
@@ -64,11 +64,11 @@ jobs:
         config:
         # AppleClang
         - {
-            name: "Clang 13 / LLVM 13 @ macOS Release",
+            name: "Clang 14 / LLVM 14 @ macOS Release",
             os: macos-latest,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: ${{ LLVM_VERSION }},
+            llvm_version: "14.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -82,11 +82,11 @@ jobs:
 
         # AppleClang
         - {
-            name: "Clang 13 / LLVM 13 @ macOS Debug",
+            name: "Clang 14 / LLVM 14 @ macOS Debug",
             os: macos-latest,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "13.0.0",
+            llvm_version: "14.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -100,11 +100,11 @@ jobs:
 
         # # AppleClang
         # - {
-        #     name: "Clang 13 / LLVM 13 @ macOS Coveage & Debug",
+        #     name: "Clang 14 / LLVM 14 @ macOS Coveage & Debug",
         #     os: macos-latest,
         #     build_type: Release,
         #     cxx: "clang++",
-        #     llvm_version: "13.0.0",
+        #     llvm_version: "14.0.0",
         #     llvm_config: "llvm-config",
         #     coverage: "Yes",
         #     static: "No",
@@ -118,11 +118,11 @@ jobs:
 
           # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 13 @ Windows Release",
+          #   name: "MSVC 2022 / LLVM 14 @ Windows Release",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "13.0.0",
+          #   llvm_version: "14.0.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "No",
@@ -137,11 +137,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 13 @ Windows Debug",
+          #   name: "MSVC 2022 / LLVM 14 @ Windows Debug",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "13.0.0",
+          #   llvm_version: "14.0.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "Yes",
@@ -155,7 +155,7 @@ jobs:
 
         # MSVC 2019
         - {
-            name: "MSVC 2022 / LLVM 13 @ Windows Code Coverage & Debug",
+            name: "MSVC 2022 / LLVM 14 @ Windows Code Coverage & Debug",
             os: windows-2022,
             build_type: Release,
             cxx: "clang-cl.exe",
@@ -322,7 +322,7 @@ jobs:
         export HOMEBREW_NO_AUTO_UPDATE=1
         brew update > /dev/null
         brew install lcov || brew upgrade lcov
-        brew install gcc@10 || brew upgrade gcc@10 # for Clang 13 and newer gcov
+        brew install gcc@10 || brew upgrade gcc@10 # for Clang 14 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
@@ -465,13 +465,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # GCC 11 / LLVM 13
+        # GCC 11 / LLVM 14
         - {
-            name: "GCC 11 / LLVM 13 @ Ubuntu Release @docker",
+            name: "GCC 11 / LLVM 14 @ Ubuntu Release @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "13.0.0",
-            llvm_config: "/usr/bin/llvm-config-13",
+            llvm_version: "14.0.0",
+            llvm_config: "/usr/bin/llvm-config-14",
             coverage: "No",
             static: "Yes",
             debug: "No",
@@ -484,13 +484,13 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 11 / LLVM 13
+        # GCC 11 / LLVM 14
         - {
-            name: "GCC 11 / LLVM 13 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 11 / LLVM 14 @ Ubuntu Code Coverage & Debug @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "13.0.0",
-            llvm_config: "/usr/bin/llvm-config-13",
+            llvm_version: "14.0.0",
+            llvm_config: "/usr/bin/llvm-config-14",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -501,13 +501,13 @@ jobs:
             archive_name: "insights-ubuntu-14.04",
           }
 
-        # GCC 11 / LLVM 13
+        # GCC 11 / LLVM 14
         - {
-            name: "GCC 11 / LLVM 13 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 11 / LLVM 14 @ Ubuntu Code Coverage (libc++) @docker",
             build_type: Release,
             cxx: "g++-11",
-            llvm_version: "13.0.0",
-            llvm_config: "/usr/bin/llvm-config-13",
+            llvm_version: "14.0.0",
+            llvm_config: "/usr/bin/llvm-config-14",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
