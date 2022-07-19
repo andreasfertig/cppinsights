@@ -79,9 +79,9 @@ int main()
     }
     
     
-  } __lambda_33_10{};
+  };
   
-  f.Do<__lambda_33_10>(__lambda_33_10);
+  f.Do<__lambda_33_10>(__lambda_33_10{});
     
   class __lambda_35_18
   {
@@ -104,9 +104,9 @@ int main()
     }
     
     
-  } __lambda_35_18{};
+  };
   
-  f.DoOther<1>(__lambda_35_18);
+  f.DoOther<1>(__lambda_35_18{});
     
   class __lambda_37_21
   {
@@ -129,9 +129,9 @@ int main()
     }
     
     
-  } __lambda_37_21{};
+  };
   
-  f.DoBar<1, 116>(__lambda_37_21);
+  f.DoBar<1, 116>(__lambda_37_21{});
   return 0;
 }
 

@@ -1,0 +1,55 @@
+// cmdline:-std=c++20
+
+namespace A
+{
+    
+  class __lambda_4_29
+  {
+    public: 
+    inline /*constexpr */ auto operator()() const
+    {
+      return true;
+    }
+    
+    using retType_4_29 = auto (*)();
+    inline constexpr operator retType_4_29 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline /*constexpr */ auto __invoke()
+    {
+      return __lambda_4_29{}.operator()();
+    }
+    
+    
+    public:
+    // /*constexpr */ __lambda_4_29() = default;
+    
+  };
+  
+  template<class F = __lambda_4_29>
+  bool test(F f)
+  {
+    return f();
+  }
+  
+  /* First instantiated from: Issue468.cpp:13 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  bool test<__lambda_4_29>(__lambda_4_29 f)
+  {
+    return f.operator()();
+  }
+  #endif
+  
+  
+}
+
+int main()
+{
+  A::test(__lambda_4_29{});
+  return 0;
+}
+

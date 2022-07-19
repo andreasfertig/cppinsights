@@ -22,10 +22,10 @@ int main()
     }
     
     
-  } __lambda_8_26{};
+  };
   
   using FuncPtr_8 = int (*)(int, char);
-  FuncPtr_8 fp = static_cast<int (*)(int, char)>(__lambda_8_26.operator __lambda_8_26::retType_8_26());
+  FuncPtr_8 fp = static_cast<int (*)(int, char)>(__lambda_8_26{}.operator __lambda_8_26::retType_8_26());
   return 0;
 }
 

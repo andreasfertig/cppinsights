@@ -7,6 +7,7 @@
 
 #include "CodeGenerator.h"
 #include <algorithm>
+#include <optional>
 #include <vector>
 #include "ClangCompat.h"
 #include "DPrint.h"
@@ -27,6 +28,14 @@
 /// \brief Convenience macro to create a \ref LambdaScopeHandler on the stack.
 #define LAMBDA_SCOPE_HELPER(type)                                                                                      \
     LambdaScopeHandler lambdaScopeHandler{mLambdaStack, mOutputFormatHelper, LambdaCallerType::type};
+//-----------------------------------------------------------------------------
+
+/// \brief The lambda scope helper is only created if cond is true
+#define CONDITIONAL_LAMBDA_SCOPE_HELPER(type, cond)                                                                    \
+    std::optional<LambdaScopeHandler> lambdaScopeHandler;                                                              \
+    if(cond) {                                                                                                         \
+        lambdaScopeHandler.emplace(mLambdaStack, mOutputFormatHelper, LambdaCallerType::type);                         \
+    }
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
@@ -412,6 +421,8 @@ void CodeGenerator::InsertArg(const VarTemplateDecl* stmt)
 
 void CodeGenerator::InsertArg(const ConceptDecl* stmt)
 {
+    LAMBDA_SCOPE_HELPER(Decltype);
+
     InsertTemplateParameters(*stmt->getTemplateParameters());
     mOutputFormatHelper.Append(kwConceptSpace, stmt->getName(), hlpAssing);
 
@@ -1149,7 +1160,20 @@ void CodeGenerator::InsertMethodBody(const FunctionDecl* stmt, const size_t posB
 
 void CodeGenerator::InsertArg(const FunctionDecl* stmt)
 {
-    //    LAMBDA_SCOPE_HELPER(VarDecl);
+    {
+        LAMBDA_SCOPE_HELPER(Decltype);  // Needed for P0315Checker
+
+        // Special handling for C++20's P0315 (lambda in unevaluated context). See p0315_2Test.cpp
+        // We have to look for the lambda expression in the decltype.
+        P0315Visitor dt{*this};
+        dt.TraverseType(stmt->getReturnType());
+
+        // The arguments can contain a lambda as well
+        for(const auto& param : stmt->parameters()) {
+            P0315Visitor dt{*this};
+            dt.TraverseType(param->getType());
+        }
+    }
 
     if(const auto* deductionGuide = dyn_cast_or_null<CXXDeductionGuideDecl>(stmt)) {
         InsertArg(deductionGuide);
@@ -1236,7 +1260,16 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
             }
 
             if(tt->hasDefaultArgument() and not tt->defaultArgumentWasInherited()) {
-                mOutputFormatHelper.Append(hlpAssing, GetName(tt->getDefaultArgument()));
+                const auto& defaultArg = tt->getDefaultArgument();
+
+                if(const auto decltypeType = dyn_cast_or_null<DecltypeType>(defaultArg.getTypePtrOrNull())) {
+                    mOutputFormatHelper.Append(hlpAssing);
+
+                    InsertArg(decltypeType->getUnderlyingExpr());
+
+                } else {
+                    mOutputFormatHelper.Append(hlpAssing, GetName(defaultArg));
+                }
             }
 
         } else if(const auto* nonTmplParam = dyn_cast_or_null<NonTypeTemplateParmDecl>(param)) {
@@ -1375,6 +1408,16 @@ void CodeGenerator::InsertArg(const CXXDeleteExpr* stmt)
 
 void CodeGenerator::InsertConstructorExpr(const auto* stmt)
 {
+    if(P0315Visitor dt{*this}; not dt.TraverseType(stmt->getType())) {
+        if(not mLambdaStack.empty()) {
+            for(const auto& e : mLambdaStack) {
+                if(LambdaCallerType::VarDecl == e.callerType()) {
+                    return;
+                }
+            }
+        }
+    }
+
     mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
 
     const BraceKind braceKind = [&]() {
@@ -1475,7 +1518,15 @@ void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 {
-    LAMBDA_SCOPE_HELPER(MemberCallExpr);
+    const bool insideDecltype{[&] {
+        if(not mLambdaStack.empty()) {
+            return LambdaCallerType::Decltype == mLambdaStack.back().callerType();
+        }
+
+        return false;
+    }()};
+
+    CONDITIONAL_LAMBDA_SCOPE_HELPER(MemberCallExpr, not insideDecltype)
 
     InsertArg(stmt->getCallee());
 
@@ -1562,7 +1613,19 @@ void CodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 
 void CodeGenerator::InsertArg(const CallExpr* stmt)
 {
-    LAMBDA_SCOPE_HELPER(CallExpr);
+    const bool insideDecltype{[&] {
+        if(not mLambdaStack.empty()) {
+            return LambdaCallerType::Decltype == mLambdaStack.back().callerType();
+        }
+
+        return false;
+    }()};
+
+    CONDITIONAL_LAMBDA_SCOPE_HELPER(CallExpr, not insideDecltype)
+    if(insideDecltype) {
+        mLambdaStack.back().setInsertName(true);
+    }
+
     UpdateCurrentPos();
 
     InsertArg(stmt->getCallee());
@@ -1576,6 +1639,10 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
     }
 
     WrapInParens([&]() { ForEachArg(stmt->arguments(), [&](const auto& arg) { InsertArg(arg); }); });
+
+    if(insideDecltype) {
+        mLambdaStack.back().setInsertName(false);
+    }
 }
 //-----------------------------------------------------------------------------
 
@@ -2049,9 +2116,15 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 
 void CodeGenerator::InsertArg(const LambdaExpr* stmt)
 {
-    if(!mLambdaStack.empty()) {
+    if(not mLambdaStack.empty()) {
+        const bool insertName{mLambdaStack.back().insertName()};
+
         HandleLambdaExpr(stmt, mLambdaStack.back());
-        mOutputFormatHelper.Append(GetLambdaName(*stmt));
+
+        if(insertName) {
+            mOutputFormatHelper.Append(GetLambdaName(*stmt));
+        }
+
     } else if(LambdaInInitCapture::Yes == mLambdaInitCapture) {
         LAMBDA_SCOPE_HELPER(InitCapture);
         HandleLambdaExpr(stmt, mLambdaStack.back());
@@ -2533,6 +2606,10 @@ auto GetSpaces(std::string::size_type offset)
 
 void CodeGenerator::InsertArg(const FieldDecl* stmt)
 {
+    LAMBDA_SCOPE_HELPER(Decltype);
+    P0315Visitor dt{*this};
+    dt.TraverseType(stmt->getType());
+
     const auto initialSize{mOutputFormatHelper.GetString().size()};
     InsertAttributes(stmt->attrs());
 
@@ -2803,6 +2880,8 @@ void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
 
 void CodeGenerator::InsertArg(const FunctionTemplateDecl* stmt)
 {
+    LAMBDA_SCOPE_HELPER(TemplateHead);
+
     // InsertTemplateParameters(*stmt->getTemplateParameters());
     InsertArg(stmt->getTemplatedDecl());
 
@@ -3214,10 +3293,14 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         // close the class scope
         mOutputFormatHelper.CloseScope();
 
-        if(not is{lambdaCallerType}.any_of(
-               LambdaCallerType::VarDecl, LambdaCallerType::InitCapture, LambdaCallerType::CallExpr)) {
+        if(not is{lambdaCallerType}.any_of(LambdaCallerType::VarDecl,
+                                           LambdaCallerType::InitCapture,
+                                           LambdaCallerType::CallExpr,
+                                           LambdaCallerType::MemberCallExpr,
+                                           LambdaCallerType::TemplateHead,
+                                           LambdaCallerType::Decltype)) {
             mOutputFormatHelper.Append(" "sv, GetLambdaName(*stmt), ctorArguments);
-        } else {
+        } else if(not is{lambdaCallerType}.any_of(LambdaCallerType::TemplateHead, LambdaCallerType::Decltype)) {
             mLambdaStack.back().inits().append(ctorArguments);
         }
     } else {
@@ -3543,7 +3626,7 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
         case TemplateArgument::Type: mOutputFormatHelper.Append(GetName(arg.getAsType())); break;
         case TemplateArgument::Declaration:
             // TODO: handle pointers
-            mOutputFormatHelper.Append("&"sv, arg.getAsDecl()->getQualifiedNameAsString());
+            mOutputFormatHelper.Append("&"sv, GetName(*arg.getAsDecl(), QualifiedName::Yes));
             break;
         case TemplateArgument::NullPtr: mOutputFormatHelper.Append(kwNullptr); break;
         case TemplateArgument::Integral:
