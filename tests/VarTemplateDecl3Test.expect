@@ -28,8 +28,8 @@ int circular_area<int>(int r)
 template<typename T>
 struct X
 {
-   T x;
-   T y;
+  T x;
+  T y;
 };
 
 /* First instantiated from: VarTemplateDecl3Test.cpp:30 */

@@ -23,31 +23,11 @@ namespace clang::insights {
 FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    matcher.addMatcher(functionDecl(unless(anyOf(cxxMethodDecl(),
-                                                 isExpansionInSystemHeader(),
-                                                 isTemplate,
-                                                 hasParent(linkageSpecDecl()),  // filter this out for coroutines
-                                                 hasAncestor(friendDecl()),     // friendDecl has functionDecl as child
-                                                 hasAncestor(functionDecl()),   // prevent forward declarations
-                                                 hasAncestor(namespaceDecl()),
-                                                 isInvalidLocation())))
-                           .bind("funcDecl"),
-                       this);
+    const auto hasThisTUParentNonTemplate = allOf(hasThisTUParent, unless(anyOf(cxxMethodDecl(), isTemplate)));
 
-    static const auto hasTemplateDescendant = anyOf(hasDescendant(classTemplateDecl()),
-                                                    hasDescendant(functionTemplateDecl()),
-                                                    hasDescendant(classTemplateSpecializationDecl()));
+    matcher.addMatcher(functionDecl(hasThisTUParentNonTemplate).bind("funcDecl"), this);
 
-    matcher.addMatcher(friendDecl(unless(anyOf(cxxMethodDecl(),
-                                               hasAncestor(cxxRecordDecl()),
-                                               hasAncestor(namespaceDecl()),
-                                               isExpansionInSystemHeader(),
-                                               isTemplate,
-                                               hasTemplateDescendant,
-                                               hasAncestor(functionDecl()),  // prevent forward declarations
-                                               isInvalidLocation())))
-                           .bind("friendDecl"),
-                       this);
+    matcher.addMatcher(friendDecl(hasThisTUParentNonTemplate).bind("friendDecl"), this);
 }
 //-----------------------------------------------------------------------------
 

@@ -1,15 +1,14 @@
 template<typename T>
 class Test
 {
-public:
-    Test() = default;
-
-    template<typename T2>
-    Test& operator=(const Test<T2>& other)
-    {
-
-        return *this;
-    }
+  
+  public: 
+  inline Test() = default;
+  template<typename T2>
+  inline Test<T> & operator=(const Test<T2> & other)
+  {
+    return *this;
+  }
 };
 
 /* First instantiated from: FunctionTemplateDecl3Test.cpp:17 */
@@ -45,8 +44,6 @@ class Test<int>
 };
 
 #endif
-
-
 /* First instantiated from: FunctionTemplateDecl3Test.cpp:18 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -70,8 +67,6 @@ class Test<char>
 };
 
 #endif
-
-
 /* First instantiated from: FunctionTemplateDecl3Test.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

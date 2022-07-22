@@ -1,5 +1,7 @@
-template <typename T>
-class Foo{};
+template<typename T>
+class Foo
+{
+};
 
 /* First instantiated from: ClassTemplateWithoutDefinitionTest.cpp:11 */
 #ifdef INSIGHTS_USE_TEMPLATE

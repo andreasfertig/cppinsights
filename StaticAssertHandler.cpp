@@ -21,13 +21,7 @@ namespace clang::insights {
 StaticAssertHandler::StaticAssertHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
-    matcher.addMatcher(staticAssertDecl(unless(anyOf(isExpansionInSystemHeader(),
-                                                     isMacroOrInvalidLocation(),
-                                                     isTemplate,
-                                                     hasAncestor(namespaceDecl()),
-                                                     hasAncestor(functionDecl()))))
-                           .bind("static_assert"),
-                       this);
+    matcher.addMatcher(staticAssertDecl(hasThisTUParent).bind("static_assert"), this);
 }
 //-----------------------------------------------------------------------------
 

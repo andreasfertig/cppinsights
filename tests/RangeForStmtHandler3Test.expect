@@ -61,10 +61,19 @@
 
 
 template<class Char>
-struct str_view {
-    Char const* ptr = 0;
-    Char const* begin() const { return ptr; }
-    null_sentinal_t end() const { return {}; }
+struct str_view
+{
+  const Char * ptr = 0;
+  inline const Char * begin() const
+  {
+    return this->ptr;
+  }
+  
+  inline null_sentinal_t end() const
+  {
+    return {};
+  }
+  
 };
 
 /* First instantiated from: RangeForStmtHandler3Test.cpp:49 */

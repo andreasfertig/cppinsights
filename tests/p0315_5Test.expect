@@ -1,8 +1,11 @@
 // cmdline:-std=c++20
 
 template<auto SIZE>
-class LambdaInNTTP {
+class LambdaInNTTP
+{
 };
+
+
 
 
 class __lambda_7_32

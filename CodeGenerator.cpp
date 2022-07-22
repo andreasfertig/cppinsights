@@ -1213,6 +1213,26 @@ static std::string GetTypeConstraintAsString(const TypeConstraint* typeConstrain
 }
 //-----------------------------------------------------------------------------
 
+static std::string_view Ellipsis(bool b)
+{
+    if(b) {
+        return kwElipsisSpace;
+    }
+
+    return {};
+}
+//-----------------------------------------------------------------------------
+
+static std::string_view EllipsisSpace(bool b)
+{
+    if(b) {
+        return kwElipsis;
+    }
+
+    return {};
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
                                              const TemplateParamsOnly     templateParamsOnly)
 {
@@ -1238,17 +1258,11 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
                     mOutputFormatHelper.Append(kwClassSpace);
                 }
 
-                if(tt->isParameterPack()) {
-                    mOutputFormatHelper.Append(kwElipsisSpace);
-                }
+                mOutputFormatHelper.Append(Ellipsis(tt->isParameterPack()));
             }
 
             if(0 == typeName.size() || tt->isImplicit() /* fixes class container:auto*/) {
                 AppendTemplateTypeParamName(mOutputFormatHelper, tt, not full);
-
-                if(not full and tt->isParameterPack()) {
-                    mOutputFormatHelper.Append(kwElipsis);
-                }
 
             } else {
                 if(auto typeConstraint = GetTypeConstraintAsString(tt->getTypeConstraint());
@@ -1258,6 +1272,8 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
 
                 mOutputFormatHelper.Append(typeName);
             }
+
+            mOutputFormatHelper.Append(Ellipsis(not full and tt->isParameterPack()));
 
             if(tt->hasDefaultArgument() and not tt->defaultArgumentWasInherited()) {
                 const auto& defaultArg = tt->getDefaultArgument();
@@ -1273,20 +1289,33 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
             }
 
         } else if(const auto* nonTmplParam = dyn_cast_or_null<NonTypeTemplateParmDecl>(param)) {
+            if(full) {
+                if(const auto nttpType = nonTmplParam->getType();
+                   nttpType->isFunctionPointerType() or nttpType->isMemberFunctionPointerType()) {
+                    mOutputFormatHelper.Append(GetTypeNameAsParameter(nttpType, typeName));
 
-            mOutputFormatHelper.Append(GetName(nonTmplParam->getType()), " "sv);
-            if(nonTmplParam->isParameterPack()) {
-                mOutputFormatHelper.Append(kwElipsisSpace);
-            }
+                } else {
+                    mOutputFormatHelper.Append(
+                        GetName(nttpType), " "sv, EllipsisSpace(nonTmplParam->isParameterPack()), typeName);
+                }
 
-            mOutputFormatHelper.Append(typeName);
-
-            if(nonTmplParam->hasDefaultArgument()) {
-                mOutputFormatHelper.Append(hlpAssing);
-                InsertArg(nonTmplParam->getDefaultArgument());
+                if(nonTmplParam->hasDefaultArgument()) {
+                    mOutputFormatHelper.Append(hlpAssing);
+                    InsertArg(nonTmplParam->getDefaultArgument());
+                }
+            } else {
+                mOutputFormatHelper.Append(typeName, EllipsisSpace(nonTmplParam->isParameterPack()));
             }
         } else if(const auto* tmplTmplParam = dyn_cast_or_null<TemplateTemplateParmDecl>(param)) {
-            mOutputFormatHelper.Append(kwTemplateSpace, "<typename> typename "sv, typeName);
+            const std::string pack{[&]() {
+                if(tmplTmplParam->isParameterPack()) {
+                    return kwElipsisSpace;
+                }
+
+                return " "sv;
+            }()};
+
+            mOutputFormatHelper.Append(kwTemplateSpace, "<typename> typename"sv, pack, typeName);
 
             if(tmplTmplParam->hasDefaultArgument()) {
                 mOutputFormatHelper.Append(hlpAssing);
@@ -1309,12 +1338,25 @@ void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
     InsertTemplateParameters(*stmt->getTemplateParameters());
     InsertArg(stmt->getTemplatedDecl());
 
+    SmallVector<const ClassTemplateSpecializationDecl*, 10> specializations{};
+
     for(const auto* spec : stmt->specializations()) {
         // Explicit specializations and instantiations will appear later in the AST as dedicated node. Don't generate
         // code for them now, otherwise they are there twice.
         if(TSK_ImplicitInstantiation == spec->getSpecializationKind()) {
-            InsertArg(spec);
+            specializations.push_back(spec);
         }
+    }
+
+    // Sort specializations by POI to make dependent specializations work.
+    std::sort(specializations.begin(),
+              specializations.end(),
+              [](const ClassTemplateSpecializationDecl* a, const ClassTemplateSpecializationDecl* b) {
+                  return a->getPointOfInstantiation() < b->getPointOfInstantiation();
+              });
+
+    for(const auto* spec : specializations) {
+        InsertArg(spec);
     }
 }
 //-----------------------------------------------------------------------------
@@ -1714,13 +1756,18 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
     } else {
         auto           castName{GetCastName(castKind)};
         const QualType castDestType{[&] {
+            const auto type{stmt->getType()};
+
             // In at least the case a structured bindings the compiler adds xvalue casts but the && is missing to make
             // it valid C++.
             if(VK_XValue == stmt->getValueKind()) {
-                return GetGlobalAST().getRValueReferenceType(stmt->getType().getCanonicalType());
+                return GetGlobalAST().getRValueReferenceType(type.getCanonicalType());
+            } else if(type->isDependentType()) {  // In case of a dependent type the canonical type doesn't know the
+                                                  // parameters name.
+                return type;
             }
 
-            return stmt->getType().getCanonicalType();
+            return type.getCanonicalType();
         }()};
 
         FormatCast(castName, castDestType, subExpr, castKind);
@@ -2801,6 +2848,22 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const UnresolvedUsingValueDecl* stmt)
+{
+    stmt->dump();
+
+    mOutputFormatHelper.Append(kwUsingSpace);
+
+    InsertQualifierAndName(stmt->getDeclName(), stmt->getQualifier(), false);
+
+    if(stmt->isPackExpansion()) {
+        mOutputFormatHelper.Append(kwElipsis);
+    }
+
+    mOutputFormatHelper.AppendSemiNewLine();
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const NamespaceAliasDecl* stmt)
 {
     mOutputFormatHelper.AppendNewLine(
@@ -2930,6 +2993,24 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
         return;
     }
 
+    // Clang's printPretty misses the parameter pack elipsis. Hence treat this special case here.
+    if(const auto* alignedAttr = dyn_cast_or_null<AlignedAttr>(&attr)) {
+        if(const auto* unaryExpr = dyn_cast_or_null<UnaryExprOrTypeTraitExpr>(alignedAttr->getAlignmentExpr())) {
+            if(const auto* tmplTypeParam =
+                   dyn_cast_or_null<TemplateTypeParmType>(unaryExpr->getArgumentType().getTypePtrOrNull())) {
+                mOutputFormatHelper.Append(attr.getSpelling(),
+                                           "("sv,
+                                           kwAlignof,
+                                           "("sv,
+                                           GetName(unaryExpr->getArgumentType()),
+                                           ")"sv,
+                                           EllipsisSpace(tmplTypeParam->isParameterPack()),
+                                           ") "sv);
+                return;
+            }
+        }
+    }
+
     StringStream   stream{};
     PrintingPolicy pp{LangOptions{}};
     pp.Alignof = true;
@@ -3018,6 +3099,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
             mOutputFormatHelper.Append(
                 AccessToString(base.getAccessSpecifier()), " "sv, virtualKw, GetName(base.getType()));
+
+            if(base.isPackExpansion()) {
+                mOutputFormatHelper.Append(kwElipsis);
+            }
         });
     }
 

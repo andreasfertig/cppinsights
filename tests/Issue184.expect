@@ -46,8 +46,9 @@ struct CustomerHash
 
 
 template<typename ... Bases>
-struct ManyParentsWithOperator : Bases...{
-using Bases::operator()...;//C++17
+struct ManyParentsWithOperator : public Bases...
+{
+  using Bases::operator()...;
 };
 
 /* First instantiated from: type_traits:1773 */
@@ -65,8 +66,6 @@ struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, 
 };
 
 #endif
-
-
 /* First instantiated from: type_traits:1773 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

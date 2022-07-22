@@ -19,11 +19,12 @@ int main()
 template<unsigned int TA>
 struct SA
 {
-  SA (const int & PA);
-
- ~SA();
-
+  SA(const int & PA);
+  
+  ~SA();
+  
   bool Test();
+  
   int nt;
 };
 

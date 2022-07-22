@@ -1,6 +1,9 @@
 // cmdline:-std=c++2a
 template<typename T>
-concept C = requires(T t) { f(t); };
+concept C = requires(T t) {
+  f(t);
+};
+
 
 template<typename T>
 constexpr bool foo() { return false; }
@@ -86,12 +89,17 @@ struct test
 
 
 template<typename T>
-concept default_constructible = requires { T{}; T(); };
+concept default_constructible = requires{
+  T{};
+  T();
+};
+
 
 template<typename T>
 requires default_constructible<T>
 class ClsWithRequires
-{};
+{
+};
 
 /* First instantiated from: conceptsTest.cpp:88 */
 #ifdef INSIGHTS_USE_TEMPLATE

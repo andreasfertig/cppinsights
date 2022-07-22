@@ -3,10 +3,11 @@
 //CXXDependentScopeMemberExpr
 // http://lists.llvm.org/pipermail/cfe-dev/2017-January/052433.html
 
-template <typename T>
+template<typename T>
 struct A
 {
-   void foo(int);
+  void foo(int);
+  
 };
 
 /* First instantiated from: TemplateSpecializationWithDependentTypeTest.cpp:22 */

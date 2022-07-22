@@ -32,7 +32,11 @@ inline constexpr int & get<1>(Point & p)
 #endif
 
 
-template <typename T> struct type_t { using type = T; };
+template<typename T>
+struct type_t
+{
+  using type = T;
+};
 
 /* First instantiated from: Issue277.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE

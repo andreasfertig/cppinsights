@@ -1,10 +1,10 @@
-.tmp.cpp:22:21: error: 'S' does not refer to a value
+.tmp.cpp:25:21: error: 'S' does not refer to a value
      S arr2[3][2] = S[3][2]();
                     ^
 .tmp.cpp:1:8: note: declared here
 struct S
        ^
-.tmp.cpp:24:27: error: expected '(' for function-style cast or type construction
+.tmp.cpp:27:27: error: expected '(' for function-style cast or type construction
 T<int> arr3[3][2] = T<int>[3][2]();
                     ~~~~~~^
 2 errors generated.

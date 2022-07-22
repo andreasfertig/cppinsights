@@ -1,6 +1,6 @@
 .tmp.cpp:19:11: error: templates cannot be declared inside of a local class
-          template<std::size_t ... I>
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+          template<std::size_t ...I>
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:26:11: error: 'auto' not allowed in non-static class member
           auto rhs;
           ^~~~

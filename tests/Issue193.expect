@@ -4,8 +4,10 @@ struct cppcmb_rule_tag16
 
 
 
-template <typename Val, typename Tag>
-class rule_t {};
+template<typename Val, typename Tag>
+class rule_t
+{
+};
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

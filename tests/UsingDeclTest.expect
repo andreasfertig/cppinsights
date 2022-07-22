@@ -29,17 +29,32 @@ struct B
 
  
 template<typename T>
-struct D : B {
-    using B::m; // D::m is public
-    using B::value_type; // D::value_type is public
- 
-    using B::f;
-    void f(int) { std::cout << "D::f\n"; } // D::f(int) overrides B::f(int)
-    using B::g;
-    void g(int) { std::cout << "D::g\n"; } // both g(int) and g(char) are visible
-                                           // as members of D
-    using B::h;
-    void h(int) { std::cout << "D::h\n"; } // D::h(int) hides B::h(int)
+struct D : public B
+{
+  using B::m;
+  // int m;
+  
+  using B::value_type;
+  using B::f;
+  inline virtual void f(int)
+  {
+    std::operator<<(std::cout, "D::f\n");
+  }
+  
+  using B::g;
+  // inline void B::g(char);
+  
+  inline void g(int)
+  {
+    std::operator<<(std::cout, "D::g\n");
+  }
+  
+  using B::h;
+  inline void h(int)
+  {
+    std::operator<<(std::cout, "D::h\n");
+  }
+  
 };
 
 /* First instantiated from: UsingDeclTest.cpp:56 */

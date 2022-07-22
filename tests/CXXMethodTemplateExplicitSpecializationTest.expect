@@ -1,8 +1,10 @@
 template<typename T>
 class Foo
 {
-public:
-    void Func();
+  
+  public: 
+  void Func();
+  
 };
 
 /* First instantiated from: CXXMethodTemplateExplicitSpecializationTest.cpp:10 */
@@ -18,8 +20,6 @@ class Foo<int>
 };
 
 #endif
-
-
 /* First instantiated from: CXXMethodTemplateExplicitSpecializationTest.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

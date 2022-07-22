@@ -3,14 +3,16 @@
 template<typename T, bool array>
 class Alloc
 {
-    const int z;
-    T* data{nullptr};    
-    const bool x{false};
-    
-public:
-    Alloc() : z{2}
-    {
-    }
+  const int z;
+  T * data;
+  const bool x;
+  
+  public: 
+  inline Alloc()
+  : z{2}
+  {
+  }
+  
 };
 
 /* First instantiated from: CXXDefaultInitExprTest.cpp:18 */
@@ -33,8 +35,6 @@ class Alloc<int, false>
 };
 
 #endif
-
-
 /* First instantiated from: CXXDefaultInitExprTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

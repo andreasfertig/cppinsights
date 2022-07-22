@@ -2,27 +2,23 @@
 
 #include <type_traits>
 
-template <typename T>
-struct remove_all_pointers : std::conditional_t<
-    std::is_pointer_v<T>,
-    remove_all_pointers<std::remove_pointer_t<T>>,
-    std::type_identity<T>
-> {};
-
-/* First instantiated from: Issue473.cpp:13 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct remove_all_pointers<int *> : public remove_all_pointers<int>
+template<typename T>
+struct remove_all_pointers : public std::conditional_t<std::is_pointer_v<T>, remove_all_pointers<std::remove_pointer_t<T> >, std::type_identity<T> >
 {
 };
-
-#endif
-
 
 /* First instantiated from: Issue473.cpp:6 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct remove_all_pointers<int> : public std::type_identity<int>
+{
+};
+
+#endif
+/* First instantiated from: Issue473.cpp:13 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct remove_all_pointers<int *> : public remove_all_pointers<int>
 {
 };
 

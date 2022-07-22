@@ -1,10 +1,15 @@
 #define INSIGHTS_USE_TEMPLATE
 
 template<typename T>
-class Foo {
-public:
-    Foo() = delete;
-    Foo(int){}
+class Foo
+{
+  
+  public: 
+  // inline Foo() = delete;
+  inline Foo(int)
+  {
+  }
+  
 };
 
 /* First instantiated from: ClassWithDeletedSpecialFunctionTest.cpp:12 */

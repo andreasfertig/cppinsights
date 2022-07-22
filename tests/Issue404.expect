@@ -4,7 +4,10 @@ struct S
 };
 
 
-template<typename> struct T {};
+template<typename type_parameter_0_0>
+struct T
+{
+};
 
 /* First instantiated from: Issue404.cpp:6 */
 #ifdef INSIGHTS_USE_TEMPLATE

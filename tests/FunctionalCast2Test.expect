@@ -8,7 +8,7 @@ namespace details
 {
   namespace array_single_compare
   {
-    template<typename T, size_t N, typename TTo, size_t ... I>
+    template<typename T, size_t N, typename TTo, size_t ...I>
     inline constexpr bool Compare(const T (&ar)[N], const TTo & to, std::index_sequence<I...>)
     {
       return ((to == ar[I]) && ...);
@@ -47,7 +47,7 @@ namespace details
 {
   namespace array_compare
   {
-    template<typename T, size_t N, size_t ... I>
+    template<typename T, size_t N, size_t ...I>
     inline constexpr bool Compare(const T (&ar)[N], const T (&to)[N], std::index_sequence<I...>)
     {
       return ((to[I] == ar[I]) && ...);

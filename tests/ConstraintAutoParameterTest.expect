@@ -4,6 +4,7 @@ template<typename T>
 concept C = true;
 
 
+
 class __lambda_6_15
 {
   public: 

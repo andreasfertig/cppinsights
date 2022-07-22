@@ -10,27 +10,65 @@
 #include <new>
 #include <utility>
 
-template <typename T> struct generator {
-  struct promise_type {
+template<typename T>
+struct generator
+{
+  struct promise_type
+  {
     T current_value{};
-    std::suspend_always yield_value(T value) {
-      current_value = value;
+    inline std::suspend_always yield_value(T value)
+    {
+      this->current_value = value;
       return {};
     }
-    std::suspend_always initial_suspend() { return {}; }
-    std::suspend_always final_suspend() noexcept { return {}; }
-    generator get_return_object() { return generator{this}; };
-    void unhandled_exception() { std::terminate(); }
-    void return_value(T v) { current_value = v; }
+    
+    inline std::suspend_always initial_suspend()
+    {
+      return {};
+    }
+    
+    inline std::suspend_always final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline generator<T> get_return_object()
+    {
+      return generator<T>{{this}};
+    }
+    
+    inline void unhandled_exception()
+    {
+      std::terminate();
+    }
+    
+    inline void return_value(T v)
+    {
+      this->current_value = v;
+    }
+    
   };
-
-  generator(generator &&rhs) : p{std::exchange(rhs.p, nullptr)} {}
-  ~generator() { if (p) { p.destroy(); } }
-
-private:
-  explicit generator(promise_type* _p)
-      : p{std::coroutine_handle<promise_type>::from_promise(*_p)} {}
-
+  
+  inline generator(generator<T> && rhs)
+  : p{std::exchange(rhs.p, nullptr)}
+  {
+  }
+  
+  inline ~generator()
+  {
+    if(this->p) {
+      this->p.destroy();
+    } 
+    
+  }
+  
+  
+  private: 
+  inline explicit generator(promise_type * _p)
+  : p{std::coroutine_handle<promise_type>::from_promise(*_p)}
+  {
+  }
+  
   std::coroutine_handle<promise_type> p;
 };
 

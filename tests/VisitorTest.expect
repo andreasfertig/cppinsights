@@ -1,4 +1,8 @@
-template<class... Ts> struct visitor: Ts... { using Ts::operator()...; };
+template<class ... Ts>
+struct visitor : public Ts...
+{
+  using Ts::operator()...;
+};
 
 /* First instantiated from: VisitorTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE

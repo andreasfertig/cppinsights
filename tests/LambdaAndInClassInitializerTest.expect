@@ -1,13 +1,15 @@
 // std::function mock up
-template<typename ReturnValue, typename... Args>
+template<typename ReturnValue, typename ... Args>
 class function
 {
-public:
-    function() = default;
-
-    template<typename T>
-    function(T&& f)
-    {}
+  
+  public: 
+  inline function() = default;
+  template<typename T>
+  inline function(T && f)
+  {
+  }
+  
 };
 
 /* First instantiated from: LambdaAndInClassInitializerTest.cpp:17 */

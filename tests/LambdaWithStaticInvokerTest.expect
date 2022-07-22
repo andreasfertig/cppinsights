@@ -179,7 +179,7 @@ class __lambda_32_27
   template<int X = 3, int Z = 4>
   static inline auto __invoke(int x, int y)
   {
-    return __lambda_32_27{}.operator()<int X = 3, int Z = 4>(x, y);
+    return __lambda_32_27{}.operator()<X, Z>(x, y);
   }
   
   #ifdef INSIGHTS_USE_TEMPLATE

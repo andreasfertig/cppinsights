@@ -1,12 +1,18 @@
 #define INSIGHTS_USE_TEMPLATE
 
-template <typename T>
-class Foo{
-public:
-    Foo() = default;
-
-protected:
-    bool Mo() { return false; }
+template<typename T>
+class Foo
+{
+  
+  public: 
+  inline Foo() = default;
+  
+  protected: 
+  inline bool Mo()
+  {
+    return false;
+  }
+  
 };
 
 /* First instantiated from: ClassTemplateTest.cpp:12 */

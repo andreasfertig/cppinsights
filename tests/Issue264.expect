@@ -21,7 +21,7 @@ class __lambda_2_10
   template<class ... type_parameter_0_0>
   static inline /*constexpr */ auto __invoke(type_parameter_0_0... i)
   {
-    return __lambda_2_10{}.operator()<type_parameter_0_0...>(i...);
+    return __lambda_2_10{}.operator()<type_parameter_0_0... >(i...);
   }
   
 };
@@ -50,7 +50,7 @@ class __lambda_3_10
   template<class ... type_parameter_0_0>
   static inline /*constexpr */ auto __invoke(type_parameter_0_0... i)
   {
-    return __lambda_3_10{}.operator()<type_parameter_0_0...>(i...);
+    return __lambda_3_10{}.operator()<type_parameter_0_0... >(i...);
   }
   
 };

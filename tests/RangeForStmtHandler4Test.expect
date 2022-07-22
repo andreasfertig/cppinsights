@@ -2,13 +2,22 @@
 
 // https://mbevin.wordpress.com/2012/11/14/range-based-for/
 template<class T>
-class MyArrayWrapper {
-   T* data;
-   int size;
-
-public:
-   int* begin() { return size>0 ? &data[0] : nullptr; }
-   int* end()   { return size>0 ? &data[size-1] : nullptr; }
+class MyArrayWrapper
+{
+  T * data;
+  int size;
+  
+  public: 
+  inline int * begin()
+  {
+    return this->size > 0 ? &this->data[0] : nullptr;
+  }
+  
+  inline int * end()
+  {
+    return this->size > 0 ? &this->data[this->size - 1] : nullptr;
+  }
+  
 };
 
 /* First instantiated from: RangeForStmtHandler4Test.cpp:16 */

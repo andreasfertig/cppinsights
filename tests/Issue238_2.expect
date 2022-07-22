@@ -1,12 +1,21 @@
 // dummy to have a range-based for ready container link thing
 template<class T>
-class MyArrayWrapper {
-   T* data;
-   int size;
-
-public:
-   int* begin() { return size>0 ? &data[0] : nullptr; }
-   int* end()   { return size>0 ? &data[size-1] : nullptr; }
+class MyArrayWrapper
+{
+  T * data;
+  int size;
+  
+  public: 
+  inline int * begin()
+  {
+    return this->size > 0 ? &this->data[0] : nullptr;
+  }
+  
+  inline int * end()
+  {
+    return this->size > 0 ? &this->data[this->size - 1] : nullptr;
+  }
+  
 };
 
 /* First instantiated from: Issue238_2.cpp:19 */

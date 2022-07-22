@@ -20,14 +20,6 @@ using namespace clang::ast_matchers;
 
 namespace clang::ast_matchers {
 const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl> varTemplateSpecDecl;  // NOLINT
-#if IS_CLANG_NEWER_THAN(11)
-#else
-// Clang 12 has decompositionDecl but with different type
-const internal::VariadicDynCastAllOfMatcher<Decl, DecompositionDecl> decompositionDecl;  // NOLINT
-#endif
-
-// XXX: recent clang source has a declType matcher. Try to figure out a migration path.
-const internal::VariadicDynCastAllOfMatcher<Type, DecltypeType> myDecltypeType;  // NOLINT
 }  // namespace clang::ast_matchers
 
 namespace clang::insights {
@@ -36,25 +28,13 @@ GlobalVariableHandler::GlobalVariableHandler(Rewriter& rewrite, MatchFinder& mat
 : InsightsBase(rewrite)
 {
     matcher.addMatcher(
-        varDecl(unless(anyOf(
-                    isExpansionInSystemHeader(),
-                    isInvalidLocation(),
-                    hasAncestor(varTemplateDecl()),
-                    hasAncestor(functionDecl()),
-                    hasAncestor(cxxRecordDecl()),
-                    hasAncestor(namespaceDecl()),
-                    hasAncestor(typeAliasDecl()),
-                    hasAncestor(cxxMethodDecl()),
-                    parmVarDecl(),
-                    // don't match a VarDecl within a VarDecl. Happens for example in lambdas.
-                    hasAncestor(varDecl()),
+        varDecl(hasThisTUParent,
+                unless(anyOf(
                     varTemplateSpecDecl(),
                     // A DecompositionDecl in global scope is different in the AST than one in a function for example.
                     // Try to find out whether this VarDecl is the result of a DecompositionDecl, if so bail out.
                     hasInitializer(ignoringImpCasts(
-                        callExpr(hasAnyArgument(ignoringParenImpCasts(declRefExpr(to(decompositionDecl()))))))),
-                    // don't replace anything in templates
-                    isTemplate)))
+                        callExpr(hasAnyArgument(ignoringParenImpCasts(declRefExpr(to(decompositionDecl()))))))))))
             .bind("varDecl"),
         this);
 }

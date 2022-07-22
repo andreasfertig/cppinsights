@@ -1,13 +1,20 @@
 #include <type_traits>
 #include <utility>
 
-template <typename T, T v>
+template<typename T, T v>
 struct typed_constant
 {
   using type = T;
-  static constexpr T value{v};
-  constexpr operator type() const { return v;}
+  inline static constexpr const T value = {v};
+  using retType_9_3 = type;
+  inline constexpr operator retType_9_3 () const
+  {
+    return v;
+  }
+  
 };
+
+
 
 template<auto V>
 using constant = typed_constant<std::remove_cv_t<decltype(V)>, V>;
@@ -177,14 +184,21 @@ namespace detail
   
 }
 
-template<typename...>
-struct list {};
+template<typename ... type_parameter_0_0>
+struct list
+{
+};
 
-template<template<typename ...> class C>
-struct make {
+
+
+template<template <typename> typename C>
+struct make
+{
   template<typename ... Ts>
   using result = C<Ts...>;
 };
+
+
 
 template <typename F, typename T>
 using apply_one = typename F::template result<T>;
@@ -197,123 +211,62 @@ struct identity
 
 
 
-template <template <typename ...> class T, typename ... Ts>
-struct bind_front {
-  template <typename ... Vs>
-  struct helper {
+template<template <typename> typename T, typename ... Ts>
+struct bind_front
+{
+  template<typename ... Vs>
+  struct helper
+  {
     using type = T<Ts..., Vs...>;
   };
-  template <typename ... Vs>
+  
+  template<typename ... Vs>
   using result = typename helper<Vs...>::type;
 };
 
-template<template <typename...> class T>
-struct from_type {
+
+
+template<template <typename> typename T>
+struct from_type
+{
   using continuation = identity;
-  template <typename C = continuation>
-  struct to {
+  template<typename C = continuation>
+  struct to
+  {
     using TO = detail::to<C>;
     template<typename ... Vs>
-    struct helper {
+    struct helper
+    {
       using type = apply_one<TO, typename T<Vs...>::type>;
     };
+    
     template<typename ... Vs>
     using result = typename helper<Vs...>::type;
   };
+  
 };
 
-template <template <typename ...> class T>
+
+
+template<template <typename> typename T>
 struct from_value
 {
   using continuation = identity;
-  template <typename C = continuation>
-  struct to {
+  template<typename C = continuation>
+  struct to
+  {
     using TO = detail::to<C>;
     template<typename ... Vs>
-    using result = apply_one<TO, constant<T<Vs...>::value>>;
+    using result = apply_one<TO, constant<T<Vs...>::value> >;
   };
+  
 };
 
 
-template <typename ...>
+
+
+template<typename ... type_parameter_0_0>
 struct compose;
-
-/* First instantiated from: Issue101.cpp:213 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct compose<add_pointer>
-{
-  using continuation = typename add_pointer::continuation;
-  template<typename C = continuation>
-  struct to;
-  /* First instantiated from: Issue101.cpp:213 */
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct to<identity>
-  {
-    template<typename ... Ts>
-    using result = compose<>::to<add_pointer::to<identity> >::result<Ts...>;
-  };
-  
-  #endif
-  /* First instantiated from: Issue101.cpp:169 */
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct to<add_const::to<identity> >
-  {
-    template<typename ... Ts>
-    using result = compose<>::to<add_pointer::to<add_const::to<identity> > >::result<Ts...>;
-  };
-  
-  #endif
-  /* First instantiated from: Issue101.cpp:215 */
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct to<wrap>
-  {
-    template<typename ... Ts>
-    using result = compose<>::to<add_pointer::to<wrap> >::result<Ts...>;
-  };
-  
-  #endif
-};
-
-#endif
-
-
-/* First instantiated from: Issue101.cpp:213 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct compose<add_pointer, add_const>
-{
-  using continuation = typename add_pointer::continuation;
-  template<typename C = continuation>
-  struct to;
-  /* First instantiated from: Issue101.cpp:213 */
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct to<identity>
-  {
-    template<typename ... Ts>
-    using result = compose<add_const>::to<add_pointer::to<identity> >::result<Ts...>;
-  };
-  
-  #endif
-  /* First instantiated from: Issue101.cpp:215 */
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct to<wrap>
-  {
-    template<typename ... Ts>
-    using result = compose<add_const>::to<add_pointer::to<wrap> >::result<Ts...>;
-  };
-  
-  #endif
-};
-
-#endif
-
-
 /* First instantiated from: Issue101.cpp:169 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -345,8 +298,78 @@ struct compose<add_const>
 };
 
 #endif
+/* First instantiated from: Issue101.cpp:213 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct compose<add_pointer>
+{
+  using continuation = typename add_pointer::continuation;
+  template<typename C = continuation>
+  struct to;
+  /* First instantiated from: Issue101.cpp:169 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct to<add_const::to<identity> >
+  {
+    template<typename ... Ts>
+    using result = compose<>::to<add_pointer::to<add_const::to<identity> > >::result<Ts...>;
+  };
+  
+  #endif
+  /* First instantiated from: Issue101.cpp:213 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct to<identity>
+  {
+    template<typename ... Ts>
+    using result = compose<>::to<add_pointer::to<identity> >::result<Ts...>;
+  };
+  
+  #endif
+  /* First instantiated from: Issue101.cpp:215 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct to<wrap>
+  {
+    template<typename ... Ts>
+    using result = compose<>::to<add_pointer::to<wrap> >::result<Ts...>;
+  };
+  
+  #endif
+};
 
+#endif
+/* First instantiated from: Issue101.cpp:213 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct compose<add_pointer, add_const>
+{
+  using continuation = typename add_pointer::continuation;
+  template<typename C = continuation>
+  struct to;
+  /* First instantiated from: Issue101.cpp:213 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct to<identity>
+  {
+    template<typename ... Ts>
+    using result = compose<add_const>::to<add_pointer::to<identity> >::result<Ts...>;
+  };
+  
+  #endif
+  /* First instantiated from: Issue101.cpp:215 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct to<wrap>
+  {
+    template<typename ... Ts>
+    using result = compose<add_const>::to<add_pointer::to<wrap> >::result<Ts...>;
+  };
+  
+  #endif
+};
 
+#endif
 /* First instantiated from: Issue101.cpp:213 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -493,27 +516,6 @@ struct add_const
   };
   
   #endif
-  /* First instantiated from: Issue101.cpp:100 */
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  struct to<identity>
-  {
-    template<typename T>
-    struct inner;
-    /* First instantiated from: Issue101.cpp:184 */
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    struct inner<int *>
-    {
-      using type = apply_one<identity, int *const>;
-    };
-    
-    #endif
-    template<typename ... T>
-    using result = typename inner<T...>::type;
-  };
-  
-  #endif
   /* First instantiated from: Issue101.cpp:67 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
@@ -527,6 +529,27 @@ struct add_const
     struct inner<int>
     {
       using type = apply_one<add_pointer::to<wrap>, const int>;
+    };
+    
+    #endif
+    template<typename ... T>
+    using result = typename inner<T...>::type;
+  };
+  
+  #endif
+  /* First instantiated from: Issue101.cpp:100 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct to<identity>
+  {
+    template<typename T>
+    struct inner;
+    /* First instantiated from: Issue101.cpp:184 */
+    #ifdef INSIGHTS_USE_TEMPLATE
+    template<>
+    struct inner<int *>
+    {
+      using type = apply_one<identity, int *const>;
     };
     
     #endif
@@ -640,8 +663,12 @@ struct add_pointer
 
 
 
-template <typename T>
-struct wrapped {};
+template<typename T>
+struct wrapped
+{
+};
+
+
 
 struct wrap
 {

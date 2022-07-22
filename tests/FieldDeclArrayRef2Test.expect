@@ -1,11 +1,21 @@
-template <typename T, unsigned int SIZE>
+template<typename T, unsigned int SIZE>
 class array
 {
-private:
-    T (&data)[SIZE];
-public:
-    array() : data(*new T[1][SIZE]) { }
-    array(T (&reference)[SIZE]) : data(reference) { }
+  
+  private: 
+  T (&data)[SIZE];
+  
+  public: 
+  inline array()
+  : data{*new T[1][SIZE]}
+  {
+  }
+  
+  inline array(T (&reference)[SIZE])
+  : data{reference}
+  {
+  }
+  
 };
 
 /* First instantiated from: FieldDeclArrayRef2Test.cpp:13 */

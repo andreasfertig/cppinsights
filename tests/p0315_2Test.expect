@@ -32,8 +32,11 @@ static std::array<__lambda_5_28, 2> ff();
 
 
 template<typename T, int SIZE>
-class Container {
+class Container
+{
 };
+
+
 
 
 class __lambda_11_27
