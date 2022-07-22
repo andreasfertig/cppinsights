@@ -1,5 +1,9 @@
-// cmdline:-std=c++2a
-#include <experimental/coroutine>
+// cmdline:-std=c++20
+
+#include <coroutine>
+#include <exception> // std::terminate
+#include <new>
+#include <tuple>
 
 template <typename T>
 struct generator
@@ -7,13 +11,13 @@ struct generator
 	struct promise_type
 	{
 		T current_value;
-		std::experimental::suspend_always yield_value(T value)
+		std::suspend_always yield_value(T value)
 		{
 			this->current_value = value;
 			return {};
 		}
-		std::experimental::suspend_always initial_suspend() { return {}; }
-		std::experimental::suspend_always final_suspend() noexcept { return {}; }
+		std::suspend_always initial_suspend() { return {}; }
+		std::suspend_always final_suspend() noexcept { return {}; }
 		generator get_return_object() { return generator{ this }; };
 		void unhandled_exception() { std::terminate(); }
 		void return_void() {}
@@ -24,10 +28,10 @@ struct generator
     
 	struct iterator
 	{
-		std::experimental::coroutine_handle<promise_type> hco;
+		std::coroutine_handle<promise_type> hco;
 		bool done = false;
 
-		iterator(std::experimental::coroutine_handle<promise_type> hco, bool done)
+		iterator(std::coroutine_handle<promise_type> hco, bool done)
 		: hco(hco), done(done) {}
 
 		iterator& operator++()
@@ -63,12 +67,12 @@ struct generator
 
 private:
 	explicit generator(promise_type* p)
-	: p(std::experimental::coroutine_handle<promise_type>::from_promise(*p)) {}
+	: p(std::coroutine_handle<promise_type>::from_promise(*p)) {}
 
-	std::experimental::coroutine_handle<promise_type> p;
+	std::coroutine_handle<promise_type> p;
 };
 
-/* First instantiated from: Issue92.cpp:71 */
+/* First instantiated from: Issue92.cpp:75 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct generator<unsigned int>
@@ -76,18 +80,18 @@ struct generator<unsigned int>
   struct promise_type
   {
     unsigned int current_value;
-    inline std::experimental::suspend_always yield_value(unsigned int value)
+    inline std::suspend_always yield_value(unsigned int value)
     {
       this->current_value = value;
       return {};
     }
     
-    inline std::experimental::suspend_always initial_suspend()
+    inline std::suspend_always initial_suspend()
     {
       return {};
     }
     
-    inline std::experimental::suspend_always final_suspend() noexcept
+    inline std::suspend_always final_suspend() noexcept
     {
       return {};
     }
@@ -116,18 +120,18 @@ struct generator<unsigned int>
   
   struct iterator
   {
-    std::experimental::coroutine_handle<promise_type> hco;
+    std::coroutine_handle<promise_type> hco;
     bool done;
-    inline iterator(std::experimental::coroutine_handle<promise_type> hco, bool done)
-    : hco{std::experimental::coroutine_handle<promise_type>(hco)}
+    inline iterator(std::coroutine_handle<promise_type> hco, bool done)
+    : hco{std::coroutine_handle<promise_type>(hco)}
     , done{done}
     {
     }
     
     inline iterator & operator++()
     {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->hco).resume();
-      this->done = static_cast<const std::experimental::coroutine_handle<void>&>(this->hco).done();
+      this->hco.resume();
+      this->done = this->hco.done();
       return *this;
     }
     
@@ -152,25 +156,25 @@ struct generator<unsigned int>
   
   inline iterator begin()
   {
-    static_cast<std::experimental::coroutine_handle<void>&>(this->p).resume();
-    return iterator{std::experimental::coroutine_handle<promise_type>(this->p), static_cast<const std::experimental::coroutine_handle<void>&>(this->p).done()};
+    this->p.resume();
+    return iterator{std::coroutine_handle<promise_type>(this->p), this->p.done()};
   }
   
   inline iterator end()
   {
-    return iterator{std::experimental::coroutine_handle<promise_type>(this->p), true};
+    return iterator{std::coroutine_handle<promise_type>(this->p), true};
   }
   
   inline generator(generator<unsigned int> && rhs)
-  : p{std::experimental::coroutine_handle<promise_type>(rhs.p)}
+  : p{std::coroutine_handle<promise_type>(rhs.p)}
   {
     rhs.p.operator=(nullptr);
   }
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    if(static_cast<bool>(this->p.operator bool())) {
+      this->p.destroy();
     } 
     
   }
@@ -178,11 +182,11 @@ struct generator<unsigned int>
   
   private: 
   inline explicit generator(promise_type * p)
-  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*p)}
+  : p{std::coroutine_handle<promise_type>::from_promise(*p)}
   {
   }
   
-  std::experimental::coroutine_handle<promise_type> p;
+  std::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator<unsigned int> &) /* noexcept */ = delete;
   // inline generator<unsigned int> & operator=(const generator<unsigned int> &) /* noexcept */ = delete;

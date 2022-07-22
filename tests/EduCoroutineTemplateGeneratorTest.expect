@@ -5,20 +5,10 @@
 // cmdline:-std=c++20
 // cmdlineinsights:-edu-show-coroutine-transformation
 
-
-#if __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std
-{
-  using namespace experimental;
-  
-}
-#elif __has_include(<coroutine>)
 #include <coroutine>
-#else
-#error "No coroutine header"
-#endif
+#include <exception> // std::terminate
+#include <new>
+#include <utility>
 
 template <typename T> struct generator {
   struct promise_type {
@@ -44,7 +34,7 @@ private:
   std::coroutine_handle<promise_type> p;
 };
 
-/* First instantiated from: EduCoroutineTemplateGeneratorTest.cpp:48 */
+/* First instantiated from: EduCoroutineTemplateGeneratorTest.cpp:40 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct generator<int>
@@ -89,8 +79,8 @@ struct generator<int>
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    if(static_cast<bool>(this->p.operator bool())) {
+      this->p.destroy();
     } 
     
   }
@@ -98,11 +88,11 @@ struct generator<int>
   
   private: 
   inline explicit generator(promise_type * _p)
-  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*_p)}
+  : p{std::coroutine_handle<promise_type>::from_promise(*_p)}
   {
   }
   
-  std::experimental::coroutine_handle<promise_type> p;
+  std::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator<int> &) /* noexcept */ = delete;
   // inline generator<int> & operator=(const generator<int> &) /* noexcept */ = delete;
@@ -120,14 +110,14 @@ struct __fun_intFrame
 {
   void (*resume_fn)(__fun_intFrame *);
   void (*destroy_fn)(__fun_intFrame *);
-  std::experimental::__coroutine_traits_sfinae<generator<int> >::promise_type __promise;
+  std::__coroutine_traits_sfinae<generator<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
-  std::suspend_always __suspend_42_14;
-  std::suspend_always __suspend_42_14_1;
+  std::suspend_always __suspend_34_14;
+  std::suspend_always __suspend_34_14_1;
 };
 
-/* First instantiated from: EduCoroutineTemplateGeneratorTest.cpp:48 */
+/* First instantiated from: EduCoroutineTemplateGeneratorTest.cpp:40 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 generator<int> fun<int>()
@@ -138,7 +128,7 @@ generator<int> fun<int>()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::experimental::__coroutine_traits_sfinae<generator<int> >::promise_type{};
+  new (&__f->__promise)std::__coroutine_traits_sfinae<generator<int> >::promise_type{};
   
   generator<int> __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
   
@@ -170,18 +160,18 @@ void __fun_intResume(__fun_intFrame * __f)
       case 1: goto __resume_fun_int_1;
     }
     
-    /* co_await EduCoroutineTemplateGeneratorTest.cpp:42 */
-    __f->__suspend_42_14 = __f->__promise.initial_suspend();
-    if(!__f->__suspend_42_14.await_ready()) {
-      __f->__suspend_42_14.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f))));
+    /* co_await EduCoroutineTemplateGeneratorTest.cpp:34 */
+    __f->__suspend_34_14 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_34_14.await_ready()) {
+      __f->__suspend_34_14.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
     } 
     
     __resume_fun_int_1:
-    __f->__suspend_42_14.await_resume();
-    /* co_return EduCoroutineTemplateGeneratorTest.cpp:43 */
+    __f->__suspend_34_14.await_resume();
+    /* co_return EduCoroutineTemplateGeneratorTest.cpp:35 */
     __f->__promise.return_value(2);
     goto __final_suspend;
   } catch(...) {
@@ -194,10 +184,10 @@ void __fun_intResume(__fun_intFrame * __f)
   
   __final_suspend:
   
-  /* co_await EduCoroutineTemplateGeneratorTest.cpp:42 */
-  __f->__suspend_42_14_1 = __f->__promise.final_suspend();
-  if(!__f->__suspend_42_14_1.await_ready()) {
-    __f->__suspend_42_14_1.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f))));
+  /* co_await EduCoroutineTemplateGeneratorTest.cpp:34 */
+  __f->__suspend_34_14_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_34_14_1.await_ready()) {
+    __f->__suspend_34_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
   } 
   
   ;

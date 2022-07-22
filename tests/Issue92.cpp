@@ -1,5 +1,9 @@
-// cmdline:-std=c++2a
-#include <experimental/coroutine>
+// cmdline:-std=c++20
+
+#include <coroutine>
+#include <exception> // std::terminate
+#include <new>
+#include <tuple>
 
 template <typename T>
 struct generator
@@ -7,13 +11,13 @@ struct generator
 	struct promise_type
 	{
 		T current_value;
-		std::experimental::suspend_always yield_value(T value)
+		std::suspend_always yield_value(T value)
 		{
 			this->current_value = value;
 			return {};
 		}
-		std::experimental::suspend_always initial_suspend() { return {}; }
-		std::experimental::suspend_always final_suspend() noexcept { return {}; }
+		std::suspend_always initial_suspend() { return {}; }
+		std::suspend_always final_suspend() noexcept { return {}; }
 		generator get_return_object() { return generator{ this }; };
 		void unhandled_exception() { std::terminate(); }
 		void return_void() {}
@@ -24,10 +28,10 @@ struct generator
     
 	struct iterator
 	{
-		std::experimental::coroutine_handle<promise_type> hco;
+		std::coroutine_handle<promise_type> hco;
 		bool done = false;
 
-		iterator(std::experimental::coroutine_handle<promise_type> hco, bool done)
+		iterator(std::coroutine_handle<promise_type> hco, bool done)
 		: hco(hco), done(done) {}
 
 		iterator& operator++()
@@ -63,9 +67,9 @@ struct generator
 
 private:
 	explicit generator(promise_type* p)
-	: p(std::experimental::coroutine_handle<promise_type>::from_promise(*p)) {}
+	: p(std::coroutine_handle<promise_type>::from_promise(*p)) {}
 
-	std::experimental::coroutine_handle<promise_type> p;
+	std::coroutine_handle<promise_type> p;
 };
 
 generator<uint32_t> fibonaccis()

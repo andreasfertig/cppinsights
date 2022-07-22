@@ -7,8 +7,11 @@
 
 
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4736.pdf
+#include <coroutine>
+#include <exception> // std::terminate
+#include <new>
+#include <utility>
 #include <chrono>
-#include <experimental/coroutine>
 #include <iostream>
 
 template<typename T>
@@ -16,8 +19,8 @@ struct my_future
 {
 	struct promise_type
 	{
-		std::experimental::suspend_always initial_suspend() { return {}; }
-		std::experimental::suspend_always final_suspend() noexcept { return {}; }
+		std::suspend_always initial_suspend() { return {}; }
+		std::suspend_always final_suspend() noexcept { return {}; }
         auto get_return_object() { return my_future{}; }
 		void unhandled_exception() { std::terminate(); }
 		void return_void() {}
@@ -25,23 +28,23 @@ struct my_future
 
     
     bool await_ready();
-    void await_suspend(std::experimental::coroutine_handle<>);
+    void await_suspend(std::coroutine_handle<>);
     T    await_resume();
 };
 
-/* First instantiated from: EduCoroutineCoAwaitOperatorTest.cpp:48 */
+/* First instantiated from: EduCoroutineCoAwaitOperatorTest.cpp:51 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct my_future<int>
 {
   struct promise_type
   {
-    inline std::experimental::suspend_always initial_suspend()
+    inline std::suspend_always initial_suspend()
     {
       return {};
     }
     
-    inline std::experimental::suspend_always final_suspend() noexcept
+    inline std::suspend_always final_suspend() noexcept
     {
       return {};
     }
@@ -65,7 +68,7 @@ struct my_future<int>
   
   bool await_ready();
   
-  void await_suspend(std::experimental::coroutine_handle<void>);
+  void await_suspend(std::coroutine_handle<void>);
   
   int await_resume();
   
@@ -87,7 +90,7 @@ auto operator co_await(std::chrono::duration<Rep, Period> d)
 
         bool await_ready() const { return duration.count() <= 0; }
         void await_resume() {}
-        void await_suspend(std::experimental::coroutine_handle<> h) {  }
+        void await_suspend(std::coroutine_handle<> h) {  }
     };
     
     return awaiter{d};
@@ -114,7 +117,7 @@ awaiter operator co_await<long long, std::ratio<1, 1000> >(std::chrono::duration
     {
     }
     
-    inline void await_suspend(std::experimental::coroutine_handle<void> h)
+    inline void await_suspend(std::coroutine_handle<void> h)
     {
     }
     
@@ -132,14 +135,14 @@ struct __gFrame
 {
   void (*resume_fn)(__gFrame *);
   void (*destroy_fn)(__gFrame *);
-  std::experimental::__coroutine_traits_sfinae<my_future<int> >::promise_type __promise;
+  std::__coroutine_traits_sfinae<my_future<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
-  std::experimental::suspend_always __suspend_48_16;
-  awaiter __suspend_51_5;
-  my_future<int> __suspend_53_14;
-  int __suspend_53_14_res;
-  std::experimental::suspend_always __suspend_48_16_1;
+  std::suspend_always __suspend_51_16;
+  awaiter __suspend_54_5;
+  my_future<int> __suspend_56_14;
+  int __suspend_56_14_res;
+  std::suspend_always __suspend_51_16_1;
 };
 
 my_future<int> g()
@@ -150,7 +153,7 @@ my_future<int> g()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::experimental::__coroutine_traits_sfinae<my_future<int> >::promise_type{};
+  new (&__f->__promise)std::__coroutine_traits_sfinae<my_future<int> >::promise_type{};
   
   my_future<int> __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
   
@@ -184,41 +187,41 @@ void __gResume(__gFrame * __f)
       case 3: goto __resume_g_3;
     }
     
-    /* co_await EduCoroutineCoAwaitOperatorTest.cpp:48 */
-    __f->__suspend_48_16 = __f->__promise.initial_suspend();
-    if(!__f->__suspend_48_16.await_ready()) {
-      __f->__suspend_48_16.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f))));
+    /* co_await EduCoroutineCoAwaitOperatorTest.cpp:51 */
+    __f->__suspend_51_16 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_51_16.await_ready()) {
+      __f->__suspend_51_16.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
     } 
     
     __resume_g_1:
-    __f->__suspend_48_16.await_resume();
+    __f->__suspend_51_16.await_resume();
     std::operator<<(std::cout, "just about go to sleep...\n");
     
-    /* co_await EduCoroutineCoAwaitOperatorTest.cpp:51 */
-    __f->__suspend_51_5 = operator co_await(std::operator""ms(10ULL));
-    if(!__f->__suspend_51_5.await_ready()) {
-      __f->__suspend_51_5.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f))));
+    /* co_await EduCoroutineCoAwaitOperatorTest.cpp:54 */
+    __f->__suspend_54_5 = operator co_await(std::operator""ms(10ULL));
+    if(!__f->__suspend_54_5.await_ready()) {
+      __f->__suspend_54_5.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 2;
       return;
     } 
     
     __resume_g_2:
-    __f->__suspend_51_5.await_resume();
+    __f->__suspend_54_5.await_resume();
     std::operator<<(std::cout, "resumed\n");
     
-    /* co_await EduCoroutineCoAwaitOperatorTest.cpp:53 */
-    __f->__suspend_53_14 = h();
-    if(!__f->__suspend_53_14.await_ready()) {
-      __f->__suspend_53_14.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f))));
+    /* co_await EduCoroutineCoAwaitOperatorTest.cpp:56 */
+    __f->__suspend_56_14 = h();
+    if(!__f->__suspend_56_14.await_ready()) {
+      __f->__suspend_56_14.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 3;
       return;
     } 
     
     __resume_g_3:
-    __f->__suspend_53_14_res = __f->__suspend_53_14.await_resume();
+    __f->__suspend_56_14_res = __f->__suspend_56_14.await_resume();
     goto __final_suspend;
   } catch(...) {
     if(!__f->__initial_await_suspend_called) {
@@ -230,10 +233,10 @@ void __gResume(__gFrame * __f)
   
   __final_suspend:
   
-  /* co_await EduCoroutineCoAwaitOperatorTest.cpp:48 */
-  __f->__suspend_48_16_1 = __f->__promise.final_suspend();
-  if(!__f->__suspend_48_16_1.await_ready()) {
-    __f->__suspend_48_16_1.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f))));
+  /* co_await EduCoroutineCoAwaitOperatorTest.cpp:51 */
+  __f->__suspend_51_16_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_51_16_1.await_ready()) {
+    __f->__suspend_51_16_1.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
   } 
   
   ;

@@ -3,8 +3,11 @@
 
 
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4736.pdf
+#include <coroutine>
+#include <exception> // std::terminate
+#include <new>
+#include <utility>
 #include <chrono>
-#include <experimental/coroutine>
 #include <iostream>
 
 template<typename T>
@@ -12,8 +15,8 @@ struct my_future
 {
 	struct promise_type
 	{
-		std::experimental::suspend_always initial_suspend() { return {}; }
-		std::experimental::suspend_always final_suspend() noexcept { return {}; }
+		std::suspend_always initial_suspend() { return {}; }
+		std::suspend_always final_suspend() noexcept { return {}; }
         auto get_return_object() { return my_future{}; }
 		void unhandled_exception() { std::terminate(); }
 		void return_void() {}
@@ -21,7 +24,7 @@ struct my_future
 
     
     bool await_ready();
-    void await_suspend(std::experimental::coroutine_handle<>);
+    void await_suspend(std::coroutine_handle<>);
     T    await_resume();
 };
 
@@ -37,7 +40,7 @@ auto operator co_await(std::chrono::duration<Rep, Period> d)
 
         bool await_ready() const { return duration.count() <= 0; }
         void await_resume() {}
-        void await_suspend(std::experimental::coroutine_handle<> h) {  }
+        void await_suspend(std::coroutine_handle<> h) {  }
     };
     
     return awaiter{d};

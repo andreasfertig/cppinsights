@@ -1,17 +1,10 @@
 // cmdline:-std=c++20
 // cmdlineinsights:-edu-show-coroutine-transformation
 
-#if __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std {
-    using namespace std::experimental;
-}
-#elif __has_include(<coroutine>)
 #include <coroutine>
-#else
-#error "No coroutine header"
-#endif
+#include <exception> // std::terminate
+#include <new>
+#include <utility>
 
 template <typename T> struct generator {
   struct promise_type {

@@ -1,5 +1,6 @@
 // cmdline:-std=c++2a
 #include <coroutine>
+#include <exception> // std::terminate
 #include <new>
 
 struct generator {

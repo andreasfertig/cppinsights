@@ -1,4 +1,16 @@
-.tmp.cpp:233:19: error: this builtin expect that __builtin_coro_id has been used earlier in this function
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
-                  ^
-1 error generated.
+.tmp.cpp:153:138: error: unknown type name 'coroutine_handle'
+      __f->__suspend_35_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:167:139: error: unknown type name 'coroutine_handle'
+        __f->__suspend_42_5.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                          ^
+.tmp.cpp:178:140: error: unknown type name 'coroutine_handle'
+        __f->__suspend_43_12.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                           ^
+.tmp.cpp:189:139: error: unknown type name 'coroutine_handle'
+        __f->__suspend_44_5.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                          ^
+.tmp.cpp:212:138: error: unknown type name 'coroutine_handle'
+    __f->__suspend_35_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+5 errors generated.

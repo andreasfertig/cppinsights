@@ -5,19 +5,8 @@
 // cmdline:-std=c++2a
 // cmdlineinsights:-edu-show-coroutine-transformation
 
-
-#if __has_include(<coroutine>)
 #include <coroutine>
-#elif __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std {
-    using namespace std::experimental;
-}
-#else
-#error "No coroutine header"
-#endif
-
+#include <exception> // std::terminate
 #include <new>
 #include <utility>
 
@@ -95,8 +84,8 @@ struct __funFrame
   std::__coroutine_traits_sfinae<generator>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
-  std::suspend_never __suspend_45_11;
-  std::suspend_always __suspend_45_11_1;
+  std::suspend_never __suspend_34_11;
+  std::suspend_always __suspend_34_11_1;
 };
 
 generator fun()
@@ -139,18 +128,18 @@ void __funResume(__funFrame * __f)
       case 1: goto __resume_fun_1;
     }
     
-    /* co_await EduCoroutineSimpleTest.cpp:45 */
-    __f->__suspend_45_11 = __f->__promise.initial_suspend();
-    if(!__f->__suspend_45_11.await_ready()) {
-      __f->__suspend_45_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+    /* co_await EduCoroutineSimpleTest.cpp:34 */
+    __f->__suspend_34_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_34_11.await_ready()) {
+      __f->__suspend_34_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
     } 
     
     __resume_fun_1:
-    __f->__suspend_45_11.await_resume();
-    /* co_return EduCoroutineSimpleTest.cpp:46 */
+    __f->__suspend_34_11.await_resume();
+    /* co_return EduCoroutineSimpleTest.cpp:35 */
     __f->__promise.return_value(2);
     goto __final_suspend;
   } catch(...) {
@@ -163,10 +152,10 @@ void __funResume(__funFrame * __f)
   
   __final_suspend:
   
-  /* co_await EduCoroutineSimpleTest.cpp:45 */
-  __f->__suspend_45_11_1 = __f->__promise.final_suspend();
-  if(!__f->__suspend_45_11_1.await_ready()) {
-    __f->__suspend_45_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+  /* co_await EduCoroutineSimpleTest.cpp:34 */
+  __f->__suspend_34_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_34_11_1.await_ready()) {
+    __f->__suspend_34_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
   } 
   
   ;
