@@ -251,6 +251,9 @@ int main(int argc, const char** argv)
     if(gUseLibCpp) {
         prependArgument(INSIGHTS_LLVM_INCLUDE_DIR);
         prependArgument("-stdlib=libc++");
+#ifdef __APPLE__
+        prependArgument("-nostdinc++");  // macos Monterey
+#endif                                   /* __APPLE__ */
     }
 
     prependArgument(INSIGHTS_CLANG_RESOURCE_INCLUDE_DIR);

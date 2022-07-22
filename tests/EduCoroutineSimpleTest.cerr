@@ -1,7 +1,7 @@
-.tmp.cpp:145:138: error: unknown type name 'coroutine_handle'
-      __f->__suspend_45_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+.tmp.cpp:134:138: error: unknown type name 'coroutine_handle'
+      __f->__suspend_34_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
                                                                                                                                          ^
-.tmp.cpp:169:138: error: unknown type name 'coroutine_handle'
-    __f->__suspend_45_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+.tmp.cpp:158:138: error: unknown type name 'coroutine_handle'
+    __f->__suspend_34_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
                                                                                                                                          ^
 2 errors generated.

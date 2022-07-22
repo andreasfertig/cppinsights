@@ -1,46 +1,67 @@
-.tmp.cpp:207:19: error: this builtin expect that __builtin_coro_id has been used earlier in this function
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
-                  ^
-.tmp.cpp:290:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_63_24 = simpleReturn(__f->v);
+.tmp.cpp:162:138: error: unknown type name 'coroutine_handle'
+      __f->__suspend_50_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:186:138: error: unknown type name 'coroutine_handle'
+    __f->__suspend_50_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:271:138: error: unknown type name 'coroutine_handle'
+      __f->__suspend_55_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:281:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
+    __f->__suspend_56_24 = simpleReturn(__f->v);
                          ^
-.tmp.cpp:82:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
+.tmp.cpp:73:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
   inline generator(generator && rhs)
          ^
-.tmp.cpp:301:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_63_51 = simpleReturn(__f->v + 1);
+.tmp.cpp:292:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
+    __f->__suspend_56_51 = simpleReturn(__f->v + 1);
                          ^
-.tmp.cpp:82:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
+.tmp.cpp:73:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
   inline generator(generator && rhs)
          ^
-.tmp.cpp:425:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
+.tmp.cpp:319:138: error: unknown type name 'coroutine_handle'
+    __f->__suspend_55_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:406:138: error: unknown type name 'coroutine_handle'
+      __f->__suspend_59_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:416:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
+    __f->__suspend_60_24 = simpleReturn(__f->v);
+                         ^
+.tmp.cpp:73:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
+  inline generator(generator && rhs)
+         ^
+.tmp.cpp:427:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
+    __f->__suspend_60_51 = simpleReturn(__f->v + 1);
+                         ^
+.tmp.cpp:73:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
+  inline generator(generator && rhs)
+         ^
+.tmp.cpp:439:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
+    __f->__suspend_60_80 = simpleReturn(__f->v + 2);
+                         ^
+.tmp.cpp:73:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
+  inline generator(generator && rhs)
+         ^
+.tmp.cpp:466:138: error: unknown type name 'coroutine_handle'
+    __f->__suspend_59_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:550:138: error: unknown type name 'coroutine_handle'
+      __f->__suspend_63_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+.tmp.cpp:560:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
     __f->__suspend_67_24 = simpleReturn(__f->v);
                          ^
-.tmp.cpp:82:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
+.tmp.cpp:73:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
   inline generator(generator && rhs)
          ^
-.tmp.cpp:436:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
+.tmp.cpp:571:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
     __f->__suspend_67_51 = simpleReturn(__f->v + 1);
                          ^
-.tmp.cpp:82:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
+.tmp.cpp:73:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
   inline generator(generator && rhs)
          ^
-.tmp.cpp:448:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_67_80 = simpleReturn(__f->v + 2);
-                         ^
-.tmp.cpp:82:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
-.tmp.cpp:569:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_74_24 = simpleReturn(__f->v);
-                         ^
-.tmp.cpp:82:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
-.tmp.cpp:580:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_74_51 = simpleReturn(__f->v + 1);
-                         ^
-.tmp.cpp:82:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
-8 errors generated.
+.tmp.cpp:599:138: error: unknown type name 'coroutine_handle'
+    __f->__suspend_63_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+                                                                                                                                         ^
+15 errors generated.

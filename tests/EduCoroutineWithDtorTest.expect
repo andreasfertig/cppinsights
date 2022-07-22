@@ -5,19 +5,10 @@
 // cmdline:-std=c++20
 // cmdlineinsights:-edu-show-coroutine-transformation
 
-#if __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std
-{
-  using namespace experimental;
-  
-}
-#elif __has_include(<coroutine>)
 #include <coroutine>
-#else
-#error "No coroutine header"
-#endif
+#include <exception> // std::terminate
+#include <new>
+#include <utility>
 
 struct Test
 {
@@ -61,7 +52,7 @@ private:
   std::coroutine_handle<promise_type> p;
 };
 
-/* First instantiated from: EduCoroutineWithDtorTest.cpp:56 */
+/* First instantiated from: EduCoroutineWithDtorTest.cpp:49 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct generator<Test>
@@ -107,8 +98,8 @@ struct generator<Test>
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    if(static_cast<bool>(this->p.operator bool())) {
+      this->p.destroy();
     } 
     
   }
@@ -116,11 +107,11 @@ struct generator<Test>
   
   private: 
   inline explicit generator(promise_type * _p)
-  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*_p)}
+  : p{std::coroutine_handle<promise_type>::from_promise(*_p)}
   {
   }
   
-  std::experimental::coroutine_handle<promise_type> p;
+  std::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator<Test> &) /* noexcept */ = delete;
   // inline generator<Test> & operator=(const generator<Test> &) /* noexcept */ = delete;
@@ -138,14 +129,14 @@ struct __fun_TestFrame
 {
   void (*resume_fn)(__fun_TestFrame *);
   void (*destroy_fn)(__fun_TestFrame *);
-  std::experimental::__coroutine_traits_sfinae<generator<Test> >::promise_type __promise;
+  std::__coroutine_traits_sfinae<generator<Test> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
-  std::suspend_always __suspend_50_14;
-  std::suspend_always __suspend_50_14_1;
+  std::suspend_always __suspend_43_14;
+  std::suspend_always __suspend_43_14_1;
 };
 
-/* First instantiated from: EduCoroutineWithDtorTest.cpp:56 */
+/* First instantiated from: EduCoroutineWithDtorTest.cpp:49 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 generator<Test> fun<Test>()
@@ -156,7 +147,7 @@ generator<Test> fun<Test>()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::experimental::__coroutine_traits_sfinae<generator<Test> >::promise_type{};
+  new (&__f->__promise)std::__coroutine_traits_sfinae<generator<Test> >::promise_type{};
   
   generator<Test> __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
   
@@ -188,18 +179,18 @@ void __fun_TestResume(__fun_TestFrame * __f)
       case 1: goto __resume_fun_Test_1;
     }
     
-    /* co_await EduCoroutineWithDtorTest.cpp:50 */
-    __f->__suspend_50_14 = __f->__promise.initial_suspend();
-    if(!__f->__suspend_50_14.await_ready()) {
-      __f->__suspend_50_14.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator<Test>::promise_type>::from_address(static_cast<void *>(__f))));
+    /* co_await EduCoroutineWithDtorTest.cpp:43 */
+    __f->__suspend_43_14 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_43_14.await_ready()) {
+      __f->__suspend_43_14.await_suspend(std::coroutine_handle<generator<Test>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
     } 
     
     __resume_fun_Test_1:
-    __f->__suspend_50_14.await_resume();
-    /* co_return EduCoroutineWithDtorTest.cpp:51 */
+    __f->__suspend_43_14.await_resume();
+    /* co_return EduCoroutineWithDtorTest.cpp:44 */
     __f->__promise.return_value(Test(2));
     goto __final_suspend;
   } catch(...) {
@@ -212,10 +203,10 @@ void __fun_TestResume(__fun_TestFrame * __f)
   
   __final_suspend:
   
-  /* co_await EduCoroutineWithDtorTest.cpp:50 */
-  __f->__suspend_50_14_1 = __f->__promise.final_suspend();
-  if(!__f->__suspend_50_14_1.await_ready()) {
-    __f->__suspend_50_14_1.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator<Test>::promise_type>::from_address(static_cast<void *>(__f))));
+  /* co_await EduCoroutineWithDtorTest.cpp:43 */
+  __f->__suspend_43_14_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_43_14_1.await_ready()) {
+    __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<Test>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
   } 
   
   ;

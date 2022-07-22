@@ -5,19 +5,10 @@
 // cmdline:-std=c++20
 // cmdlineinsights:-edu-show-coroutine-transformation
 
-#if __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std
-{
-  using namespace experimental;
-  
-}
-#elif __has_include(<coroutine>)
 #include <coroutine>
-#else
-#error "No coroutine header"
-#endif
+#include <exception> // std::terminate
+#include <new>
+#include <utility>
 
 struct generator
 {
@@ -65,8 +56,8 @@ struct generator
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(static_cast<const std::experimental::coroutine_handle<void>&>(this->p).operator bool())) {
-      static_cast<std::experimental::coroutine_handle<void>&>(this->p).destroy();
+    if(static_cast<bool>(this->p.operator bool())) {
+      this->p.destroy();
     } 
     
   }
@@ -74,11 +65,11 @@ struct generator
   
   private: 
   inline explicit generator(promise_type * _p)
-  : p{std::experimental::coroutine_handle<promise_type>::from_promise(*_p)}
+  : p{std::coroutine_handle<promise_type>::from_promise(*_p)}
   {
   }
   
-  std::experimental::coroutine_handle<promise_type> p;
+  std::coroutine_handle<promise_type> p;
   public: 
   // inline constexpr generator(const generator &) /* noexcept */ = delete;
   // inline generator & operator=(const generator &) /* noexcept */ = delete;
@@ -91,7 +82,7 @@ struct __seqFrame
 {
   void (*resume_fn)(__seqFrame *);
   void (*destroy_fn)(__seqFrame *);
-  std::experimental::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   
@@ -104,8 +95,8 @@ struct __seqFrame
   public: 
   const int & start;
   const S s;
-  std::suspend_always __suspend_42_11;
-  std::suspend_always __suspend_42_11_1;
+  std::suspend_always __suspend_35_11;
+  std::suspend_always __suspend_35_11_1;
 };
 
 generator seq(const int & start)
@@ -117,7 +108,7 @@ generator seq(const int & start)
   __f->start = std::forward<const int &>(start);
   
   /* Construct the promise. */
-  new (&__f->__promise)std::experimental::__coroutine_traits_sfinae<generator>::promise_type{};
+  new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
   
   generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
   
@@ -149,19 +140,19 @@ void __seqResume(__seqFrame * __f)
       case 1: goto __resume_seq_1;
     }
     
-    /* co_await EduCoroutineCaptureConstTest.cpp:42 */
-    __f->__suspend_42_11 = __f->__promise.initial_suspend();
-    if(!__f->__suspend_42_11.await_ready()) {
-      __f->__suspend_42_11.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+    /* co_await EduCoroutineCaptureConstTest.cpp:35 */
+    __f->__suspend_35_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_35_11.await_ready()) {
+      __f->__suspend_35_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
     } 
     
     __resume_seq_1:
-    __f->__suspend_42_11.await_resume();
+    __f->__suspend_35_11.await_resume();
     __f->s = {0, '\0'};
-    /* co_return EduCoroutineCaptureConstTest.cpp:47 */
+    /* co_return EduCoroutineCaptureConstTest.cpp:40 */
     __f->__promise.return_value(__f->s.t);
     goto __final_suspend;
   } catch(...) {
@@ -174,10 +165,10 @@ void __seqResume(__seqFrame * __f)
   
   __final_suspend:
   
-  /* co_await EduCoroutineCaptureConstTest.cpp:42 */
-  __f->__suspend_42_11_1 = __f->__promise.final_suspend();
-  if(!__f->__suspend_42_11_1.await_ready()) {
-    __f->__suspend_42_11_1.await_suspend(std::experimental::coroutine_handle<void>(std::experimental::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f))));
+  /* co_await EduCoroutineCaptureConstTest.cpp:35 */
+  __f->__suspend_35_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_35_11_1.await_ready()) {
+    __f->__suspend_35_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
   } 
   
   ;
