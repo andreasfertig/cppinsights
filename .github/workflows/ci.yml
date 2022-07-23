@@ -664,7 +664,6 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "/home/runner/binaries/insights-artifact-*/insights-*"
-        bodyFile: "${{ github.workspace }}/changelog.md"
         token: ${{ secrets.GITHUB_TOKEN }}
         allowUpdates: true
         artifactErrorsFailBuild: true
