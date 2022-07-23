@@ -676,6 +676,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/cppinsights
         gren changelog --generate --override --username=andreasfertig --repo=cppinsights -t continuous..`git tag --sort=-creatordate | grep -v continuous | head -n 1 ` -c .github/grenrc.json
+        sed -in '1,4d' CHANGELOG.md
 
     - name: Create Release
       uses: ncipollo/release-action@v1
