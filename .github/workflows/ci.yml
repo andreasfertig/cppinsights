@@ -675,14 +675,14 @@ jobs:
       shell: bash
       run: |
         cd ${GITHUB_WORKSPACE}/cppinsights
-        gren changelog --generate --override --username=andreasfertig --repo=cppinsights -t continuous..`git tag --sort=-creatordate | grep -v continuous | head -n 1 ` -c .github/grenrc.json -f ${GITHUB_WORKSPACE}/changelog.md
+        gren changelog --generate --override --username=andreasfertig --repo=cppinsights -t continuous..`git tag --sort=-creatordate | grep -v continuous | head -n 1 ` -c .github/grenrc.json
 
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
         artifacts: "/home/runner/binaries/insights-artifact-*/insights-*"
         token: ${{ secrets.GITHUB_TOKEN }}
-        bodyFile: "${{ github.workspace }}/changelog.md"
+        bodyFile: "${{ github.workspace }}/cppinsights/CHANGELOG.md"
         allowUpdates: true
         artifactErrorsFailBuild: true
         name: continuous
