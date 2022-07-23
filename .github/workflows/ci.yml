@@ -655,23 +655,41 @@ jobs:
         path: cppinsights
         fetch-depth: 0
 
+    - name: Install node
+      uses: actions/setup-node@v1
+
+    - name: Install gren
+      id: install_gren
+      shell: bash
+      run: |
+        npm install github-release-notes -g
+
     - name: Download artifacts
       uses: actions/download-artifact@v2
       with:
           path: ~/binaries
+
+    - name: Generate release notes
+      env:
+        GREN_GITHUB_TOKEN: ${{ secrets.GREN_GITHUB_TOKEN }}
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/cppinsights
+        gren changelog --generate --override --username=andreasfertig --repo=cppinsights -t continuous..`git tag --sort=-creatordate | grep -v continuous | head -n 1 ` -c .github/grenrc.json -f ${GITHUB_WORKSPACE}/changelog.md
 
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
         artifacts: "/home/runner/binaries/insights-artifact-*/insights-*"
         token: ${{ secrets.GITHUB_TOKEN }}
+        bodyFile: "${{ github.workspace }}/changelog.md"
         allowUpdates: true
         artifactErrorsFailBuild: true
         name: continuous
         prerelease: true
         removeArtifacts: true
         tag: continuous
-        generateReleaseNotes: true
+        generateReleaseNotes: false
 
     - name: Upload docs to gh-pages
       env:
