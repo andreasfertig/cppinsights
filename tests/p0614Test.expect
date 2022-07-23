@@ -1,0 +1,38 @@
+// cmdline:-std=c++20
+
+#include <vector>
+
+struct T
+{
+  std::vector<int, std::allocator<int> > _items = std::vector<int, std::allocator<int> >{};
+  inline const std::vector<int, std::allocator<int> > & items() const
+  {
+    return this->_items;
+  }
+  
+  // inline constexpr ~T() noexcept = default;
+};
+
+
+
+T f()
+{
+  return T{{std::vector<int, std::allocator<int> >{}}};
+}
+
+
+int main()
+{
+  {
+    T thing = f();
+    const std::vector<int, std::allocator<int> > & __range1 = thing.items();
+    std::__wrap_iter<const int *> __begin1 = __range1.begin();
+    std::__wrap_iter<const int *> __end1 = __range1.end();
+    for(; std::operator!=(__begin1, __end1); __begin1.operator++()) {
+      const int & x = __begin1.operator*();
+    }
+    
+  }
+  return 0;
+}
+
