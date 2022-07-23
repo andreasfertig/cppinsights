@@ -655,46 +655,24 @@ jobs:
         path: cppinsights
         fetch-depth: 0
 
-    - name: Install node
-      uses: actions/setup-node@v1
-
-    - name: Install gren
-      id: install_gren
-      shell: bash
-      run: |
-        npm install github-release-notes -g
-
     - name: Download artifacts
       uses: actions/download-artifact@v2
       with:
           path: ~/binaries
 
-    - uses: dev-drprasad/delete-tag-and-release@v0.1.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        delete_release: true
-        tag_name: continuous
-
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GREN_GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        tag_name: continuous
-        release_name: continuous
-        draft: false
+        artifacts: "/home/runner/binaries/insights-artifact-*/insights-*"
+        bodyFile: "${{ github.workspace }}/changelog.md"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        allowUpdates: true
+        artifactErrorsFailBuild: true
+        name: continuous
         prerelease: true
-
-    - name: Upload binaries to GH
-      uses: svenstaro/upload-release-action@v2
-      with:
-        file: '/home/runner/binaries/insights-artifact-*/insights-*'
-        repo_token: ${{ secrets.GREN_GITHUB_TOKEN }}
+        removeArtifacts: true
         tag: continuous
-        overwrite: true
-        file_glob: true
+        generateReleaseNotes: true
 
     - name: Upload docs to gh-pages
       env:
@@ -725,15 +703,6 @@ jobs:
         echo "Pushing"
         /usr/bin/git push --force
 
-    - name: Create release notes
-      id: create_release_notes
-      env:
-        GREN_GITHUB_TOKEN: ${{ secrets.GREN_GITHUB_TOKEN }}
-      shell: bash
-      run: |
-        cd ${GITHUB_WORKSPACE}/cppinsights
-        gren release --override --username=andreasfertig --repo=cppinsights -t `git tag --sort=-creatordate | grep -v continuous | head -n 1 `..continuous -c .github/grenrc.json  -P
-
-    - name: Notify listeners
-      run: |
-          curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GH_TRIGGER }}" https://api.github.com/repos/andreasfertig/cppinsights-container/dispatches -d '{"event_type":"rebuild_trigger"}' &> /dev/null
+        #    - name: Notify listeners
+      #      run: |
+        #          curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GH_TRIGGER }}" https://api.github.com/repos/andreasfertig/cppinsights-container/dispatches -d '{"event_type":"rebuild_trigger"}' &> /dev/null
