@@ -15,9 +15,11 @@ struct Person
 
 
 template<typename Key, typename POD>
-Key extractKey(Key POD::* pMember);
+Key extractKey(Key POD::*pMember);
+;
 template<typename Key, typename POD>
-POD extractPOD(Key POD::* pMember);
+POD extractPOD(Key POD::*pMember);
+;
 
 template<auto pMember>
 using Key_t = decltype(extractKey(pMember));

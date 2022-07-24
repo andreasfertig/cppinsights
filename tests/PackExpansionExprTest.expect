@@ -3,10 +3,12 @@ void f(int, int, int)
 }
 
 
-template<typename F, typename ...Types>
-void forward(F f, Types &&...args) {
-  f(static_cast<Types&&>(args)...);
+template<typename F, typename ... Types>
+void forward(F f, Types &&... args)
+{
+  f(static_cast<Types &&>(args)... );
 }
+
 
 /* First instantiated from: PackExpansionExprTest.cpp:12 */
 #ifdef INSIGHTS_USE_TEMPLATE

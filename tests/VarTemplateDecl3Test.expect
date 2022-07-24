@@ -12,8 +12,9 @@ constexpr const int pi<int> = int(3.14159265358979323851L);
 template<class T>
 T circular_area(T r)
 {
-    return pi<T> * r * r;
+  return (pi<T> * r) * r;
 }
+
 
 /* First instantiated from: VarTemplateDecl3Test.cpp:33 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -47,8 +48,9 @@ struct X<int>
 template<typename T>
 X<T> DoIt(T x)
 {
-    return { circular_area(x), circular_area(x+2)};
+  return {circular_area(x), circular_area(x + 2)};
 }
+
 
 /* First instantiated from: VarTemplateDecl3Test.cpp:30 */
 #ifdef INSIGHTS_USE_TEMPLATE

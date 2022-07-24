@@ -241,6 +241,8 @@ public:
     void InsertTemplateParameters(const TemplateParameterList& list,
                                   const TemplateParamsOnly     templateParamsOnly = TemplateParamsOnly::No);
 
+    void InsertPrimaryTemplate(const FunctionTemplateDecl*);
+
 protected:
     virtual bool InsertVarDecl()
     {
@@ -307,6 +309,8 @@ protected:
     void InsertConceptConstraint(const FunctionDecl* tmplDecl);
     void InsertConceptConstraint(const VarDecl* varDecl);
     void InsertConceptConstraint(const TemplateParameterList& tmplDecl);
+
+    void InsertTemplate(const FunctionTemplateDecl*, bool withSpec);
 
     void InsertQualifierAndNameWithTemplateArgs(const DeclarationName& declName, const auto* stmt)
     {

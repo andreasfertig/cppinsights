@@ -89,14 +89,16 @@ MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
 
 
 template<typename T>
-MyVector<T> operator*(const MyVector<T>& a, const MyVector<T>& b)
+MyVector<T> operator*(const MyVector<T> & a, const MyVector<T> & b)
 {
-    MyVector<T> result(a.size());
-    for(std::size_t s = 0; s <= a.size(); ++s) {
-        result[s] = a[s] + b[s];
-    }
-    return result;
+  MyVector<T> result = a.size() /* NRVO variable */;
+  for(std::size_t s = 0; s <= a.size(); ++s) {
+    result[s] = operator+(a[s], b[s]);
+  }
+  
+  return result;
 }
+
 
 /* First instantiated from: ClassOperatorHandler9Test.cpp:70 */
 #ifdef INSIGHTS_USE_TEMPLATE

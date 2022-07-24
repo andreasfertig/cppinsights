@@ -1,6 +1,8 @@
-template <class T>
+template<class T>
 void foo(T && t)
-{ }
+{
+}
+
 
 /* First instantiated from: Issue50.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE

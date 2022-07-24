@@ -67,7 +67,10 @@ void bar(std::initializer_list<int> x)
 
 
 template<typename T>
-void something(std::initializer_list<T>) {}
+void something(std::initializer_list<T>)
+{
+}
+
 
 /* First instantiated from: InitializerListTest.cpp:58 */
 #ifdef INSIGHTS_USE_TEMPLATE

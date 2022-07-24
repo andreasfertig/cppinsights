@@ -1,10 +1,12 @@
 #include <iostream>
 
 
-template<class T, class Case, class ...Cases>
-decltype(auto) match(T&& value, const Case& _case, const Cases&... cases) {
-	return 1;
+template<class T, class Case, class ... Cases>
+decltype(auto) match(T && value, const Case & _case, const Cases &... cases)
+{
+  return 1;
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -44,13 +46,80 @@ int match<float &, __lambda_13_4, __lambda_14_4, __lambda_15_4>(float & value, c
 
 
 template<class T>
-decltype(auto) test(T&& value) {
-    return match(value
-		,[](std::string value)	{ std::cout <<"This is string "; return value + " Hi!"; }
-		,[](int i)				{ std::cout << "This is int ";	 return i * 100; }
-		,[](auto a)				{ std::cout << "This is default ";return 0; }
-	);
+decltype(auto) test(T && value)
+{
+      
+  class __lambda_13_4
+  {
+    public: 
+    inline auto operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    using retType_13_4 = auto (*)(std::string);
+    inline constexpr operator retType_13_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline auto __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
+    {
+      return __lambda_13_4{}.operator()(value);
+    }
+    
+    
+  };
+  
+  
+  class __lambda_14_4
+  {
+    public: 
+    inline auto operator()(int i) const
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    using retType_14_4 = auto (*)(int);
+    inline constexpr operator retType_14_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline auto __invoke(int i)
+    {
+      return __lambda_14_4{}.operator()(i);
+    }
+    
+    
+  };
+  
+  
+  class __lambda_15_4
+  {
+    public: 
+    template<class type_parameter_1_0>
+    inline auto operator()(type_parameter_1_0 a) const
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    private: 
+    template<class type_parameter_1_0>
+    static inline auto __invoke(type_parameter_1_0 a)
+    {
+      return __lambda_15_4{}.operator()<type_parameter_1_0>(a);
+    }
+    
+  };
+  
+  return match(value, __lambda_13_4{}, __lambda_14_4{}, __lambda_15_4{});
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

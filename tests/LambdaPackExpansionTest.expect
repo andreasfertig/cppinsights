@@ -1,10 +1,11 @@
 #define INSIGHTS_USE_TEMPLATE
 
-template<class... Args>
-int g(Args ...)
+template<class ... Args>
+int g(Args...)
 {
-    return 1;
+  return 1;
 }
+
 
 /* First instantiated from: LambdaPackExpansionTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -24,11 +25,32 @@ void f(Args... args) {
 }
 #endif
 
-template<class... Args>
-void f2(Args... args) {
-    auto lm = [&, args...] { return g(args...); };
-    lm();
+template<class ... Args>
+void f2(Args... args)
+{
+    
+  class __lambda_19_15
+  {
+    public: 
+    inline auto operator()() const
+    {
+      return g(args... );
+    }
+    
+    private: 
+    Args... args;
+    
+    public:
+    __lambda_19_15(const type_parameter_0_0... & _args)
+    : args{_args}
+    {}
+    
+  };
+  
+  auto lm = __lambda_19_15{args};
+  lm();
 }
+
 
 /* First instantiated from: LambdaPackExpansionTest.cpp:26 */
 #ifdef INSIGHTS_USE_TEMPLATE

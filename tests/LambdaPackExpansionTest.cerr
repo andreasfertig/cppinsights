@@ -1,0 +1,20 @@
+.tmp.cpp:41:9: error: only function and template parameters can be parameter packs
+    Args... args;
+        ^
+.tmp.cpp:41:13: error: data member type contains unexpanded parameter pack 'Args'
+    Args... args;
+    ~~~~    ^
+.tmp.cpp:44:26: error: unknown type name 'type_parameter_0_0'
+    __lambda_19_15(const type_parameter_0_0... & _args)
+                         ^
+.tmp.cpp:44:44: error: '...' must immediately precede declared identifier
+    __lambda_19_15(const type_parameter_0_0... & _args)
+                                           ^~~
+                                                 ...
+.tmp.cpp:44:44: error: type 'const int &' of function parameter pack does not contain any unexpanded parameter packs
+    __lambda_19_15(const type_parameter_0_0... & _args)
+                   ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+.tmp.cpp:50:13: error: initializer contains unexpanded parameter pack 'args'
+  auto lm = __lambda_19_15{args};
+            ^              ~~~~
+6 errors generated.

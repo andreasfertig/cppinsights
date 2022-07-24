@@ -1,9 +1,11 @@
 #include <utility>
 
-template <typename T, typename ... Args>
-T create(Args&& ... args){
-  return T(std::forward<Args>(args)...);
+template<typename T, typename ... Args>
+T create(Args &&... args)
+{
+  return T(std::forward<Args>(args)... );
 }
+
 
 /* First instantiated from: CXXScalarValueInitExprTest.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE

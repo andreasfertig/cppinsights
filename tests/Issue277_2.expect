@@ -7,10 +7,12 @@ struct Point
 
 
 
-template <std::size_t N>
-constexpr int& get(Point& p) {
+template<std::size_t N>
+inline constexpr int & get(Point & p)
+{
   return p.data[N];
 }
+
 
 /* First instantiated from: Issue277_2.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE

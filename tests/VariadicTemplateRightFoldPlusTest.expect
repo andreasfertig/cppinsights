@@ -1,9 +1,11 @@
 #define INSIGHTS_USE_TEMPLATE
 
-template<int... Ints>
-constexpr int fold_minus_impl_rf() {
-    return ( 5 - ... - Ints);
+template<int ...Ints>
+inline constexpr int fold_minus_impl_rf()
+{
+  return (5 - ... - Ints);
 }
+
 
 /* First instantiated from: VariadicTemplateRightFoldPlusTest.cpp:8 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -30,10 +32,12 @@ inline constexpr int fold_minus_impl_rf<0, 1>()
 /* PASSED: static_assert(fold_minus_impl_rf<0, 1>() == 4); */
 
 
-template<int... Ints>
-constexpr int fold_negative_minus_impl_rf() {
-    return ( -5 - ... - Ints);
+template<int ...Ints>
+inline constexpr int fold_negative_minus_impl_rf()
+{
+  return (-5 - ... - Ints);
 }
+
 
 /* First instantiated from: VariadicTemplateRightFoldPlusTest.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE

@@ -9,9 +9,10 @@ void Func()
 
 
 template<typename T>
-void Test(T& t) 
+void Test(T & t)
 {
 }
+
 
 /* First instantiated from: StdFunctionTest.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE

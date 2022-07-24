@@ -64,7 +64,10 @@ namespace Test
 }
 
 template<Test::X t>
-void Fun(){}
+void Fun()
+{
+}
+
 
 /* First instantiated from: p0315_3Test.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE

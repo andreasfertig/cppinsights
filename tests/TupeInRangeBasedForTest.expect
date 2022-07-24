@@ -3,10 +3,12 @@
 #include <tuple>
 #include <vector>
 
-template <typename Tuple_t>
-void fillTuples(std::vector<Tuple_t> tuples) {
+template<typename Tuple_t>
+void fillTuples(std::vector<Tuple_t> tuples)
+{
   tuples.emplace_back("hello", 1);
 }
+
 
 /* First instantiated from: TupeInRangeBasedForTest.cpp:13 */
 #ifdef INSIGHTS_USE_TEMPLATE

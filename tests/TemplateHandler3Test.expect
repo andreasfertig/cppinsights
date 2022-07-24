@@ -1,10 +1,11 @@
 #define INSIGHTS_USE_TEMPLATE
     
 template<int N, typename T>
-constexpr T min(const T& b)
+inline constexpr T min(const T & b)
 {
-    return N < b;
+  return N < b;
 }
+
 
 /* First instantiated from: TemplateHandler3Test.cpp:11 */
 #ifdef INSIGHTS_USE_TEMPLATE

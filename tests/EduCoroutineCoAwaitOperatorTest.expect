@@ -102,20 +102,32 @@ struct my_future<int>
 template<class Rep, class Period>
 auto operator co_await(std::chrono::duration<Rep, Period> d)
 {
-    struct awaiter
+  struct awaiter
+  {
+    std::chrono::duration<long long, std::ratio<1, 1000000> > duration;
+    inline awaiter(std::chrono::duration<long long, std::ratio<1, 1000000> > d)
+    : duration{std::chrono::duration<long long, std::ratio<1, 1000000> >(d)}
     {
-        std::chrono::system_clock::duration duration;
-        awaiter(std::chrono::system_clock::duration d)
-        : duration(d)
-        {}
-
-        bool await_ready() const { return duration.count() <= 0; }
-        void await_resume() {}
-        void await_suspend(std::coroutine_handle<> h) {  }
-    };
+    }
     
-    return awaiter{d};
+    inline bool await_ready() const
+    {
+      return this->duration.count() <= 0;
+    }
+    
+    inline void await_resume()
+    {
+    }
+    
+    inline void await_suspend(std::coroutine_handle<void> h)
+    {
+    }
+    
+  };
+  
+  return awaiter{{d}};
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

@@ -1,8 +1,9 @@
 template<typename T>
-int Test(T&& t)
+int Test(T && t)
 {
-    return t();
+  return t();
 }
+
 
 /* First instantiated from: LambdaHandler8Test.cpp:9 */
 #ifdef INSIGHTS_USE_TEMPLATE

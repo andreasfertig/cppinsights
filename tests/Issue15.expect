@@ -15,11 +15,12 @@ std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator"
 }
 
 
-template<char... _Digits>
-constexpr int operator""_cs()
+template<char ..._Digits>
+inline constexpr int operator""_cs()
 {
-    return 0;
+  return 0;
 }
+
 
 /* First instantiated from: Issue15.cpp:38 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -31,11 +32,12 @@ inline constexpr int operator""_cs<'4', '5', '6', '7'>()
 #endif
 
 
-template<typename T, T... C>
-constexpr int operator""_x()
+template<typename T, T ...C>
+inline constexpr int operator""_x()
 {
-    return 0;
+  return 0;
 }
+
 
 /* First instantiated from: Issue15.cpp:33 */
 #ifdef INSIGHTS_USE_TEMPLATE

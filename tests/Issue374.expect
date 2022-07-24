@@ -29,5 +29,13 @@ struct T
 using MemberVarPtr_24 = int T::*;
 MemberVarPtr_24 static_mptr = 0;
 
-template<int T::*>     void T::f() {}
-template<int (T::*)()> void T::f() {}
+template<int T::* >
+void T::f()
+{
+}
+
+template<int (T::*)()>
+void T::f()
+{
+}
+
