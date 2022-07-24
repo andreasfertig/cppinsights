@@ -15,7 +15,7 @@ namespace clang::insights {
 
 void InsightsBase::InsertIndentedText(SourceLocation loc, OutputFormatHelper& outputFormatHelper)
 {
-    mRewrite.InsertText(loc, outputFormatHelper.GetString(), true, true);
+    mRewrite.InsertText(loc, outputFormatHelper, true, true);
 }
 //-----------------------------------------------------------------------------
 

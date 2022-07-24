@@ -33,7 +33,7 @@ static void ToDo(const char* name, OutputFormatHelper& outputFormatHelper, std::
 void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
 {
     const char* name = [&]() {
-        if(stmt && stmt->getStmtClassName()) {
+        if(stmt and stmt->getStmtClassName()) {
             Dump(stmt);
 
             return stmt->getStmtClassName();
@@ -51,7 +51,7 @@ void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, std::string_
 void ToDo(const Decl* stmt, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
 {
     const char* name = [&]() {
-        if(stmt && stmt->getDeclKindName()) {
+        if(stmt and stmt->getDeclKindName()) {
             Dump(stmt);
             return stmt->getDeclKindName();
         }

@@ -34,11 +34,16 @@ public:
     {
     }
 
+    operator std::string_view() const& { return {mOutput}; }
+    operator StringRef() const& { return {mOutput}; }
+
+    auto size() const { return mOutput.size(); }
+
     /// \brief Returns the current position in the output buffer.
     size_t CurrentPos() const { return mOutput.length(); }
 
     /// \brief Insert a string before the position \c atPos
-    void InsertAt(const size_t atPos, const std::string& data) { mOutput.insert(atPos, data); }
+    void InsertAt(const size_t atPos, std::string_view data) { mOutput.insert(atPos, data); }
 
     STRONG_BOOL(SkipIndenting);
 
@@ -57,7 +62,7 @@ public:
     /// \brief Check whether the buffer is empty.
     ///
     /// This also treats a string of just whitespaces as empty.
-    bool empty() const { return mOutput.empty() || (std::string::npos == mOutput.find_first_not_of(' ', 0)); }
+    bool empty() const { return mOutput.empty() or (std::string::npos == mOutput.find_first_not_of(' ', 0)); }
 
     /// \brief Returns a reference to the underlying string buffer.
     std::string& GetString() { return mOutput; }
@@ -200,7 +205,7 @@ public:
         OnceFalse needsComma{};
         for(const auto& arg : arguments) {
             if constexpr(std::is_same_v<const TemplateArgument&, decltype(arg)>) {
-                if((TemplateArgument::Pack == arg.getKind()) && (0 == arg.pack_size())) {
+                if((TemplateArgument::Pack == arg.getKind()) and (0 == arg.pack_size())) {
                     break;
                 }
             }

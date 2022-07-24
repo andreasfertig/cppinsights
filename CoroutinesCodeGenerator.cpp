@@ -59,11 +59,7 @@ auto* mkIfStmt(Expr* condition, ArrayRef<Stmt*> bodyStmts)
 {
     return IfStmt::Create(GetGlobalAST(),
                           {},
-#if IS_CLANG_NEWER_THAN(13)
                           IfStatementKind::Ordinary,
-#else
-                          false,
-#endif
                           nullptr,
                           nullptr,
                           condition,
@@ -146,9 +142,7 @@ auto* mkFunctionDeclBase(std::string_view     name,
         ctx.getFunctionType(returnType, ArrayRef<QualType>{argTypes}, FunctionProtoType::ExtProtoInfo{}),
         nullptr,
         SC_None,  // SC_Static,
-#if IS_CLANG_NEWER_THAN(13)
         false,
-#endif
         false,
         false,
         ConstexprSpecKind::Unspecified,
@@ -300,9 +294,7 @@ struct DeclsHolder
     /// directly appearing in the body, \c CallExpr will be skipped.
     void FindAllVarDecls(const Stmt* stmt)
     {
-        if(nullptr == stmt) {
-            return;
-        }
+        RETURN_IF(nullptr == stmt);
 
         // Take this expressions to rewrite access when the coroutine is a class method.
         if(const auto* thisExpr = dyn_cast_or_null<CXXThisExpr>(stmt)) {
@@ -351,9 +343,7 @@ QualType CoroutinesCodeGenerator::GetFramePointerType() const
 
 CoroutinesCodeGenerator::~CoroutinesCodeGenerator()
 {
-    if(not(mASTData.mFrameType && mASTData.mDoInsertInDtor)) {
-        return;
-    }
+    RETURN_IF(not(mASTData.mFrameType and mASTData.mDoInsertInDtor));
 
     mASTData.mFrameType->completeDefinition();
 
@@ -366,7 +356,7 @@ CoroutinesCodeGenerator::~CoroutinesCodeGenerator()
     codeGenerator.InsertArg(mASTData.mFrameType);
 
     // Insert the made-up struct before the function declaration
-    mOutputFormatHelper.InsertAt(mPosBeforeFunc, ofm.GetString());
+    mOutputFormatHelper.InsertAt(mPosBeforeFunc, ofm);
 }
 //-----------------------------------------------------------------------------
 
@@ -994,7 +984,7 @@ void CoroutinesCodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 
         ofm.SetIndent(mOutputFormatHelper);
 
-        mOutputFormatHelper.InsertAt(mPosBeforeSuspendExpr, ofm.GetString());
+        mOutputFormatHelper.InsertAt(mPosBeforeSuspendExpr, ofm);
         mOutputFormatHelper.Append(accessName);
     }
 }
@@ -1114,9 +1104,7 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
         mOutputFormatHelper.AppendNewLine();
     }
 
-    if(eState::FinalSuspend == mState) {
-        return;
-    }
+    RETURN_IF(eState::FinalSuspend == mState);
 
     auto* suspendLabel = asthelpers::mkLabelStmt(BuildResumeLabelName(mSuspendsCount));
     InsertArg(suspendLabel);
@@ -1190,7 +1178,7 @@ void CoroutinesCodeGenerator::InsertArg(const CoreturnStmt* stmt)
 
     if(const auto fieldsAfter = std::distance(mASTData.mFrameType->field_begin(), mASTData.mFrameType->field_end());
        fieldsAfter != fieldsBefore) {
-        mOutputFormatHelper.AppendNewLine(outputFormatHelper.GetString());
+        mOutputFormatHelper.AppendNewLine(outputFormatHelper);
     }
 
     InsertInstantiationPoint(GetGlobalAST().getSourceManager(), stmt->getKeywordLoc(), kwCoReturnSpace);

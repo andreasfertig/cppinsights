@@ -88,8 +88,8 @@ protected:
 
         void finish()
         {
-            if(!mLambdaOutputFormatHelper.empty()) {
-                mOutputFormatHelper.InsertAt(mCurrentPos, mLambdaOutputFormatHelper.GetString());
+            if(not mLambdaOutputFormatHelper.empty()) {
+                mOutputFormatHelper.InsertAt(mCurrentPos, mLambdaOutputFormatHelper);
             }
         }
 
@@ -99,14 +99,14 @@ protected:
 
         void insertInits(OutputFormatHelper& outputFormatHelper)
         {
-            if(!mInits.empty()) {
+            if(not mInits.empty()) {
                 outputFormatHelper.Append(mInits);
                 mInits.clear();
             }
         }
 
         LambdaCallerType callerType() const { return mLambdaCallerType; }
-        bool             insertName() const { return (LambdaCallerType::Decltype != mLambdaCallerType) || mForceName; }
+        bool             insertName() const { return (LambdaCallerType::Decltype != mLambdaCallerType) or mForceName; }
 
         void setInsertName(bool b) { mForceName = b; }
 

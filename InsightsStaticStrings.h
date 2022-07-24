@@ -76,21 +76,21 @@ using namespace std::literals;
 
 inline constexpr std::string_view KW_OPERATOR_ALL{BUILD_KW(KW_OPERATOR)};
 
-constexpr std::string_view KwWithSpaceBefore(std::string_view kw)
+consteval std::string_view KwWithSpaceBefore(std::string_view kw)
 {
     kw.remove_suffix(1);
 
     return kw;
 }
 
-constexpr std::string_view KwWithSpaceAfter(std::string_view kw)
+consteval std::string_view KwWithSpaceAfter(std::string_view kw)
 {
     kw.remove_prefix(1);
 
     return kw;
 }
 
-constexpr std::string_view KwWithNoSpace(std::string_view kw)
+consteval std::string_view KwWithNoSpace(std::string_view kw)
 {
     kw.remove_suffix(1);
     kw.remove_prefix(1);
@@ -108,7 +108,6 @@ inline constexpr std::string_view kwStaticCast{KW_STATIC_CAST};
 inline constexpr std::string_view kwSizeof{KW_SIZEOF};
 inline constexpr std::string_view kwAlignof{KW_ALIGNOF};
 inline constexpr std::string_view kwUnkown{"unkown"sv};
-inline constexpr std::string_view emptySV{};
 inline constexpr std::string_view kwOperator{KwWithNoSpace(KW_OPERATOR_ALL)};
 // inline constexpr std::string_view kwOperator{KW_OPERATOR};
 inline constexpr std::string_view kwTemplate{KW_TEMPLATE};

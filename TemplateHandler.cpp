@@ -48,9 +48,7 @@ public:
                 Visit(child);
             }
 
-            if(mIsCoroutine) {
-                return;
-            }
+            RETURN_IF(mIsCoroutine);
         }
     }
 
@@ -79,6 +77,13 @@ static OutputFormatHelper InsertInstantiatedTemplate(const Decl* decl)
 }
 //-----------------------------------------------------------------------------
 
+constexpr auto idDecl{"decl"sv};
+constexpr auto idFunc{"func"sv};
+constexpr auto idFunc2{"func2"sv};
+constexpr auto idClass{"class"sv};
+constexpr auto idVar{"vd"sv};
+//-----------------------------------------------------------------------------
+
 TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
@@ -86,29 +91,29 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
                                           unless(isMacroOrInvalidLocation()),
                                           hasParent(functionTemplateDecl(hasParent(translationUnitDecl()))),
                                           isTemplateInstantiationPlain()))
-                           .bind("func"),
+                           .bind(idFunc),
                        this);
 
-    matcher.addMatcher(functionTemplateDecl(hasThisTUParent).bind("func2"), this);
+    matcher.addMatcher(functionTemplateDecl(hasThisTUParent).bind(idFunc2), this);
 
     // match typical use where a class template is defined and it is used later.
     matcher.addMatcher(classTemplateSpecializationDecl(
                            unless(isExpansionInSystemHeader()),
-                           allOf(hasParent(classTemplateDecl(hasParent(translationUnitDecl())).bind("decl")),
+                           allOf(hasParent(classTemplateDecl(hasParent(translationUnitDecl())).bind(idDecl)),
                                  isExplicitTemplateSpecialization()))
-                           .bind("class"),
+                           .bind(idClass),
                        this);
 
-    matcher.addMatcher(classTemplateDecl(hasThisTUParent).bind("decl"), this);
+    matcher.addMatcher(classTemplateDecl(hasThisTUParent).bind(idDecl), this);
 
-    matcher.addMatcher(conceptDecl(hasThisTUParent).bind("decl"), this);
+    matcher.addMatcher(conceptDecl(hasThisTUParent).bind(idDecl), this);
 
     // special case, where a class template is defined and somewhere else we request an explicit instantiation
     matcher.addMatcher(
-        classTemplateSpecializationDecl(hasThisTUParent, unless(isExplicitTemplateSpecialization())).bind("class"),
+        classTemplateSpecializationDecl(hasThisTUParent, unless(isExplicitTemplateSpecialization())).bind(idClass),
         this);
 
-    matcher.addMatcher(varTemplateDecl(hasThisTUParent).bind("vd"), this);
+    matcher.addMatcher(varTemplateDecl(hasThisTUParent).bind(idVar), this);
 }
 //-----------------------------------------------------------------------------
 
@@ -135,10 +140,8 @@ static SourceLocation FindLocationAfterRBrace(const SourceLocation              
 
 void TemplateHandler::run(const MatchFinder::MatchResult& result)
 {
-    if(const auto* functionDecl = result.Nodes.getNodeAs<FunctionDecl>("func")) {
-        if(not functionDecl->getBody() && not isa<CXXDeductionGuideDecl>(functionDecl)) {
-            return;
-        }
+    if(const auto* functionDecl = result.Nodes.getNodeAs<FunctionDecl>(idFunc)) {
+        RETURN_IF(not functionDecl->getBody() and not isa<CXXDeductionGuideDecl>(functionDecl));
 
         // Figure out whether we are looking at a CXXDeductionGuideDecl. If so, ensure that the deduction guide comes
         // after the primary template declaration.
@@ -162,40 +165,34 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         InsertIndentedText(endOfCond, outputFormatHelper);
 
-    } else if(const auto* functionTemplateDecl = result.Nodes.getNodeAs<FunctionTemplateDecl>("func2")) {
-        if(isa<CXXDeductionGuideDecl>(functionTemplateDecl->getTemplatedDecl())) {
-            return;
-        }
+    } else if(const auto* functionTemplateDecl = result.Nodes.getNodeAs<FunctionTemplateDecl>(idFunc2)) {
+        RETURN_IF(isa<CXXDeductionGuideDecl>(functionTemplateDecl->getTemplatedDecl()));
 
         // For now, don't transform the primary template of a coroutine
-        if(CoroutineBodyFinder{}.Find(functionTemplateDecl->getTemplatedDecl()->getBody())) {
-            return;
-        }
+        RETURN_IF(CoroutineBodyFinder{}.Find(functionTemplateDecl->getTemplatedDecl()->getBody()));
 
         OutputFormatHelper outputFormatHelper{};
 
         CodeGenerator codeGenerator{outputFormatHelper};
         codeGenerator.InsertPrimaryTemplate(functionTemplateDecl);
 
-        mRewrite.ReplaceText(functionTemplateDecl->getSourceRange(), outputFormatHelper.GetString());
+        mRewrite.ReplaceText(functionTemplateDecl->getSourceRange(), outputFormatHelper);
 
-    } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("class")) {
+    } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>(idClass)) {
         // skip classes/struct's without a definition
-        if(not clsTmplSpecDecl->hasDefinition()) {
-            return;
-        }
+        RETURN_IF(not clsTmplSpecDecl->hasDefinition());
 
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(clsTmplSpecDecl);
 
-        if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl")) {
+        if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>(idDecl)) {
             const auto endOfCond = FindLocationAfterSemi(clsTmplDecl->getEndLoc(), result);
             InsertIndentedText(endOfCond, outputFormatHelper);
 
         } else {  // explicit specialization, we have to remove the specialization
-            mRewrite.ReplaceText(clsTmplSpecDecl->getSourceRange(), outputFormatHelper.GetString());
+            mRewrite.ReplaceText(clsTmplSpecDecl->getSourceRange(), outputFormatHelper);
         }
 
-    } else if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>("decl")) {
+    } else if(const auto* clsTmplDecl = result.Nodes.getNodeAs<ClassTemplateDecl>(idDecl)) {
 
         OutputFormatHelper outputFormatHelper{};
 
@@ -204,9 +201,9 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         mRewrite.ReplaceText(
             {clsTmplDecl->getSourceRange().getBegin(), FindLocationAfterSemi(clsTmplDecl->getEndLoc(), result)},
-            outputFormatHelper.GetString());
+            outputFormatHelper);
 
-    } else if(const auto* conceptDecl = result.Nodes.getNodeAs<ConceptDecl>("decl")) {
+    } else if(const auto* conceptDecl = result.Nodes.getNodeAs<ConceptDecl>(idDecl)) {
 
         OutputFormatHelper outputFormatHelper{};
 
@@ -215,16 +212,15 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
         mRewrite.ReplaceText({conceptDecl->getSourceRange().getBegin(),
                               FindLocationAfterSemi(conceptDecl->getEndLoc(), result).getLocWithOffset(1)},
-                             outputFormatHelper.GetString());
+                             outputFormatHelper);
 
-    } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>("vd")) {
+    } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>(idVar)) {
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(vd);
 
         if(auto sourceRange = vd->getSourceRange(); not IsMacroLocation(sourceRange)) {
             const auto endOfCond = FindLocationAfterSemi(vd->getEndLoc(), result);
 
-            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond.getLocWithOffset(1)},
-                                 outputFormatHelper.GetString());
+            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond.getLocWithOffset(1)}, outputFormatHelper);
 
         } else {
             // We're just interested in the start location, -1 work(s|ed)
