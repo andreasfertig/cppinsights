@@ -18,8 +18,11 @@ struct identity
 };
 
 
-template <template <typename> class... Templates>
-template_tuple<Templates...> f7() {}
+template<template <typename> typename... Templates>
+template_tuple<Templates...> f7()
+{
+}
+
 
 /* First instantiated from: TemplateExpansionTest.cpp:9 */
 #ifdef INSIGHTS_USE_TEMPLATE

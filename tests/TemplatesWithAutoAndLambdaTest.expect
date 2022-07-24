@@ -3,18 +3,32 @@
 #include <iostream>
 
 // Example taken from Nicolai Josuttis slides
-template<auto sep = ' ',
-         typename T1, typename... Types>
-void print(const T1& arg1, const Types&... args)
+template<auto sep = static_cast<auto>(' '), typename T1, typename ... Types>
+void print(const T1 & arg1, const Types &... args)
 {
-    std::cout << arg1;
-    auto coutSpaceAndArg = [](const auto& arg) {
-      std::cout << sep << arg;
-      };
-
-   // we end up here with multiple parameters named 'args'. Other than that it would compile    
-   (..., coutSpaceAndArg(args));     
+  std::cout << arg1;
+    
+  class __lambda_11_28
+  {
+    public: 
+    template<class type_parameter_1_0>
+    inline auto operator()(const type_parameter_1_0 & arg) const
+    {
+      (std::cout << sep) << arg;
+    }
+    private: 
+    template<class type_parameter_1_0>
+    static inline auto __invoke(const type_parameter_1_0 & arg)
+    {
+      return __lambda_11_28{}.operator()<type_parameter_1_0>(arg);
+    }
+    
+  };
+  
+  auto coutSpaceAndArg = __lambda_11_28{};
+  (... , coutSpaceAndArg(args));
 }
+
 
 /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE

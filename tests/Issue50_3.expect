@@ -1,9 +1,10 @@
 #define INSIGHTS_USE_TEMPLATE
 
 template<class F>
-void foo(F&& f)
+void foo(F && f)
 {
 }
+
 
 /* First instantiated from: Issue50_3.cpp:18 */
 #ifdef INSIGHTS_USE_TEMPLATE

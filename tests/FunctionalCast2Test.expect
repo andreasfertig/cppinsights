@@ -28,10 +28,11 @@ namespace details
 } /* namespace details::array_single_compare */
 
 template<typename T, size_t N, typename TTo>
-constexpr bool Compare(const T (&ar)[N], const TTo& to)
+inline constexpr bool Compare(const T (&ar)[N], const TTo & to)
 {
   return details::array_single_compare::Compare(ar, to, std::make_index_sequence<N>{});
 }
+
 
 /* First instantiated from: FunctionalCast2Test.cpp:47 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -67,10 +68,11 @@ namespace details
 } /* namespace details::array_compare */
 
 template<typename T, size_t N>
-constexpr bool Compare(const T (&ar)[N], const T (&to)[N])
+inline constexpr bool Compare(const T (&ar)[N], const T (&to)[N])
 {
   return details::array_compare::Compare(ar, to, std::make_index_sequence<N>{});
 }
+
 
 /* First instantiated from: FunctionalCast2Test.cpp:51 */
 #ifdef INSIGHTS_USE_TEMPLATE

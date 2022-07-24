@@ -2,10 +2,11 @@
 
 
 template<typename T>
-constexpr T min(const T& a, const T& b)
+inline constexpr T min(const T & a, const T & b)
 {
-    return (a < b) ? a : b;
+  return (a < b) ? a : b;
 }
+
 
 /* First instantiated from: TemplateHandlerTest.cpp:55 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -28,10 +29,11 @@ inline constexpr double min<double>(const double & a, const double & b)
  
 
 template<typename T>
-static T max(const T& a, const T& b)
+static T max(const T & a, const T & b)
 {
-    return (a > b) ? a : b;
+  return (a > b) ? a : b;
 }
+
 
 /* First instantiated from: TemplateHandlerTest.cpp:67 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -126,18 +128,21 @@ void tprintf(const char * format)
 }
 
  
-template<typename T, typename... Targs>
-void tprintf(const char* format, T value, Targs... Fargs) // recursive variadic function
+template<typename T, typename ... Targs>
+void tprintf(const char * format, T value, Targs... Fargs)
 {
-    for ( ; *format != '\0'; format++ ) {
-        if ( *format == '%' ) {
-           std::cout << value;
-           tprintf(format+1, Fargs...); // recursive call
-           return;
-        }
-        std::cout << *format;
-    }
+  for(; static_cast<int>(*format) != static_cast<int>('\0'); format++) {
+    if(static_cast<int>(*format) == static_cast<int>('%')) {
+      std::cout << value;
+      tprintf(format + 1, Fargs... );
+      return;
+    } 
+    
+    std::operator<<(std::cout, *format);
+  }
+  
 }
+
 
 /* First instantiated from: TemplateHandlerTest.cpp:65 */
 #ifdef INSIGHTS_USE_TEMPLATE

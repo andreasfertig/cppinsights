@@ -9,6 +9,7 @@ int (&f(T i))[3]
   return arr[i];
 }
 
+
 /* First instantiated from: Issue74Tmpl.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

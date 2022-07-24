@@ -151,10 +151,12 @@ struct FunctionArgs<R (C::*)(Args...) const> : public FunctionArgsBase<R, Args..
 
 
 // forward declarations
-template<class T, class Case, class ...Cases>
-decltype(auto) match(T&& value, const Case& _case, const Cases&... cases);
+template<class T, class Case, class ... Cases>
+decltype(auto) match(T && value, const Case & _case, const Cases &... cases);
+;
 template<class T, class Case>
-decltype(auto) match(T&& value, const Case& _case);
+decltype(auto) match(T && value, const Case & _case);
+;
 
 namespace details
 {
@@ -216,14 +218,16 @@ namespace details
   
 }
 
-template<class T, class Case, class ...Cases>
-decltype(auto) match(T&& value, const Case& _case, const Cases&... cases) {
-    using namespace std;
-    using args = typename FunctionArgs<Case>::args;
-	using arg = tuple_element_t<0, args>;
-	using match = is_same<decay_t<arg>, decay_t<T>>;
-	return details::match_call(_case, std::forward<T>(value), match{}, cases...);
+template<class T, class Case, class ... Cases>
+decltype(auto) match(T && value, const Case & _case, const Cases &... cases)
+{
+  using namespace std;
+  using args = typename FunctionArgs<Case>::args;
+  using arg = tuple_element_t<0, args>;
+  using match = is_same<decay_t<arg>, decay_t<T> >;
+  return details::match_call(_case, std::forward<T>(value), match{}, cases... );
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -293,9 +297,11 @@ std::basic_string<char, std::char_traits<char>, std::allocator<char> > match<std
 
 // the last one is default
 template<class T, class Case>
-decltype(auto) match(T&& value, const Case& _case) {
-	return _case(std::forward<T>(value));
+decltype(auto) match(T && value, const Case & _case)
+{
+  return _case(std::forward<T>(value));
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -311,13 +317,80 @@ int match<const char (&)[3], __lambda_75_4>(const char (&value)[3], const __lamb
 
 
 template<class T>
-decltype(auto) test(T&& value) {
-    return match(value
-		,[](std::string value)	{ std::cout << "This is string "; return value + " Hi!"; }
-		,[](int i)				{ std::cout << "This is int ";	 return i * 100; }
-		,[](auto a)				{ std::cout << "This is default ";return 0; }
-	);
+decltype(auto) test(T && value)
+{
+      
+  class __lambda_73_4
+  {
+    public: 
+    inline auto operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
+    {
+      std::operator<<(std::cout, "This is string ");
+      return operator+(value, " Hi!");
+    }
+    
+    using retType_73_4 = auto (*)(std::string);
+    inline constexpr operator retType_73_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline auto __invoke(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value)
+    {
+      return __lambda_73_4{}.operator()(value);
+    }
+    
+    
+  };
+  
+  
+  class __lambda_74_4
+  {
+    public: 
+    inline auto operator()(int i) const
+    {
+      std::operator<<(std::cout, "This is int ");
+      return i * 100;
+    }
+    
+    using retType_74_4 = auto (*)(int);
+    inline constexpr operator retType_74_4 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline auto __invoke(int i)
+    {
+      return __lambda_74_4{}.operator()(i);
+    }
+    
+    
+  };
+  
+  
+  class __lambda_75_4
+  {
+    public: 
+    template<class type_parameter_1_0>
+    inline auto operator()(type_parameter_1_0 a) const
+    {
+      std::operator<<(std::cout, "This is default ");
+      return 0;
+    }
+    private: 
+    template<class type_parameter_1_0>
+    static inline auto __invoke(type_parameter_1_0 a)
+    {
+      return __lambda_75_4{}.operator()<type_parameter_1_0>(a);
+    }
+    
+  };
+  
+  return match(value, __lambda_73_4{}, __lambda_74_4{}, __lambda_75_4{});
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

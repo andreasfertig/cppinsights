@@ -2850,8 +2850,6 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
 
 void CodeGenerator::InsertArg(const UnresolvedUsingValueDecl* stmt)
 {
-    stmt->dump();
-
     mOutputFormatHelper.Append(kwUsingSpace);
 
     InsertQualifierAndName(stmt->getDeclName(), stmt->getQualifier(), false);
@@ -2941,18 +2939,34 @@ void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertArg(const FunctionTemplateDecl* stmt)
+void CodeGenerator::InsertPrimaryTemplate(const FunctionTemplateDecl* stmt)
+{
+    InsertTemplate(stmt, false);
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertTemplate(const FunctionTemplateDecl* stmt, bool withSpec)
 {
     LAMBDA_SCOPE_HELPER(TemplateHead);
 
     // InsertTemplateParameters(*stmt->getTemplateParameters());
     InsertArg(stmt->getTemplatedDecl());
 
+    if(not withSpec) {
+        return;
+    }
+
     for(const auto* spec : stmt->specializations()) {
         mOutputFormatHelper.AppendNewLine();
         InsertArg(spec);
         mOutputFormatHelper.AppendNewLine();
     }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const FunctionTemplateDecl* stmt)
+{
+    InsertTemplate(stmt, true);
 }
 //-----------------------------------------------------------------------------
 

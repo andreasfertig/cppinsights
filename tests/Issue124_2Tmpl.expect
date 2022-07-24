@@ -11,6 +11,7 @@ void (&&f(T))()
   return g;
 }
 
+
 /* First instantiated from: Issue124_2Tmpl.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

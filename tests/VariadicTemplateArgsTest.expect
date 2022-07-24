@@ -5,10 +5,12 @@ void f(int, int, int)
 }
 
 
-template<typename F, typename ...Types>
-void forward(F ff, Types &&...args) {
-  ff(args...);
+template<typename F, typename ... Types>
+void forward(F ff, Types &&... args)
+{
+  ff(args... );
 }
+
 
 /* First instantiated from: VariadicTemplateArgsTest.cpp:14 */
 #ifdef INSIGHTS_USE_TEMPLATE

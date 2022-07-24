@@ -3,10 +3,12 @@ void f(int, int, int)
 }
 
 
-template<typename F, typename ...Types>
-auto forward(F f, Types &&...args) {
+template<typename F, typename ... Types>
+auto forward(F f, Types &&... args)
+{
   return sizeof...(args);
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

@@ -24,43 +24,115 @@ using constant = typed_constant<std::remove_cv_t<decltype(V)>, V>;
 template<auto V>
 inline constexpr const auto constant_v = constant<V>{};
 
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1+v2)> operator+(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1-v2)> operator-(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1/v2)> operator/(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1*v2)> operator*(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1%v2)> operator%(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1==v2)> operator==(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1!=v2)> operator!=(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1<v2)> operator<(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1<=v2)> operator<=(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1>v2)> operator>(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1>=v2)> operator>=(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1|v2)> operator|(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1&v2)> operator&(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1^v2)> operator^(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1&&v2)> operator&&(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
-template <typename T1, T1 v1, typename T2, T2 v2>
-constexpr constant<(v1||v2)> operator||(typed_constant<T1,v1>,typed_constant<T2,v2>) { return {};}
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 + v2)> operator+(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
 
-template <typename T1, auto v1>
-constexpr constant<!v1> operator!(typed_constant<T1,v1>) { return {};}
-template <typename T1, T1 v1>
-constexpr constant<(~v1)> operator~(typed_constant<T1,v1>) { return {};}
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 - v2)> operator-(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 / v2)> operator/(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 * v2)> operator*(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 % v2)> operator%(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 == v2)> operator==(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 != v2)> operator!=(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 < v2)> operator<(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 <= v2)> operator<=(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 > v2)> operator>(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 >= v2)> operator>=(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 | v2)> operator|(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 & v2)> operator&(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 ^ v2)> operator^(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 && v2)> operator&&(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1, typename T2, T2 v2>
+inline constexpr constant<(v1 || v2)> operator||(typed_constant<T1, v1>, typed_constant<T2, v2>)
+{
+  return {};
+}
+
+
+template<typename T1, auto v1>
+inline constexpr constant<!v1> operator!(typed_constant<T1, v1>)
+{
+  return {};
+}
+
+template<typename T1, T1 v1>
+inline constexpr constant<(~v1)> operator~(typed_constant<T1, v1>)
+{
+  return {};
+}
+
 
 
 namespace detail

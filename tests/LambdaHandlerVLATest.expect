@@ -76,6 +76,7 @@ inline void test(TB aa)
 {
 }
 
+
 /* First instantiated from: LambdaHandlerVLATest.cpp:40 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>

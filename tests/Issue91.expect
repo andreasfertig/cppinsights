@@ -1,7 +1,9 @@
-template<int... Ints>
-constexpr int fold_minus_impl() {
-    return (Ints - ... - 5);
+template<int ...Ints>
+inline constexpr int fold_minus_impl()
+{
+  return (Ints - ... - 5);
 }
+
 
 /* First instantiated from: Issue91.cpp:8 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -23,10 +25,12 @@ inline constexpr int fold_minus_impl<0, 0>()
 #endif
 
 
-template<int... Ints>
-constexpr int fold_minus() {
-    return fold_minus_impl<0, Ints...>();
+template<int ...Ints>
+inline constexpr int fold_minus()
+{
+  return fold_minus_impl<0, Ints... >();
 }
+
 
 /* First instantiated from: Issue91.cpp:11 */
 #ifdef INSIGHTS_USE_TEMPLATE

@@ -1,9 +1,10 @@
 #include <cstdio>
 
 template<typename T>
-void Test(T&& t)
+void Test(T && t)
 {
 }
+
 
 /* First instantiated from: LambdaHandlerInFunctionTest.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE

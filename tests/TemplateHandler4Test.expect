@@ -1,12 +1,12 @@
 #define INSIGHTS_USE_TEMPLATE
     
 template<typename T>
-bool Is(const T& x)
+bool Is(const T & x)
 {
-    T b{x};
-
-    return b == x;
+  T b = {x};
+  return b == x;
 }
+
 
 /* First instantiated from: TemplateHandler4Test.cpp:13 */
 #ifdef INSIGHTS_USE_TEMPLATE

@@ -11,10 +11,11 @@ struct T
 
 
 
-template <typename T>
-auto f(T, int) -> decltype(T{}.f()) {
-    //printf( "Has member function named f().\n");
+template<typename T>
+decltype(T({}).f()) f(T, int)
+{
 }
+
 
 /* First instantiated from: AutoHandler3Test.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -25,10 +26,11 @@ void f<S>(S, int)
 #endif
 
 
-template <typename T>
-void f(T, ...) {
-    //printf( "No member function named f().\n");
+template<typename T>
+void f(T, ...)
+{
 }
+
 
 /* First instantiated from: AutoHandler3Test.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE

@@ -1,10 +1,7 @@
-.tmp.cpp:14:26: error: 'auto' not allowed in type alias
-    using retType_4_29 = auto (*)();
-                         ^~~~
-.tmp.cpp:15:31: error: unknown type name 'retType_4_29'
-    inline constexpr operator retType_4_29 () const noexcept
-                              ^
-.tmp.cpp:52:11: error: use of undeclared identifier '__lambda_4_29'
-  A::test(__lambda_4_29{});
-          ^
-3 errors generated.
+.tmp.cpp:12:24: error: 'auto' not allowed in type alias
+  using retType_3_29 = auto (*)();
+                       ^~~~
+.tmp.cpp:13:29: error: unknown type name 'retType_3_29'
+  inline constexpr operator retType_3_29 () const noexcept
+                            ^
+2 errors generated.

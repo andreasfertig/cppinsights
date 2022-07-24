@@ -1,14 +1,16 @@
 #include <cstdio>
 #include <string>
 template<typename T>
-static inline decltype(auto) Normalize(const T& arg)
+static inline decltype(auto) Normalize(const T & arg)
 {
-  if constexpr(std::is_same_v<T, std::string>) {
+  if constexpr(std::is_same_v<T, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >) {
     return arg.c_str();
-  } else {
+  } else /* constexpr */ {
     return arg;
-  }
+  } 
+  
 }
+
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -48,11 +50,12 @@ inline const std::basic_string<char>::value_type * Normalize<std::basic_string<c
 #endif
 
 
-template<typename... Ts>
-void Log(const char* fmt, const Ts&... ts)
+template<typename ... Ts>
+void Log(const char * fmt, const Ts &... ts)
 {
-  printf(fmt, Normalize(ts)...);
+  printf(fmt, Normalize(ts)... );
 }
+
 
 /* First instantiated from: TemplateArgumentsTest.cpp:23 */
 #ifdef INSIGHTS_USE_TEMPLATE

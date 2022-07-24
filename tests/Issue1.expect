@@ -1,6 +1,11 @@
 #define INSIGHTS_USE_TEMPLATE
 
-template<typename T> T foo() {return T(42); }
+template<typename T>
+T foo()
+{
+  return T(42);
+}
+
 
 /* First instantiated from: Issue1.cpp:6 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -11,7 +16,12 @@ int foo<int>()
 }
 #endif
  
-template<typename T> T fooGood() {return T{42}; }
+template<typename T>
+T fooGood()
+{
+  return T{{42}};
+}
+
 
 /* First instantiated from: Issue1.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE

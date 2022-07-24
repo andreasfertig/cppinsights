@@ -1,5 +1,8 @@
 template<typename T>
-void foo(T, ...) {}
+void foo(T, ...)
+{
+}
+
 
 /* First instantiated from: Issue128.cpp:5 */
 #ifdef INSIGHTS_USE_TEMPLATE

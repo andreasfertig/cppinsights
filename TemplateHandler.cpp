@@ -26,6 +26,45 @@ const internal::VariadicDynCastAllOfMatcher<Decl, ConceptDecl> conceptDecl;
 
 namespace clang::insights {
 
+/// \brief Find a \c DeclRefExpr belonging to a \c DecompisitionDecl
+class CoroutineBodyFinder : public ConstStmtVisitor<CoroutineBodyFinder>
+{
+    bool mIsCoroutine{};
+
+public:
+    CoroutineBodyFinder() = default;
+
+    void VisitCoroutineBodyStmt(const CoroutineBodyStmt*) { mIsCoroutine = true; }
+
+    void VisitStmt(const Stmt* stmt)
+    {
+        if(isa<CoroutineBodyStmt>(stmt)) {
+            mIsCoroutine = true;
+            return;
+        }
+
+        for(const auto* child : stmt->children()) {
+            if(child) {
+                Visit(child);
+            }
+
+            if(mIsCoroutine) {
+                return;
+            }
+        }
+    }
+
+    bool Find(const Stmt* stmt)
+    {
+        if(stmt) {
+            VisitStmt(stmt);
+        }
+
+        return mIsCoroutine;
+    }
+};
+//-----------------------------------------------------------------------------
+
 /// \brief Insert the instantiated template with the resulting code.
 static OutputFormatHelper InsertInstantiatedTemplate(const Decl* decl)
 {
@@ -49,6 +88,8 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
                                           isTemplateInstantiationPlain()))
                            .bind("func"),
                        this);
+
+    matcher.addMatcher(functionTemplateDecl(hasThisTUParent).bind("func2"), this);
 
     // match typical use where a class template is defined and it is used later.
     matcher.addMatcher(classTemplateSpecializationDecl(
@@ -120,6 +161,23 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
                                                   // here, as then we require a semi at the end.
 
         InsertIndentedText(endOfCond, outputFormatHelper);
+
+    } else if(const auto* functionTemplateDecl = result.Nodes.getNodeAs<FunctionTemplateDecl>("func2")) {
+        if(isa<CXXDeductionGuideDecl>(functionTemplateDecl->getTemplatedDecl())) {
+            return;
+        }
+
+        // For now, don't transform the primary template of a coroutine
+        if(CoroutineBodyFinder{}.Find(functionTemplateDecl->getTemplatedDecl()->getBody())) {
+            return;
+        }
+
+        OutputFormatHelper outputFormatHelper{};
+
+        CodeGenerator codeGenerator{outputFormatHelper};
+        codeGenerator.InsertPrimaryTemplate(functionTemplateDecl);
+
+        mRewrite.ReplaceText(functionTemplateDecl->getSourceRange(), outputFormatHelper.GetString());
 
     } else if(const auto* clsTmplSpecDecl = result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("class")) {
         // skip classes/struct's without a definition

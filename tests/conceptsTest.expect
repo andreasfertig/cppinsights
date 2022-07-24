@@ -6,12 +6,24 @@ concept C = requires(T t) {
 
 
 template<typename T>
-constexpr bool foo() { return false; }
+inline constexpr bool foo()
+{
+  return false;
+}
+
 
 
 template<typename T>
-requires requires(T t) { b(t); }
-constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires requires(T t) { f(t); } { return true; }
+requires requires(T t) {
+  b(t);
+}
+inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requires requires(T t) {
+  f(t);
+}
+{
+  return true;
+}
+
 
 /* First instantiated from: conceptsTest.cpp:84 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -27,8 +39,14 @@ inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn<a::A>()
 
 
 template<typename T>
-requires requires(T t) { f(t); }
-constexpr bool FunctionWithRequiresForTemplateParameters() { return true; }
+requires requires(T t) {
+  f(t);
+}
+inline constexpr bool FunctionWithRequiresForTemplateParameters()
+{
+  return true;
+}
+
 
 /* First instantiated from: conceptsTest.cpp:85 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -41,7 +59,13 @@ inline constexpr bool FunctionWithRequiresForTemplateParameters<a::A>()
 
 
 template<typename T>
-constexpr bool FunctionWithRequiresForReturn() requires requires(T t) { f(t); } { return true; }
+inline constexpr bool FunctionWithRequiresForReturn() requires requires(T t) {
+  f(t);
+}
+{
+  return true;
+}
+
 
 /* First instantiated from: conceptsTest.cpp:86 */
 #ifdef INSIGHTS_USE_TEMPLATE
