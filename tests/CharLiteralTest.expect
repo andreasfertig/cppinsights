@@ -80,8 +80,10 @@ struct Foo<int>
 #endif
 
 
-using Int  = Foo<int>;
+using Int = Foo<int>;
+
 using Char = Foo<char>;
+
 
 class Test
 {

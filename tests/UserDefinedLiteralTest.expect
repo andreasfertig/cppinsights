@@ -1,8 +1,11 @@
 #include <chrono>
 
-using nanoseconds_t  = std::chrono::nanoseconds;
-using milliseconds_t = std::chrono::milliseconds;
-using seconds_t      = std::chrono::seconds;
+using nanoseconds_t = std::chrono::duration<long long, std::ratio<1, 1000000000> >;
+
+using milliseconds_t = std::chrono::duration<long long, std::ratio<1, 1000> >;
+
+using seconds_t = std::chrono::duration<long long>;
+
 
 inline constexpr std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long long s)
 {

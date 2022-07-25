@@ -29,6 +29,8 @@ RecordDeclHandler::RecordDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
     matcher.addMatcher(namespaceDecl(hasThisTUParent).bind("namespaceDecl"), this);
 
     matcher.addMatcher(enumDecl(hasThisTUParent).bind("enumDecl"), this);
+
+    matcher.addMatcher(typeAliasDecl(hasThisTUParent).bind("typeAliasDecl"), this);
 }
 //-----------------------------------------------------------------------------
 
@@ -72,6 +74,15 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
         codeGenerator.InsertArg(enumDecl);
 
         mRewrite.ReplaceText(GetSourceRangeAfterSemi(enumDecl->getSourceRange(), result, RequireSemi::No),
+                             outputFormatHelper.GetString());
+
+    } else if(const auto* typeAliasDecl = result.Nodes.getNodeAs<TypeAliasDecl>("typeAliasDecl")) {
+        OutputFormatHelper outputFormatHelper{};
+
+        CodeGenerator codeGenerator{outputFormatHelper};
+        codeGenerator.InsertArg(typeAliasDecl);
+
+        mRewrite.ReplaceText(GetSourceRangeAfterSemi(typeAliasDecl->getSourceRange(), result, RequireSemi::No),
                              outputFormatHelper.GetString());
     }
 }

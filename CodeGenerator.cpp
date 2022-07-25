@@ -2415,8 +2415,13 @@ void CodeGenerator::InsertArg(const ConstantExpr* stmt)
 
 void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 {
-    mOutputFormatHelper.Append(kwUsingSpace, GetName(*stmt), hlpAssing);
     const auto& underlyingType = stmt->getUnderlyingType();
+
+    LAMBDA_SCOPE_HELPER(Decltype);
+    P0315Visitor dt{*this};
+    dt.TraverseType(underlyingType);
+
+    mOutputFormatHelper.Append(kwUsingSpace, GetName(*stmt), hlpAssing);
 
     if(auto* templateSpecializationType = underlyingType->getAs<TemplateSpecializationType>()) {
         if(const auto* elaboratedType = underlyingType->getAs<ElaboratedType>()) {

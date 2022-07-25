@@ -1,5 +1,6 @@
 //#include <tuple>
-using size_t = decltype(sizeof(0));
+using size_t = unsigned long;
+
 // Without this the compiler does not know a symbol tuple_size and hence can/will not decompose
 namespace std
 {

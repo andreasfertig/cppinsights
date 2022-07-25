@@ -77,6 +77,7 @@ class MyVector<int>
 
 using vec_t = MyVector<int>;
 
+
 MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
 {
   MyVector<int> result = MyVector<int>(a.size()) /* NRVO variable */;
