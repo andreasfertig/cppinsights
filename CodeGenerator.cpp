@@ -391,9 +391,15 @@ void CodeGenerator::InsertArg(const VarTemplateDecl* stmt)
 
     // VarTemplatedDecl's can have lambdas as initializers. Push a VarDecl on the stack, otherwise the lambda would
     // appear in the middle of template<....> and the variable itself.
+    {
+        LAMBDA_SCOPE_HELPER(Decltype);  // Needed for P0315Checker
+        mLambdaStack.back().setInsertName(true);
+
+        InsertTemplateParameters(*stmt->getTemplateParameters());
+    }
+
     LAMBDA_SCOPE_HELPER(VarDecl);
 
-    InsertTemplateParameters(*stmt->getTemplateParameters());
     InsertArg(templatedDecl);
 
     OnceTrue first{};
@@ -1316,7 +1322,13 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
 
 void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
 {
-    InsertTemplateParameters(*stmt->getTemplateParameters());
+    {
+        LAMBDA_SCOPE_HELPER(Decltype);  // Needed for P0315Checker
+        mLambdaStack.back().setInsertName(true);
+
+        InsertTemplateParameters(*stmt->getTemplateParameters());
+    }
+
     InsertArg(stmt->getTemplatedDecl());
 
     SmallVector<const ClassTemplateSpecializationDecl*, 10> specializations{};
@@ -1763,7 +1775,11 @@ void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
         mOutputFormatHelper.Append(GetName(*stmt));
     }
 
-    InsertTemplateArgs(*stmt);
+    if(const auto* varTmplSpecDecl = dyn_cast_or_null<VarTemplateSpecializationDecl>(stmt->getDecl())) {
+        InsertTemplateArgs(*varTmplSpecDecl);
+    } else {
+        InsertTemplateArgs(*stmt);
+    }
 }
 //-----------------------------------------------------------------------------
 

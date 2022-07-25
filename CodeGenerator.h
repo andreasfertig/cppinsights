@@ -171,6 +171,9 @@ public:
             if(const auto* tmplArgs = t.getTemplateSpecializationArgs()) {
                 InsertTemplateArgs(*tmplArgs);
             }
+        } else if constexpr(std::is_same_v<T, VarTemplateSpecializationDecl>) {
+            InsertTemplateArgs(t.getTemplateArgs());
+
         } else if constexpr(requires { t.template_arguments(); }) {
             if constexpr(std::is_same_v<DeclRefExpr, T>) {
                 if(0 == t.getNumTemplateArgs()) {
