@@ -1,6 +1,7 @@
 #include <chrono>
 
-using seconds_t      = std::chrono::seconds;
+using seconds_t = std::chrono::duration<long long>;
+
 
 inline constexpr std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long long s)
 {

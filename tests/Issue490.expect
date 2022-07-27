@@ -1,0 +1,31 @@
+// cmdline:-std=c++20
+
+
+class __lambda_3_24
+{
+  public: 
+  inline /*constexpr */ int operator()() const
+  {
+    return 4;
+  }
+  
+  using retType_3_24 = int (*)();
+  inline constexpr operator retType_3_24 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ int __invoke()
+  {
+    return __lambda_3_24{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_3_24() = default;
+  
+};
+
+__lambda_3_24 foo();
+
