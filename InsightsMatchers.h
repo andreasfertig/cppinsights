@@ -45,7 +45,7 @@ AST_POLYMORPHIC_MATCHER(isMacroOrInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPE
 {
     SILENCE;
 
-    return (insights::IsMacroLocation(Node.getBeginLoc()) || insights::IsInvalidLocation(Node.getBeginLoc()));
+    return (insights::IsMacroLocation(Node.getBeginLoc()) or insights::IsInvalidLocation(Node.getBeginLoc()));
 }
 //-----------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ AST_POLYMORPHIC_MATCHER(isInvalidLocation, AST_POLYMORPHIC_SUPPORTED_TYPES(Decl,
 }
 //-----------------------------------------------------------------------------
 
-inline static const auto hasThisTUParent =
+inline const auto hasThisTUParent =
     allOf(unless(isExpansionInSystemHeader()), unless(isInvalidLocation()), hasParent(translationUnitDecl()));
 //-----------------------------------------------------------------------------
 

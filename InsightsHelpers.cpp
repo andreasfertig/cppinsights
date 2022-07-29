@@ -34,7 +34,7 @@ ScopeHandler::ScopeHandler(const Decl* d)
             CodeGenerator      codeGenerator{ofm};
             codeGenerator.InsertTemplateArgs(*classTmplSpec);
 
-            mScope.append(ofm.GetString());
+            mScope.append(ofm);
         }
 
     } else if(const auto* namespaceDecl = dyn_cast_or_null<NamespaceDecl>(d)) {
@@ -60,7 +60,7 @@ std::string ScopeHandler::RemoveCurrentScope(std::string name)
         auto findAndReplace = [&name](const std::string& scope) {
             if(const auto startPos = name.find(scope, 0); std::string::npos != startPos) {
                 if(const auto pos = startPos + scope.length();
-                   (pos > name.length()) || (name[pos] != '*')) {  // keep member points (See #374)
+                   (pos > name.length()) or (name[pos] != '*')) {  // keep member points (See #374)
                     name.replace(startPos, scope.length(), ""sv);
                     return true;
                 }
@@ -132,9 +132,7 @@ namespace details {
 static void
 BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, const IgnoreNamespace ignoreNamespace)
 {
-    if(!stmt) {
-        return;
-    }
+    RETURN_IF(not stmt);
 
     if(const auto* prefix = stmt->getPrefix()) {
         BuildNamespace(fullNamespace, prefix, ignoreNamespace);
@@ -144,9 +142,7 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
         case NestedNameSpecifier::Identifier: fullNamespace.append(stmt->getAsIdentifier()->getName()); break;
 
         case NestedNameSpecifier::Namespace:
-            if((IgnoreNamespace::Yes == ignoreNamespace) or (stmt->getAsNamespace()->isAnonymousNamespace())) {
-                return;
-            }
+            RETURN_IF((IgnoreNamespace::Yes == ignoreNamespace) or (stmt->getAsNamespace()->isAnonymousNamespace()));
 
             fullNamespace.append(stmt->getAsNamespace()->getName());
             break;
@@ -348,11 +344,7 @@ const std::string EvaluateAsFloat(const FloatingLiteral& expr)
         str.append(".0"sv);
     }
 
-#if IS_CLANG_NEWER_THAN(10)
     return std::string{str.str()};
-#else
-    return str.str();
-#endif
 }
 //-----------------------------------------------------------------------------
 
@@ -393,14 +385,14 @@ std::string GetDeclContext(const DeclContext* ctx, WithTemplateParameters withTe
             codeGenerator.InsertTemplateArgs(*classTmplSpec);
 
         } else if(const auto* nd = dyn_cast<NamespaceDecl>(declContext)) {
-            if(nd->isAnonymousNamespace() || nd->isInline()) {
+            if(nd->isAnonymousNamespace() or nd->isInline()) {
                 continue;
             }
 
             mOutputFormatHelper.Append(nd->getName());
 
         } else if(const auto* rd = dyn_cast<RecordDecl>(declContext)) {
-            if(!rd->getIdentifier()) {
+            if(not rd->getIdentifier()) {
                 continue;
             }
 
@@ -408,7 +400,7 @@ std::string GetDeclContext(const DeclContext* ctx, WithTemplateParameters withTe
 
             // A special case at least for out-of-line static member variables of a class template. They need to carry
             // the template parameters of the class template.
-            if(WithTemplateParameters::Yes == withTemplateParameters /*declContext->isNamespace() || declContext->getLexicalParent()->isNamespace() || declContext->getLexicalParent()->isTranslationUnit()*/) {
+            if(WithTemplateParameters::Yes == withTemplateParameters /*declContext->isNamespace() or declContext->getLexicalParent()->isNamespace() or declContext->getLexicalParent()->isTranslationUnit()*/) {
                 if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(rd)) {
                     if(const auto* classTmpl = cxxRecordDecl->getDescribedClassTemplate()) {
                         CodeGenerator codeGenerator{mOutputFormatHelper};
@@ -422,7 +414,7 @@ std::string GetDeclContext(const DeclContext* ctx, WithTemplateParameters withTe
             continue;
 
         } else if(const auto* ed = dyn_cast<EnumDecl>(declContext)) {
-            if(!ed->isScoped()) {
+            if(not ed->isScoped()) {
                 continue;
             }
 
@@ -465,7 +457,7 @@ static std::string GetScope(const DeclContext*       declCtx,
 {
     std::string name{};
 
-    if(not declCtx->isTranslationUnit() && not declCtx->isFunctionOrMethod()) {
+    if(not declCtx->isTranslationUnit() and not declCtx->isFunctionOrMethod()) {
         while(declCtx->isInlineNamespace()) {
             declCtx = declCtx->getParent();
         }
@@ -508,8 +500,8 @@ private:
     {
         const TemplateTypeParmDecl* decl = type->getDecl();
 
-        if((nullptr == type->getIdentifier()) ||
-           (decl && decl->isImplicit()) /* this fixes auto operator()(type_parameter_0_0 container) const */) {
+        if((nullptr == type->getIdentifier()) or
+           (decl and decl->isImplicit()) /* this fixes auto operator()(type_parameter_0_0 container) const */) {
 
             AppendTemplateTypeParamName(mData, decl, true, type);
 
@@ -550,7 +542,7 @@ private:
                 const auto& scope = GetScope(type->getDecl()->getDeclContext());
 
                 // If we don't have a scope with GetScope use a possible one from ElaboratedType
-                if((InsightsSuppressScope::Yes == mPrintingPolicy.CppInsightsSuppressScope) || scope.empty()) {
+                if((InsightsSuppressScope::Yes == mPrintingPolicy.CppInsightsSuppressScope) or scope.empty()) {
                     mData.Append(mScope);
                 } else {
                     mData.Append(scope);
@@ -855,10 +847,10 @@ private:
 
     void AddCVQualifiers(const Qualifiers& quals)
     {
-        if((false == mPrintingPolicy.CppInsightsUnqualified) && not quals.empty()) {
+        if((false == mPrintingPolicy.CppInsightsUnqualified) and not quals.empty()) {
             mData.Append(quals.getAsString());
 
-            if(not mData.empty() && not mSkipSpace) {
+            if(not mData.empty() and not mSkipSpace) {
                 mData.Append(' ');
             }
         }
@@ -943,13 +935,13 @@ static bool NeedsNamespace(const Decl& decl, UseLexicalParent useLexicalParent)
     }
 
     const bool isFriend{(decl.getFriendObjectKind() != Decl::FOK_None)};
-    const bool neitherTransparentNorFriend{not declCtx->isTransparentContext() && not isFriend};
+    const bool neitherTransparentNorFriend{not declCtx->isTransparentContext() and not isFriend};
 
     if(UseLexicalParent::Yes == useLexicalParent) {
-        return (declCtx->isNamespace() && not declCtx->isInlineNamespace()) && neitherTransparentNorFriend;
+        return (declCtx->isNamespace() and not declCtx->isInlineNamespace()) and neitherTransparentNorFriend;
     }
 
-    return (declCtx->isNamespace() || declCtx->isInlineNamespace()) && neitherTransparentNorFriend;
+    return (declCtx->isNamespace() or declCtx->isInlineNamespace()) and neitherTransparentNorFriend;
 }
 //-----------------------------------------------------------------------------
 
@@ -957,7 +949,7 @@ std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName)
 {
     std::string name{};
 
-    if(NeedsNamespace(nd, UseLexicalParent::No) || (QualifiedName::Yes == qualifiedName)) {
+    if(NeedsNamespace(nd, UseLexicalParent::No) or (QualifiedName::Yes == qualifiedName)) {
         if(const auto* cxxMedthodDecl = dyn_cast_or_null<CXXMethodDecl>(&nd)) {
             if(cxxMedthodDecl->isLambdaStaticInvoker()) {
                 name = GetName(*cxxMedthodDecl->getParent());
@@ -1044,7 +1036,7 @@ static bool HasTypeWithSubType(const QualType& t)
 std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqualified unqualified)
 {
     const bool isFunctionPointer =
-        HasTypeWithSubType<ReferenceType, FunctionProtoType>(t.getCanonicalType()) ||
+        HasTypeWithSubType<ReferenceType, FunctionProtoType>(t.getCanonicalType()) or
         HasTypeWithSubType<ReferenceType, PointerType, FunctionProtoType>(t.getCanonicalType());
     const bool isArrayRef = HasTypeWithSubType<ReferenceType, ArrayType>(t);
     // Special case for Issue81, auto returns an array-ref and to catch auto deducing an array (Issue106)
@@ -1064,7 +1056,7 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
         return {};
     };
 
-    if(t->isArrayType() && !t->isLValueReferenceType()) {
+    if(t->isArrayType() and not t->isLValueReferenceType()) {
         const auto space = getSpaceOrEmpty(" ["sv);
         InsertBefore(typeName, "["sv, StrCat(space, varName));
 
@@ -1124,7 +1116,7 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
             typeName += StrCat(" "sv, varName);
         }
 
-    } else if(!t->isArrayType() && !varName.empty()) {
+    } else if(not t->isArrayType() and not varName.empty()) {
         typeName += StrCat(" "sv, varName);
     }
 
@@ -1138,7 +1130,7 @@ void AppendTemplateTypeParamName(OutputFormatHelper&         ofm,
                                  const TemplateTypeParmType* type)
 {
     if(decl) {
-        if(const auto* typeConstraint = decl->getTypeConstraint(); typeConstraint && not isParameter) {
+        if(const auto* typeConstraint = decl->getTypeConstraint(); typeConstraint and not isParameter) {
             StringStream sstream{};
             sstream.Print(*typeConstraint);
 
@@ -1165,10 +1157,10 @@ static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 
 APValue* GetEvaluatedValue(const VarDecl& varDecl)
 {
-    if((nullptr != varDecl.ensureEvaluatedStmt()) && (nullptr != varDecl.ensureEvaluatedStmt()->Value)) {
+    if((nullptr != varDecl.ensureEvaluatedStmt()) and (nullptr != varDecl.ensureEvaluatedStmt()->Value)) {
 
         const auto* init = cast<Expr>(varDecl.ensureEvaluatedStmt()->Value);
-        if(!init->isValueDependent()) {
+        if(not init->isValueDependent()) {
 
             return varDecl.evaluateValue();
         }
@@ -1187,9 +1179,9 @@ bool IsEvaluatable(const VarDecl& varDecl)
 bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl)
 {
     // Should the VarDecl be evaluatable at compile-time, there is no additional guard added by the compiler.
-    if(varDecl.isStaticLocal() && not IsEvaluatable(varDecl)) {
+    if(varDecl.isStaticLocal() and not IsEvaluatable(varDecl)) {
         if(const auto* cxxRecordDecl = varDecl.getType()->getAsCXXRecordDecl()) {
-            if(cxxRecordDecl->hasNonTrivialDestructor() || cxxRecordDecl->hasNonTrivialDefaultConstructor()) {
+            if(cxxRecordDecl->hasNonTrivialDestructor() or cxxRecordDecl->hasNonTrivialDefaultConstructor()) {
                 return true;
             }
         }
@@ -1272,7 +1264,7 @@ void SkipNamePrefix(bool b)
 
 static std::string_view GetPrefixIfAvailable(const ValueDecl* decl)
 {
-    if(Contains(varNamePrefix, decl) && not skipNamePrefix) {
+    if(Contains(varNamePrefix, decl) and not skipNamePrefix) {
         return varNamePrefix[decl];
     }
 
@@ -1293,7 +1285,7 @@ std::string GetName(const DeclRefExpr& declRefExpr)
         name = details::GetQualifiedName(*declRefDecl);
     }
 
-    if(needsNamespace || not declRefExpr.hasQualifier()) {
+    if(needsNamespace or not declRefExpr.hasQualifier()) {
         std::string plainName{GetPlainName(declRefExpr)};
 
         // try to handle the special case of a function local static with class type and non trivial destructor. In
@@ -1393,7 +1385,7 @@ const std::string GetNoExcept(const FunctionDecl& decl)
 {
     const auto* func = decl.getType()->castAs<FunctionProtoType>();
 
-    if(func && func->hasNoexceptExceptionSpec()) {
+    if(func and func->hasNoexceptExceptionSpec()) {
         std::string ret{kwSpaceNoexcept};
 
         if(const auto* expr = func->getNoexceptExpr()) {
@@ -1452,26 +1444,13 @@ std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword)
 
 void StringStream::Print(const TemplateArgument& arg)
 {
-    arg.print(CppInsightsPrintingPolicy{},
-              *this
-#if IS_CLANG_NEWER_THAN(12)
-              ,
-              false
-#endif
-    );
+    arg.print(CppInsightsPrintingPolicy{}, *this, false);
 }
 //-----------------------------------------------------------------------------
 
 void StringStream::Print(const TemplateSpecializationType& arg)
 {
-    arg.getTemplateName().print(*this,
-                                CppInsightsPrintingPolicy{},
-#if IS_CLANG_NEWER_THAN(13)
-                                TemplateName::Qualified::AsWritten
-#else
-                                true
-#endif
-    );
+    arg.getTemplateName().print(*this, CppInsightsPrintingPolicy{}, TemplateName::Qualified::AsWritten);
 }
 //-----------------------------------------------------------------------------
 

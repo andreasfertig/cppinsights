@@ -19,24 +19,30 @@ using namespace clang::ast_matchers;
 
 namespace clang::insights {
 
+constexpr auto idRecordDecl{"rd"sv};
+constexpr auto idDecl{"decl"sv};
+//-----------------------------------------------------------------------------
+
 RecordDeclHandler::RecordDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
     matcher.addMatcher(
-        cxxRecordDecl(hasDefinition(), hasThisTUParent, unless(anyOf(isLambda(), isTemplate))).bind("cxxRecordDecl"),
+        cxxRecordDecl(hasDefinition(), hasThisTUParent, unless(anyOf(isLambda(), isTemplate))).bind(idRecordDecl),
         this);
 
-    matcher.addMatcher(namespaceDecl(hasThisTUParent).bind("namespaceDecl"), this);
+    matcher.addMatcher(namespaceDecl(hasThisTUParent).bind(idDecl), this);
 
-    matcher.addMatcher(enumDecl(hasThisTUParent).bind("enumDecl"), this);
+    matcher.addMatcher(enumDecl(hasThisTUParent).bind(idDecl), this);
 
-    matcher.addMatcher(typeAliasDecl(hasThisTUParent).bind("typeAliasDecl"), this);
+    matcher.addMatcher(typeAliasDecl(hasThisTUParent).bind(idDecl), this);
+
+    matcher.addMatcher(staticAssertDecl(hasThisTUParent).bind(idDecl), this);
 }
 //-----------------------------------------------------------------------------
 
 void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
 {
-    if(const auto* cxxRecordDecl = result.Nodes.getNodeAs<CXXRecordDecl>("cxxRecordDecl")) {
+    if(const auto* cxxRecordDecl = result.Nodes.getNodeAs<CXXRecordDecl>(idRecordDecl)) {
         OutputFormatHelper outputFormatHelper{};
 
         CodeGenerator codeGenerator{outputFormatHelper};
@@ -47,8 +53,7 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
                 sourceRange.setEnd(sourceRange.getEnd().getLocWithOffset(2));  // 2 is just what worked
             }
 
-            mRewrite.ReplaceText(GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::Yes),
-                                 outputFormatHelper.GetString());
+            mRewrite.ReplaceText(GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::Yes), outputFormatHelper);
 
         } else {
             // We're just interested in the start location, -1 work(s|ed)
@@ -58,32 +63,17 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
             InsertIndentedText(startLoc, outputFormatHelper);
         }
 
-    } else if(const auto* namespaceDecl = result.Nodes.getNodeAs<NamespaceDecl>("namespaceDecl")) {
+        // Catch all for:
+        // - NamespaceDecl
+        // - EnumDecl
+        // - TypeAliasDecl
+    } else if(const auto* decl = result.Nodes.getNodeAs<Decl>(idDecl)) {
         OutputFormatHelper outputFormatHelper{};
 
         CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(namespaceDecl);
+        codeGenerator.InsertArg(decl);
 
-        mRewrite.ReplaceText(GetSourceRangeAfterSemi(namespaceDecl->getSourceRange(), result, RequireSemi::No),
-                             outputFormatHelper.GetString());
-
-    } else if(const auto* enumDecl = result.Nodes.getNodeAs<EnumDecl>("enumDecl")) {
-        OutputFormatHelper outputFormatHelper{};
-
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(enumDecl);
-
-        mRewrite.ReplaceText(GetSourceRangeAfterSemi(enumDecl->getSourceRange(), result, RequireSemi::No),
-                             outputFormatHelper.GetString());
-
-    } else if(const auto* typeAliasDecl = result.Nodes.getNodeAs<TypeAliasDecl>("typeAliasDecl")) {
-        OutputFormatHelper outputFormatHelper{};
-
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(typeAliasDecl);
-
-        mRewrite.ReplaceText(GetSourceRangeAfterSemi(typeAliasDecl->getSourceRange(), result, RequireSemi::No),
-                             outputFormatHelper.GetString());
+        mRewrite.ReplaceText(GetSourceRangeAfterSemi(decl->getSourceRange(), result), outputFormatHelper);
     }
 }
 //-----------------------------------------------------------------------------

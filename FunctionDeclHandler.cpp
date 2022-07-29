@@ -6,7 +6,6 @@
  ****************************************************************************/
 
 #include "FunctionDeclHandler.h"
-#include "ClangCompat.h"
 #include "CodeGenerator.h"
 #include "InsightsHelpers.h"
 #include "InsightsMatchers.h"
@@ -72,20 +71,21 @@ static SourceLocation findTrailingReturnTypeSourceLocation(const FunctionDecl&  
 }
 //-----------------------------------------------------------------------------
 
+constexpr auto idFunc{"func"sv};
+//-----------------------------------------------------------------------------
+
 FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
     const auto hasThisTUParentNonTemplate = allOf(hasThisTUParent, unless(anyOf(cxxMethodDecl(), isTemplate)));
 
-    matcher.addMatcher(functionDecl(hasThisTUParentNonTemplate).bind("funcDecl"), this);
-
-    matcher.addMatcher(friendDecl(hasThisTUParentNonTemplate).bind("friendDecl"), this);
+    matcher.addMatcher(functionDecl(hasThisTUParentNonTemplate).bind(idFunc), this);
 }
 //-----------------------------------------------------------------------------
 
 void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 {
-    if(const auto* funcDecl = result.Nodes.getNodeAs<FunctionDecl>("funcDecl")) {
+    if(const auto* funcDecl = result.Nodes.getNodeAs<FunctionDecl>(idFunc)) {
         const auto         columnNr = GetSM(result).getSpellingColumnNumber(funcDecl->getBeginLoc()) - 1;
         OutputFormatHelper outputFormatHelper{columnNr};
         CodeGenerator      codeGenerator{outputFormatHelper};
@@ -134,9 +134,7 @@ void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
             return funcRange;
         }();
 
-        // DPrint("fd rw:  %d %s\n", (sr.getBegin() == sr.getEnd()), outputFormatHelper.GetString());
-
-        mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
+        mRewrite.ReplaceText(sr, outputFormatHelper);
     }
 }
 //-----------------------------------------------------------------------------

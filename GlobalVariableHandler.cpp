@@ -24,6 +24,9 @@ const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl>
 
 namespace clang::insights {
 
+constexpr auto idVar{"varDevl"sv};
+//-----------------------------------------------------------------------------
+
 GlobalVariableHandler::GlobalVariableHandler(Rewriter& rewrite, MatchFinder& matcher)
 : InsightsBase(rewrite)
 {
@@ -35,14 +38,14 @@ GlobalVariableHandler::GlobalVariableHandler(Rewriter& rewrite, MatchFinder& mat
                     // Try to find out whether this VarDecl is the result of a DecompositionDecl, if so bail out.
                     hasInitializer(ignoringImpCasts(
                         callExpr(hasAnyArgument(ignoringParenImpCasts(declRefExpr(to(decompositionDecl()))))))))))
-            .bind("varDecl"),
+            .bind(idVar),
         this);
 }
 //-----------------------------------------------------------------------------
 
 void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
 {
-    if(const auto* matchedDecl = result.Nodes.getNodeAs<VarDecl>("varDecl")) {
+    if(const auto* matchedDecl = result.Nodes.getNodeAs<VarDecl>(idVar)) {
         OutputFormatHelper outputFormatHelper{};
 
         // Take a preceding attribute into account
@@ -62,8 +65,8 @@ void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
         // case for:
         // - an anonymous struct declared with TU as root
         // - a out-of-line static member variable of a class template
-        if(not IsMacroLocation(matchedDecl->getSourceRange()) && (mRewrite.buffer_begin() != mRewrite.buffer_end()) &&
-           (isTemplateInstantiation(matchedDecl->getTemplateSpecializationKind()) ||
+        if(not IsMacroLocation(matchedDecl->getSourceRange()) and (mRewrite.buffer_begin() != mRewrite.buffer_end()) &&
+           (isTemplateInstantiation(matchedDecl->getTemplateSpecializationKind()) or
             IsAnonymousStructOrUnion(matchedDecl->getType()->getAsCXXRecordDecl()))) {
             if(auto&& text = mRewrite.getRewrittenText(sr); not text.empty()) {
                 const char* data = result.SourceManager->getCharacterData(matchedDecl->getSourceRange().getBegin());
@@ -82,10 +85,10 @@ void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
         if(IsMacroLocation(sr)) {
             // Special case for AnonymousStructInMacroTest.cpp (#290) where a macro gets expanded
             mRewrite.ReplaceText(GetSM(result).getImmediateExpansionRange(matchedDecl->getSourceRange().getBegin()),
-                                 outputFormatHelper.GetString());
+                                 outputFormatHelper);
 
         } else {
-            mRewrite.ReplaceText(sr, outputFormatHelper.GetString());
+            mRewrite.ReplaceText(sr, outputFormatHelper);
         }
     }
 }

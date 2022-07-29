@@ -494,7 +494,6 @@ add_clang_tool(insights
     InsightsHelpers.cpp
     OutputFormatHelper.cpp
     RecordDeclHandler.cpp
-    StaticAssertHandler.cpp
     TemplateHandler.cpp
 )
 

@@ -51,13 +51,13 @@ inline bool IsMacroLocation(const SourceLocation& loc)
 
 inline bool IsMacroLocation(const SourceRange& range)
 {
-    return IsMacroLocation(range.getBegin()) || IsMacroLocation(range.getEnd());
+    return IsMacroLocation(range.getBegin()) or IsMacroLocation(range.getEnd());
 }
 //-----------------------------------------------------------------------------
 
 inline bool IsMacroLocation(const auto& t, auto... args)
 {
-    return (IsMacroLocation(t) || IsMacroLocation(args...));
+    return (IsMacroLocation(t) or IsMacroLocation(args...));
 }
 //-----------------------------------------------------------------------------
 
@@ -69,13 +69,13 @@ inline bool IsInvalidLocation(const SourceLocation& loc)
 
 inline bool IsInvalidLocation(const SourceRange& range)
 {
-    return IsInvalidLocation(range.getBegin()) || IsInvalidLocation(range.getEnd());
+    return IsInvalidLocation(range.getBegin()) or IsInvalidLocation(range.getEnd());
 }
 //-----------------------------------------------------------------------------
 
 inline bool IsInvalidLocation(const auto& t, auto... args)
 {
-    return (IsInvalidLocation(t) || IsInvalidLocation(args...));
+    return (IsInvalidLocation(t) or IsInvalidLocation(args...));
 }
 //-----------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ std::string BuildRetTypeName(const Decl& decl);
 
 #define SKIP_MACRO_LOCATION(...)                                                                                       \
     {                                                                                                                  \
-        const bool isMacro{IsMacroLocation(__VA_ARGS__) || IsInvalidLocation(__VA_ARGS__)};                            \
+        const bool isMacro{IsMacroLocation(__VA_ARGS__) or IsInvalidLocation(__VA_ARGS__)};                            \
         if(isMacro) {                                                                                                  \
             return;                                                                                                    \
         } else {                                                                                                       \
@@ -362,7 +362,7 @@ struct is
 {
     T t;
 
-    constexpr bool any_of(const auto&... ts) const { return ((t == ts) || ...); }
+    constexpr bool any_of(const auto&... ts) const { return ((t == ts) or ...); }
 };
 //-----------------------------------------------------------------------------
 

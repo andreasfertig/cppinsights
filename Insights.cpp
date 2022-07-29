@@ -5,17 +5,12 @@
  *
  ****************************************************************************/
 
-#include "clang/AST/AST.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendActions.h"
-#include "clang/Lex/Lexer.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
-#include "llvm/Support/Format.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Signals.h"
@@ -27,7 +22,6 @@
 #include "GlobalVariableHandler.h"
 #include "Insights.h"
 #include "RecordDeclHandler.h"
-#include "StaticAssertHandler.h"
 #include "TemplateHandler.h"
 #include "version.h"
 //-----------------------------------------------------------------------------
@@ -52,7 +46,7 @@ static llvm::cl::OptionCategory gInsightCategory("Insights"sv);
 //-----------------------------------------------------------------------------
 
 static llvm::cl::OptionCategory gInsightEduCategory(
-    "Insights- Educational"sv,
+    "Insights-Educational"sv,
     "This transformations are only for education purposes. The resulting code most likely does not compile."sv);
 //-----------------------------------------------------------------------------
 
@@ -103,7 +97,6 @@ public:
     : ASTConsumer()
     , mMatcher{}
     , mRecordDeclHandler{rewriter, mMatcher}
-    , mStaticAssertHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
     , mGlobalVariableHandler{rewriter, mMatcher}
     , mFunctionDeclHandler{rewriter, mMatcher}
@@ -154,7 +147,6 @@ public:
 private:
     MatchFinder           mMatcher;
     RecordDeclHandler     mRecordDeclHandler;
-    StaticAssertHandler   mStaticAssertHandler;
     TemplateHandler       mTemplateHandler;
     GlobalVariableHandler mGlobalVariableHandler;
     FunctionDeclHandler   mFunctionDeclHandler;
@@ -205,30 +197,31 @@ int main(int argc, const char** argv)
     llvm::cl::HideUnrelatedOptions(gInsightCategory);
     llvm::cl::SetVersionPrinter(&PrintVersion);
 
-#if IS_CLANG_NEWER_THAN(12)
-    // XXX handle errors?
-    auto                 opExpected = CommonOptionsParser::create(argc, argv, gInsightCategory);
-    CommonOptionsParser& op         = opExpected.get();
-#else
-    CommonOptionsParser op(argc, argv, gInsightCategory);
-#endif
+    auto opExpected = CommonOptionsParser::create(argc, argv, gInsightCategory);
 
-    ClangTool tool(op.getCompilations(), op.getSourcePathList());
+    if(auto err = opExpected.takeError()) {
+        llvm::errs() << toString(std::move(err)) << "\n";
+        return 1;
+    }
 
-    llvm::StringRef sourceFilePath = op.getSourcePathList().front();
-    // In STDINMode, we override the file content with the <stdin> input.
-    // Since `tool.mapVirtualFile` takes `StringRef`, we define `Code` outside of
-    // the if-block so that `Code` is not released after the if-block.
-    std::unique_ptr<llvm::MemoryBuffer> inMemoryCode{};
+    CommonOptionsParser& op{opExpected.get()};
+    ClangTool            tool(op.getCompilations(), op.getSourcePathList());
+    llvm::StringRef      sourceFilePath = op.getSourcePathList().front();
 
     if(gStdinMode) {
-        assert(op.getSourcePathList().size() == 1 && "Expect exactly one file path in STDINMode.");
+        assert((op.getSourcePathList().size() == 1) and "Expect exactly one file path in STDINMode.");
         llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> codeOrErr = llvm::MemoryBuffer::getSTDIN();
+
         if(const std::error_code errorCode = codeOrErr.getError()) {
             llvm::errs() << errorCode.message() << "\n";
             return 1;
         }
-        inMemoryCode = std::move(codeOrErr.get());
+
+        // In STDINMode, we override the file content with the <stdin> input.
+        // Since `tool.mapVirtualFile` takes `StringRef`, we define `Code` outside of
+        // the if-block so that `Code` is not released after the if-block.
+        std::unique_ptr<llvm::MemoryBuffer> inMemoryCode{std::move(codeOrErr.get())};
+
         if(inMemoryCode->getBufferSize() == 0) {
             Error("empty file\n");
             return 1;  // Skip empty files.
