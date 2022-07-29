@@ -70,8 +70,14 @@ static OutputFormatHelper InsertInstantiatedTemplate(const Decl* decl)
     outputFormatHelper.AppendNewLine();
     outputFormatHelper.AppendNewLine();
 
+    const auto pos{outputFormatHelper.CurrentPos()};
+
     CodeGenerator codeGenerator{outputFormatHelper};
     codeGenerator.InsertArg(decl);
+
+    if(outputFormatHelper.CurrentPos() == pos) {
+        return {};
+    }
 
     return outputFormatHelper;
 }
@@ -216,6 +222,9 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
 
     } else if(const auto* vd = result.Nodes.getNodeAs<VarTemplateDecl>(idVar)) {
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(vd);
+
+        // Keep the primary template in case it has no initializer
+        RETURN_IF(outputFormatHelper.empty());
 
         if(auto sourceRange = vd->getSourceRange(); not IsMacroLocation(sourceRange)) {
             const auto endOfCond = FindLocationAfterSemi(vd->getEndLoc(), result);

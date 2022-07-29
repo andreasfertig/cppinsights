@@ -755,11 +755,11 @@ using apply = typename F::template to<>::template result<Ts...>;
 template <typename F, typename C, typename ... Ts>
 using apply_to = typename F::template to<C>::template result<Ts...>;
 
-/* PASSED: static_assert(std::is_same_v<apply<compose<add_pointer>, int>, int *>); */
+/* PASSED: static_assert(std::is_same_v<int *, int *>); */
 
-/* PASSED: static_assert(std::is_same_v<apply<compose<add_pointer, add_const>, int>, const int *>); */
+/* PASSED: static_assert(std::is_same_v<const int *, const int *>); */
 
-/* PASSED: static_assert(std::is_same_v<apply<compose<add_const, add_pointer>, int>, int *const>); */
+/* PASSED: static_assert(std::is_same_v<int *const, int *const>); */
 
 /* PASSED: static_assert(std::is_same_v<wrapped<int *>, wrapped<int *> >); */
 

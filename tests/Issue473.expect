@@ -27,7 +27,7 @@ struct remove_all_pointers<int *> : public remove_all_pointers<int>
 
 int main()
 {
-  /* PASSED: static_assert(std::is_same_v<int, remove_all_pointers<int *>::type>); */
+  /* PASSED: static_assert(std::is_same_v<int, int>); */
   return 0;
 }
 
