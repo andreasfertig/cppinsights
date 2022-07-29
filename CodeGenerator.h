@@ -414,7 +414,7 @@ protected:
     static std::string FillConstantArray(const ConstantArrayType* ct, const std::string& value, const uint64_t startAt);
     static std::string GetValueOfValueInit(const QualType& t);
 
-    //    virtual std::string GetName(const VarDecl& vd);
+    bool InsideDecltype() const;
 
     LambdaStackType  mLambdaStackThis;
     LambdaStackType& mLambdaStack;

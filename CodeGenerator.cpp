@@ -219,25 +219,17 @@ OutputFormatHelper& CodeGenerator::LambdaScopeHandler::GetBuffer(OutputFormatHel
     // Find the most outer element to place the lambda class definition. For example, if we have this:
     // Test( [&]() {} );
     // The lambda's class definition needs to be placed _before_ the CallExpr to Test.
-    auto* element = [&]() -> LambdaHelper* {
-        for(auto& l : mStack) {
-            switch(l.callerType()) {
-                case LambdaCallerType::CallExpr:
-                case LambdaCallerType::VarDecl:
-                case LambdaCallerType::ReturnStmt:
-                case LambdaCallerType::OperatorCallExpr:
-                case LambdaCallerType::MemberCallExpr:
-                case LambdaCallerType::BinaryOperator:
-                case LambdaCallerType::CXXMethodDecl: return &l;
-                default: break;
-            }
+    for(auto& l : mStack) {
+        switch(l.callerType()) {
+            case LambdaCallerType::CallExpr:
+            case LambdaCallerType::VarDecl:
+            case LambdaCallerType::ReturnStmt:
+            case LambdaCallerType::OperatorCallExpr:
+            case LambdaCallerType::MemberCallExpr:
+            case LambdaCallerType::BinaryOperator:
+            case LambdaCallerType::CXXMethodDecl: return l.buffer();
+            default: break;
         }
-
-        return nullptr;
-    }();
-
-    if(element) {
-        return element->buffer();
     }
 
     return outputFormatHelper;
@@ -1558,17 +1550,19 @@ void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+bool CodeGenerator::InsideDecltype() const
+{
+    if(not mLambdaStack.empty()) {
+        return LambdaCallerType::Decltype == mLambdaStack.back().callerType();
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 {
-    const bool insideDecltype{[&] {
-        if(not mLambdaStack.empty()) {
-            return LambdaCallerType::Decltype == mLambdaStack.back().callerType();
-        }
-
-        return false;
-    }()};
-
-    CONDITIONAL_LAMBDA_SCOPE_HELPER(MemberCallExpr, not insideDecltype)
+    CONDITIONAL_LAMBDA_SCOPE_HELPER(MemberCallExpr, not InsideDecltype())
 
     InsertArg(stmt->getCallee());
 
@@ -1655,13 +1649,7 @@ void CodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 
 void CodeGenerator::InsertArg(const CallExpr* stmt)
 {
-    const bool insideDecltype{[&] {
-        if(not mLambdaStack.empty()) {
-            return LambdaCallerType::Decltype == mLambdaStack.back().callerType();
-        }
-
-        return false;
-    }()};
+    const bool insideDecltype{InsideDecltype()};
 
     CONDITIONAL_LAMBDA_SCOPE_HELPER(CallExpr, not insideDecltype)
     if(insideDecltype) {
