@@ -33,11 +33,20 @@ option(INSIGHTS_STATIC              "Use static linking"         Off)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
+function(check_llvm_version LLVMVERSION version)
+    if(${LLVMVERSION} VERSION_LESS ${version})
+        message(FATAL_ERROR "${LLVMVERSION} version must be at least ${version}!")
+    endif()
+endfunction(check_llvm_version)
+
+
 set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 14)
 set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
 
 if(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder
   set(BUILD_INSIGHTS_OUTSIDE_LLVM On)
+else()
+    check_llvm_version(${LLVM_VERSION_MAJOR} ${INSIGHTS_MIN_LLVM_MAJOR_VERSION})
 endif()
 
 if(INSIGHTS_COVERAGE OR DEBUG)
@@ -108,9 +117,9 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         endif()
     endfunction(check_compiler)
 
-    check_compiler("GNU" 7.3)
-    check_compiler("Clang" 6.0)
-    check_compiler("MSVC" 19.25.0.0)
+    check_compiler("GNU" 11.0)
+    check_compiler("Clang" 14.0)
+    check_compiler("MSVC" 19.30.0.0)
 
     if(NOT HAVE_COMPILER)
         message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang and GCC.")
@@ -221,6 +230,10 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         unset(CONFIG_COMMAND)
     endfunction(llvm_config)
 
+    llvm_config(LLVM_PACKAGE_VERSION "--version")
+    string(REPLACE "git" "" LLVM_PACKAGE_VERSION_PLAIN "${LLVM_PACKAGE_VERSION}")
+    check_llvm_version(${LLVM_PACKAGE_VERSION_PLAIN} ${INSIGHTS_MIN_LLVM_MAJOR_VERSION})
+
     llvm_config(LLVM_CXXFLAGS "--cxxflags")
     llvm_config(LLVM_LDFLAGS "--ldflags")
 
@@ -254,9 +267,6 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     else()
         set(LLVM_SYSTEM_LIBS ${LLVM_SYSTEM_LIBS2})
     endif()
-
-    llvm_config(LLVM_PACKAGE_VERSION "--version")
-    string(REPLACE "git" "" LLVM_PACKAGE_VERSION_PLAIN "${LLVM_PACKAGE_VERSION}")
 
     # always generate the compile commands
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
