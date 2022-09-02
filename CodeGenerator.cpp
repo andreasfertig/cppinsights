@@ -3907,7 +3907,6 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     bool        isFirstCxxMethodDecl{true};
     const auto* methodDecl{dyn_cast_or_null<CXXMethodDecl>(&decl)};
     bool        isCXXMethodDecl{nullptr != methodDecl};
-    const bool  isClassTemplateSpec{isCXXMethodDecl and isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
     const bool  requiresComment{isCXXMethodDecl and not methodDecl->isUserProvided() and
                                not methodDecl->isExplicitlyDefaulted()};
     // [expr.prim.lambda.closure] p7 consteval/constexpr are obtained from the call operator
