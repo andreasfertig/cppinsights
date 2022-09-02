@@ -12,6 +12,7 @@
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Rewrite/Core/Rewriter.h"
+#include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
 
 #include "ClangCompat.h"
