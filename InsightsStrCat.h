@@ -8,6 +8,9 @@
 #ifndef INSIGHTS_STRCAT_H
 #define INSIGHTS_STRCAT_H
 
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+
 #include "clang/AST/AST.h"
 #include "llvm/ADT/StringExtras.h"
 
