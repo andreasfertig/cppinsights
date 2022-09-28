@@ -250,7 +250,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     elseif(APPLE)
         string(REPLACE ".dylib" "" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS2}")
         string(REPLACE "/usr/lib/lib" "-l" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS}")
-        set(LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS}")
+        set(LLVM_SYSTEM_LIBS ${LLVM_SYSTEM_LIBS})
     else()
         set(LLVM_SYSTEM_LIBS ${LLVM_SYSTEM_LIBS2})
     endif()
@@ -378,6 +378,13 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         ${LLVM_LIBS}
         ${LLVM_SYSTEM_LIBS}
     )
+
+    if(${LLVM_PACKAGE_VERSION_PLAIN} VERSION_GREATER_EQUAL "15.0.0")
+        set(ADDITIONAL_LIBS
+            ${ADDITIONAL_LIBS}
+            clangSupport
+        )
+    endif()
 
 
 elseif(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder

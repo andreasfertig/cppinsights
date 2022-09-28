@@ -271,6 +271,10 @@ static void AddBodyStmts(std::vector<Stmt*>& v, Stmt* body)
 }
 //-----------------------------------------------------------------------------
 
+namespace asthelpers {
+CompoundStmt* mkCompoundStmt(ArrayRef<Stmt*> bodyStmts, SourceLocation beginLoc = {}, SourceLocation endLoc = {});
+}
+
 void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 {
     auto&      langOpts{GetLangOpts(*rangeForStmt->getLoopVariable())};
@@ -317,7 +321,7 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 
     ArrayRef<Stmt*> innerScopeStmtsRef{bodyStmts};
     auto*           innerScope =
-        CompoundStmt::Create(ctx, innerScopeStmtsRef, rangeForStmt->getBeginLoc(), rangeForStmt->getEndLoc());
+        asthelpers::mkCompoundStmt(innerScopeStmtsRef, rangeForStmt->getBeginLoc(), rangeForStmt->getEndLoc());
 
     auto* forStmt = new(ctx) ForStmt(ctx,
                                      declStmt,
@@ -333,7 +337,7 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 
     ArrayRef<Stmt*> outerScopeStmtsRef{outerScopeStmts};
     auto*           outerScope =
-        CompoundStmt::Create(ctx, outerScopeStmtsRef, rangeForStmt->getBeginLoc(), rangeForStmt->getEndLoc());
+        asthelpers::mkCompoundStmt(outerScopeStmtsRef, rangeForStmt->getBeginLoc(), rangeForStmt->getEndLoc());
 
     InsertArg(outerScope);
 
@@ -1916,7 +1920,7 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
         }();
 
         ArrayRef<Stmt*> bodyStmtsRef{bodyStmts};
-        auto*           outerBody = CompoundStmt::Create(ctx, bodyStmtsRef, stmt->getBeginLoc(), stmt->getEndLoc());
+        auto*           outerBody = asthelpers::mkCompoundStmt(bodyStmtsRef, stmt->getBeginLoc(), stmt->getEndLoc());
         auto*           whileStmt = WhileStmt::Create(
             ctx, nullptr, condition, outerBody, stmt->getBeginLoc(), stmt->getLParenLoc(), stmt->getRParenLoc());
 
@@ -1925,7 +1929,7 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
         AddStmt(outerScopeStmts, whileStmt);
 
         ArrayRef<Stmt*> outerScopeStmtsRef{outerScopeStmts};
-        auto* outerScopeBody = CompoundStmt::Create(ctx, outerScopeStmtsRef, stmt->getBeginLoc(), stmt->getEndLoc());
+        auto* outerScopeBody = asthelpers::mkCompoundStmt(outerScopeStmtsRef, stmt->getBeginLoc(), stmt->getEndLoc());
 
         InsertArg(outerScopeBody);
         mOutputFormatHelper.AppendNewLine();
@@ -3269,7 +3273,14 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                         CodeGenerator codeGenerator{ofm, LambdaInInitCapture::Yes};
                         codeGenerator.InsertArg(expr);
 
-                        mOutputFormatHelper.InsertAt(insertPosBeforeCtor.getValueOr(-1), ofm);
+                        mOutputFormatHelper.InsertAt(insertPosBeforeCtor.
+#if IS_CLANG_NEWER_THAN(14)
+                                                     value_or
+#else
+                                                     getValueOr
+#endif
+                                                     (-1),
+                                                     ofm);
                     }
                 } else {
                     if(isThis and not fieldDeclType->isPointerType()) {
@@ -3496,13 +3507,31 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
         RETURN_IF(not mCurrentPos.hasValue() and not mCurrentFieldPos.hasValue() and not mCurrentReturnPos.hasValue());
 
         std::string modifiers{};
-        size_t      variableInsertPos = mCurrentReturnPos.getValueOr(mCurrentPos.getValueOr(0));
+        size_t      variableInsertPos = mCurrentReturnPos.
+#if IS_CLANG_NEWER_THAN(14)
+                                   value_or
+#else
+                                   getValueOr
+#endif
+                                   (mCurrentPos.
+#if IS_CLANG_NEWER_THAN(14)
+                                    value_or
+#else
+                                    getValueOr
+#endif
+                                    (0));
 
         auto& ofmToInsert = [&]() -> decltype(auto) {
             if(not mCurrentPos.hasValue() and not mCurrentReturnPos.hasValue()) {
-                variableInsertPos = mCurrentFieldPos.getValueOr(0);
-                mCurrentPos       = variableInsertPos;
-                modifiers         = StrCat(kwStaticSpace, kwInlineSpace);
+                variableInsertPos = mCurrentFieldPos.
+#if IS_CLANG_NEWER_THAN(14)
+                                    value_or
+#else
+                                    getValueOr
+#endif
+                                    (0);
+                mCurrentPos = variableInsertPos;
+                modifiers   = StrCat(kwStaticSpace, kwInlineSpace);
                 return (*mOutputFormatHelperOutside);
             }
 
