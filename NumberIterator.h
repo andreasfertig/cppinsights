@@ -4,10 +4,12 @@
 template<typename T>
 class NumberIterator
 {
+    const T mNum;
+    T       mCount{};
+
 public:
     NumberIterator(const T num)
     : mNum{num}
-    , mCount{0}
     {
     }
 
@@ -20,14 +22,14 @@ public:
         return *this;
     }
 
-    bool operator!=(const NumberIterator&) const { return mCount < mNum; }
+    struct sentinel
+    {
+    };
+
+    bool operator==(sentinel) const { return mCount >= mNum; }
 
     const NumberIterator& begin() const { return *this; }
-    const NumberIterator& end() const { return *this; }
-
-private:
-    const T mNum;
-    T       mCount;
+    const sentinel        end() const { return {}; }
 };
 //-----------------------------------------------------------------------------
 
