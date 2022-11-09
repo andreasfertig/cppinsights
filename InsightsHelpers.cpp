@@ -462,7 +462,7 @@ static std::string GetScope(const DeclContext*       declCtx,
             declCtx = declCtx->getParent();
         }
 
-        if(declCtx->isNamespace() or declCtx->getParent()->isTranslationUnit()) {
+        if(not declCtx->isTranslationUnit() and (declCtx->isNamespace() or declCtx->getParent()->isTranslationUnit())) {
             if(const auto* namedDecl = dyn_cast_or_null<NamedDecl>(declCtx)) {
                 name = GetQualifiedName(*namedDecl, removeCurrentScope);
                 name.append("::"sv);
