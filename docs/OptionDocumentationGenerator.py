@@ -10,7 +10,7 @@ import base64
 #------------------------------------------------------------------------------
 
 def runCmd(cmd, data=None):
-    if None == input:
+    if input is None:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
     else:

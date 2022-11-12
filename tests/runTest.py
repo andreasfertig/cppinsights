@@ -14,7 +14,7 @@ import difflib
 mypath = '.'
 
 def runCmd(cmd, data=None):
-    if None == input:
+    if input is None:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
     else:
@@ -25,7 +25,7 @@ def runCmd(cmd, data=None):
 #------------------------------------------------------------------------------
 
 def cleanStderr(stderr, fileName=None):
-    if None != fileName:
+    if fileName is not None:
         stderr = stderr.replace(fileName, '.tmp.cpp')
     else:
         stderr = re.sub('(.*).cpp:', '.tmp:', stderr)
@@ -155,11 +155,11 @@ def main():
         fileHeader = fh.readline()
         fileHeader += fh.readline()
         m = regEx.search(fileHeader)
-        if None != m:
+        if m is not None:
             cppStd = m.group(1)
 
         m = regExInsights.search(fileHeader)
-        if None != m:
+        if m is not None:
             insightsOpts = m.group(1)
 
         if not os.path.isfile(expectFile) and not os.path.isfile(ignoreFile):
