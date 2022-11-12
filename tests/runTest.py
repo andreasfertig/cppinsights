@@ -256,7 +256,7 @@ def main():
 
     passed = (0 == missingExpected) and (expectedToPass == filesPassed)
 
-    return (False == passed)  # note bash expects 0 for ok
+    return (passed is False)  # note bash expects 0 for ok
 #------------------------------------------------------------------------------
 
 
