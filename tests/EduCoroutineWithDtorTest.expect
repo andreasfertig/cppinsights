@@ -129,10 +129,7 @@ struct generator<Test>
     // inline constexpr promise_type() noexcept = default;
   };
   
-  inline generator(generator<Test> && rhs)
-  : p{{std::exchange(rhs.p, nullptr)}}
-  {
-  }
+  inline generator(generator<Test> && rhs);
   
   inline ~generator() noexcept
   {
@@ -187,8 +184,6 @@ generator<Test> fun<Test>()
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<generator<Test> >::promise_type{};
   
-  generator<Test> __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __fun_TestResume(__fun_TestFrame * __f);
   void __fun_TestDestroy(__fun_TestFrame * __f);
@@ -203,7 +198,7 @@ generator<Test> fun<Test>()
   __fun_TestResume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */

@@ -1,6 +1,7 @@
 // cmdline:-std=c++20
 
 #include <coroutine>
+#include <cstdint>
 #include <exception> // std::terminate
 #include <new>
 #include <tuple>
@@ -122,7 +123,7 @@ struct generator
   std::coroutine_handle<promise_type> p;
 };
 
-/* First instantiated from: Issue92.cpp:75 */
+/* First instantiated from: Issue92.cpp:76 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct generator<unsigned int>
@@ -215,11 +216,7 @@ struct generator<unsigned int>
     return iterator{std::coroutine_handle<promise_type>(this->p), true};
   }
   
-  inline generator(generator<unsigned int> && rhs)
-  : p{std::coroutine_handle<promise_type>(rhs.p)}
-  {
-    rhs.p.operator=(nullptr);
-  }
+  inline generator(generator<unsigned int> && rhs);
   
   inline ~generator() noexcept
   {

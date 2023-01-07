@@ -112,10 +112,7 @@ struct generator<int>
     // inline constexpr promise_type() noexcept = default;
   };
   
-  inline generator(generator<int> && rhs)
-  : p{{std::exchange(rhs.p, nullptr)}}
-  {
-  }
+  inline generator(generator<int> && rhs);
   
   inline ~generator() noexcept
   {
@@ -174,8 +171,6 @@ generator<int> seq<int>()
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<generator<int> >::promise_type{};
   
-  generator<int> __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __seq_intResume(__seq_intFrame * __f);
   void __seq_intDestroy(__seq_intFrame * __f);
@@ -190,7 +185,7 @@ generator<int> seq<int>()
   __seq_intResume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */

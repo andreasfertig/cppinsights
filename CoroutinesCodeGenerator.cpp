@@ -307,14 +307,16 @@ struct DeclsHolder
             mThisExprs.push_back(thisExpr);
 
         } else if(const auto* declStmt = dyn_cast_or_null<DeclStmt>(stmt)) {
-            const auto* singleDecl = declStmt->getSingleDecl();
+            if(declStmt->isSingleDecl()) {
+                const auto* singleDecl = declStmt->getSingleDecl();
 
-            if(const auto* vd = dyn_cast_or_null<VarDecl>(singleDecl)) {
-                push_back(vd);
-                return;
+                if(const auto* vd = dyn_cast_or_null<VarDecl>(singleDecl)) {
+                    push_back(vd);
+                    return;
 
-            } else if(const auto* recordDecl = dyn_cast_or_null<CXXRecordDecl>(singleDecl)) {
-                mRecordDecls.push_back(recordDecl);
+                } else if(const auto* recordDecl = dyn_cast_or_null<CXXRecordDecl>(singleDecl)) {
+                    mRecordDecls.push_back(recordDecl);
+                }
             }
         }
 

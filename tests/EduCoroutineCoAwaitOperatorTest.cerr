@@ -1,16 +1,19 @@
-.tmp.cpp:175:3: error: unknown type name 'awaiter'
+.tmp.cpp:174:3: error: unknown type name 'awaiter'
   awaiter __suspend_54_5;
   ^
-.tmp.cpp:226:143: error: unknown type name 'coroutine_handle'
+.tmp.cpp:204:10: error: use of undeclared identifier '__promise'
+  return __promise.get_return_object();
+         ^
+.tmp.cpp:223:143: error: unknown type name 'coroutine_handle'
       __f->__suspend_51_16.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
                                                                                                                                               ^
-.tmp.cpp:239:142: error: unknown type name 'coroutine_handle'
+.tmp.cpp:236:142: error: unknown type name 'coroutine_handle'
       __f->__suspend_54_5.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
                                                                                                                                              ^
-.tmp.cpp:251:143: error: unknown type name 'coroutine_handle'
+.tmp.cpp:248:143: error: unknown type name 'coroutine_handle'
       __f->__suspend_56_14.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
                                                                                                                                               ^
-.tmp.cpp:272:143: error: unknown type name 'coroutine_handle'
+.tmp.cpp:269:143: error: unknown type name 'coroutine_handle'
     __f->__suspend_51_16_1.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
                                                                                                                                               ^
-5 errors generated.
+6 errors generated.
