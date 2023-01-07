@@ -50,9 +50,15 @@ auto* mkLabelStmt(std::string_view name)
     return new(GetGlobalAST()) LabelStmt({}, mkLabelDecl(name), nullptr);
 }
 
-auto* mkCompoundStmt(ArrayRef<Stmt*> bodyStmts)
+CompoundStmt* mkCompoundStmt(ArrayRef<Stmt*> bodyStmts, SourceLocation beginLoc = {}, SourceLocation endLoc = {})
 {
-    return CompoundStmt::Create(GetGlobalAST(), bodyStmts, {}, {});
+    return CompoundStmt::Create(GetGlobalAST(),
+                                bodyStmts,
+#if IS_CLANG_NEWER_THAN(14)
+                                FPOptionsOverride{},
+#endif
+                                beginLoc,
+                                endLoc);
 }
 
 auto* mkIfStmt(Expr* condition, ArrayRef<Stmt*> bodyStmts)
@@ -649,8 +655,10 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     }
 
     // P0057R8: [dcl.fct.def.coroutine] p5: before initial_suspend and at tops 1
+#if not IS_CLANG_NEWER_THAN(14)
     mOutputFormatHelper.AppendNewLine();
     InsertArg(stmt->getResultDecl());
+#endif
 
     // Make a call the the made up state machine function for the initial suspend
     mOutputFormatHelper.AppendNewLine();
@@ -688,15 +696,21 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.AppendNewLine();
 
-    // XXX: The getReturnStmt may contain more as just __coro_gro
+    // XXX: The getReturnStmt may contain more as just __coro_gro pre Clang 15
     SKIP_NAME_PREFIX_FOR_SCOPE
     {
+#if IS_CLANG_NEWER_THAN(14)
+        InsertArg(stmt->getReturnStmt());
+#else
         DeclsHolder tmpDeclsHolder{};
         tmpDeclsHolder.FindAllVarDecls(stmt->getResultDecl());
-        const auto* retVd          = tmpDeclsHolder.mMoveDecls.at(0);
-        auto*       coroReturnDref = asthelpers::mkDeclRefExpr(const_cast<VarDecl*>(retVd));
-        auto*       returnStmt     = asthelpers::mkReturnStmt(coroReturnDref);
-        InsertArg(returnStmt);
+        if(tmpDeclsHolder.mMoveDecls.size() > 0) {
+            const auto* retVd          = tmpDeclsHolder.mMoveDecls.at(0);
+            auto*       coroReturnDref = asthelpers::mkDeclRefExpr(const_cast<VarDecl*>(retVd));
+            auto*       returnStmt     = asthelpers::mkReturnStmt(coroReturnDref);
+            InsertArg(returnStmt);
+        }
+#endif
     }
 
     mOutputFormatHelper.AppendSemiNewLine();

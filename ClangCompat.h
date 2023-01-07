@@ -13,7 +13,7 @@
 #include "version.h"
 //-----------------------------------------------------------------------------
 
-#define IS_CLANG_NEWER_THAN(major) CLANG_VERSION_MAJOR > (major)
+#define IS_CLANG_NEWER_THAN(major) (CLANG_VERSION_MAJOR > (major))
 //-----------------------------------------------------------------------------
 
 #include "clang/AST/ExprCXX.h"
