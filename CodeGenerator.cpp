@@ -53,7 +53,7 @@ static std::string AccessToStringWithColon(const AccessSpecifier& access)
 
 static std::string_view GetCastName(const CastKind castKind)
 {
-    if(is{castKind}.any_of(CastKind::CK_BitCast, CastKind::CK_IntegralToPointer)) {
+    if(is{castKind}.any_of(CastKind::CK_BitCast, CastKind::CK_IntegralToPointer, CastKind::CK_PointerToIntegral)) {
         return kwReinterpretCast;
     }
 
