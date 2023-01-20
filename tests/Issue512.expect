@@ -1,0 +1,14 @@
+long long charPtrToInt(const char * str)
+{
+  long long a = reinterpret_cast<long long>(str);
+  return a;
+}
+
+
+int main()
+{
+  const char * str = "123";
+  charPtrToInt(str);
+  return 0;
+}
+

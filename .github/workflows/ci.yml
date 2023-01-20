@@ -153,24 +153,24 @@ jobs:
           #   environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
           # }
 
-        # MSVC 2019
-        - {
-            name: "MSVC 2022 / LLVM 14 @ Windows Code Coverage & Debug",
-            os: windows-2022,
-            build_type: Release,
-            cxx: "clang-cl.exe",
-            llvm_version: "14.0.0",
-            llvm_config: "current/bin/llvm-config.exe",
-            coverage: "Yes",
-            static: "Yes",
-            debug: "Yes",
-            tidy: "No",
-            run_tests: "No",
-            bin_name: "insights.exe",
-            archive_name: "insights-windows",
-            upload: "No",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-          }
+        # # MSVC 2019
+        # - {
+        #     name: "MSVC 2022 / LLVM 14 @ Windows Code Coverage & Debug",
+        #     os: windows-2022,
+        #     build_type: Release,
+        #     cxx: "clang-cl.exe",
+        #     llvm_version: "14.0.0",
+        #     llvm_config: "current/bin/llvm-config.exe",
+        #     coverage: "Yes",
+        #     static: "Yes",
+        #     debug: "Yes",
+        #     tidy: "No",
+        #     run_tests: "No",
+        #     bin_name: "insights.exe",
+        #     archive_name: "insights-windows",
+        #     upload: "No",
+        #     environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+        #   }
 
     steps:
     - uses: actions/checkout@v2

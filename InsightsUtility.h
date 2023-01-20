@@ -10,6 +10,7 @@
 
 #include "llvm/ADT/STLExtras.h"
 
+#include <type_traits>
 #include <utility>
 //-----------------------------------------------------------------------------
 
