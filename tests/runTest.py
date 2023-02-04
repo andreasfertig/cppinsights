@@ -24,6 +24,20 @@ def runCmd(cmd, data=None):
     return stdout.decode('utf-8'), stderr.decode('utf-8'), p.returncode
 #------------------------------------------------------------------------------
 
+def cleanStderr(stderr, fileName=None):
+    if None != fileName:
+        stderr = stderr.replace(fileName, '.tmp.cpp')
+    else:
+        stderr = re.sub('(.*).cpp:', '.tmp:', stderr)
+#    stderr = re.sub('[\n ](.*).cpp:', '\\1%s:' %(fileName), stderr)
+
+    # Replace paths, as for example, the STL path differs from a local build to Travis-CI at least for macOS
+    stderr = re.sub('/(.*)/(.*?:[0-9]+):', '... \\2:', stderr)
+    stderr = re.sub('RecoveryExpr 0x[a-f0-9]+ ', 'RecoveryExpr ', stderr)
+
+    return stderr
+#------------------------------------------------------------------------------
+
 def testCompare(tmpFileName, stdout, expectFile, f, args, time):
     expect = open(expectFile, 'r', encoding='utf-8').read()
 
@@ -67,9 +81,7 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
     if 0 != returncode:
         if os.path.isfile(compileErrorFile):
             ce = open(compileErrorFile, 'r', encoding='utf-8').read()
-            stderr = stderr.replace(tmpFileName, '.tmp.cpp')
-            # Replace paths, as for example, the STL path differs from a local build to Travis-CI at least for macOS
-            stderr = re.sub('/(.*)/(.*?:[0-9]+):', '... \\2:', stderr)
+            stderr = cleanStderr(stderr, tmpFileName)
 
             if ce == stderr:
                 print('[PASSED] Compile: %s' %(f))
@@ -184,10 +196,8 @@ def main():
                 # these errors.
                 ce = re.sub('(.*).cpp:', '.tmp:', ce)
                 ce = re.sub('(.*).cpp.', '.tmp:', ce)
-                stderr = re.sub('(.*).cpp:', '.tmp:', stderr)
                 stderr = re.sub('(Error while processing.*.cpp.)', '', stderr)
-                # Replace paths, as for example, the STL path differs from a local build to Travis-CI at least for macOS
-                stderr = re.sub('/(.*)/(.*?:[0-9]+):', '... \\2:', stderr)
+                stderr = cleanStderr(stderr)
 
                 # The cerr output matches and the return code says that we hit a compile error, accept it as passed
                 if (ce == stderr) and (1 == returncode):

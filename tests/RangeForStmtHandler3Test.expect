@@ -7,7 +7,7 @@
 
     struct null_sentinal_t
 {
-  template<class Rhs, std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>({}), int>  = 0>
+  template<class Rhs, std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>{}, int>  = 0>
   friend inline bool operator==(const Rhs & ptr, null_sentinal_t)
   {
     return !*ptr;
@@ -22,7 +22,7 @@
   }
   #endif
   
-  template<class Rhs, std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>({}), int>  = 0>
+  template<class Rhs, std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>{}, int>  = 0>
   friend inline bool operator!=(const Rhs & ptr, null_sentinal_t)
   {
     return !(ptr == null_sentinal_t{});
@@ -37,12 +37,12 @@
   }
   #endif
   
-  template<class Lhs, std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>({}), int>  = 0>
+  template<class Lhs, std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>{}, int>  = 0>
   friend inline bool operator==(null_sentinal_t, const Lhs & ptr)
   {
     return !*ptr;
   }
-  template<class Lhs, std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>({}), int>  = 0>
+  template<class Lhs, std::enable_if_t<!std::is_same<Lhs, null_sentinal_t>{}, int>  = 0>
   friend inline bool operator!=(null_sentinal_t, const Lhs & ptr)
   {
     return !(null_sentinal_t{} == ptr);

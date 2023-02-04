@@ -126,8 +126,6 @@ generator simpleReturn(int v)
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
   
-  generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __simpleReturnResume(__simpleReturnFrame * __f);
   void __simpleReturnDestroy(__simpleReturnFrame * __f);
@@ -142,7 +140,7 @@ generator simpleReturn(int v)
   __simpleReturnResume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */
@@ -233,8 +231,6 @@ generator additionAwaitReturn(int v)
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
   
-  generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __additionAwaitReturnResume(__additionAwaitReturnFrame * __f);
   void __additionAwaitReturnDestroy(__additionAwaitReturnFrame * __f);
@@ -249,7 +245,7 @@ generator additionAwaitReturn(int v)
   __additionAwaitReturnResume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */
@@ -367,8 +363,6 @@ generator additionAwaitReturn2(int v)
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
   
-  generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __additionAwaitReturn2Resume(__additionAwaitReturn2Frame * __f);
   void __additionAwaitReturn2Destroy(__additionAwaitReturn2Frame * __f);
@@ -383,7 +377,7 @@ generator additionAwaitReturn2(int v)
   __additionAwaitReturn2Resume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */
@@ -512,8 +506,6 @@ generator additionAwaitReturnWithInt(int v)
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
   
-  generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __additionAwaitReturnWithIntResume(__additionAwaitReturnWithIntFrame * __f);
   void __additionAwaitReturnWithIntDestroy(__additionAwaitReturnWithIntFrame * __f);
@@ -528,7 +520,7 @@ generator additionAwaitReturnWithInt(int v)
   __additionAwaitReturnWithIntResume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */

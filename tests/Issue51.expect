@@ -5,6 +5,6 @@ int main()
     using Map = std::map<int, bool>;
     int m;
 
-    auto __7;
- [it, ok] = m.insert({1, true});
+    auto __7 = /* INSIGHTS-TODO: CodeGenerator.cpp:3628 stmt: RecoveryExpr */.insert({1, true});
+
 }

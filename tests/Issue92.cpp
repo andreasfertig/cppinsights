@@ -1,6 +1,7 @@
 // cmdline:-std=c++20
 
 #include <coroutine>
+#include <cstdint>
 #include <exception> // std::terminate
 #include <new>
 #include <tuple>

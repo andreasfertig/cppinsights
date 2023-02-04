@@ -12,7 +12,7 @@ struct T
 
 
 template<typename T>
-decltype(T({}).f()) f(T, int)
+decltype(T{}.f()) f(T, int)
 {
 }
 

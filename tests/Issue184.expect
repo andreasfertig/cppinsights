@@ -51,7 +51,7 @@ struct ManyParentsWithOperator : public Bases...
   using Bases::operator()...;
 };
 
-/* First instantiated from: type_traits:1773 */
+/* First instantiated from: is_empty.h:23 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, public CustomerEq
@@ -66,7 +66,7 @@ struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, 
 };
 
 #endif
-/* First instantiated from: type_traits:1773 */
+/* First instantiated from: is_empty.h:23 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, public CustomerHash

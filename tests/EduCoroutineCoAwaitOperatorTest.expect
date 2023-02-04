@@ -93,7 +93,6 @@ struct my_future<int>
   
   int await_resume();
   
-  // inline constexpr my_future(my_future<int> &&) noexcept = default;
 };
 
 #endif
@@ -188,8 +187,6 @@ my_future<int> g()
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<my_future<int> >::promise_type{};
   
-  my_future<int> __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __gResume(__gFrame * __f);
   void __gDestroy(__gFrame * __f);
@@ -204,7 +201,7 @@ my_future<int> g()
   __gResume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */

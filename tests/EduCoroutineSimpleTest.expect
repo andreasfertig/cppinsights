@@ -98,8 +98,6 @@ generator fun()
   /* Construct the promise. */
   new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
   
-  generator __coro_gro = __f->__promise.get_return_object() /* NRVO variable */;
-  
   /* Forward declare the resume and destroy function. */
   void __funResume(__funFrame * __f);
   void __funDestroy(__funFrame * __f);
@@ -114,7 +112,7 @@ generator fun()
   __funResume(__f);
   
   
-  return __coro_gro;
+  return __promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */
