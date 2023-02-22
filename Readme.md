@@ -207,6 +207,11 @@ Here "`${GCC_11_2_0_INSTALL_PATH}`" is the installation directory of your custom
 There is also another GitHub project which sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
+### C++ Insights @ Vim
+
+A plugin for Vim is available at
+[here](https://github.com/Freed-Wu/cppinsights.vim).
+
 ### C++ Insights @ VSCode
 
 An extension for Visual Studio Code is available at the VS Code marketplace: [C++
