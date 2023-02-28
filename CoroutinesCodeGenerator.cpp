@@ -18,16 +18,6 @@
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
-void SkipNamePrefix(bool b);
-
-#define SKIP_NAME_PREFIX_FOR_SCOPE                                                                                     \
-    if(FinalAction __fa{[] { SkipNamePrefix(false); }}; SkipNamePrefix(true), false) {                                 \
-    } else
-
-#define SCOPED_VAR_TOGGLE(var)                                                                                         \
-    if(FinalAction __fa{[&] { var != var; }}; (var != var), false) {                                                   \
-    } else
-//-----------------------------------------------------------------------------
 
 constexpr std::string_view CORO_FRAME_NAME{"__f"sv};
 const std::string          CORO_FRAME_ACCESS{StrCat(CORO_FRAME_NAME, "->"sv)};
@@ -271,84 +261,6 @@ UnaryExprOrTypeTraitExpr* Sizeof(QualType toType)
     const auto& ctx = GetGlobalAST();
     return new(ctx) UnaryExprOrTypeTraitExpr(UETT_SizeOf, ctx.getTrivialTypeSourceInfo(toType), toType, {}, {});
 }
-
-using decl_vector_t       = std::vector<const VarDecl*>;
-using this_vector_t       = std::vector<const CXXThisExpr*>;
-using recordDecl_vector_t = std::vector<const CXXRecordDecl*>;
-//-----------------------------------------------------------------------------
-
-struct DeclsHolder
-{
-    decl_vector_t mMoveDecls{};
-    decl_vector_t mDecls{};
-
-    recordDecl_vector_t mEmptyRecordDecls{};
-    recordDecl_vector_t mRecordDecls{};
-
-    this_vector_t mThisExprs{};
-    int           mSuspendsCount{};
-    bool          EmulateEmpty{true};
-
-    void push_back(const VarDecl* vd)
-    {
-        void AddToVarNamePrefixMap(const VarDecl* vd, std::string_view name);
-
-        mMoveDecls.push_back(vd);
-        AddToVarNamePrefixMap(vd, CORO_FRAME_ACCESS);
-    }
-
-    void JoinDeclsAndMoveDecls()
-    {
-        mDecls.insert(mDecls.end(), mMoveDecls.begin(), mMoveDecls.end());
-        mMoveDecls.clear();
-    }
-
-    /// Traverse the whole CoroutineBodyStmt to find all appearing \c VarDecl. These need to be rerouted to the
-    /// coroutine frame and hence prefixed by something like __f->. For that reason we only look for \c VarDecls
-    /// directly appearing in the body, \c CallExpr will be skipped.
-    void FindAllVarDecls(const Stmt* stmt)
-    {
-        RETURN_IF(nullptr == stmt);
-
-        // Take this expressions to rewrite access when the coroutine is a class method.
-        if(const auto* thisExpr = dyn_cast_or_null<CXXThisExpr>(stmt)) {
-            mThisExprs.push_back(thisExpr);
-
-        } else if(const auto* declStmt = dyn_cast_or_null<DeclStmt>(stmt)) {
-            if(declStmt->isSingleDecl()) {
-                const auto* singleDecl = declStmt->getSingleDecl();
-
-                if(const auto* vd = dyn_cast_or_null<VarDecl>(singleDecl)) {
-                    push_back(vd);
-                    return;
-
-                } else if(const auto* recordDecl = dyn_cast_or_null<CXXRecordDecl>(singleDecl)) {
-                    mRecordDecls.push_back(recordDecl);
-                }
-            }
-        }
-
-        for(const auto* child : stmt->children()) {
-            FindAllVarDecls(child);
-        }
-    }
-
-    const decl_vector_t& GetDecls() const
-    {
-        if(EmulateEmpty) {
-            static const decl_vector_t mEmptyDecls{};
-
-            return mEmptyDecls;
-        }
-
-        return mDecls;
-    }
-
-    bool ContainsDecl(const Decl* decl) const { return Contains(GetDecls(), decl); }
-};
-//-----------------------------------------------------------------------------
-
-static DeclsHolder mDeclsHolder{};
 //-----------------------------------------------------------------------------
 
 QualType CoroutinesCodeGenerator::GetFramePointerType() const
@@ -366,8 +278,6 @@ CoroutinesCodeGenerator::~CoroutinesCodeGenerator()
     OutputFormatHelper ofm{};
 
     // Using the "normal" CodeGenerator here as this is only about inserting the made up coroutine-frame.
-    void ClearVarNamePrefix();
-    ClearVarNamePrefix();
     CodeGenerator codeGenerator{ofm};
     codeGenerator.InsertArg(mASTData.mFrameType);
 
@@ -389,6 +299,8 @@ struct StmtsContainer
         }
     }
 
+    void clear() { mStmts.clear(); }
+
     void Add(const Stmt* stmt)
     {
         if(stmt) {
@@ -400,20 +312,26 @@ struct StmtsContainer
 };
 //-----------------------------------------------------------------------------
 
-FieldDecl* CoroutinesCodeGenerator::AddField(std::string_view name, QualType type)
+static FieldDecl* AddField(CoroutineASTData& astData, std::string_view name, QualType type)
 {
-    if(nullptr == mASTData.mFrameType) {
+    if(nullptr == astData.mFrameType) {
         return nullptr;
     }
 
     auto& ctx       = GetGlobalAST();
     auto* fieldDecl = FieldDecl::Create(
-        ctx, mASTData.mFrameType, {}, {}, &ctx.Idents.get(name), type, nullptr, nullptr, false, ICIS_NoInit);
+        ctx, astData.mFrameType, {}, {}, &ctx.Idents.get(name), type, nullptr, nullptr, false, ICIS_NoInit);
 
     fieldDecl->setAccess(AS_public);
-    mASTData.mFrameType->addDecl(fieldDecl);
+    astData.mFrameType->addDecl(fieldDecl);
 
     return fieldDecl;
+}
+//-----------------------------------------------------------------------------
+
+FieldDecl* CoroutinesCodeGenerator::AddField(std::string_view name, QualType type)
+{
+    return ::clang::insights::AddField(mASTData, name, type);
 }
 //-----------------------------------------------------------------------------
 
@@ -440,12 +358,357 @@ static void SetFunctionBody(FunctionDecl* fd, StmtsContainer& bodyStmts)
 }
 //-----------------------------------------------------------------------------
 
+static std::string BuildSuspendVarName(const OpaqueValueExpr* stmt)
+{
+    return BuildInternalVarName(
+        MakeLineColumnName(GetGlobalAST().getSourceManager(), stmt->getSourceExpr()->getBeginLoc(), "suspend_"sv));
+}
+//-----------------------------------------------------------------------------
+
+/// \brief Find a \c SuspendsExpr's in a coroutine body statement for early transformation.
+///
+/// Traverse the whole CoroutineBodyStmt to find all appearing \c VarDecl. These need to be rerouted to the
+/// coroutine frame and hence prefixed by something like __f->. For that reason we only look for \c VarDecls
+/// directly appearing in the body, \c CallExpr will be skipped.
+class CoroutineASTTransformer : public StmtVisitor<CoroutineASTTransformer>
+{
+    StmtsContainer                        mBodyStmts{};
+    Stmt*                                 mPrevStmt{};  // used to insert the suspendexpr
+    CoroutineASTData&                     mASTData;
+    Stmt*                                 mStaged{};
+    bool                                  mSkip{};
+    bool                                  mFinalSuspend{};
+    size_t&                               mSuspendsCount;
+    llvm::DenseMap<VarDecl*, MemberExpr*> mVarNamePrefix{};
+
+public:
+    CoroutineASTTransformer(CoroutineASTData&                     coroutineASTData,
+                            size_t&                               suspendsCounter,
+                            Stmt*                                 stmt,
+                            llvm::DenseMap<VarDecl*, MemberExpr*> varNamePrefix,
+                            Stmt*                                 prev = nullptr)
+    : mASTData{coroutineASTData}
+    , mPrevStmt{prev}
+    , mSuspendsCount{suspendsCounter}
+    , mVarNamePrefix{varNamePrefix}
+    {
+        if(nullptr == mPrevStmt) {
+            mPrevStmt = stmt;
+        }
+
+        Visit(stmt);
+    }
+
+    void Visit(Stmt* stmt)
+    {
+        if(stmt) {
+            StmtVisitor<CoroutineASTTransformer>::Visit(stmt);
+        }
+    }
+
+    void VisitCompoundStmt(CompoundStmt* stmt)
+    {
+        for(auto* child : stmt->body()) {
+            mStaged = child;
+            Visit(child);
+
+            if(not mSkip) {
+                mBodyStmts.Add(child);
+            }
+
+            mSkip = false;
+        }
+
+        auto* comp = asthelpers::mkCompoundStmt(mBodyStmts);
+
+        std::replace(mPrevStmt->child_begin(), mPrevStmt->child_end(), stmt, comp);
+
+        mBodyStmts.clear();
+    }
+
+    void VisitSwitchStmt(SwitchStmt* stmt)
+    {
+        Visit(stmt->getCond());
+
+        CoroutineASTTransformer{mASTData, mSuspendsCount, stmt->getBody(), mVarNamePrefix, stmt};
+    }
+
+    void VisitDoStmt(DoStmt* stmt)
+    {
+        Visit(stmt->getCond());
+
+        CoroutineASTTransformer{mASTData, mSuspendsCount, stmt->getBody(), mVarNamePrefix, stmt};
+    }
+
+    void VisitWhileStmt(WhileStmt* stmt)
+    {
+        Visit(stmt->getCond());
+
+        CoroutineASTTransformer{mASTData, mSuspendsCount, stmt->getBody(), mVarNamePrefix, stmt};
+    }
+
+    void VisitIfStmt(IfStmt* stmt)
+    {
+        Visit(stmt->getCond());
+
+        CoroutineASTTransformer{mASTData, mSuspendsCount, stmt->getThen(), mVarNamePrefix, stmt};
+
+        CoroutineASTTransformer{mASTData, mSuspendsCount, stmt->getElse(), mVarNamePrefix, stmt};
+    }
+
+    void VisitForStmt(ForStmt* stmt)
+    {
+        // technically because of the init the entire for loop should be put into a dedicated scope
+        Visit(stmt->getInit());
+
+        // Special case. A VarDecl in init will be added to the body of the function and the actual init is left
+        // untouched. Work some magic to put it in the right place.
+        if(mSkip) {
+            auto* oldInit = stmt->getInit();
+            auto* newInit = mBodyStmts.mStmts.back();
+            mBodyStmts.mStmts.pop_back();
+
+            std::replace(stmt->child_begin(),
+                         stmt->child_end(),
+                         dyn_cast_or_null<Stmt>(oldInit),
+                         dyn_cast_or_null<Stmt>(newInit));
+
+            mSkip = false;
+        }
+
+        Visit(stmt->getCond());
+
+        Visit(stmt->getInc());
+
+        CoroutineASTTransformer{mASTData, mSuspendsCount, stmt->getBody(), mVarNamePrefix, stmt};
+
+        mSkip = false;
+    }
+
+    void VisitCXXForRangeStmt(CXXForRangeStmt* stmt)
+    {
+        Visit(stmt->getRangeStmt());
+
+        // ignoring the loop variable should be fine.
+
+        CoroutineASTTransformer{mASTData, mSuspendsCount, stmt->getBody(), mVarNamePrefix, stmt};
+    }
+
+    void VisitDeclRefExpr(DeclRefExpr* stmt)
+    {
+        if(auto* vd = dyn_cast_or_null<VarDecl>(stmt->getDecl())) {
+            if(not vd->isLocalVarDeclOrParm() or not Contains(mVarNamePrefix, vd)) {
+                return;
+            }
+
+            auto* memberExpr = mVarNamePrefix[vd];
+
+            std::replace(mPrevStmt->child_begin(),
+                         mPrevStmt->child_end(),
+                         dyn_cast_or_null<Stmt>(stmt),
+                         dyn_cast_or_null<Stmt>(memberExpr));
+        }
+    }
+
+    void VisitDeclStmt(DeclStmt* stmt)
+    {
+        for(auto* decl : stmt->decls()) {
+            if(auto* varDecl = dyn_cast_or_null<VarDecl>(decl)) {
+                // add this point a placement-new would be appropriate for at least some cases.
+
+                auto* field  = AddField(mASTData, GetName(*varDecl), varDecl->getType());
+                auto* me     = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, field);
+                auto* assign = asthelpers::mkBinaryOperator(me, varDecl->getInit(), BO_Assign, field->getType());
+
+                mVarNamePrefix.insert(std::make_pair(varDecl, me));
+
+                Visit(varDecl->getInit());
+
+                mSkip = true;
+                mBodyStmts.Add(assign);
+
+            } else if(const auto* recordDecl = dyn_cast_or_null<CXXRecordDecl>(decl)) {
+                mASTData.mFrameType->addDecl(const_cast<CXXRecordDecl*>(recordDecl));
+            }
+        }
+    }
+
+    void VisitCXXThisExpr(CXXThisExpr* stmt)
+    {
+        auto& ctx       = GetGlobalAST();
+        auto* fieldDecl = FieldDecl::Create(ctx,
+                                            mASTData.mFrameType,
+                                            {},
+                                            {},
+                                            &ctx.Idents.get(kwInternalThis),
+                                            stmt->getType(),
+                                            nullptr,
+                                            nullptr,
+                                            false,
+                                            ICIS_NoInit);
+        fieldDecl->setAccess(AS_public);
+
+        auto* indirectThisMemberExpr = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, fieldDecl);
+
+        std::replace(mPrevStmt->child_begin(),
+                     mPrevStmt->child_end(),
+                     dyn_cast_or_null<Stmt>(stmt),
+                     dyn_cast_or_null<Stmt>(indirectThisMemberExpr));
+
+        if(0 == mASTData.mThisExprs.size()) {
+            mASTData.mThisExprs.push_back(stmt);
+        }
+    }
+
+    void VisitCallExpr(CallExpr* stmt)
+    {
+        auto* tmp = mPrevStmt;
+        mPrevStmt = stmt;
+
+        for(auto* arg : stmt->arguments()) {
+            Visit(arg);
+        }
+
+        mPrevStmt = tmp;
+    }
+
+    void VisitCXXMemberCallExpr(CXXMemberCallExpr* stmt)
+    {
+        auto* tmp = mPrevStmt;
+        mPrevStmt = stmt->getCallee();
+
+        Visit(stmt->getCallee());
+
+        mPrevStmt = tmp;
+
+        StmtVisitor<CoroutineASTTransformer>::VisitCXXMemberCallExpr(stmt);
+    }
+
+    void VisitCoreturnStmt(CoreturnStmt* stmt)
+    {
+        Visit(stmt->getOperand());
+        Visit(stmt->getPromiseCall());
+    }
+
+    void VisitCoyieldExpr(CoyieldExpr* stmt)
+    {
+        ++mSuspendsCount;
+
+        if(isa<ExprWithCleanups>(mStaged)) {
+            mBodyStmts.Add(stmt);
+            mSkip = true;
+        }
+
+        Visit(stmt->getOperand());
+    }
+
+    void VisitCoawaitExpr(CoawaitExpr* stmt)
+    {
+        if(not mFinalSuspend) {
+            ++mSuspendsCount;
+        }
+
+        if(const bool returnsVoid{stmt->getResumeExpr()->getType()->isVoidType()}; returnsVoid) {
+            Visit(stmt->getOperand());
+
+            // in the void return case there is nothing to do, because this expression (potentially) is not nested.
+            return;
+        }
+
+        mBodyStmts.Add(stmt);
+
+        // Note: Add the this pointer to the name isn't the best but s quick approach
+        const std::string name{StrCat(CORO_FRAME_ACCESS, BuildSuspendVarName(stmt->getOpaqueValue()), "_res"sv)};
+
+        auto* resultVar        = asthelpers::mkVarDecl(name, stmt->getType());
+        auto* resultVarDeclRef = asthelpers::mkDeclRefExpr(resultVar);
+
+        std::replace(mPrevStmt->child_begin(),
+                     mPrevStmt->child_end(),
+                     dyn_cast_or_null<Stmt>(stmt),
+                     dyn_cast_or_null<Stmt>(resultVarDeclRef));
+
+        Visit(stmt->getCommonExpr());
+        Visit(stmt->getOperand());
+        Visit(stmt->getSuspendExpr());
+        Visit(stmt->getReadyExpr());
+        Visit(stmt->getResumeExpr());
+    }
+
+    void VisitCoroutineBodyStmt(CoroutineBodyStmt* stmt)
+    {
+        auto* varDecl = stmt->getPromiseDecl();
+
+        mASTData.mPromiseField = AddField(mASTData, GetName(*varDecl), varDecl->getType());
+        auto* me               = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
+        auto* assign =
+            asthelpers::mkBinaryOperator(me, varDecl->getInit(), BO_Assign, mASTData.mPromiseField->getType());
+
+        mVarNamePrefix.insert(std::make_pair(varDecl, me));
+
+        auto& ctx = GetGlobalAST();
+
+        // add the suspend index variable
+        mASTData.mSuspendIndexField = AddField(mASTData, SUSPEND_INDEX_NAME, ctx.IntTy);
+        mASTData.mSuspendIndexAccess =
+            asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mSuspendIndexField);
+
+        // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
+        mASTData.mInitialAwaitResumeCalledField = AddField(mASTData, INITIAL_AWAIT_SUSPEND_CALLED_NAME, ctx.BoolTy);
+        mASTData.mInitialAwaitResumeCalledAccess =
+            asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField);
+
+        for(auto* param : stmt->getParamMoves()) {
+            if(auto* declStmt = dyn_cast_or_null<DeclStmt>(param)) {
+                if(auto* varDecl2 = dyn_cast_or_null<VarDecl>(declStmt->getSingleDecl())) {
+                    //  For the captured parameters we need to find the ParmVarDecl instead of the newly created VarDecl
+                    if(auto* declRef = FindDeclRef(varDecl2->getAnyInitializer())) {
+                        auto* varDecl = dyn_cast<ParmVarDecl>(declRef->getDecl());
+
+                        auto* field  = AddField(mASTData, GetName(*varDecl), varDecl->getType());
+                        auto* me     = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, field);
+                        auto* assign = asthelpers::mkBinaryOperator(
+                            me, const_cast<Expr*>(varDecl2->getInit()), BO_Assign, field->getType());
+
+                        mVarNamePrefix.insert(std::make_pair(const_cast<ParmVarDecl*>(varDecl), me));
+                    }
+                }
+            }
+        }
+
+        Visit(stmt->getBody());
+
+        Visit(stmt->getReturnStmt());
+        Visit(stmt->getReturnValue());
+        Visit(stmt->getReturnValueInit());
+        Visit(stmt->getExceptionHandler());
+        Visit(stmt->getReturnStmtOnAllocFailure());
+
+        Visit(stmt->getInitSuspendStmt());
+
+        // final suspend point doesn't need a label
+        mFinalSuspend = true;
+        Visit(stmt->getFinalSuspendStmt());
+        mFinalSuspend = false;
+    }
+
+    void VisitStmt(Stmt* stmt)
+    {
+        auto* tmp = mPrevStmt;
+        mPrevStmt = stmt;
+
+        for(auto* child : stmt->children()) {
+            Visit(child);
+        }
+
+        mPrevStmt = tmp;
+    }
+};
+//-----------------------------------------------------------------------------
+
 void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const CoroutineBodyStmt* stmt)
 {
     mOutputFormatHelper.OpenScope();
-
-    const auto* promiseDecl = stmt->getPromiseDecl();
-    mDeclsHolder.push_back(promiseDecl);
 
     auto& ctx = GetGlobalAST();
 
@@ -497,8 +760,14 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mASTData.mFrameAccessDeclRef = asthelpers::mkDeclRefExpr(frameAccess);
 
     // The coroutine frame starts with two function pointers to the resume and destroy function. See:
-    // https://gcc.gnu.org/legacy-ml/gcc-patches/2020-01/msg01096.html and https://llvm.org/docs/Coroutines.html#id72
-    // "Coroutine Representation"
+    // https://gcc.gnu.org/legacy-ml/gcc-patches/2020-01/msg01096.html:
+    // "The ABI mandates that pointers into the coroutine frame point to an area
+    // begining with two function pointers (to the resume and destroy functions
+    // described below); these are immediately followed by the "promise object"
+    // described in the standard."
+    //
+    // and
+    // https://llvm.org/docs/Coroutines.html#id72 "Coroutine Representation"
     auto* resumeFnFd =
         asthelpers::mkFunctionDecl(hlpResumeFn, ctx.VoidTy, {{CORO_FRAME_NAME, ctx.getPointerType(GetFrameType())}});
     auto resumeFnType       = ctx.getPointerType(resumeFnFd->getType());
@@ -508,33 +777,6 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         asthelpers::mkFunctionDecl(hlpDestroyFn, ctx.VoidTy, {{CORO_FRAME_NAME, ctx.getPointerType(GetFrameType())}});
     auto destroyFnType       = ctx.getPointerType(destroyFnFd->getType());
     mASTData.mDestroyFnField = AddField(hlpDestroyFn, destroyFnType);
-
-    SKIP_NAME_PREFIX_FOR_SCOPE
-    {
-        mASTData.mPromiseField = AddField(GetName(*promiseDecl), promiseDecl->getType());
-        // add the suspend index variable
-        mASTData.mSuspendIndexField = AddField(SUSPEND_INDEX_NAME, ctx.IntTy);
-        mASTData.mSuspendIndexAccess =
-            asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mSuspendIndexField);
-
-        // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
-        mASTData.mInitialAwaitResumeCalledField = AddField(INITIAL_AWAIT_SUSPEND_CALLED_NAME, ctx.BoolTy);
-        mASTData.mInitialAwaitResumeCalledAccess =
-            asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField);
-    }
-
-    for(auto* param : stmt->getParamMoves()) {
-        if(const auto* declStmt = dyn_cast_or_null<DeclStmt>(param)) {
-            if(const auto* varDecl = dyn_cast_or_null<VarDecl>(declStmt->getSingleDecl())) {
-                // For the captured parameters we need to find the ParmVarDecl instead of the newly created VarDecl
-                if(const auto* declRef = FindDeclRef(varDecl->getAnyInitializer())) {
-                    varDecl = dyn_cast<ParmVarDecl>(declRef->getDecl());
-                }
-
-                mDeclsHolder.push_back(varDecl);
-            }
-        }
-    }
 
     // Allocated the made up frame
     mOutputFormatHelper.AppendCommentNewLine("Allocate the frame including the promise"sv);
@@ -572,6 +814,9 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         InsertArg(ifStmt);
     }
 
+    CoroutineASTTransformer{
+        mASTData, mSuspendsCounter, const_cast<CoroutineBodyStmt*>(stmt), llvm::DenseMap<VarDecl*, MemberExpr*>{}};
+
     // set initial suspend count to zero.
     auto* setSuspendIndexToZero = asthelpers::mkAssign(
         mASTData.mFrameAccessDeclRef, mASTData.mSuspendIndexField, asthelpers::mkIntegerLiteral32(0));
@@ -600,141 +845,110 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         }
     }
 
-    mDeclsHolder.FindAllVarDecls(stmt->getBody());
+    std::vector<Expr*> exprs{};
 
-    // cache the entries. At least in a co_return co_await + co_await we see the operands multiple times
-    llvm::DenseMap<const Stmt*, bool> exprs{};
+    // According to https://eel.is/c++draft/dcl.fct.def.coroutine#5.7 the promise_type constructor can have
+    // parameters. If so, they must be equal to the coroutines function parameters.
+    // The code here performs a _simple_ lookup for a matching ctor without using Clang's overload resolution.
+    ArrayRef<ParmVarDecl*>    funParams = fd.parameters();
+    std::vector<ParmVarDecl*> funParamStorage{};
+    QualType                  cxxMethodType{};
 
-    // -1 because of the final suspend which needs no label
-    auto FindAllSuspends = [&](const Stmt* stmt, auto& self) {
-        if(nullptr == stmt) {
-            return 0;
-        }
+    if(const auto* cxxMethodDecl = dyn_cast_or_null<CXXMethodDecl>(&fd)) {
+        funParamStorage.reserve(funParams.size() + 1);
 
-        int count = 0;
+        cxxMethodType = cxxMethodDecl->getThisObjectType();
 
-        if(isa<CoroutineSuspendExpr>(stmt)) {
-            if(not Contains(exprs, stmt)) {
-                ++count;
-                exprs.insert(std::make_pair(stmt, true));
-            }
-        }
+        // In case we have a member function the first parameter is a reference to this. The following code injects
+        // this parameter.
+        funParamStorage.push_back(ParmVarDecl::Create(const_cast<ASTContext&>(ctx),
+                                                      const_cast<FunctionDecl*>(&fd),
+                                                      {},
+                                                      {},
+                                                      &ctx.Idents.get(CORO_FRAME_ACCESS_THIS),
+                                                      cxxMethodType,
+                                                      nullptr,
+                                                      SC_None,
+                                                      nullptr));
 
-        for(const auto* child : stmt->children()) {
-            count += self(child, self);
-        }
+        // XXX: use ranges once available
+        std::copy(funParams.begin(), funParams.end(), std::back_inserter(funParamStorage));
 
-        return count;
-    };
-
-    mSuspendsCounter = FindAllSuspends(fd.getBody(), FindAllSuspends) - 1;
-
-    SCOPED_VAR_TOGGLE(mDeclsHolder.EmulateEmpty)
-    {
-        std::vector<Expr*> mExprs{};
-
-        // According to https://eel.is/c++draft/dcl.fct.def.coroutine#5.7 the promise_type constructor can have
-        // parameters. If so, they must be equal to the coroutines function parameters.
-        // The code here performs a _simple_ lookup for a matching ctor without using Clang's overload resolution.
-        ArrayRef<ParmVarDecl*>    funParams = fd.parameters();
-        std::vector<ParmVarDecl*> funParamStorage{};
-        QualType                  cxxMethodType{};
-
-        if(const auto* cxxMethodDecl = dyn_cast_or_null<CXXMethodDecl>(&fd)) {
-            funParamStorage.reserve(funParams.size() + 1);
-
-            cxxMethodType = cxxMethodDecl->getThisObjectType();
-
-            // In case we have a member function the first parameter is a reference to this. The following code injects
-            // this parameter.
-            funParamStorage.push_back(ParmVarDecl::Create(const_cast<ASTContext&>(ctx),
-                                                          const_cast<FunctionDecl*>(&fd),
-                                                          {},
-                                                          {},
-                                                          &ctx.Idents.get(CORO_FRAME_ACCESS_THIS),
-                                                          cxxMethodType,
-                                                          nullptr,
-                                                          SC_None,
-                                                          nullptr));
-
-            // XXX: use ranges once available
-            std::copy(funParams.begin(), funParams.end(), std::back_inserter(funParamStorage));
-
-            funParams = funParamStorage;
-        }
-
-        for(auto* promiseTypeRecordDecl = mASTData.mPromiseField->getType()->getAsCXXRecordDecl();
-            auto* ctor : promiseTypeRecordDecl->ctors()) {
-            // XXX: use ranges once available
-            if(not std::equal(
-                   ctor->param_begin(), ctor->param_end(), funParams.begin(), funParams.end(), [&](auto& a, auto& b) {
-                       return a->getType().getNonReferenceType() == b->getType().getNonReferenceType();
-                   })) {
-                continue;
-            }
-
-            // In case of a promise ctor which takes this as the first argument, that parameter needs to be deferences,
-            // as it can only be taken as a reference.
-            OnceTrue derefFirstParam{};
-
-            if(not ctor->param_empty() and (ctor->getParamDecl(0)->getType().getNonReferenceType() == cxxMethodType)) {
-                mDeclsHolder.mThisExprs.push_back(new(ctx) CXXThisExpr({}, ctx.getPointerType(cxxMethodType), false));
-            } else {
-                (void)static_cast<bool>(derefFirstParam);  // set it to false
-            }
-
-            for(const auto& fparam : funParams) {
-                if(derefFirstParam) {
-                    mExprs.push_back(
-                        asthelpers::mkUnaryOperator(asthelpers::mkDeclRefExpr(fparam), UO_Deref, fparam->getType()));
-
-                } else {
-                    mExprs.push_back(asthelpers::mkDeclRefExpr(fparam));
-                }
-            }
-
-            if(funParams.size()) {
-                // The <new> header needs to be included.
-                mHaveCoroutine = true;
-            }
-
-            break;  // We've found what we were looking for
-        }
-
-        for(const auto* thisExpr : mDeclsHolder.mThisExprs) {
-            mOutputFormatHelper.AppendNewLine(CORO_FRAME_ACCESS_THIS, " = this;"sv);
-        }
-
-        // Now call the promise ctor, as it may access some of the parameters it comes at this point.
-        mOutputFormatHelper.AppendNewLine();
-        mOutputFormatHelper.AppendCommentNewLine("Construct the promise."sv);
-        auto* me    = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
-        auto* asRef = asthelpers::mkUnaryOperator(me, UO_AddrOf, mASTData.mPromiseField->getType());
-
-        auto* ctorArgs = new(ctx) InitListExpr{ctx, {}, static_cast<ArrayRef<Expr*>>(mExprs), {}};
-
-        CXXNewExpr* newFrame =
-            CXXNewExpr::Create(ctx,
-                               false,
-                               nullptr,
-                               nullptr,
-                               true,
-                               false,
-                               {asRef},
-                               SourceRange{},
-                               Optional<Expr*>{},
-                               CXXNewExpr::CallInit,
-                               ctorArgs,
-                               ctx.getPointerType(mASTData.mPromiseField->getType()),
-                               ctx.getTrivialTypeSourceInfo(ctx.getPointerType(mASTData.mPromiseField->getType())),
-                               SourceRange{},
-                               SourceRange{});
-
-        InsertArgWithNull(newFrame);
-
-        // Add parameters from the original function to the list
-        mDeclsHolder.JoinDeclsAndMoveDecls();
+        funParams = funParamStorage;
     }
+
+    for(auto* promiseTypeRecordDecl = mASTData.mPromiseField->getType()->getAsCXXRecordDecl();
+        auto* ctor : promiseTypeRecordDecl->ctors()) {
+        // XXX: use ranges once available
+        if(not std::equal(
+               ctor->param_begin(), ctor->param_end(), funParams.begin(), funParams.end(), [&](auto& a, auto& b) {
+                   return a->getType().getNonReferenceType() == b->getType().getNonReferenceType();
+               })) {
+            continue;
+        }
+
+        // In case of a promise ctor which takes this as the first argument, that parameter needs to be deferences,
+        // as it can only be taken as a reference.
+        OnceTrue derefFirstParam{};
+
+        if(not ctor->param_empty() and (ctor->getParamDecl(0)->getType().getNonReferenceType() == cxxMethodType)) {
+            if(0 == mASTData.mThisExprs.size()) {
+                mASTData.mThisExprs.push_back(new(ctx) CXXThisExpr({}, ctx.getPointerType(cxxMethodType), false));
+            }
+        } else {
+            (void)static_cast<bool>(derefFirstParam);  // set it to false
+        }
+
+        for(const auto& fparam : funParams) {
+            if(derefFirstParam) {
+                exprs.push_back(
+                    asthelpers::mkUnaryOperator(asthelpers::mkDeclRefExpr(fparam), UO_Deref, fparam->getType()));
+
+            } else {
+                exprs.push_back(asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, fparam));
+            }
+        }
+
+        if(funParams.size()) {
+            // The <new> header needs to be included.
+            mHaveCoroutine = true;
+        }
+
+        break;  // We've found what we were looking for
+    }
+
+    if(mASTData.mThisExprs.size()) {
+        mOutputFormatHelper.AppendNewLine(CORO_FRAME_ACCESS_THIS, " = this;"sv);
+    }
+
+    // Now call the promise ctor, as it may access some of the parameters it comes at this point.
+    mOutputFormatHelper.AppendNewLine();
+    mOutputFormatHelper.AppendCommentNewLine("Construct the promise."sv);
+    auto* me    = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
+    auto* asRef = asthelpers::mkUnaryOperator(me, UO_AddrOf, mASTData.mPromiseField->getType());
+
+    auto* ctorArgs = new(ctx) InitListExpr{ctx, {}, static_cast<ArrayRef<Expr*>>(exprs), {}};
+
+    CXXNewExpr* newFrame =
+        CXXNewExpr::Create(ctx,
+                           false,
+                           nullptr,
+                           nullptr,
+                           true,
+                           false,
+                           {asRef},
+                           SourceRange{},
+                           Optional<Expr*>{},
+                           CXXNewExpr::CallInit,
+                           ctorArgs,
+                           ctx.getPointerType(mASTData.mPromiseField->getType()),
+                           ctx.getTrivialTypeSourceInfo(ctx.getPointerType(mASTData.mPromiseField->getType())),
+                           SourceRange{},
+                           SourceRange{});
+
+    InsertArgWithNull(newFrame);
+
+    // Add parameters from the original function to the list
 
     // P0057R8: [dcl.fct.def.coroutine] p5: before initial_suspend and at tops 1
 #if not IS_CLANG_NEWER_THAN(14)
@@ -742,7 +956,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     InsertArg(stmt->getResultDecl());
 #endif
 
-    // Make a call the the made up state machine function for the initial suspend
+    // Make a call to the made up state machine function for the initial suspend
     mOutputFormatHelper.AppendNewLine();
 
     // [dcl.fct.def.coroutine]
@@ -813,9 +1027,9 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     }
 #endif
 
-    // This code isn't really there but it is the easiest and cleanest way to visualize the destruction of all member in
-    // the frame.
-    // The deallocation function: https://devblogs.microsoft.com/oldnewthing/20210331-00/?p=105028
+    // This code isn't really there but it is the easiest and cleanest way to visualize the destruction of all
+    // member in the frame. The deallocation function:
+    // https://devblogs.microsoft.com/oldnewthing/20210331-00/?p=105028
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.AppendCommentNewLine("This function invoked by coroutine_handle<>::destroy()"sv);
 
@@ -863,39 +1077,15 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
     // insert the init suspend expr
     mState = eState::InitialSuspend;
 
-    for(const auto* recordDeclDecl : mDeclsHolder.mRecordDecls) {
-        mASTData.mFrameType->addDecl(const_cast<CXXRecordDecl*>(recordDeclDecl));
-    }
-
-    SKIP_NAME_PREFIX_FOR_SCOPE
-    {
-        for(const auto* thisExpr : mDeclsHolder.mThisExprs) {
-            AddField(kwInternalThis, thisExpr->getType());
-        }
-
-        SCOPED_VAR_TOGGLE(mDeclsHolder.EmulateEmpty)
-        {
-            for(const auto& promiseType{stmt->getPromiseDecl()->getType()}; const auto* varDecl : mDeclsHolder.mDecls) {
-                // skip the promise-type, as we inserted that earlier to be sure about the order
-                if(promiseType != varDecl->getType()) {
-                    AddField(GetName(*varDecl), varDecl->getType());
-                }
-            }
-        }
+    if(mASTData.mThisExprs.size()) {
+        AddField(kwInternalThis, mASTData.mThisExprs.at(0)->getType());
     }
 
     mInsertVarDecl      = false;
     mSupressRecordDecls = true;
 
-    for(const auto* c : stmt->children()) {
-        // Process only CompoundStmt's
-        if(not isa<CompoundStmt>(c)) {
-            break;
-        }
-
-        for(const auto* c : c->children()) {
-            funcBodyStmts.Add(c);
-        }
+    for(const auto* c : stmt->getBody()->children()) {
+        funcBodyStmts.Add(c);
     }
 
     // InsertArg(stmt->getFallthroughHandler());
@@ -932,10 +1122,7 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
     InsertArg(stmt->getFinalSuspendStmt());
 
     // disable prefixing names and types
-    mInsertVarDecl            = true;
-    mDeclsHolder.EmulateEmpty = true;
-
-    mDeclsHolder.mDecls.clear();
+    mInsertVarDecl = true;
 }
 //-----------------------------------------------------------------------------
 
@@ -944,38 +1131,6 @@ void CoroutinesCodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     if(not mSupressRecordDecls) {
         CodeGenerator::InsertArg(stmt);
     }
-}
-//-----------------------------------------------------------------------------
-
-/// This is here to filter out a void cast of a co_await / co_yield expr.
-void CoroutinesCodeGenerator::InsertArg(const CStyleCastExpr* stmt)
-{
-    // treat a case where a co_await / co_yield is casted to void:
-    // \code
-    // (void)(co_await i);
-    // \endcode
-    auto findChilds = [](const Stmt* s, int n, auto f, int i = 0) -> const CoroutineSuspendExpr* {
-        if(i > n) {
-            return nullptr;
-        }
-
-        for(const auto* c : s->children()) {
-            if(const auto* corSus = dyn_cast_or_null<CoroutineSuspendExpr>(c)) {
-                return corSus;
-            }
-
-            return f(c, n, f, ++i);
-        }
-
-        return nullptr;
-    };
-
-    if(const auto* corSus = findChilds(stmt->getSubExpr(), 3, findChilds)) {
-        InsertArg(corSus);
-        return;
-    }
-
-    CodeGenerator::InsertArg(stmt);
 }
 //-----------------------------------------------------------------------------
 
@@ -1044,15 +1199,12 @@ void CoroutinesCodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
 
     } else {
         // Needs to be internal because a user can create the same type and it gets put into the stack frame
-        std::string name{BuildInternalVarName(
-            MakeLineColumnName(GetGlobalAST().getSourceManager(), stmt->getBeginLoc(), "suspend_"sv))};
-
-        auto lookupName{StrCat(CORO_FRAME_ACCESS, name)};
+        std::string name{BuildSuspendVarName(stmt)};
 
         // The initial_suspend and final_suspend expressions carry the same location info. If we hit such a case,
         // make up another name.
         // Below is a std::find_if. However, the same code looks unreadable with std::find_if
-        for(const auto& [k, v] : mOpaqueValues) {
+        for(const auto lookupName{StrCat(CORO_FRAME_ACCESS, name)}; const auto& [k, v] : mOpaqueValues) {
             if(v == lookupName) {
                 name += "_1"sv;
                 break;
@@ -1088,19 +1240,6 @@ std::string CoroutinesCodeGenerator::BuildResumeLabelName(int index) const
 
 void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 {
-    const auto* sourceExpr = stmt->getOpaqueValue()->getSourceExpr();
-
-    // If we are traversing the operands of a co_return we only want the name
-    if(mNameOnly) {
-        if(const auto& s = FindValue(mOpaqueValues, sourceExpr)) {
-            mOutputFormatHelper.Append(s.value(), "_res"sv);
-        } else {
-            mOutputFormatHelper.Append("error");
-        }
-
-        return;
-    }
-
     auto& ctx = GetGlobalAST();
 
     mOutputFormatHelper.AppendNewLine();
@@ -1202,6 +1341,8 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
     const auto* resumeExpr = stmt->getResumeExpr();
 
     if(not resumeExpr->getType()->isVoidType()) {
+        const auto* sourceExpr = stmt->getOpaqueValue()->getSourceExpr();
+
         if(const auto& s = FindValue(mOpaqueValues, sourceExpr)) {
             const auto fieldName{StrCat(std::string_view{s.value()}.substr(CORO_FRAME_ACCESS.size()), "_res"sv)};
             mOutputFormatHelper.Append(CORO_FRAME_ACCESS, fieldName, hlpAssing);
@@ -1214,120 +1355,15 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static bool HasCoroutineSuspendExpr(const Stmt* stmt)
-{
-    if((nullptr == stmt) or (isa<CppInsightsCommentStmt>(stmt))) {
-        return false;
-    }
-
-    // Take this expressions to rewrite access when the coroutine is a class method.
-    if(isa<CoroutineSuspendExpr>(stmt)) {
-        return true;
-    }
-
-    const auto children = stmt->children();
-    return children.end() != std::find_if(children.begin(), children.end(), [](const auto* child) {
-               return HasCoroutineSuspendExpr(child);
-           });
-}
-//-----------------------------------------------------------------------------
-
 void CoroutinesCodeGenerator::InsertArg(const CoreturnStmt* stmt)
 {
-    OutputFormatHelper outputFormatHelper{};
-    outputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
-
-    const auto fieldsBefore = std::distance(mASTData.mFrameType->field_begin(), mASTData.mFrameType->field_end());
-
-    // A co_return can come in a flavor like this:
-    // \code
-    // co_return co_await simpleReturn(v) + co_await simpleReturn(v);
-    // \endcode
-    //
-    // If we just insert \c getPromiseCall we end up having a expanded coroutine suspend expression in a call, which
-    // would look like this: \code
-    //     __f->__promise.return_value(__f->__promise_10_24 = simpleReturn(__f->v); ... );
-    // \endcode
-    // Which is invalid code. To avoid this, we traverse with \c getOperand first the operand only. During the
-    // traversal all the promises created are picked up as well as the operator. We then insert \c getPromiseCall
-    // and during that insert only the already prepared string.
-    if(const auto* op = stmt->getOperand()) {
-        if(const auto* binOp = dyn_cast_or_null<BinaryOperator>(op)) {
-            mCorosOnly = true;
-            InsertArg(binOp);
-            mOutputFormatHelper.AppendSemiNewLine();
-            mCorosOnly = false;
-        }
-
-        CoroutinesCodeGenerator codeGenerator{outputFormatHelper, mPosBeforeFunc, mFSMName, mSuspendsCount, mASTData};
-        codeGenerator.mBinaryExprs = mBinaryExprs;
-        codeGenerator.InsertArg(op);
-
-        mBinaryExprs.insert(codeGenerator.mBinaryExprs.begin(), codeGenerator.mBinaryExprs.end());
-    }
-
-    if(const auto fieldsAfter = std::distance(mASTData.mFrameType->field_begin(), mASTData.mFrameType->field_end());
-       fieldsAfter != fieldsBefore) {
-        mOutputFormatHelper.AppendNewLine(outputFormatHelper);
-    }
-
     InsertInstantiationPoint(GetGlobalAST().getSourceManager(), stmt->getKeywordLoc(), kwCoReturnSpace);
 
     if(stmt->getPromiseCall()) {
-        mNameOnly = true;
         InsertArg(stmt->getPromiseCall());
-        mNameOnly = false;
 
         if(stmt->isImplicit()) {
             mOutputFormatHelper.AppendComment("implicit"sv);
-        }
-    }
-}
-//-----------------------------------------------------------------------------
-
-void CoroutinesCodeGenerator::InsertArg(const CXXThisExpr* stmt)
-{
-    if(Contains(mDeclsHolder.mThisExprs, stmt)) {
-        mOutputFormatHelper.Append(CORO_FRAME_ACCESS_THIS);
-    } else {
-        CodeGenerator::InsertArg(stmt);
-    }
-}
-//-----------------------------------------------------------------------------
-
-void CoroutinesCodeGenerator::InsertArg(const BinaryOperator* stmt)
-{
-    // A BinaryOperator can have a BinaryOperator as LHS / RHS: x + 4 + t
-    // This is a special case for coroutines. There in a co_return expression we may need to skip inserting this
-    // expression, when evaluating it a second time.
-
-    // We still need to insert our own made up __suspend_index assignment
-    if(BO_Assign == stmt->getOpcode()) {
-        CodeGenerator::InsertArg(stmt);
-        return;
-    }
-
-    // If this BinaryOperator has no co-suspend expression in its children do nothing special.
-    if(not mCorosOnly) {
-        if(not HasCoroutineSuspendExpr(stmt) or mNameOnly) {
-            CodeGenerator::InsertArg(stmt);
-            return;
-        }
-    }
-
-    if(not Contains(mBinaryExprs, stmt)) {
-        // At this point we have a BinaryOperator with at least one leaf with a co-suspend expression. Add this
-        // expression to a map to mark it a seen.
-        mBinaryExprs.insert(std::make_pair(stmt, true));
-
-        if(const auto* lhs = stmt->getLHS()->IgnoreImpCasts(); HasCoroutineSuspendExpr(lhs)) {
-            InsertArg(lhs);
-            mOutputFormatHelper.AppendSemiNewLine();
-        }
-
-        if(const auto* rhs = stmt->getRHS()->IgnoreImpCasts(); HasCoroutineSuspendExpr(rhs)) {
-            InsertArg(rhs);
-            mOutputFormatHelper.AppendSemiNewLine();
         }
     }
 }

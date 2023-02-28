@@ -470,16 +470,17 @@ protected:
 
 struct CoroutineASTData
 {
-    CXXRecordDecl* mFrameType{};
-    FieldDecl*     mResumeFnField{};
-    FieldDecl*     mDestroyFnField{};
-    FieldDecl*     mPromiseField{};
-    FieldDecl*     mSuspendIndexField{};
-    FieldDecl*     mInitialAwaitResumeCalledField{};
-    MemberExpr*    mInitialAwaitResumeCalledAccess{};
-    DeclRefExpr*   mFrameAccessDeclRef{};
-    MemberExpr*    mSuspendIndexAccess{};
-    bool           mDoInsertInDtor{};
+    CXXRecordDecl*                  mFrameType{};
+    FieldDecl*                      mResumeFnField{};
+    FieldDecl*                      mDestroyFnField{};
+    FieldDecl*                      mPromiseField{};
+    FieldDecl*                      mSuspendIndexField{};
+    FieldDecl*                      mInitialAwaitResumeCalledField{};
+    MemberExpr*                     mInitialAwaitResumeCalledAccess{};
+    DeclRefExpr*                    mFrameAccessDeclRef{};
+    MemberExpr*                     mSuspendIndexAccess{};
+    bool                            mDoInsertInDtor{};
+    std::vector<const CXXThisExpr*> mThisExprs{};
 };
 
 ///
@@ -512,11 +513,8 @@ public:
 
     void InsertArg(const ImplicitCastExpr* stmt) override;
     void InsertArg(const CallExpr* stmt) override;
-    void InsertArg(const CStyleCastExpr* stmt) override;
     void InsertArg(const CXXRecordDecl* stmt) override;
-    void InsertArg(const CXXThisExpr* stmt) override;
     void InsertArg(const OpaqueValueExpr* stmt) override;
-    void InsertArg(const BinaryOperator* stmt) override;
 
     void InsertArg(const CoroutineBodyStmt* stmt) override;
     void InsertArg(const CoroutineSuspendExpr* stmt) override;
@@ -547,8 +545,6 @@ private:
     bool                              mInsertVarDecl{true};
     bool                              mSupressCasts{};
     bool                              mSupressRecordDecls{};
-    bool                              mNameOnly{};
-    bool                              mCorosOnly{};
     std::string                       mFrameName{};
     std::string                       mFSMName{};
     CoroutineASTData                  mASTData{};

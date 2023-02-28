@@ -229,7 +229,7 @@ void __seqResume(__seqFrame * __f)
     
     __resume_seq_1:
     __f->__suspend_86_11.await_resume();
-    for( __f->i = __f->start; ; ++__f->i) {
+    for(__f->i = __f->start; ; ++__f->i) {
       
       /* co_await EduCoroutineCustomYieldTypeTest.cpp:88 */
       __f->__suspend_88_14 = auto_await_suspend{};

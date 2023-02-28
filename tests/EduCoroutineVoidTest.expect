@@ -212,7 +212,7 @@ void __seq_intResume(__seq_intFrame * __f)
     
     __resume_seq_int_1:
     __f->__suspend_34_14.await_resume();
-    for( __f->i = {}; ; ++__f->i) {
+    for(__f->i = {}; ; ++__f->i) {
       
       /* co_yield EduCoroutineVoidTest.cpp:36 */
       __f->__suspend_36_5 = __f->__promise.yield_value(__f->i);

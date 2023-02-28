@@ -2136,7 +2136,15 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
     if(isCXXMethod) {
         const OverloadedOperatorKind opKind = stmt->getOperator();
 
-        mOutputFormatHelper.Append("."sv, kwOperator, getOperatorSpelling(opKind), "("sv);
+        const std::string_view operatorKw{[&] {
+            if(OO_Coawait == opKind) {
+                return kwOperatorSpace;
+            }
+
+            return kwOperator;
+        }()};
+
+        mOutputFormatHelper.Append("."sv, operatorKw, getOperatorSpelling(opKind), "("sv);
     }
 
     // consume all remaining arguments
@@ -2705,7 +2713,8 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
         // - get next field
         // - if this fields offset + size is equal to the next fields offset we are good,
         // - if not we insert padding bytes
-        // - in case there is no next field this is the last field, check this field's offset + size against the records
+        // - in case there is no next field this is the last field, check this field's offset + size against the
+        // records
         //   size. If unequal padding is needed
 
         const auto expectedOffset = fieldOffset + effectiveFieldSize;

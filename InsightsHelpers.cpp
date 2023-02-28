@@ -863,10 +863,7 @@ public:
     {
     }
 
-    std::string& GetString()
-    {
-        return mData.GetString();
-    }
+    std::string& GetString() { return mData.GetString(); }
 
     bool GetTypeString()
     {
@@ -1243,38 +1240,10 @@ static std::string GetTemplateParameterPackArgumentName(std::string_view name, c
 }
 //-----------------------------------------------------------------------------
 
-static llvm::DenseMap<const ValueDecl*, std::string_view> varNamePrefix{};
-static bool                                               skipNamePrefix{};
-
-void AddToVarNamePrefixMap(const VarDecl* vd, std::string_view name)
-{
-    // The name currently is _only_ CORO_FRAME_ACCESS. Known at compile-time
-    varNamePrefix.insert(std::make_pair(vd, name));
-}
-
-void ClearVarNamePrefix()
-{
-    varNamePrefix.clear();
-}
-
-void SkipNamePrefix(bool b)
-{
-    skipNamePrefix = b;
-}
-
-static std::string_view GetPrefixIfAvailable(const ValueDecl* decl)
-{
-    if(Contains(varNamePrefix, decl) and not skipNamePrefix) {
-        return varNamePrefix[decl];
-    }
-
-    return {};
-}
-
 std::string GetName(const DeclRefExpr& declRefExpr)
 {
     const auto* declRefDecl = declRefExpr.getDecl();
-    std::string name{GetPrefixIfAvailable(declRefDecl)};
+    std::string name{};
     const auto* declCtx = declRefDecl->getDeclContext();
     const bool  needsNamespace{NeedsNamespace(*declRefDecl, UseLexicalParent::No)};
 
@@ -1364,8 +1333,7 @@ std::string GetName(const VarDecl& VD)
         return {BuildInternalVarName(baseVarName, decompositionDeclStmt->getBeginLoc(), GetSM(*decompositionDeclStmt))};
     }
 
-    std::string name{GetPrefixIfAvailable(&VD)};
-    name += VD.getNameAsString();
+    std::string name{VD.getNameAsString()};
 
     return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, &VD));
 }
