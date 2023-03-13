@@ -3464,28 +3464,43 @@ void CodeGenerator::InsertArg(const RequiresExpr* stmt)
 
     for(const auto& requirement : stmt->getRequirements()) {
         if(const auto* typeRequirement = dyn_cast_or_null<concepts::TypeRequirement>(requirement)) {
-            mOutputFormatHelper.Append(GetName(typeRequirement->getType()->getType()));
+            if(typeRequirement->isSubstitutionFailure()) {
+                mOutputFormatHelper.Append(kwRequires, " false");
+            } else {
+                mOutputFormatHelper.Append(GetName(typeRequirement->getType()->getType()));
+            }
 
             // SimpleRequirement
         } else if(const auto* exprRequirement = dyn_cast_or_null<concepts::ExprRequirement>(requirement)) {
-            WrapInCurliesIfNeeded(exprRequirement->isCompound(), [&] { InsertArg(exprRequirement->getExpr()); });
+            if(exprRequirement->isExprSubstitutionFailure()) {
+                // The requirement failed. We need some way to express that. Using a nested
+                // requirement with false seems to be the simplest solution.
+                mOutputFormatHelper.Append(kwRequires, " false");
+            } else {
+                WrapInCurliesIfNeeded(exprRequirement->isCompound(), [&] { InsertArg(exprRequirement->getExpr()); });
 
-            if(exprRequirement->hasNoexceptRequirement()) {
-                mOutputFormatHelper.Append(kwSpaceNoexcept);
-            }
+                if(exprRequirement->hasNoexceptRequirement()) {
+                    mOutputFormatHelper.Append(kwSpaceNoexcept);
+                }
 
-            if(const auto& returnTypeRequirement = exprRequirement->getReturnTypeRequirement();
-               not returnTypeRequirement.isEmpty()) {
-                if(auto typeConstraint = GetTypeConstraintAsString(returnTypeRequirement.getTypeConstraint());
-                   not typeConstraint.empty()) {
-                    mOutputFormatHelper.Append(hlpArrow, std::move(typeConstraint));
+                if(const auto& returnTypeRequirement = exprRequirement->getReturnTypeRequirement();
+                   not returnTypeRequirement.isEmpty()) {
+                    if(auto typeConstraint = GetTypeConstraintAsString(returnTypeRequirement.getTypeConstraint());
+                       not typeConstraint.empty()) {
+                        mOutputFormatHelper.Append(hlpArrow, std::move(typeConstraint));
+                    }
                 }
             }
-
         } else if(const auto* nestedRequirement = dyn_cast_or_null<concepts::NestedRequirement>(requirement)) {
             mOutputFormatHelper.Append(kwRequiresSpace);
 
-            InsertArg(nestedRequirement->getConstraintExpr());
+            if(nestedRequirement->isSubstitutionFailure()) {
+                // The requirement failed. We need some way to express that. Using a nested
+                // requirement with false seems to be the simplest solution.
+                mOutputFormatHelper.Append("false");
+            } else {
+                InsertArg(nestedRequirement->getConstraintExpr());
+            }
         }
 
         mOutputFormatHelper.AppendSemiNewLine();
@@ -3560,8 +3575,8 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 
         ofmToInsert.InsertAt(variableInsertPos, ofm);
 
-        // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's
-        // are not allowed there.
+        // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter.
+        // CV's are not allowed there.
         mOutputFormatHelper.Append(
             GetName(stmt->getType(), Unqualified::Yes), "{"sv, internalListName, ", "sv, size, "}"sv);
 
@@ -3572,8 +3587,8 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
         }
 
     } else {
-        // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter. CV's
-        // are not allowed there.
+        // No qualifiers like const or volatile here. This appears in  function calls or operators as a parameter.
+        // CV's are not allowed there.
         mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
         InsertArg(stmt->getSubExpr());
     }
@@ -3757,8 +3772,8 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
         mOutputFormatHelper.OpenScope();
     }
 
-    // try to find out whether this ctor or the CallExpr can throw. If, then additional code needs to be generated for
-    // exception handling.
+    // try to find out whether this ctor or the CallExpr can throw. If, then additional code needs to be generated
+    // for exception handling.
     const bool canThrow{[&] {
         const ValueDecl* decl = [&]() -> const ValueDecl* {
             const auto* init = stmt->getInit()->IgnoreCasts();
@@ -4006,8 +4021,8 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
 
     if(constExprDecl.isConstexpr()) {
         const bool skipConstexpr{isLambda and not isa<CXXConversionDecl>(constExprDecl)};
-        // Special treatment for a conversion operator in a captureless lambda. It appears that if the call operator is
-        // consteval the conversion operator must be as well, otherwise it cannot take the address of the invoke
+        // Special treatment for a conversion operator in a captureless lambda. It appears that if the call operator
+        // is consteval the conversion operator must be as well, otherwise it cannot take the address of the invoke
         // function.
         const bool isConversionOpWithConstevalCallOp{[&]() {
             if(methodDecl) {
@@ -4122,8 +4137,8 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
 
     mOutputFormatHelper.Append(GetNoExcept(decl));
 
-    // insert the trailing requires-clause, if any. In case, this is a template then we already inserted the template
-    // requires-clause during creation of the template head.
+    // insert the trailing requires-clause, if any. In case, this is a template then we already inserted the
+    // template requires-clause during creation of the template head.
     InsertConceptConstraint(&decl);
 
     if(decl.isPure()) {
@@ -4241,8 +4256,8 @@ void CodeGenerator::WrapInCurlys(void_func_ref lambda, const AddSpaceAtTheEnd ad
 
 void CodeGenerator::InsertArg(const BindingDecl*)
 {
-    // We ignore this here in the global level. In some cases a BindingDecl appears _before_ the DecompositionDecl which
-    // leads to invalid code. See StructuredBindingsHandler3Test.cpp.
+    // We ignore this here in the global level. In some cases a BindingDecl appears _before_ the DecompositionDecl
+    // which leads to invalid code. See StructuredBindingsHandler3Test.cpp.
 }
 //-----------------------------------------------------------------------------
 
@@ -4257,16 +4272,16 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
     // Assume that we are looking at a builtin type. We have to construct the variable declaration information.
     auto type = stmt->getType();
 
-    // If we have a holding var we are looking at a user defined type like tuple and those the defaults from above are
-    // wrong. This type contains the variable declaration so we insert this.
+    // If we have a holding var we are looking at a user defined type like tuple and those the defaults from above
+    // are wrong. This type contains the variable declaration so we insert this.
     if(const auto* holdingVar = stmt->getHoldingVar()) {
         // Initial paper: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0144r0.pdf
 
         // The type of the binding depends on the initializer. In case the initializer is an lvalue we get a T&,
-        // otherwise a T&&. We typically look at an lvalue if the decomposition declaration was auto& [a,b]. Note the &
-        // here We have a rvalue in case the decomposition declaration was auto [a,b]. Note no reference. The standard
-        // std::get returns a lvalue reference in case e in get(e) is an lvalue, otherwise it returns an rvalue
-        // reference because then the call is get(std::move(e))
+        // otherwise a T&&. We typically look at an lvalue if the decomposition declaration was auto& [a,b]. Note
+        // the & here We have a rvalue in case the decomposition declaration was auto [a,b]. Note no reference. The
+        // standard std::get returns a lvalue reference in case e in get(e) is an lvalue, otherwise it returns an
+        // rvalue reference because then the call is get(std::move(e))
         type = holdingVar->getType().getCanonicalType();
 
         bindingStmt = holdingVar->getAnyInitializer();
