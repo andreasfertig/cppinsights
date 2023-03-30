@@ -139,8 +139,8 @@ static SourceLocation FindLocationAfterRBrace(const SourceLocation              
     if(not mustHaveSemi) {
         auto nToken = clang::Lexer::findNextToken(loc, GetSM(result), result.Context->getLangOpts());
 
-        if(nToken.hasValue()) {
-            if(auto& rToken = nToken.getValue(); rToken.getKind() == tok::semi) {
+        if(nToken.has_value()) {
+            if(auto& rToken = nToken.value(); rToken.getKind() == tok::semi) {
                 return rToken.getLocation();
             }
         }

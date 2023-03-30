@@ -546,11 +546,21 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
 
 /// Get the name of a \c FieldDecl in case this \c FieldDecl is part of a lambda. The name has to be retrieved from the
 /// capture fields or can be \c __this.
-static Optional<std::string> GetFieldDeclNameForLambda(const FieldDecl& fieldDecl, const CXXRecordDecl& cxxRecordDecl)
+static std::optional<std::string> GetFieldDeclNameForLambda(const FieldDecl&     fieldDecl,
+                                                            const CXXRecordDecl& cxxRecordDecl)
 {
     if(cxxRecordDecl.isLambda()) {
-        llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
-        FieldDecl*                                 thisCapture{};
+        llvm::DenseMap<const
+#if IS_CLANG_NEWER_THAN(15)
+                       ValueDecl*
+#else
+                       VarDecl*
+#endif
+                       ,
+                       FieldDecl*>
+            captures{};
+
+        FieldDecl* thisCapture{};
 
         cxxRecordDecl.getCaptureFields(captures, thisCapture);
 
@@ -608,7 +618,7 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
         else if(const auto* fd = dyn_cast_or_null<FieldDecl>(meDecl)) {
             if(const auto* cxxRecordDecl = dyn_cast_or_null<CXXRecordDecl>(fd->getParent())) {
                 if(const auto& fieldName = GetFieldDeclNameForLambda(*fd, *cxxRecordDecl)) {
-                    return fieldName.getValue();
+                    return fieldName.value();
                 }
             }
         }
@@ -2105,7 +2115,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
             CodeGenerator      codeGenerator{ofm};
 
             ofm.Append("["sv);
-            codeGenerator.InsertArg(stmt->getArraySize().getValue());
+            codeGenerator.InsertArg(stmt->getArraySize().value());
             ofm.Append(']');
 
             // In case of multi dimension the first dimension is the getArraySize() while the others are part of the
@@ -2761,7 +2771,7 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
         std::string name{GetName(*stmt)};
 
         if(const auto fieldName = GetFieldDeclNameForLambda(*stmt, *cxxRecordDecl)) {
-            name = std::move(fieldName.getValue());
+            name = std::move(fieldName.value());
         }
 
         mOutputFormatHelper.Append(GetTypeNameAsParameter(stmt->getType(), name));
@@ -3228,11 +3238,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     mCurrentFieldPos = mOutputFormatHelper.CurrentPos();
 
-    OnceTrue               firstRecordDecl{};
-    OnceTrue               firstDecl{};
-    Decl::Kind             formerKind{};
-    llvm::Optional<size_t> insertPosBeforeCtor{};
-    AccessSpecifier        lastAccess{stmt->isClass() ? AS_private : AS_public};
+    OnceTrue              firstRecordDecl{};
+    OnceTrue              firstDecl{};
+    Decl::Kind            formerKind{};
+    std::optional<size_t> insertPosBeforeCtor{};
+    AccessSpecifier       lastAccess{stmt->isClass() ? AS_private : AS_public};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) and firstRecordDecl) {
             continue;
@@ -3261,7 +3271,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
         InsertArg(d);
 
-        if(lastAccess == AS_public and not insertPosBeforeCtor.hasValue()) {
+        if(lastAccess == AS_public and not insertPosBeforeCtor.has_value()) {
             insertPosBeforeCtor = mOutputFormatHelper.CurrentPos();
         }
 
@@ -3409,14 +3419,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                         CodeGenerator codeGenerator{ofm, LambdaInInitCapture::Yes};
                         codeGenerator.InsertArg(expr);
 
-                        mOutputFormatHelper.InsertAt(insertPosBeforeCtor.
-#if IS_CLANG_NEWER_THAN(14)
-                                                     value_or
-#else
-                                                     getValueOr
-#endif
-                                                     (-1),
-                                                     ofm);
+                        mOutputFormatHelper.InsertAt(insertPosBeforeCtor.value_or(-1), ofm);
                     }
                 } else {
                     if(isThis and not fieldDeclType->isPointerType()) {
@@ -3429,8 +3432,16 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 mOutputFormatHelper.Append(GetTypeNameAsParameter(fieldDeclType, StrCat("_"sv, name)));
             };
 
-        llvm::DenseMap<const VarDecl*, FieldDecl*> captures{};
-        FieldDecl*                                 thisCapture{};
+        llvm::DenseMap<const
+#if IS_CLANG_NEWER_THAN(15)
+                       ValueDecl*
+#else
+                       VarDecl*
+#endif
+                       ,
+                       FieldDecl*>
+                   captures{};
+        FieldDecl* thisCapture{};
 
         stmt->getCaptureFields(captures, thisCapture);
 
@@ -3451,8 +3462,15 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
             const auto* capturedVar = c.getCapturedVar();
             if(const auto* value = captures[capturedVar]) {
-                addToInits(
-                    GetName(*capturedVar), value, false, cinit, VarDecl::ListInit == capturedVar->getInitStyle());
+                addToInits(GetName(*capturedVar),
+                           value,
+                           false,
+                           cinit,
+#if IS_CLANG_NEWER_THAN(15)
+                           VarDecl::ListInit == dyn_cast_or_null<VarDecl>(capturedVar)->getInitStyle());
+#else
+                           VarDecl::ListInit == capturedVar->getInitStyle());
+#endif
             }
         }
 
@@ -3630,7 +3648,11 @@ void CodeGenerator::InsertArg(const RequiresExpr* stmt)
         } else if(const auto* nestedRequirement = dyn_cast_or_null<concepts::NestedRequirement>(requirement)) {
             mOutputFormatHelper.Append(kwRequiresSpace);
 
+#if IS_CLANG_NEWER_THAN(15)
+            if(nestedRequirement->hasInvalidConstraint()) {
+#else
             if(nestedRequirement->isSubstitutionFailure()) {
+#endif
                 // The requirement failed. We need some way to express that. Using a nested
                 // requirement with false seems to be the simplest solution.
                 mOutputFormatHelper.Append("false");
@@ -3655,34 +3677,17 @@ void CodeGenerator::InsertArg(const CXXDefaultArgExpr* stmt)
 void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 {
     if(GetInsightsOptions().UseShowInitializerList) {
-        RETURN_IF(not mCurrentPos.hasValue() and not mCurrentFieldPos.hasValue() and not mCurrentReturnPos.hasValue());
+        RETURN_IF(not mCurrentPos.has_value() and not mCurrentFieldPos.has_value() and
+                  not mCurrentReturnPos.has_value());
 
         std::string modifiers{};
-        size_t      variableInsertPos = mCurrentReturnPos.
-#if IS_CLANG_NEWER_THAN(14)
-                                   value_or
-#else
-                                   getValueOr
-#endif
-                                   (mCurrentPos.
-#if IS_CLANG_NEWER_THAN(14)
-                                    value_or
-#else
-                                    getValueOr
-#endif
-                                    (0));
+        size_t      variableInsertPos = mCurrentReturnPos.value_or(mCurrentPos.value_or(0));
 
         auto& ofmToInsert = [&]() -> decltype(auto) {
-            if(not mCurrentPos.hasValue() and not mCurrentReturnPos.hasValue()) {
-                variableInsertPos = mCurrentFieldPos.
-#if IS_CLANG_NEWER_THAN(14)
-                                    value_or
-#else
-                                    getValueOr
-#endif
-                                    (0);
-                mCurrentPos = variableInsertPos;
-                modifiers   = StrCat(kwStaticSpace, kwInlineSpace);
+            if(not mCurrentPos.has_value() and not mCurrentReturnPos.has_value()) {
+                variableInsertPos = mCurrentFieldPos.value_or(0);
+                mCurrentPos       = variableInsertPos;
+                modifiers         = StrCat(kwStaticSpace, kwInlineSpace);
                 return (*mOutputFormatHelperOutside);
             }
 
@@ -3716,10 +3721,10 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
         mOutputFormatHelper.Append(
             GetName(stmt->getType(), Unqualified::Yes), "{"sv, internalListName, ", "sv, size, "}"sv);
 
-        if(mCurrentReturnPos.hasValue()) {
-            mCurrentReturnPos = mCurrentReturnPos.getValue() + ofm.size();
+        if(mCurrentReturnPos.has_value()) {
+            mCurrentReturnPos = mCurrentReturnPos.value() + ofm.size();
         } else {
-            mCurrentPos = mCurrentPos.getValue() + ofm.size();
+            mCurrentPos = mCurrentPos.value() + ofm.size();
         }
 
     } else {
