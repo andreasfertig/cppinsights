@@ -696,7 +696,7 @@ void CodeGenerator::InsertArg(const CXXTypeidExpr* stmt)
     mOutputFormatHelper.Append(kwTypeId);
     WrapInParens([&]() {
         if(stmt->isTypeOperand()) {
-            mOutputFormatHelper.Append(GetName(stmt->getType()));
+            mOutputFormatHelper.Append(GetName(stmt->getTypeOperand(const_cast<ASTContext&>(GetGlobalAST()))));
         } else {
             InsertArg(stmt->getExprOperand());
         }
