@@ -1,0 +1,17 @@
+// cmdline:-std=c++17
+
+int main()
+{
+  char arr[3] = {2, 4, 6};
+  {
+    char (&__range1)[3] = arr;
+    char * __begin1 = __range1;
+    char * __end1 = __range1 + 3L;
+    for(; __begin1 != __end1; ++__begin1) {
+      char c = *__begin1;
+    }
+    
+  }
+  return 0;
+}
+
