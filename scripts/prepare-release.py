@@ -17,7 +17,7 @@ def main():
     oldClangStable = '14'
     newClangStable = '15'
     newInsightsVersion = '0.10'
-    oldInsightsVersion = re.search('INSIGHTS_VERSION\s+"(.*?)"', versionH, re.DOTALL | re.MULTILINE).group(1)
+    oldInsightsVersion = re.search(r'INSIGHTS_VERSION\s+"(.*?)"', versionH, re.DOTALL | re.MULTILINE).group(1)
 
 
     print('Preparing a new release:')
@@ -31,7 +31,7 @@ def main():
 
     regEx = re.compile('[clang|llvm]-([0-9]+)')
 
-    travis = re.sub('(clang|llvm|clang\+\+|llvm-config|llvm-toolchain-bionic|clang-format|clang-tidy|llvm-toolchain-trusty)(-%s)' %(oldClangStable), '\\1-%s' %(newClangStable) , travis)
+    travis = re.sub(r'(clang|llvm|clang\+\+|llvm-config|llvm-toolchain-bionic|clang-format|clang-tidy|llvm-toolchain-trusty)(-%s)' %(oldClangStable), '\\1-%s' %(newClangStable) , travis)
     travis = re.sub('(clang|Clang|llvm|LLVM) (%s)' %(oldClangStable), '\\1 %s' %(newClangStable) , travis)
     travis = re.sub(r"(LLVM_VERSION=)('%s)" %(oldClangStable), r"\1'%s" %(newClangStable) , travis)
     travis = re.sub(r"(LLVM_VERSION:)\s*(%s.0.0)" %(oldClangStable), r"\1 %s.0.0" %(newClangStable) , travis)
@@ -46,7 +46,7 @@ def main():
 
     print('  - Updating CMakeLists.txt')
     cmake = open('CMakeLists.txt', 'r').read()
-    cmake = re.sub('(set\(INSIGHTS_MIN_LLVM_MAJOR_VERSION)( %s)\)' %(oldClangStable), '\\1 %s)' %(newClangStable) , cmake)
+    cmake = re.sub(r'(set\(INSIGHTS_MIN_LLVM_MAJOR_VERSION)( %s)\)' %(oldClangStable), '\\1 %s)' %(newClangStable) , cmake)
     open('CMakeLists.txt', 'w').write(cmake)
 
 
@@ -90,7 +90,7 @@ def main():
     print('  - Updating cppinsights-docker-base (%s)' %(cppInsightsDockerBaseFile))
 
     dockerFile = open(cppInsightsDockerBaseFile, 'r').read()
-    dockerFile = re.sub('(ENV\s+CLANG_VERSION=)([0-9]+)', r'\g<1>%s' %(newClangStable), dockerFile)
+    dockerFile = re.sub(r'(ENV\s+CLANG_VERSION=)([0-9]+)', r'\g<1>%s' %(newClangStable), dockerFile)
     open(cppInsightsDockerBaseFile, 'w').write(dockerFile)
 #------------------------------------------------------------------------------
 
