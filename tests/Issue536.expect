@@ -1,0 +1,178 @@
+/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+#include <new> // for thread-safe static's placement new
+#include <stdint.h> // for uint64_t under Linux/GCC
+// cmdline:-std=c++20
+// cmdlineinsights:-edu-show-coroutine-transformation
+
+#include <coroutine>
+#include <utility>
+
+struct my_resumable
+{
+  struct promise_type
+  {
+    inline constexpr promise_type() /* noexcept */ = default;
+    inline promise_type(int & a, char & b, double & c)
+    {
+    }
+    
+    inline my_resumable get_return_object()
+    {
+      std::coroutine_handle<promise_type> h = std::coroutine_handle<promise_type>::from_promise(*this);
+      return my_resumable(my_resumable(std::coroutine_handle<promise_type>(h)));
+    }
+    
+    inline std::suspend_never initial_suspend()
+    {
+      return {};
+    }
+    
+    inline std::suspend_always final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline void return_void()
+    {
+    }
+    
+    inline void unhandled_exception()
+    {
+    }
+    
+  };
+  
+  using handle_type = std::coroutine_handle<promise_type>;
+  inline constexpr my_resumable() /* noexcept */ = default;
+  inline my_resumable(std::coroutine_handle<promise_type> h)
+  : m_handle{std::coroutine_handle<promise_type>(h)}
+  {
+  }
+  
+  inline ~my_resumable() noexcept
+  {
+    if(static_cast<bool>(this->m_handle.operator bool())) {
+      this->m_handle.destroy();
+    } 
+    
+  }
+  
+  inline my_resumable(my_resumable && other) noexcept
+  : m_handle{std::exchange(other.m_handle, nullptr)}
+  {
+  }
+  
+  inline my_resumable & operator=(my_resumable && other) noexcept
+  {
+    this->m_handle.operator=(std::exchange(other.m_handle, nullptr));
+    return *this;
+  }
+  
+  std::coroutine_handle<promise_type> m_handle;
+  // inline constexpr my_resumable(const my_resumable &) /* noexcept */ = delete;
+  // inline my_resumable & operator=(const my_resumable &) /* noexcept */ = delete;
+};
+
+
+
+struct __coroFrame
+{
+  void (*resume_fn)(__coroFrame *);
+  void (*destroy_fn)(__coroFrame *);
+  std::__coroutine_traits_sfinae<my_resumable>::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  int a;
+  char b;
+  double c;
+  std::suspend_never __suspend_37_14;
+  std::suspend_always __suspend_37_14_1;
+};
+
+my_resumable coro(int a, char b, double c)
+{
+  /* Allocate the frame including the promise */
+  __coroFrame * __f = reinterpret_cast<__coroFrame *>(operator new(__builtin_coro_size()));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  __f->a = std::forward<int>(a);
+  __f->b = std::forward<char>(b);
+  __f->c = std::forward<double>(c);
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<my_resumable>::promise_type{__f->a, __f->b, __f->c};
+  
+  /* Forward declare the resume and destroy function. */
+  void __coroResume(__coroFrame * __f);
+  void __coroDestroy(__coroFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__coroResume;
+  __f->destroy_fn = &__coroDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __coroResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __coroResume(__coroFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_coro_1;
+    }
+    
+    /* co_await Issue536.cpp:37 */
+    __f->__suspend_37_14 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_37_14.await_ready()) {
+      __f->__suspend_37_14.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_coro_1:
+    __f->__suspend_37_14.await_resume();
+    /* co_return Issue536.cpp:38 */
+    __f->__promise.return_void();
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await Issue536.cpp:37 */
+  __f->__suspend_37_14_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_37_14_1.await_ready()) {
+    __f->__suspend_37_14_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __coroDestroy(__coroFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__coroFrame();
+  /* Deallocating the coroutine frame */
+  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+}
+
+

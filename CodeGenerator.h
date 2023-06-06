@@ -153,9 +153,13 @@ public:
     virtual ~CodeGenerator() = default;
 
 #define IGNORED_DECL(type)                                                                                             \
-    virtual void InsertArg(const type*) {}
+    virtual void InsertArg(const type*)                                                                                \
+    {                                                                                                                  \
+    }
 #define IGNORED_STMT(type)                                                                                             \
-    virtual void InsertArg(const type*) {}
+    virtual void InsertArg(const type*)                                                                                \
+    {                                                                                                                  \
+    }
 #define SUPPORTED_DECL(type) virtual void InsertArg(const type* stmt);
 #define SUPPORTED_STMT(type) virtual void InsertArg(const type* stmt);
 
@@ -203,22 +207,13 @@ public:
 
     /// Track whether we have at least one local static variable in this TU.
     /// If so we need to insert the <new> header for the placement-new.
-    static bool NeedToInsertNewHeader()
-    {
-        return mHaveLocalStatic;
-    }
+    static bool NeedToInsertNewHeader() { return mHaveLocalStatic or mHaveCoroutine; }
 
     /// Track whether we have a noexcept transformation which needs the exception header.
-    static bool NeedToInsertExceptionHeader()
-    {
-        return mHaveException;
-    }
+    static bool NeedToInsertExceptionHeader() { return mHaveException; }
 
     /// Track whether we inserted a std::move due, to a static transformation, this means we need the utility header.
-    static bool NeedToInsertUtilityHeader()
-    {
-        return mHaveMovedLambda;
-    }
+    static bool NeedToInsertUtilityHeader() { return mHaveMovedLambda; }
 
     template<typename T>
     void InsertTemplateArgs(const ArrayRef<T>& array)
@@ -247,34 +242,16 @@ public:
     void InsertPrimaryTemplate(const FunctionTemplateDecl*);
 
 protected:
-    virtual bool InsertVarDecl()
-    {
-        return true;
-    }
-    virtual bool SkipSpaceAfterVarDecl()
-    {
-        return false;
-    }
-    virtual bool InsertComma()
-    {
-        return false;
-    }
-    virtual bool InsertSemi()
-    {
-        return true;
-    }
-    virtual bool InsertNamespace() const
-    {
-        return false;
-    }
+    virtual bool InsertVarDecl() { return true; }
+    virtual bool SkipSpaceAfterVarDecl() { return false; }
+    virtual bool InsertComma() { return false; }
+    virtual bool InsertSemi() { return true; }
+    virtual bool InsertNamespace() const { return false; }
 
     /// \brief Show casts to xvalues independent from the show all casts option.
     ///
     /// This helps showing xvalue casts in structured bindings.
-    virtual bool ShowXValueCasts() const
-    {
-        return false;
-    }
+    virtual bool ShowXValueCasts() const { return false; }
 
     void HandleTemplateParameterPack(const ArrayRef<TemplateArgument>& args);
     void HandleCompoundStmt(const CompoundStmt* stmt);
@@ -291,18 +268,12 @@ protected:
                     const Expr*            SubExpr,
                     const CastKind&        castKind);
 
-    void ForEachArg(const auto& arguments, auto&& lambda)
-    {
-        mOutputFormatHelper.ForEachArg(arguments, lambda);
-    }
+    void ForEachArg(const auto& arguments, auto&& lambda) { mOutputFormatHelper.ForEachArg(arguments, lambda); }
 
     void InsertArgWithParensIfNeeded(const Stmt* stmt);
     void InsertSuffix(const QualType& type);
 
-    void InsertTemplateArg(const TemplateArgumentLoc& arg)
-    {
-        InsertTemplateArg(arg.getArgument());
-    }
+    void InsertTemplateArg(const TemplateArgumentLoc& arg) { InsertTemplateArg(arg.getArgument()); }
     bool InsertLambdaStaticInvoker(const CXXMethodDecl* cxxMethodDecl);
 
     STRONG_BOOL(InsertInline);
@@ -339,10 +310,7 @@ protected:
     void InsertTemplateGuardEnd(const FunctionDecl* stmt);
 
     /// \brief Insert \c template<> to introduce a template specialization.
-    void InsertTemplateSpecializationHeader()
-    {
-        mOutputFormatHelper.AppendNewLine("template<>"sv);
-    }
+    void InsertTemplateSpecializationHeader() { mOutputFormatHelper.AppendNewLine("template<>"sv); }
 
     void InsertNamespace(const NestedNameSpecifier* namespaceSpecifier);
     void ParseDeclContext(const DeclContext* Ctx);
@@ -390,10 +358,7 @@ protected:
                               void_func_ref          lambda,
                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
-    void UpdateCurrentPos()
-    {
-        mCurrentPos = mOutputFormatHelper.CurrentPos();
-    }
+    void UpdateCurrentPos() { mCurrentPos = mOutputFormatHelper.CurrentPos(); }
 
     static std::string_view GetBuiltinTypeSuffix(const BuiltinType::Kind& kind);
 
@@ -435,6 +400,7 @@ protected:
         NoEmptyInitList::No};  //!< At least in case if a requires-clause containing T{} we don't want to get T{{}}.
     const LambdaExpr*  mLambdaExpr{};
     static inline bool mHaveLocalStatic;  //!< Track whether there was a thread-safe \c static in the code.
+    static inline bool mHaveCoroutine;    //!< Track whether there we have a coroutine and need the new header there.
     static inline bool mHaveMovedLambda;  //!< Track whether there was a std::move inserted.
     static inline bool
         mHaveException;  //!< Track whether there was a noexcept transformation requireing the exception header.

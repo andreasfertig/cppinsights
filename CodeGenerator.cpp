@@ -611,6 +611,13 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
             }
         }
 
+        // Special case. If this is a CXXConversionDecl it might be:
+        // a) a template so we need the template arguments from this type
+        // b) in a namespace and need want to preserve that one.
+        if(const auto* convDecl = dyn_cast_or_null<CXXConversionDecl>(meDecl)) {
+            return StrCat(kwOperatorSpace, GetName(convDecl->getConversionType()));
+        }
+
         return stmt->getMemberNameInfo().getName().getAsString();
     }();
 

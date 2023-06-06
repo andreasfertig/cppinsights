@@ -128,7 +128,7 @@ generator seq(int start)
   __seqResume(__f);
   
   
-  return __promise.get_return_object();
+  return __f->__promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */
@@ -148,7 +148,7 @@ void __seqResume(__seqFrame * __f)
     /* co_await EduCoroutineBinaryExprTest.cpp:35 */
     __f->__suspend_35_11 = __f->__promise.initial_suspend();
     if(!__f->__suspend_35_11.await_ready()) {
-      __f->__suspend_35_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+      __f->__suspend_35_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
@@ -162,7 +162,7 @@ void __seqResume(__seqFrame * __f)
       /* co_yield EduCoroutineBinaryExprTest.cpp:42 */
       __f->__suspend_42_5 = __f->__promise.yield_value(__f->s.t);
       if(!__f->__suspend_42_5.await_ready()) {
-        __f->__suspend_42_5.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+        __f->__suspend_42_5.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
         __f->__suspend_index = 2;
         return;
       } 
@@ -173,7 +173,7 @@ void __seqResume(__seqFrame * __f)
       /* co_yield EduCoroutineBinaryExprTest.cpp:43 */
       __f->__suspend_43_12 = __f->__promise.yield_value(__f->i);
       if(!__f->__suspend_43_12.await_ready()) {
-        __f->__suspend_43_12.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+        __f->__suspend_43_12.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
         __f->__suspend_index = 3;
         return;
       } 
@@ -184,7 +184,7 @@ void __seqResume(__seqFrame * __f)
       /* co_yield EduCoroutineBinaryExprTest.cpp:44 */
       __f->__suspend_44_5 = __f->__promise.yield_value(__f->i + 1);
       if(!__f->__suspend_44_5.await_ready()) {
-        __f->__suspend_44_5.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+        __f->__suspend_44_5.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
         __f->__suspend_index = 4;
         return;
       } 
@@ -207,7 +207,7 @@ void __seqResume(__seqFrame * __f)
   /* co_await EduCoroutineBinaryExprTest.cpp:35 */
   __f->__suspend_35_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_35_11_1.await_ready()) {
-    __f->__suspend_35_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+    __f->__suspend_35_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
   } 
   
   ;
