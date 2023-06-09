@@ -168,7 +168,8 @@ template<>
 generator<int> fun<int>()
 {
   /* Allocate the frame including the promise */
-  __fun_intFrame * __f = reinterpret_cast<__fun_intFrame *>(operator new(__builtin_coro_size(), std::nothrow));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __fun_intFrame * __f = reinterpret_cast<__fun_intFrame *>(operator new(sizeof(__fun_intFrame), std::nothrow));
   
   if(nullptr == __f) {
     return generator<int>::promise_type::get_return_object_on_allocation_failure();
@@ -247,7 +248,8 @@ void __fun_intDestroy(__fun_intFrame * __f)
   /* destroy all variables with dtors */
   __f->~__fun_intFrame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 #endif

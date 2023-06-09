@@ -266,6 +266,12 @@ auto* mkCXXRecordDecl(std::string_view name)
 }
 }  // namespace asthelpers
 
+UnaryExprOrTypeTraitExpr* Sizeof(QualType toType)
+{
+    const auto& ctx = GetGlobalAST();
+    return new(ctx) UnaryExprOrTypeTraitExpr(UETT_SizeOf, ctx.getTrivialTypeSourceInfo(toType), toType, {}, {});
+}
+
 using decl_vector_t       = std::vector<const VarDecl*>;
 using this_vector_t       = std::vector<const CXXThisExpr*>;
 using recordDecl_vector_t = std::vector<const CXXRecordDecl*>;
@@ -532,6 +538,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
 
     // Allocated the made up frame
     mOutputFormatHelper.AppendCommentNewLine("Allocate the frame including the promise"sv);
+    mOutputFormatHelper.AppendCommentNewLine("Note: The actual parameter new is __builtin_coro_size"sv);
 
     auto* coroFrameVar = asthelpers::mkVarDecl(CORO_FRAME_NAME, GetFramePointerType());
 
@@ -821,6 +828,9 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     deallocFuncBodyStmts.Add(dtorCall);
 
     deallocFuncBodyStmts.Add(asthelpers::mkInsightsComment("Deallocating the coroutine frame"sv));
+    deallocFuncBodyStmts.Add(asthelpers::mkInsightsComment(
+        "Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter"sv));
+
     deallocFuncBodyStmts.Add(stmt->getDeallocate());
 
     SetFunctionBody(deallocFuncDecl, deallocFuncBodyStmts);
@@ -980,8 +990,8 @@ void CoroutinesCodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-// A special hack to avoid having calls to __builtin_coro_frame() which are what Clang does but don't show that it
-// is about the promise type.
+// A special hack to avoid having calls to __builtin_coro_xxx as some of them result in a crash
+// of the compiler and have assumption on the call order and function location.
 void CoroutinesCodeGenerator::InsertArg(const CallExpr* stmt)
 {
     if(const auto* callee = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreCasts())) {
@@ -1001,6 +1011,12 @@ void CoroutinesCodeGenerator::InsertArg(const CallExpr* stmt)
                                                                   {});
 
             CodeGenerator::InsertArg(toVoid);
+            return;
+        } else if(GetPlainName(*callee) == "__builtin_coro_free"sv) {
+            CodeGenerator::InsertArg(stmt->getArg(0));
+            return;
+        } else if(GetPlainName(*callee) == "__builtin_coro_size"sv) {
+            CodeGenerator::InsertArg(Sizeof(GetFrameType()));
             return;
         }
     }

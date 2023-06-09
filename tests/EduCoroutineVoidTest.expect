@@ -164,7 +164,8 @@ template<>
 generator<int> seq<int>()
 {
   /* Allocate the frame including the promise */
-  __seq_intFrame * __f = reinterpret_cast<__seq_intFrame *>(operator new(__builtin_coro_size()));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __seq_intFrame * __f = reinterpret_cast<__seq_intFrame *>(operator new(sizeof(__seq_intFrame)));
   __f->__suspend_index = 0;
   __f->__initial_await_suspend_called = false;
   
@@ -251,7 +252,8 @@ void __seq_intDestroy(__seq_intFrame * __f)
   /* destroy all variables with dtors */
   __f->~__seq_intFrame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 #endif

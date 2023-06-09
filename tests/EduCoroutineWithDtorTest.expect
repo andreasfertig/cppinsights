@@ -177,7 +177,8 @@ template<>
 generator<Test> fun<Test>()
 {
   /* Allocate the frame including the promise */
-  __fun_TestFrame * __f = reinterpret_cast<__fun_TestFrame *>(operator new(__builtin_coro_size()));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __fun_TestFrame * __f = reinterpret_cast<__fun_TestFrame *>(operator new(sizeof(__fun_TestFrame)));
   __f->__suspend_index = 0;
   __f->__initial_await_suspend_called = false;
   
@@ -251,7 +252,8 @@ void __fun_TestDestroy(__fun_TestFrame * __f)
   /* destroy all variables with dtors */
   __f->~__fun_TestFrame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 #endif

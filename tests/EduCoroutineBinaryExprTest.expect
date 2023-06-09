@@ -106,7 +106,8 @@ struct __seqFrame
 generator seq(int start)
 {
   /* Allocate the frame including the promise */
-  __seqFrame * __f = reinterpret_cast<__seqFrame *>(operator new(__builtin_coro_size()));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __seqFrame * __f = reinterpret_cast<__seqFrame *>(operator new(sizeof(__seqFrame)));
   __f->__suspend_index = 0;
   __f->__initial_await_suspend_called = false;
   __f->start = std::forward<int>(start);
@@ -219,7 +220,8 @@ void __seqDestroy(__seqFrame * __f)
   /* destroy all variables with dtors */
   __f->~__seqFrame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 
