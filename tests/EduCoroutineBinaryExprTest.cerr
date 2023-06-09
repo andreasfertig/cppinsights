@@ -1,4 +1,0 @@
-.tmp.cpp:222:19: error: this builtin expect that __builtin_coro_id has been used earlier in this function
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
-                  ^
-1 error generated.

@@ -113,7 +113,8 @@ struct __simpleReturnFrame
 generator simpleReturn(int v)
 {
   /* Allocate the frame including the promise */
-  __simpleReturnFrame * __f = reinterpret_cast<__simpleReturnFrame *>(operator new(__builtin_coro_size(), std::nothrow));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __simpleReturnFrame * __f = reinterpret_cast<__simpleReturnFrame *>(operator new(sizeof(__simpleReturnFrame), std::nothrow));
   
   if(nullptr == __f) {
     return generator::promise_type::get_return_object_on_allocation_failure();
@@ -193,7 +194,8 @@ void __simpleReturnDestroy(__simpleReturnFrame * __f)
   /* destroy all variables with dtors */
   __f->~__simpleReturnFrame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 
@@ -218,7 +220,8 @@ struct __additionAwaitReturnFrame
 generator additionAwaitReturn(int v)
 {
   /* Allocate the frame including the promise */
-  __additionAwaitReturnFrame * __f = reinterpret_cast<__additionAwaitReturnFrame *>(operator new(__builtin_coro_size(), std::nothrow));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __additionAwaitReturnFrame * __f = reinterpret_cast<__additionAwaitReturnFrame *>(operator new(sizeof(__additionAwaitReturnFrame), std::nothrow));
   
   if(nullptr == __f) {
     return generator::promise_type::get_return_object_on_allocation_failure();
@@ -324,7 +327,8 @@ void __additionAwaitReturnDestroy(__additionAwaitReturnFrame * __f)
   /* destroy all variables with dtors */
   __f->~__additionAwaitReturnFrame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 
@@ -350,7 +354,8 @@ struct __additionAwaitReturn2Frame
 generator additionAwaitReturn2(int v)
 {
   /* Allocate the frame including the promise */
-  __additionAwaitReturn2Frame * __f = reinterpret_cast<__additionAwaitReturn2Frame *>(operator new(__builtin_coro_size(), std::nothrow));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __additionAwaitReturn2Frame * __f = reinterpret_cast<__additionAwaitReturn2Frame *>(operator new(sizeof(__additionAwaitReturn2Frame), std::nothrow));
   
   if(nullptr == __f) {
     return generator::promise_type::get_return_object_on_allocation_failure();
@@ -469,7 +474,8 @@ void __additionAwaitReturn2Destroy(__additionAwaitReturn2Frame * __f)
   /* destroy all variables with dtors */
   __f->~__additionAwaitReturn2Frame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 
@@ -493,7 +499,8 @@ struct __additionAwaitReturnWithIntFrame
 generator additionAwaitReturnWithInt(int v)
 {
   /* Allocate the frame including the promise */
-  __additionAwaitReturnWithIntFrame * __f = reinterpret_cast<__additionAwaitReturnWithIntFrame *>(operator new(__builtin_coro_size(), std::nothrow));
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __additionAwaitReturnWithIntFrame * __f = reinterpret_cast<__additionAwaitReturnWithIntFrame *>(operator new(sizeof(__additionAwaitReturnWithIntFrame), std::nothrow));
   
   if(nullptr == __f) {
     return generator::promise_type::get_return_object_on_allocation_failure();
@@ -600,7 +607,8 @@ void __additionAwaitReturnWithIntDestroy(__additionAwaitReturnWithIntFrame * __f
   /* destroy all variables with dtors */
   __f->~__additionAwaitReturnWithIntFrame();
   /* Deallocating the coroutine frame */
-  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
 }
 
 

@@ -109,7 +109,8 @@ void SyncAwait<std::suspend_always>(std::suspend_always && a)
 inline generator operator()() const
     {
       /* Allocate the frame including the promise */
-      __operator_44_43Frame * __f = reinterpret_cast<__operator_44_43Frame *>(operator new(__builtin_coro_size()));
+      /* Note: The actual parameter new is __builtin_coro_size */
+      __operator_44_43Frame * __f = reinterpret_cast<__operator_44_43Frame *>(operator new(sizeof(__operator_44_43Frame)));
       __f->__suspend_index = 0;
       __f->__initial_await_suspend_called = false;
       
@@ -193,7 +194,8 @@ inline generator operator()() const
       /* destroy all variables with dtors */
       __f->~__operator_44_43Frame();
       /* Deallocating the coroutine frame */
-      operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+      /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+      operator delete(static_cast<void *>(__f));
     }
     
     
