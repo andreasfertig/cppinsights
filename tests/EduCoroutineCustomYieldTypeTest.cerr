@@ -1,10 +1,4 @@
-.tmp.cpp:205:10: error: use of undeclared identifier '__promise'
-  return __promise.get_return_object();
-         ^
-.tmp.cpp:223:138: error: unknown type name 'coroutine_handle'
-      __f->__suspend_86_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
-                                                                                                                                         ^
-.tmp.cpp:261:138: error: unknown type name 'coroutine_handle'
-    __f->__suspend_86_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
-                                                                                                                                         ^
-3 errors generated.
+.tmp.cpp:273:19: error: this builtin expect that __builtin_coro_id has been used earlier in this function
+  operator delete(__builtin_coro_free(static_cast<void *>(__f)));
+                  ^
+1 error generated.

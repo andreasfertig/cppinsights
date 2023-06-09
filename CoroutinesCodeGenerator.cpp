@@ -13,6 +13,8 @@
 #include "Insights.h"
 #include "InsightsHelpers.h"
 #include "NumberIterator.h"
+
+#include <algorithm>
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
@@ -622,6 +624,76 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
 
     SCOPED_VAR_TOGGLE(mDeclsHolder.EmulateEmpty)
     {
+        std::vector<Expr*> mExprs{};
+
+        // According to https://eel.is/c++draft/dcl.fct.def.coroutine#5.7 the promise_type constructor can have
+        // parameters. If so, they must be equal to the coroutines function parameters.
+        // The code here performs a _simple_ lookup for a matching ctor without using Clang's overload resolution.
+        ArrayRef<ParmVarDecl*>    funParams = fd.parameters();
+        std::vector<ParmVarDecl*> funParamStorage{};
+        QualType                  cxxMethodType{};
+
+        if(const auto* cxxMethodDecl = dyn_cast_or_null<CXXMethodDecl>(&fd)) {
+            funParamStorage.reserve(funParams.size() + 1);
+
+            cxxMethodType = cxxMethodDecl->getThisObjectType();
+
+            // In case we have a member function the first parameter is a reference to this. The following code injects
+            // this parameter.
+            funParamStorage.push_back(ParmVarDecl::Create(const_cast<ASTContext&>(ctx),
+                                                          const_cast<FunctionDecl*>(&fd),
+                                                          {},
+                                                          {},
+                                                          &ctx.Idents.get(CORO_FRAME_ACCESS_THIS),
+                                                          cxxMethodType,
+                                                          nullptr,
+                                                          SC_None,
+                                                          nullptr));
+
+            // XXX: use ranges once available
+            std::copy(funParams.begin(), funParams.end(), std::back_inserter(funParamStorage));
+
+            funParams = funParamStorage;
+        }
+
+        for(auto* promiseTypeRecordDecl = mASTData.mPromiseField->getType()->getAsCXXRecordDecl();
+            auto* ctor : promiseTypeRecordDecl->ctors()) {
+            // XXX: use ranges once available
+            if(not std::equal(
+                   ctor->param_begin(), ctor->param_end(), funParams.begin(), funParams.end(), [&](auto& a, auto& b) {
+                       return a->getType().getNonReferenceType() == b->getType().getNonReferenceType();
+                   })) {
+                continue;
+            }
+
+            // In case of a promise ctor which takes this as the first argument, that parameter needs to be deferences,
+            // as it can only be taken as a reference.
+            OnceTrue derefFirstParam{};
+
+            if(not ctor->param_empty() and (ctor->getParamDecl(0)->getType().getNonReferenceType() == cxxMethodType)) {
+                mDeclsHolder.mThisExprs.push_back(new(ctx) CXXThisExpr({}, ctx.getPointerType(cxxMethodType), false));
+            } else {
+                (void)static_cast<bool>(derefFirstParam);  // set it to false
+            }
+
+            for(const auto& fparam : funParams) {
+                if(derefFirstParam) {
+                    mExprs.push_back(
+                        asthelpers::mkUnaryOperator(asthelpers::mkDeclRefExpr(fparam), UO_Deref, fparam->getType()));
+
+                } else {
+                    mExprs.push_back(asthelpers::mkDeclRefExpr(fparam));
+                }
+            }
+
+            if(funParams.size()) {
+                // The <new> header needs to be included.
+                mHaveCoroutine = true;
+            }
+
+            break;  // We've found what we were looking for
+        }
+
         for(const auto* thisExpr : mDeclsHolder.mThisExprs) {
             mOutputFormatHelper.AppendNewLine(CORO_FRAME_ACCESS_THIS, " = this;"sv);
         }
@@ -629,9 +701,10 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         // Now call the promise ctor, as it may access some of the parameters it comes at this point.
         mOutputFormatHelper.AppendNewLine();
         mOutputFormatHelper.AppendCommentNewLine("Construct the promise."sv);
-        // XXX: Can the promise have parameters?
         auto* me    = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
         auto* asRef = asthelpers::mkUnaryOperator(me, UO_AddrOf, mASTData.mPromiseField->getType());
+
+        auto* ctorArgs = new(ctx) InitListExpr{ctx, {}, static_cast<ArrayRef<Expr*>>(mExprs), {}};
 
         CXXNewExpr* newFrame =
             CXXNewExpr::Create(ctx,
@@ -643,8 +716,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
                                {asRef},
                                SourceRange{},
                                Optional<Expr*>{},
-                               CXXNewExpr::ListInit,
-                               new(ctx) InitListExpr{{}},
+                               CXXNewExpr::CallInit,
+                               ctorArgs,
                                ctx.getPointerType(mASTData.mPromiseField->getType()),
                                ctx.getTrivialTypeSourceInfo(ctx.getPointerType(mASTData.mPromiseField->getType())),
                                SourceRange{},
@@ -698,22 +771,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.AppendNewLine();
 
-    // XXX: The getReturnStmt may contain more as just __coro_gro pre Clang 15
-    SKIP_NAME_PREFIX_FOR_SCOPE
-    {
-#if IS_CLANG_NEWER_THAN(14)
-        InsertArg(stmt->getReturnStmt());
-#else
-        DeclsHolder tmpDeclsHolder{};
-        tmpDeclsHolder.FindAllVarDecls(stmt->getResultDecl());
-        if(tmpDeclsHolder.mMoveDecls.size() > 0) {
-            const auto* retVd          = tmpDeclsHolder.mMoveDecls.at(0);
-            auto*       coroReturnDref = asthelpers::mkDeclRefExpr(const_cast<VarDecl*>(retVd));
-            auto*       returnStmt     = asthelpers::mkReturnStmt(coroReturnDref);
-            InsertArg(returnStmt);
-        }
-#endif
-    }
+    InsertArg(stmt->getReturnStmt());
 
     mOutputFormatHelper.AppendSemiNewLine();
 

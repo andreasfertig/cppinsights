@@ -124,7 +124,7 @@ generator seq(const int & start)
   __seqResume(__f);
   
   
-  return __promise.get_return_object();
+  return __f->__promise.get_return_object();
 }
 
 /* This function invoked by coroutine_handle<>::resume() */
@@ -141,7 +141,7 @@ void __seqResume(__seqFrame * __f)
     /* co_await EduCoroutineCaptureConstTest.cpp:35 */
     __f->__suspend_35_11 = __f->__promise.initial_suspend();
     if(!__f->__suspend_35_11.await_ready()) {
-      __f->__suspend_35_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+      __f->__suspend_35_11.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
@@ -166,7 +166,7 @@ void __seqResume(__seqFrame * __f)
   /* co_await EduCoroutineCaptureConstTest.cpp:35 */
   __f->__suspend_35_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_35_11_1.await_ready()) {
-    __f->__suspend_35_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator coroutine_handle());
+    __f->__suspend_35_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
   } 
   
   ;
