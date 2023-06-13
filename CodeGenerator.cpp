@@ -1775,12 +1775,21 @@ void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
 {
     if(const auto* ctx = stmt->getDecl()->getDeclContext();
        not ctx->isFunctionOrMethod() and not isa<NonTypeTemplateParmDecl>(stmt->getDecl())) {
-        OutputFormatHelper ofm{};
-        CodeGenerator      codeGenerator{ofm};
+        if(const auto* qualifier = stmt->getQualifier();
+           qualifier and (qualifier->getKind() == NestedNameSpecifier::SpecifierKind::Global)) {
+            // According to
+            // https://clang.llvm.org/doxygen/classclang_1_1NestedNameSpecifier.html#ac707a113605ed4283684b8c05664eb6f
+            // the global specifier is not stored.
+            mOutputFormatHelper.Append("::"sv, GetPlainName(*stmt));
 
-        codeGenerator.ParseDeclContext(ctx);
+        } else {
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm};
 
-        mOutputFormatHelper.Append(ScopeHandler::RemoveCurrentScope(ofm.GetString()), GetPlainName(*stmt));
+            codeGenerator.ParseDeclContext(ctx);
+
+            mOutputFormatHelper.Append(ScopeHandler::RemoveCurrentScope(ofm.GetString()), GetPlainName(*stmt));
+        }
 
     } else {
         mOutputFormatHelper.Append(GetName(*stmt));
