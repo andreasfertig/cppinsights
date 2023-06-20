@@ -297,8 +297,6 @@ void __additionAwaitReturnResume(__additionAwaitReturnFrame * __f)
     
     __resume_additionAwaitReturn_3:
     __f->__suspend_56_51_res = __f->__suspend_56_51.await_resume();
-    ;
-    
     /* co_return EduCoroutineCoreturnWithCoawaitTest.cpp:56 */
     __f->__promise.return_value(__f->__suspend_56_24_res + __f->__suspend_56_51_res);
     goto __final_suspend;
@@ -432,7 +430,6 @@ void __additionAwaitReturn2Resume(__additionAwaitReturn2Frame * __f)
     
     __resume_additionAwaitReturn2_3:
     __f->__suspend_60_51_res = __f->__suspend_60_51.await_resume();
-    ;
     
     /* co_await EduCoroutineCoreturnWithCoawaitTest.cpp:60 */
     __f->__suspend_60_80 = simpleReturn(__f->v + 2);
@@ -444,8 +441,6 @@ void __additionAwaitReturn2Resume(__additionAwaitReturn2Frame * __f)
     
     __resume_additionAwaitReturn2_4:
     __f->__suspend_60_80_res = __f->__suspend_60_80.await_resume();
-    ;
-    
     /* co_return EduCoroutineCoreturnWithCoawaitTest.cpp:60 */
     __f->__promise.return_value((__f->__suspend_60_24_res + __f->__suspend_60_51_res) + __f->__suspend_60_80_res);
     goto __final_suspend;
@@ -576,9 +571,6 @@ void __additionAwaitReturnWithIntResume(__additionAwaitReturnWithIntFrame * __f)
     
     __resume_additionAwaitReturnWithInt_3:
     __f->__suspend_67_51_res = __f->__suspend_67_51.await_resume();
-    ;
-    ;
-    
     /* co_return EduCoroutineCoreturnWithCoawaitTest.cpp:67 */
     __f->__promise.return_value((__f->__suspend_67_24_res + __f->__suspend_67_51_res) + 47);
     goto __final_suspend;

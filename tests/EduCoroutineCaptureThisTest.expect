@@ -17,7 +17,7 @@ struct my_resumable
 {
   struct promise_type
   {
-    inline promise_type(const ClassWithCoro & q1, int & q2)
+    inline promise_type(ClassWithCoro & q1, int & q2)
     {
     }
     
@@ -36,7 +36,7 @@ struct my_resumable
       return {};
     }
     
-    inline void return_void()
+    inline void return_value(int)
     {
     }
     
@@ -70,6 +70,7 @@ struct my_resumable
 
 struct ClassWithCoro
 {
+  int y{6};
   struct __coroFrame
 {
   void (*resume_fn)(__coroFrame *);
@@ -78,12 +79,12 @@ struct ClassWithCoro
   int __suspend_index;
   bool __initial_await_suspend_called;
   int x;
-  const ClassWithCoro * __this;
-  std::suspend_never __suspend_29_16;
-  std::suspend_always __suspend_29_16_1;
+  ClassWithCoro * __this;
+  std::suspend_never __suspend_31_16;
+  std::suspend_always __suspend_31_16_1;
 };
 
-inline my_resumable coro(int x) const
+inline my_resumable coro(int x)
   {
     /* Allocate the frame including the promise */
     /* Note: The actual parameter new is __builtin_coro_size */
@@ -124,19 +125,20 @@ inline my_resumable coro(int x) const
         case 1: goto __resume_coro_1;
       }
       
-      /* co_await Issue536_2.cpp:29 */
-      __f->__suspend_29_16 = __f->__promise.initial_suspend();
-      if(!__f->__suspend_29_16.await_ready()) {
-        __f->__suspend_29_16.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      /* co_await EduCoroutineCaptureThisTest.cpp:31 */
+      __f->__suspend_31_16 = __f->__promise.initial_suspend();
+      if(!__f->__suspend_31_16.await_ready()) {
+        __f->__suspend_31_16.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
         __f->__suspend_index = 1;
         __f->__initial_await_suspend_called = true;
         return;
       } 
       
       __resume_coro_1:
-      __f->__suspend_29_16.await_resume();
-      /* co_return Issue536_2.cpp:30 */
-      __f->__promise.return_void();
+      __f->__suspend_31_16.await_resume();
+      ++__f->__this->y;
+      /* co_return EduCoroutineCaptureThisTest.cpp:33 */
+      __f->__promise.return_value(__f->x + __f->__this->y);
       goto __final_suspend;
     } catch(...) {
       if(!__f->__initial_await_suspend_called) {
@@ -148,10 +150,10 @@ inline my_resumable coro(int x) const
     
     __final_suspend:
     
-    /* co_await Issue536_2.cpp:29 */
-    __f->__suspend_29_16_1 = __f->__promise.final_suspend();
-    if(!__f->__suspend_29_16_1.await_ready()) {
-      __f->__suspend_29_16_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    /* co_await EduCoroutineCaptureThisTest.cpp:31 */
+    __f->__suspend_31_16_1 = __f->__promise.final_suspend();
+    if(!__f->__suspend_31_16_1.await_ready()) {
+      __f->__suspend_31_16_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     } 
     
     ;
@@ -169,5 +171,6 @@ inline my_resumable coro(int x) const
   
   
 };
+
 
 

@@ -1,0 +1,1301 @@
+/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+// cmdline:-std=c++20
+// cmdlineinsights:-edu-show-coroutine-transformation
+
+#include <coroutine>
+#include <cstdint>
+#include <exception>
+#include <iostream>
+#include <iostream>
+#include <utility>
+
+template<class T>
+struct task
+{
+  struct promise_type
+  {
+    inline auto get_return_object()
+    {
+      return task<T>(std::coroutine_handle<promise_type>::from_promise(*this));
+    }
+    
+    inline std::suspend_always initial_suspend()
+    {
+      return {};
+    }
+    
+    struct final_awaiter
+    {
+      inline bool await_ready() noexcept
+      {
+        return false;
+      }
+      
+      inline void await_resume() noexcept
+      {
+      }
+      
+      inline std::coroutine_handle<void> await_suspend(std::coroutine_handle<promise_type> h) noexcept
+      {
+        {
+          auto previous = h.promise().previous;
+          if(previous) {
+            return previous;
+          } else {
+            return static_cast<std::coroutine_handle<void>>(std::noop_coroutine().operator std::coroutine_handle<void>());
+          } 
+          
+        }
+        
+      }
+      
+    };
+    
+    inline final_awaiter final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline void unhandled_exception()
+    {
+      throw ;
+    }
+    
+    inline void return_value(T value)
+    {
+      this->result = std::move(value);
+    }
+    
+    T result;
+    std::coroutine_handle<void> previous;
+  };
+  
+  inline task(std::coroutine_handle<promise_type> h)
+  : coro{h}
+  {
+  }
+  
+  inline task(task<T> && t) = default;
+  inline task<T> & operator=(task<T> && t) = default;
+  inline ~task()
+  {
+    this->coro.destroy();
+  }
+  
+  struct awaiter
+  {
+    inline bool await_ready()
+    {
+      return false;
+    }
+    
+    inline T await_resume()
+    {
+      return std::move(this->coro.promise().result);
+    }
+    
+    inline auto await_suspend(std::coroutine_handle<void> h)
+    {
+      this->coro.promise().previous = h;
+      return this->coro;
+    }
+    
+    std::coroutine_handle<promise_type> coro;
+  };
+  
+  inline awaiter operator co_await()
+  {
+    return awaiter{{this->coro}};
+  }
+  
+  inline T operator()()
+  {
+    this->coro.resume();
+    return std::move(this->coro.promise().result);
+  }
+  
+  
+  private: 
+  std::coroutine_handle<promise_type> coro;
+};
+
+/* First instantiated from: EduCoroutineExprTest.cpp:77 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct task<int>
+{
+  struct promise_type
+  {
+    inline task<int> get_return_object()
+    {
+      return task<int>(task<int>(std::coroutine_handle<promise_type>::from_promise(*this)));
+    }
+    
+    inline std::suspend_always initial_suspend()
+    {
+      return {};
+    }
+    
+    struct final_awaiter
+    {
+      inline bool await_ready() noexcept
+      {
+        return false;
+      }
+      
+      inline void await_resume() noexcept
+      {
+      }
+      
+      inline std::coroutine_handle<void> await_suspend(std::coroutine_handle<task<int>::promise_type> h) noexcept
+      {
+        {
+          std::coroutine_handle<void> previous = std::coroutine_handle<void>(h.promise().previous);
+          if(static_cast<bool>(previous.operator bool())) {
+            return std::coroutine_handle<void>(static_cast<std::coroutine_handle<void> &&>(previous));
+          } else {
+            return static_cast<std::coroutine_handle<void>>(std::noop_coroutine().operator std::coroutine_handle<void>());
+          } 
+          
+        }
+        
+      }
+      
+    };
+    
+    inline final_awaiter final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline void unhandled_exception()
+    {
+      throw ;
+    }
+    
+    inline void return_value(int value)
+    {
+      this->result = std::move(value);
+    }
+    
+    int result;
+    std::coroutine_handle<void> previous;
+    // inline constexpr promise_type() noexcept = default;
+  };
+  
+  inline task(std::coroutine_handle<promise_type> h)
+  : coro{std::coroutine_handle<promise_type>(h)}
+  {
+  }
+  
+  inline constexpr task(task<int> && t) /* noexcept */ = default;
+  inline task<int> & operator=(task<int> && t) /* noexcept */ = default;
+  inline ~task() noexcept
+  {
+    this->coro.destroy();
+  }
+  
+  struct awaiter
+  {
+    inline bool await_ready()
+    {
+      return false;
+    }
+    
+    inline int await_resume()
+    {
+      return std::move(this->coro.promise().result);
+    }
+    
+    inline std::coroutine_handle<promise_type> await_suspend(std::coroutine_handle<void> h)
+    {
+      this->coro.promise().previous.operator=(h);
+      return std::coroutine_handle<promise_type>(this->coro);
+    }
+    
+    std::coroutine_handle<promise_type> coro;
+  };
+  
+  inline awaiter operator co_await()
+  {
+    return awaiter{std::coroutine_handle<promise_type>(this->coro)};
+  }
+  
+  inline int operator()();
+  
+  
+  private: 
+  std::coroutine_handle<promise_type> coro;
+  public: 
+  // inline constexpr task(const task<int> &) /* noexcept */ = delete;
+  // inline task<int> & operator=(const task<int> &) /* noexcept */ = delete;
+};
+
+#endif
+
+
+struct __get_randomFrame
+{
+  void (*resume_fn)(__get_randomFrame *);
+  void (*destroy_fn)(__get_randomFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  std::suspend_always __suspend_77_11;
+  task<int>::promise_type::final_awaiter __suspend_77_11_1;
+};
+
+task<int> get_random()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __get_randomFrame * __f = reinterpret_cast<__get_randomFrame *>(operator new(sizeof(__get_randomFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __get_randomResume(__get_randomFrame * __f);
+  void __get_randomDestroy(__get_randomFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__get_randomResume;
+  __f->destroy_fn = &__get_randomDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __get_randomResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __get_randomResume(__get_randomFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_get_random_1;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:77 */
+    __f->__suspend_77_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_77_11.await_ready()) {
+      __f->__suspend_77_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_get_random_1:
+    __f->__suspend_77_11.await_resume();
+    std::operator<<(std::cout, "in get_random()\n");
+    /* co_return EduCoroutineExprTest.cpp:80 */
+    __f->__promise.return_value(4);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:77 */
+  __f->__suspend_77_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_77_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_77_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __get_randomDestroy(__get_randomFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__get_randomFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+
+int Funa(int);
+
+
+struct __testVarDeclAndConditionalFrame
+{
+  void (*resume_fn)(__testVarDeclAndConditionalFrame *);
+  void (*destroy_fn)(__testVarDeclAndConditionalFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  task<int> v;
+  task<int> u;
+  int xres;
+  int t;
+  std::suspend_always __suspend_85_11;
+  task<int>::awaiter __suspend_90_17;
+  int __suspend_90_17_res;
+  task<int>::awaiter __suspend_90_30;
+  int __suspend_90_30_res;
+  task<int>::awaiter __suspend_92_14;
+  int __suspend_92_14_res;
+  task<int>::awaiter __suspend_92_27;
+  int __suspend_92_27_res;
+  task<int>::awaiter __suspend_92_42;
+  int __suspend_92_42_res;
+  task<int>::awaiter __suspend_94_22;
+  int __suspend_94_22_res;
+  task<int>::promise_type::final_awaiter __suspend_85_11_1;
+};
+
+task<int> testVarDeclAndConditional()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __testVarDeclAndConditionalFrame * __f = reinterpret_cast<__testVarDeclAndConditionalFrame *>(operator new(sizeof(__testVarDeclAndConditionalFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f);
+  void __testVarDeclAndConditionalDestroy(__testVarDeclAndConditionalFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__testVarDeclAndConditionalResume;
+  __f->destroy_fn = &__testVarDeclAndConditionalDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __testVarDeclAndConditionalResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_testVarDeclAndConditional_1;
+      case 2: goto __resume_testVarDeclAndConditional_2;
+      case 3: goto __resume_testVarDeclAndConditional_3;
+      case 4: goto __resume_testVarDeclAndConditional_4;
+      case 5: goto __resume_testVarDeclAndConditional_5;
+      case 6: goto __resume_testVarDeclAndConditional_6;
+      case 7: goto __resume_testVarDeclAndConditional_7;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:85 */
+    __f->__suspend_85_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_85_11.await_ready()) {
+      __f->__suspend_85_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_testVarDeclAndConditional_1:
+    __f->__suspend_85_11.await_resume();
+    __f->v = get_random();
+    __f->u = get_random();
+    
+    /* co_await EduCoroutineExprTest.cpp:90 */
+    __f->__suspend_90_17 = __f->v.operator co_await();
+    if(!__f->__suspend_90_17.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_90_17.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_testVarDeclAndConditional_2:
+    __f->__suspend_90_17_res = __f->__suspend_90_17.await_resume();
+    
+    /* co_await EduCoroutineExprTest.cpp:90 */
+    __f->__suspend_90_30 = __f->u.operator co_await();
+    if(!__f->__suspend_90_30.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_90_30.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 3;
+      return;
+    } 
+    
+    __resume_testVarDeclAndConditional_3:
+    __f->__suspend_90_30_res = __f->__suspend_90_30.await_resume();
+    __f->xres = (__f->__suspend_90_17_res + __f->__suspend_90_30_res);
+    
+    /* co_await EduCoroutineExprTest.cpp:92 */
+    __f->__suspend_92_14 = __f->v.operator co_await();
+    if(!__f->__suspend_92_14.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_92_14.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 4;
+      return;
+    } 
+    
+    __resume_testVarDeclAndConditional_4:
+    __f->__suspend_92_14_res = __f->__suspend_92_14.await_resume();
+    
+    /* co_await EduCoroutineExprTest.cpp:92 */
+    __f->__suspend_92_27 = __f->v.operator co_await();
+    if(!__f->__suspend_92_27.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_92_27.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 5;
+      return;
+    } 
+    
+    __resume_testVarDeclAndConditional_5:
+    __f->__suspend_92_27_res = __f->__suspend_92_27.await_resume();
+    
+    /* co_await EduCoroutineExprTest.cpp:92 */
+    __f->__suspend_92_42 = __f->v.operator co_await();
+    if(!__f->__suspend_92_42.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_92_42.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 6;
+      return;
+    } 
+    
+    __resume_testVarDeclAndConditional_6:
+    __f->__suspend_92_42_res = __f->__suspend_92_42.await_resume();
+    __f->t = __f->__suspend_92_14_res ? __f->__suspend_92_27_res + 1 : __f->__suspend_92_42_res + 2;
+    
+    /* co_await EduCoroutineExprTest.cpp:94 */
+    __f->__suspend_94_22 = __f->v.operator co_await();
+    if(!__f->__suspend_94_22.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_94_22.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 7;
+      return;
+    } 
+    
+    __resume_testVarDeclAndConditional_7:
+    __f->__suspend_94_22_res = __f->__suspend_94_22.await_resume();
+    /* co_return EduCoroutineExprTest.cpp:94 */
+    __f->__promise.return_value(__f->xres + __f->__suspend_94_22_res);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:85 */
+  __f->__suspend_85_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_85_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_85_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __testVarDeclAndConditionalDestroy(__testVarDeclAndConditionalFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__testVarDeclAndConditionalFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+struct __testIfStmtFrame
+{
+  void (*resume_fn)(__testIfStmtFrame *);
+  void (*destroy_fn)(__testIfStmtFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  task<int> v;
+  task<int> u;
+  int w;
+  std::suspend_always __suspend_96_11;
+  task<int>::awaiter __suspend_101_8;
+  int __suspend_101_8_res;
+  task<int>::awaiter __suspend_101_21;
+  int __suspend_101_21_res;
+  task<int>::awaiter __suspend_103_19;
+  int __suspend_103_19_res;
+  task<int>::awaiter __suspend_105_18;
+  int __suspend_105_18_res;
+  task<int>::promise_type::final_awaiter __suspend_96_11_1;
+};
+
+task<int> testIfStmt()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __testIfStmtFrame * __f = reinterpret_cast<__testIfStmtFrame *>(operator new(sizeof(__testIfStmtFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __testIfStmtResume(__testIfStmtFrame * __f);
+  void __testIfStmtDestroy(__testIfStmtFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__testIfStmtResume;
+  __f->destroy_fn = &__testIfStmtDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __testIfStmtResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __testIfStmtResume(__testIfStmtFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_testIfStmt_1;
+      case 2: goto __resume_testIfStmt_2;
+      case 3: goto __resume_testIfStmt_3;
+      case 4: goto __resume_testIfStmt_4;
+      case 5: goto __resume_testIfStmt_5;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:96 */
+    __f->__suspend_96_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_96_11.await_ready()) {
+      __f->__suspend_96_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_testIfStmt_1:
+    __f->__suspend_96_11.await_resume();
+    __f->v = get_random();
+    __f->u = get_random();
+    
+    /* co_await EduCoroutineExprTest.cpp:101 */
+    __f->__suspend_101_8 = __f->v.operator co_await();
+    if(!__f->__suspend_101_8.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_101_8.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_testIfStmt_2:
+    __f->__suspend_101_8_res = __f->__suspend_101_8.await_resume();
+    
+    /* co_await EduCoroutineExprTest.cpp:101 */
+    __f->__suspend_101_21 = __f->u.operator co_await();
+    if(!__f->__suspend_101_21.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_101_21.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 3;
+      return;
+    } 
+    
+    __resume_testIfStmt_3:
+    __f->__suspend_101_21_res = __f->__suspend_101_21.await_resume();
+    if(__f->__suspend_101_8_res + __f->__suspend_101_21_res) {
+      
+      /* co_await EduCoroutineExprTest.cpp:103 */
+      __f->__suspend_103_19 = __f->v.operator co_await();
+      if(!__f->__suspend_103_19.await_ready()) {
+        __builtin_coro_resume(__f->__suspend_103_19.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+        __f->__suspend_index = 4;
+        return;
+      } 
+      
+      __resume_testIfStmt_4:
+      __f->__suspend_103_19_res = __f->__suspend_103_19.await_resume();
+      Funa(Funa(__f->__suspend_103_19_res));
+    } else {
+      
+      /* co_await EduCoroutineExprTest.cpp:105 */
+      __f->__suspend_105_18 = __f->v.operator co_await();
+      if(!__f->__suspend_105_18.await_ready()) {
+        __builtin_coro_resume(__f->__suspend_105_18.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+        __f->__suspend_index = 5;
+        return;
+      } 
+      
+      __resume_testIfStmt_5:
+      __f->__suspend_105_18_res = __f->__suspend_105_18.await_resume();
+      __f->w = __f->__suspend_105_18_res;
+    } 
+    
+    /* co_return EduCoroutineExprTest.cpp:108 */
+    __f->__promise.return_value(0);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:96 */
+  __f->__suspend_96_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_96_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_96_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __testIfStmtDestroy(__testIfStmtFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__testIfStmtFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+
+struct __testCallExprFrame
+{
+  void (*resume_fn)(__testCallExprFrame *);
+  void (*destroy_fn)(__testCallExprFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  task<int> v;
+  std::suspend_always __suspend_111_11;
+  task<int>::awaiter __suspend_115_10;
+  int __suspend_115_10_res;
+  task<int>::promise_type::final_awaiter __suspend_111_11_1;
+};
+
+task<int> testCallExpr()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __testCallExprFrame * __f = reinterpret_cast<__testCallExprFrame *>(operator new(sizeof(__testCallExprFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __testCallExprResume(__testCallExprFrame * __f);
+  void __testCallExprDestroy(__testCallExprFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__testCallExprResume;
+  __f->destroy_fn = &__testCallExprDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __testCallExprResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __testCallExprResume(__testCallExprFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_testCallExpr_1;
+      case 2: goto __resume_testCallExpr_2;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:111 */
+    __f->__suspend_111_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_111_11.await_ready()) {
+      __f->__suspend_111_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_testCallExpr_1:
+    __f->__suspend_111_11.await_resume();
+    __f->v = get_random();
+    
+    /* co_await EduCoroutineExprTest.cpp:115 */
+    __f->__suspend_115_10 = __f->v.operator co_await();
+    if(!__f->__suspend_115_10.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_115_10.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_testCallExpr_2:
+    __f->__suspend_115_10_res = __f->__suspend_115_10.await_resume();
+    Funa(__f->__suspend_115_10_res);
+    /* co_return EduCoroutineExprTest.cpp:117 */
+    __f->__promise.return_value(0);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:111 */
+  __f->__suspend_111_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_111_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_111_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __testCallExprDestroy(__testCallExprFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__testCallExprFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+
+struct __testSwitchFrame
+{
+  void (*resume_fn)(__testSwitchFrame *);
+  void (*destroy_fn)(__testSwitchFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  task<int> v;
+  std::suspend_always __suspend_120_11;
+  task<int>::awaiter __suspend_124_12;
+  int __suspend_124_12_res;
+  task<int>::promise_type::final_awaiter __suspend_120_11_1;
+};
+
+task<int> testSwitch()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __testSwitchFrame * __f = reinterpret_cast<__testSwitchFrame *>(operator new(sizeof(__testSwitchFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __testSwitchResume(__testSwitchFrame * __f);
+  void __testSwitchDestroy(__testSwitchFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__testSwitchResume;
+  __f->destroy_fn = &__testSwitchDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __testSwitchResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __testSwitchResume(__testSwitchFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_testSwitch_1;
+      case 2: goto __resume_testSwitch_2;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:120 */
+    __f->__suspend_120_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_120_11.await_ready()) {
+      __f->__suspend_120_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_testSwitch_1:
+    __f->__suspend_120_11.await_resume();
+    __f->v = get_random();
+    
+    /* co_await EduCoroutineExprTest.cpp:124 */
+    __f->__suspend_124_12 = __f->v.operator co_await();
+    if(!__f->__suspend_124_12.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_124_12.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_testSwitch_2:
+    __f->__suspend_124_12_res = __f->__suspend_124_12.await_resume();
+    switch(__f->__suspend_124_12_res) {
+      default: break;
+    }
+    /* co_return EduCoroutineExprTest.cpp:128 */
+    __f->__promise.return_value(0);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:120 */
+  __f->__suspend_120_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_120_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_120_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __testSwitchDestroy(__testSwitchFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__testSwitchFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+
+struct __testWhileFrame
+{
+  void (*resume_fn)(__testWhileFrame *);
+  void (*destroy_fn)(__testWhileFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  task<int> v;
+  int y;
+  std::suspend_always __suspend_131_11;
+  task<int>::awaiter __suspend_135_11;
+  int __suspend_135_11_res;
+  task<int>::promise_type::final_awaiter __suspend_131_11_1;
+};
+
+task<int> testWhile()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __testWhileFrame * __f = reinterpret_cast<__testWhileFrame *>(operator new(sizeof(__testWhileFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __testWhileResume(__testWhileFrame * __f);
+  void __testWhileDestroy(__testWhileFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__testWhileResume;
+  __f->destroy_fn = &__testWhileDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __testWhileResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __testWhileResume(__testWhileFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_testWhile_1;
+      case 2: goto __resume_testWhile_2;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:131 */
+    __f->__suspend_131_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_131_11.await_ready()) {
+      __f->__suspend_131_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_testWhile_1:
+    __f->__suspend_131_11.await_resume();
+    __f->v = get_random();
+    
+    /* co_await EduCoroutineExprTest.cpp:135 */
+    __f->__suspend_135_11 = __f->v.operator co_await();
+    if(!__f->__suspend_135_11.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_135_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_testWhile_2:
+    __f->__suspend_135_11_res = __f->__suspend_135_11.await_resume();
+    while(__f->__suspend_135_11_res) {
+      __f->y = {};
+    }
+    
+    /* co_return EduCoroutineExprTest.cpp:139 */
+    __f->__promise.return_value(0);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:131 */
+  __f->__suspend_131_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_131_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_131_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __testWhileDestroy(__testWhileFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__testWhileFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+
+struct __testDoWhileFrame
+{
+  void (*resume_fn)(__testDoWhileFrame *);
+  void (*destroy_fn)(__testDoWhileFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  task<int> v;
+  int yy;
+  std::suspend_always __suspend_142_11;
+  task<int>::awaiter __suspend_148_13;
+  int __suspend_148_13_res;
+  task<int>::promise_type::final_awaiter __suspend_142_11_1;
+};
+
+task<int> testDoWhile()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __testDoWhileFrame * __f = reinterpret_cast<__testDoWhileFrame *>(operator new(sizeof(__testDoWhileFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __testDoWhileResume(__testDoWhileFrame * __f);
+  void __testDoWhileDestroy(__testDoWhileFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__testDoWhileResume;
+  __f->destroy_fn = &__testDoWhileDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __testDoWhileResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __testDoWhileResume(__testDoWhileFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_testDoWhile_1;
+      case 2: goto __resume_testDoWhile_2;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:142 */
+    __f->__suspend_142_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_142_11.await_ready()) {
+      __f->__suspend_142_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_testDoWhile_1:
+    __f->__suspend_142_11.await_resume();
+    __f->v = get_random();
+    
+    /* co_await EduCoroutineExprTest.cpp:148 */
+    __f->__suspend_148_13 = __f->v.operator co_await();
+    if(!__f->__suspend_148_13.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_148_13.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_testDoWhile_2:
+    __f->__suspend_148_13_res = __f->__suspend_148_13.await_resume();
+    do {
+      __f->yy = {};
+    } while(__f->__suspend_148_13_res);
+    
+    /* co_return EduCoroutineExprTest.cpp:151 */
+    __f->__promise.return_value(0);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:142 */
+  __f->__suspend_142_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_142_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_142_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __testDoWhileDestroy(__testDoWhileFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__testDoWhileFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+
+struct __testForLoopFrame
+{
+  void (*resume_fn)(__testForLoopFrame *);
+  void (*destroy_fn)(__testForLoopFrame *);
+  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  task<int> v;
+  std::suspend_always __suspend_154_11;
+  task<int>::awaiter __suspend_159_9;
+  int __suspend_159_9_res;
+  task<int>::awaiter __suspend_159_26;
+  int __suspend_159_26_res;
+  task<int>::awaiter __suspend_159_38;
+  int __suspend_159_38_res;
+  task<int>::awaiter __suspend_161_9;
+  int __suspend_161_9_res;
+  task<int>::promise_type::final_awaiter __suspend_154_11_1;
+};
+
+task<int> testForLoop()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __testForLoopFrame * __f = reinterpret_cast<__testForLoopFrame *>(operator new(sizeof(__testForLoopFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __testForLoopResume(__testForLoopFrame * __f);
+  void __testForLoopDestroy(__testForLoopFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__testForLoopResume;
+  __f->destroy_fn = &__testForLoopDestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __testForLoopResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __testForLoopResume(__testForLoopFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_testForLoop_1;
+      case 2: goto __resume_testForLoop_2;
+      case 3: goto __resume_testForLoop_3;
+      case 4: goto __resume_testForLoop_4;
+      case 5: goto __resume_testForLoop_5;
+    }
+    
+    /* co_await EduCoroutineExprTest.cpp:154 */
+    __f->__suspend_154_11 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_154_11.await_ready()) {
+      __f->__suspend_154_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_testForLoop_1:
+    __f->__suspend_154_11.await_resume();
+    __f->v = get_random();
+    
+    /* co_await EduCoroutineExprTest.cpp:159 */
+    __f->__suspend_159_9 = __f->v.operator co_await();
+    if(!__f->__suspend_159_9.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_159_9.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_testForLoop_2:
+    __f->__suspend_159_9_res = __f->__suspend_159_9.await_resume();
+    
+    /* co_await EduCoroutineExprTest.cpp:159 */
+    __f->__suspend_159_26 = __f->v.operator co_await();
+    if(!__f->__suspend_159_26.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_159_26.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 3;
+      return;
+    } 
+    
+    __resume_testForLoop_3:
+    __f->__suspend_159_26_res = __f->__suspend_159_26.await_resume();
+    
+    /* co_await EduCoroutineExprTest.cpp:159 */
+    __f->__suspend_159_38 = __f->v.operator co_await();
+    if(!__f->__suspend_159_38.await_ready()) {
+      __builtin_coro_resume(__f->__suspend_159_38.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+      __f->__suspend_index = 4;
+      return;
+    } 
+    
+    __resume_testForLoop_4:
+    __f->__suspend_159_38_res = __f->__suspend_159_38.await_resume();
+    for(__f->__suspend_159_9_res; 0 != __f->__suspend_159_26_res; __f->__suspend_159_38_res) {
+      
+      /* co_await EduCoroutineExprTest.cpp:161 */
+      __f->__suspend_161_9 = __f->v.operator co_await();
+      if(!__f->__suspend_161_9.await_ready()) {
+        __builtin_coro_resume(__f->__suspend_161_9.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
+        __f->__suspend_index = 5;
+        return;
+      } 
+      
+      __resume_testForLoop_5:
+      __f->__suspend_161_9_res = __f->__suspend_161_9.await_resume();
+      __f->__suspend_161_9_res + 6;
+    }
+    
+    /* co_return EduCoroutineExprTest.cpp:164 */
+    __f->__promise.return_value(0);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineExprTest.cpp:154 */
+  __f->__suspend_154_11_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_154_11_1.await_ready()) {
+    __builtin_coro_resume(__f->__suspend_154_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+  } 
+  
+  ;
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __testForLoopDestroy(__testForLoopFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__testForLoopFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+

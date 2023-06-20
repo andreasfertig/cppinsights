@@ -1,14 +1,14 @@
 .tmp.cpp:109:14: error: cannot assign to non-static data member 'start' with const-qualified type 'const int &'
   __f->start = std::forward<const int &>(start);
   ~~~~~~~~~~ ^
-.tmp.cpp:96:15: note: non-static data member 'start' declared const here
+.tmp.cpp:88:15: note: non-static data member 'start' declared const here
   const int & start;
   ~~~~~~~~~~~~^~~~~
 .tmp.cpp:153:12: error: no viable overloaded '='
     __f->s = {0, '\0'};
     ~~~~~~ ^ ~~~~~~~~~
-.tmp.cpp:89:10: note: candidate function (the implicit copy assignment operator) not viable: 'this' argument has type 'const __seqFrame::S', but method is not marked const
+.tmp.cpp:90:10: note: candidate function (the implicit copy assignment operator) not viable: 'this' argument has type 'const __seqFrame::S', but method is not marked const
   struct S
          ^
-.tmp.cpp:89:10: note: candidate function (the implicit move assignment operator) not viable: 'this' argument has type 'const __seqFrame::S', but method is not marked const
+.tmp.cpp:90:10: note: candidate function (the implicit move assignment operator) not viable: 'this' argument has type 'const __seqFrame::S', but method is not marked const
 2 errors generated.

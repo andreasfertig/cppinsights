@@ -85,6 +85,7 @@ struct __seqFrame
   std::__coroutine_traits_sfinae<generator>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
+  const int & start;
   
   struct S
   {
@@ -93,7 +94,6 @@ struct __seqFrame
   };
   
   public: 
-  const int & start;
   const S s;
   std::suspend_always __suspend_35_11;
   std::suspend_always __suspend_35_11_1;

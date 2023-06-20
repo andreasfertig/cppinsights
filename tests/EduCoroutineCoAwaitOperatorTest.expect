@@ -253,6 +253,7 @@ void __gResume(__gFrame * __f)
     
     __resume_g_3:
     __f->__suspend_56_14_res = __f->__suspend_56_14.await_resume();
+    __f->__suspend_56_14_res;
     goto __final_suspend;
   } catch(...) {
     if(!__f->__initial_await_suspend_called) {

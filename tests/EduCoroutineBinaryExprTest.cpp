@@ -41,6 +41,7 @@ generator seq(int start) {
 
     co_yield s.t;
     (void)(co_yield i);
+    static_cast<void>(co_yield i);
     co_yield i+1;
   }
 }
