@@ -1,0 +1,16 @@
+namespace test
+{
+  using jmp_buf = int[30];
+  jmp_buf a;
+  
+}
+
+
+test::jmp_buf x;
+
+
+
+using test::jmp_buf;
+
+test::jmp_buf t;
+
