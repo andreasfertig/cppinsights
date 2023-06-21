@@ -1040,6 +1040,9 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
     const bool isAutoType             = (nullptr != dyn_cast_or_null<AutoType>(t.getTypePtrOrNull()));
     const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
     const bool isPointerToArray       = HasTypeWithSubType<PointerType, ArrayType>(pointerToArrayBaseType);
+    // Only treat this as an array if it is a top-level arry. Typdef's et all can hide the arrayness.
+    const bool isRawArrayType =
+        t->isArrayType() and not(isa<TypedefType>(t) or isa<ElaboratedType>(t) or isa<UsingType>(t));
 
     std::string typeName = details::GetName(t, unqualified);
 
@@ -1053,7 +1056,7 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
         return {};
     };
 
-    if(t->isArrayType() and not t->isLValueReferenceType()) {
+    if(isRawArrayType and not t->isLValueReferenceType()) {
         const auto space = getSpaceOrEmpty(" ["sv);
         InsertBefore(typeName, "["sv, StrCat(space, varName));
 
@@ -1113,7 +1116,7 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
             typeName += StrCat(" "sv, varName);
         }
 
-    } else if(not t->isArrayType() and not varName.empty()) {
+    } else if(not isRawArrayType and not varName.empty()) {
         typeName += StrCat(" "sv, varName);
     }
 
