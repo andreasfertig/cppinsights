@@ -278,7 +278,7 @@ CompoundStmt* mkCompoundStmt(ArrayRef<Stmt*> bodyStmts, SourceLocation beginLoc 
 void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 {
     auto&      langOpts{GetLangOpts(*rangeForStmt->getLoopVariable())};
-    const bool onlyCpp11{not langOpts.CPlusPlus14};
+    const bool onlyCpp11{not langOpts.CPlusPlus17};
 
     auto* rwStmt = const_cast<CXXForRangeStmt*>(rangeForStmt);
 
