@@ -1,0 +1,31 @@
+// cmdlineinsights:-alt-syntax-for
+#include <initializer_list>
+
+int main()
+{
+  {
+    std::initializer_list<int> && __range1 = std::initializer_list<int>{0, 1};
+    const int * __begin1 = __range1.begin();
+    const int * __end1 = __range1.end();
+    {
+      while(__begin1 != __end1) {
+        int i = *__begin1;
+        if(i == 0) {
+          goto __continue_5_3;
+        } 
+        
+        if(i == 5) {
+          goto __continue_5_3;
+        } 
+        
+        __continue_5_3:
+        ;
+        ++__begin1;
+      }
+      
+    }
+    
+  }
+  return 0;
+}
+
