@@ -37,7 +37,7 @@ auto* mkLabelDecl(std::string_view name)
     return LabelDecl::Create(const_cast<ASTContext&>(ctx), ctx.getTranslationUnitDecl(), {}, &ctx.Idents.get(name));
 }
 
-auto* mkLabelStmt(std::string_view name)
+LabelStmt* mkLabelStmt(std::string_view name)
 {
     return new(GetGlobalAST()) LabelStmt({}, mkLabelDecl(name), nullptr);
 }
@@ -112,7 +112,7 @@ auto* mkAssign(DeclRefExpr* declRef, FieldDecl* field, Expr* assignExpr)
     return mkBinaryOperator(me, assignExpr, BO_Assign, field->getType());
 }
 
-auto* mkGotoStmt(std::string_view labelName)
+GotoStmt* mkGotoStmt(std::string_view labelName)
 {
     return new(GetGlobalAST()) GotoStmt(asthelpers::mkLabelDecl(labelName), {}, {});
 }

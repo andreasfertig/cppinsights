@@ -251,7 +251,7 @@ void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static void AddStmt(std::vector<Stmt*>& v, const auto& stmt)
+static void AddStmt(std::vector<Stmt*>& v, const auto* stmt)
 {
     if(stmt) {
         v.push_back(const_cast<Stmt*>(static_cast<const Stmt*>(stmt)));
@@ -272,8 +272,10 @@ static void AddBodyStmts(std::vector<Stmt*>& v, Stmt* body)
 //-----------------------------------------------------------------------------
 
 namespace asthelpers {
+GotoStmt*     mkGotoStmt(std::string_view labelName);
+LabelStmt*    mkLabelStmt(std::string_view name);
 CompoundStmt* mkCompoundStmt(ArrayRef<Stmt*> bodyStmts, SourceLocation beginLoc = {}, SourceLocation endLoc = {});
-}
+}  // namespace asthelpers
 
 void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 {
@@ -1913,6 +1915,53 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+class ContinueASTTransformer : public StmtVisitor<ContinueASTTransformer>
+{
+    Stmt*            mPrevStmt{};
+    std::string_view mContinueLabel{};
+
+public:
+    bool found{};
+
+    ContinueASTTransformer(Stmt* stmt, std::string_view continueLabel)
+    : mPrevStmt{stmt}
+    , mContinueLabel{continueLabel}
+    {
+        Visit(stmt);
+    }
+
+    void Visit(Stmt* stmt)
+    {
+        if(stmt) {
+            StmtVisitor<ContinueASTTransformer>::Visit(stmt);
+        }
+    }
+
+    void VisitContinueStmt(ContinueStmt* stmt)
+    {
+        found          = true;
+        auto* gotoStmt = asthelpers::mkGotoStmt(mContinueLabel);
+
+        std::replace(mPrevStmt->child_begin(),
+                     mPrevStmt->child_end(),
+                     dyn_cast_or_null<Stmt>(stmt),
+                     dyn_cast_or_null<Stmt>(gotoStmt));
+    }
+
+    void VisitStmt(Stmt* stmt)
+    {
+        auto* tmp = mPrevStmt;
+        mPrevStmt = stmt;
+
+        for(auto* child : stmt->children()) {
+            Visit(child);
+        }
+
+        mPrevStmt = tmp;
+    }
+};
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const ForStmt* stmt)
 {
     // https://github.com/vtjnash/clang-ast-builder/blob/master/AstBuilder.cpp
@@ -1924,7 +1973,16 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
         const auto&        ctx    = GetGlobalAST();
         std::vector<Stmt*> bodyStmts{};
 
+        auto       continueLabel = MakeLineColumnName(ctx.getSourceManager(), stmt->getBeginLoc(), "__continue_"sv);
+        const bool insertLabel   = ContinueASTTransformer{rwStmt->getBody(), continueLabel}.found;
+
         AddBodyStmts(bodyStmts, rwStmt->getBody());
+
+        // Build and insert the continue goto label
+        if(insertLabel) {
+            AddStmt(bodyStmts, asthelpers::mkLabelStmt(continueLabel));
+        }
+
         AddStmt(bodyStmts, rwStmt->getInc());
 
         auto* condition = [&]() -> Expr* {
