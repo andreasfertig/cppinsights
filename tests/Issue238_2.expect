@@ -89,7 +89,7 @@ void f()
   };
   
   __lambda_15_17 lambda = __lambda_15_17{};
-  MyArrayWrapper<int> vec = MyArrayWrapper<int>{};
+  MyArrayWrapper<int> vec;
   lambda.operator()(MyArrayWrapper<int>(vec));
 }
 

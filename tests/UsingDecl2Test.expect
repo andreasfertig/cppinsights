@@ -66,7 +66,7 @@ struct UsingProtectedToPublicMember : public ProtectedMember
 
 int main()
 {
-  UsingProtectedToPublicMember usingProtectedToPublicMember = UsingProtectedToPublicMember();
+  UsingProtectedToPublicMember usingProtectedToPublicMember;
   static_cast<ProtectedMember&>(usingProtectedToPublicMember).protectedMember = 1;
   D d = D();
   B & b = static_cast<B&>(d);

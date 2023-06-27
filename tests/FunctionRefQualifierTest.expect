@@ -20,7 +20,7 @@ struct Foo
 
 int main()
 {
-  Foo f = Foo();
+  Foo f;
   f.bar();
   std::move(f).bar();
   Foo().bar();

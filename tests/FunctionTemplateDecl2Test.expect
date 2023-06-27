@@ -34,8 +34,8 @@ class Test
 
 int main()
 {
-  Test ti = Test();
-  Test tc = Test();
+  Test ti;
+  Test tc;
   ti.operator=(2);
   tc.operator=('a');
   return 0;

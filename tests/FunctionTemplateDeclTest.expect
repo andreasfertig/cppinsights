@@ -61,8 +61,8 @@ class Test<char>
 
 int main()
 {
-  Test<int> ti = Test<int>();
-  Test<char> tc = Test<char>();
+  Test<int> ti;
+  Test<char> tc;
   ti.operator=(tc);
   tc.operator=(ti);
   return 0;

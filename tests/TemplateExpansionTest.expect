@@ -201,13 +201,13 @@ struct Test
 
 int main()
 {
-  C<Test, Test> te = C<Test, Test>();
-  testType<int> type = testType<int>();
+  C<Test, Test> te;
+  testType<int> type;
   testDecl<&foo> a = {};
   testDecl<nullptr> b = {};
-  testIntegral<2> integral = testIntegral<2>();
-  testExpr<4, 1> expr = testExpr<4, 1>();
-  testPack<0, 1, 2, 4> pack = testPack<0, 1, 2, 4>();
+  testIntegral<2> integral;
+  testExpr<4, 1> expr;
+  testPack<0, 1, 2, 4> pack;
   return 0;
 }
 

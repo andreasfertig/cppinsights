@@ -18,7 +18,7 @@ class C
 
 int main()
 {
-  C c = C();
+  C c;
   return c.Get();
 }
 

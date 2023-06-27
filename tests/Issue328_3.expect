@@ -37,7 +37,7 @@ struct out
 
 
 
-static out cout = out();
+static out cout;
 
 
 int main()

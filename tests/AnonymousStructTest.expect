@@ -8,7 +8,7 @@ namespace works
     // inline __anon_4_1() noexcept = default;
   };
   
-  __anon_4_1 RR = __anon_4_1();
+  __anon_4_1 RR;
   
 }
 
@@ -24,7 +24,7 @@ struct __anon_10_1
   // inline __anon_10_1() noexcept = default;
 };
 
-__anon_10_1 RR = __anon_10_1();
+__anon_10_1 RR;
 
 
 // However, the same code with the TU as root does not
@@ -34,6 +34,6 @@ struct __anon_20_1
   // inline __anon_20_1() noexcept = default;
 };
 
-__anon_20_1 RR2 = __anon_20_1();
+__anon_20_1 RR2;
 
 

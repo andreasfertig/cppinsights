@@ -130,7 +130,7 @@ class Test
 
 int main()
 {
-  Test t = Test();
+  Test t;
   t.Apply();
   return 0;
 }

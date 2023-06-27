@@ -14,14 +14,14 @@ struct C
 
 C f()
 {
-  C namedC = C{} /* NRVO variable */;
+  C namedC /* NRVO variable */;
   return C(static_cast<const C &&>(namedC));
 }
 
 
 C f2()
 {
-  C namedC = C{};
+  C namedC;
   C namedC2 = C{namedC} /* NRVO variable */;
   return C(static_cast<const C &&>(namedC2));
 }

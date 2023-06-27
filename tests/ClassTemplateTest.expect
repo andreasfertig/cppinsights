@@ -53,7 +53,7 @@ class Bar : public Foo<int>
 
 int main()
 {
-  Bar bar = Bar();
+  Bar bar;
   bar.Do();
   return 0;
 }

@@ -7,7 +7,7 @@ struct DefaultedCtorAndConstexpr
 
 int main()
 {
-  DefaultedCtorAndConstexpr t = DefaultedCtorAndConstexpr();
+  DefaultedCtorAndConstexpr t;
   return 0;
 }
 

@@ -43,7 +43,7 @@ void foo<long>(long && t)
 
 int main()
 {
-  Test test = Test();
+  Test test;
   foo(test);
   int i = 0;
   foo(i);

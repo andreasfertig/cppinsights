@@ -958,9 +958,16 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         }
 
         if(const auto* init = stmt->getInit()) {
-            mOutputFormatHelper.Append(hlpAssing);
+            // Skip the init statement in case we have a class type with a trivial default-constructor which is used for
+            // this initialization.
+            if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(init);
+               not(ctorExpr and ctorExpr->getConstructor()->isDefaultConstructor() and
+                   ctorExpr->getConstructor()->getParent()->hasTrivialDefaultConstructor())) {
 
-            InsertArg(stmt->getInit());
+                mOutputFormatHelper.Append(hlpAssing);
+
+                InsertArg(stmt->getInit());
+            }
         }
 
         if(stmt->isNRVOVariable()) {

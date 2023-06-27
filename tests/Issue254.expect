@@ -42,7 +42,7 @@ struct demonstrator
 
 int demonstrate()
 {
-  demonstrator D = demonstrator();
+  demonstrator D;
   D.templated_function<bool>();
   D.templated_function<float>();
   D.templated_function<double>();

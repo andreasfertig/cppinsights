@@ -14,7 +14,7 @@ class Foo
 
 int main()
 {
-  Foo f = Foo();
+  Foo f;
   return 0;
 }
 

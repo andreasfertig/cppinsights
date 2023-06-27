@@ -32,7 +32,7 @@ struct SC<&c>
 
 int main()
 {
-  SC<&c> sc = SC<&c>();
+  SC<&c> sc;
   sc.Print();
   return 0;
 }

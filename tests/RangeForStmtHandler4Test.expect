@@ -48,7 +48,7 @@ class MyArrayWrapper<int>
 
 int main()
 {
-  MyArrayWrapper<int> arr = MyArrayWrapper<int>();
+  MyArrayWrapper<int> arr;
   {
     MyArrayWrapper<int> & __range1 = arr;
     int * __begin1 = __range1.begin();
