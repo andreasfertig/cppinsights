@@ -7,7 +7,7 @@ struct __anon_4_1
 };
 
 
-__anon_4_1 myAnonStruct = __anon_4_1();
+__anon_4_1 myAnonStruct;
 struct __anon_5_1
 {
   int x;
@@ -15,6 +15,6 @@ struct __anon_5_1
 };
 
 
-__anon_5_1 myAnonStruct2 = __anon_5_1();
+__anon_5_1 myAnonStruct2;
 
 

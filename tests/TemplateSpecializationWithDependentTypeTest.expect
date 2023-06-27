@@ -41,7 +41,7 @@ struct A<T *>
 
 int main()
 {
-  A<int *> a = A<int *>();
+  A<int *> a;
   return 0;
 }
 

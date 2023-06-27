@@ -48,8 +48,8 @@ void Foo<char>::Func()
 
 int main()
 {
-  Foo<int> f = Foo<int>();
-  Foo<char> fc = Foo<char>();
+  Foo<int> f;
+  Foo<char> fc;
   return 0;
 }
 

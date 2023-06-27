@@ -67,7 +67,7 @@ void foo()
 template<>
 void foo<int>()
 {
-  A<int> a = A<int>();
+  A<int> a;
   a.foo(3);
 }
 #endif
@@ -78,7 +78,7 @@ void foo<int>()
 template<>
 void foo<int *>()
 {
-  A<int *> a = A<int *>();
+  A<int *> a;
   a.foo.operator()(3);
 }
 #endif

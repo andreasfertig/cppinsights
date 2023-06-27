@@ -22,7 +22,7 @@ struct Test
 
 int main()
 {
-  Test test = Test();
+  Test test;
   foo(test);
   return 0;
 }

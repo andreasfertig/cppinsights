@@ -130,7 +130,7 @@ struct Iterable
 
 void test()
 {
-  Iterable container = Iterable();
+  Iterable container;
   {
     Iterable & __range1 = container;
     Iterable::Iterator<int> __begin1 = __range1.begin<int>();

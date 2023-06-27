@@ -8,7 +8,7 @@ struct S
 
 int main()
 {
-  S s = S();
+  S s;
   using MemberVarPtr_8 = int S::*;
   MemberVarPtr_8 m = &S::mem;
   return 0;

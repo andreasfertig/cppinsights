@@ -22,7 +22,7 @@ typedef Foo<double> DoubleFoo;
 
 int main()
 {
-  Foo<double> df = Foo<double>();
+  Foo<double> df;
   return 0;
 }
 

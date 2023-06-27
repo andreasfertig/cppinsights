@@ -73,12 +73,12 @@ int main()
   D d = {2};
   D d2 = D(d);
   D d3 = D(std::move(d));
-  D d4 = D();
+  D d4;
   d4.operator=(d2);
   SS ss = {2};
   SS ss2 = SS(ss);
   SS ss3 = SS(std::move(ss));
-  SS ss4 = SS();
+  SS ss4;
   ss4.operator=(ss2);
   D * dd = new D{3};
   delete dd;

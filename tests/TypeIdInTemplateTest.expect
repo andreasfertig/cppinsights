@@ -39,7 +39,7 @@ class Foo<int>
 
 int main()
 {
-  Foo<int> i = Foo<int>();
+  Foo<int> i;
   i.Get();
   return 0;
 }

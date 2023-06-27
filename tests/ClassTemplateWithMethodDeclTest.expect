@@ -29,7 +29,7 @@ void Foo<T>::bar()
 
 int main()
 {
-  Foo<int> f = Foo<int>();
+  Foo<int> f;
   f.bar();
   return 0;
 }

@@ -61,9 +61,9 @@ int MyClass<9>::var = 9;
 
 int main(int argc, char ** argv)
 {
-  MyClass<5> a = MyClass<5>();
-  MyClass<7> b = MyClass<7>();
-  MyClass<9> c = MyClass<9>();
+  MyClass<5> a;
+  MyClass<7> b;
+  MyClass<9> c;
   std::operator<<(std::operator<<(std::cout.operator<<(a.var), " , ").operator<<(b.var), " , ").operator<<(c.var).operator<<(std::endl);
   return 0;
 }

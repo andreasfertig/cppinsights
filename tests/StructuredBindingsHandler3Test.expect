@@ -104,7 +104,7 @@ struct std::tuple_element<N, constant::Q>
 
 namespace constant
 {
-  Q q = Q();
+  Q q;
   Q __q17 = Q(q);
   int && a = get<0UL>(static_cast<Q &&>(__q17));
   int && b = get<1UL>(static_cast<Q &&>(__q17));

@@ -26,7 +26,7 @@ class Test<int>
   template<>
   inline void func<S>()
   {
-    S t = S();
+    S t;
     t.g();
   }
   #endif
@@ -48,7 +48,7 @@ struct S
 
 int main()
 {
-  Test<int> t = Test<int>();
+  Test<int> t;
   t.func<S>();
   return 0;
 }

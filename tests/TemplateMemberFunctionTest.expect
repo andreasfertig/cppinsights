@@ -56,7 +56,7 @@ class Foo
 
 int main()
 {
-  Foo f = Foo();
+  Foo f;
     
   class __lambda_33_10
   {

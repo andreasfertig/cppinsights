@@ -136,7 +136,7 @@ int main()
   using namespace std::string_literals;
   std::basic_string<char, std::char_traits<char>, std::allocator<char> > str2 = std::operator""s("abc", 3UL);
   using Vec = Test::Alloc;
-  Vec v = Vec();
+  Vec v;
   using W = Test::West;
   using B = Test::Best;
   using F = Test::Fest;

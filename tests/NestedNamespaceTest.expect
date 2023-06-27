@@ -23,9 +23,9 @@ struct One
 
 int main()
 {
-  One one = One();
-  One::Two two = One::Two();
-  One::Two::Three three = One::Two::Three();
+  One one;
+  One::Two two;
+  One::Two::Three three;
   return 0;
 }
 

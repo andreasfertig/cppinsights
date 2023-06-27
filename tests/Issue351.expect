@@ -19,7 +19,7 @@ struct Test
 
 std::optional<Test> foo()
 {
-  A a = A();
+  A a;
   return std::optional<Test>(static_cast<A &&>(a));
 }
 

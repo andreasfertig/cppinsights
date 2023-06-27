@@ -22,7 +22,7 @@ class Test
 
 int main()
 {
-  Test t = Test();
+  Test t;
     
   class __lambda_13_12
   {

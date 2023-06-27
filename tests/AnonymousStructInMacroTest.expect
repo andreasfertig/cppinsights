@@ -7,6 +7,6 @@ struct __anon_4_1
 };
 
 
-__anon_4_1 myAnonStruct = __anon_4_1();
+__anon_4_1 myAnonStruct;
 ;
 

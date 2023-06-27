@@ -28,7 +28,7 @@ struct AlignedStructWithPack<int, char, double>
  
 int main()
 {
-  AlignedStructWithPack<int, char, double> a = AlignedStructWithPack<int, char, double>();
+  AlignedStructWithPack<int, char, double> a;
   return 0;
 }
 

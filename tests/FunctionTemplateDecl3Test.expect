@@ -84,9 +84,9 @@ class Test<float>
 
 int main()
 {
-  Test<int> ti = Test<int>();
-  Test<char> tc = Test<char>();
-  Test<float> tf = Test<float>();
+  Test<int> ti;
+  Test<char> tc;
+  Test<float> tf;
   ti.operator=(tc);
   ti.operator=(tf);
   tc.operator=(ti);

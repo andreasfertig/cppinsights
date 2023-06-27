@@ -23,7 +23,7 @@ class MyArrayWrapper
 
 int main()
 {
-  MyArrayWrapper arr = MyArrayWrapper();
+  MyArrayWrapper arr;
   {
     MyArrayWrapper & __range1 = arr;
     int * __begin1 = __range1.begin();
