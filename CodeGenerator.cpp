@@ -1086,6 +1086,14 @@ void CodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const DependentCoawaitExpr* stmt)
+{
+    mOutputFormatHelper.Append(kwCoAwaitSpace);
+
+    InsertArg(stmt->getOperand());
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 {
     //	co_await or co_yield
@@ -1119,13 +1127,29 @@ void CodeGenerator::InsertArg(const CoreturnStmt* stmt)
 
 void CodeGenerator::InsertMethodBody(const FunctionDecl* stmt, const size_t posBeforeFunc)
 {
+    auto IsPrimaryTemplate = [&] {
+        // For now, don't transform the primary template of a coroutine
+        if(const auto* cxxMethod = dyn_cast_or_null<CXXMethodDecl>(stmt)) {
+            if(const auto* tmpl = cxxMethod->getParent()->getDescribedClassTemplate();
+               tmpl and not isa<ClassTemplateSpecializationDecl>(cxxMethod->getParent())) {
+                return true;
+            }
+        }
+
+        if(FunctionDecl::TK_FunctionTemplate == stmt->getTemplatedKind()) {
+            return true;
+        }
+
+        return false;
+    };
+
     if(stmt->doesThisDeclarationHaveABody()) {
         mOutputFormatHelper.AppendNewLine();
 
         // If this function has a CoroutineBodyStmt as direct descend and coroutine transformation is enabled use the \c
         // CoroutinesCodeGenerator, otherwise insert the body as usual.
         if(const auto* corBody = dyn_cast_or_null<CoroutineBodyStmt>(stmt->getBody());
-           (nullptr != corBody) and GetInsightsOptions().ShowCoroutineTransformation) {
+           (nullptr != corBody) and not IsPrimaryTemplate() and GetInsightsOptions().ShowCoroutineTransformation) {
 
             CoroutinesCodeGenerator codeGenerator{mOutputFormatHelper, posBeforeFunc};
             codeGenerator.InsertCoroutine(*stmt, corBody);

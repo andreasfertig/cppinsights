@@ -1,0 +1,206 @@
+/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+// cmdline:-std=c++2b
+// cmdlineinsights:-edu-show-coroutine-transformation
+
+#include <coroutine>
+#include <iostream>
+#include <exception>
+
+template<typename T, typename U>
+struct executable
+{
+  static inline U execute()
+  {
+    co_await T{};
+  }
+  
+};
+
+/* First instantiated from: Issue526.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct executable<hello_logic, hello_world>
+{
+  struct __executeFrame
+{
+  void (*resume_fn)(__executeFrame *);
+  void (*destroy_fn)(__executeFrame *);
+  std::__coroutine_traits_sfinae<hello_world>::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  std::suspend_never __suspend_9_30;
+  hello_logic __suspend_9_51;
+  std::suspend_never __suspend_9_30_1;
+};
+
+static inline hello_world execute()
+  {
+    /* Allocate the frame including the promise */
+    /* Note: The actual parameter new is __builtin_coro_size */
+    __executeFrame * __f = reinterpret_cast<__executeFrame *>(operator new(sizeof(__executeFrame)));
+    __f->__suspend_index = 0;
+    __f->__initial_await_suspend_called = false;
+    
+    /* Construct the promise. */
+    new (&__f->__promise)std::__coroutine_traits_sfinae<hello_world>::promise_type{};
+    
+    /* Forward declare the resume and destroy function. */
+    void __executeResume(__executeFrame * __f);
+    void __executeDestroy(__executeFrame * __f);
+    
+    /* Assign the resume and destroy function pointers. */
+    __f->resume_fn = &__executeResume;
+    __f->destroy_fn = &__executeDestroy;
+    
+    /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+    __executeResume(__f);
+    
+    
+    return __f->__promise.get_return_object();
+  }
+  
+  /* This function invoked by coroutine_handle<>::resume() */
+  void __executeResume(__executeFrame * __f)
+  {
+    try 
+    {
+      /* Create a switch to get to the correct resume point */
+      switch(__f->__suspend_index) {
+        case 0: break;
+        case 1: goto __resume_execute_1;
+        case 2: goto __resume_execute_2;
+      }
+      
+      /* co_await Issue526.cpp:9 */
+      __f->__suspend_9_30 = __f->__promise.initial_suspend();
+      if(!__f->__suspend_9_30.await_ready()) {
+        __f->__suspend_9_30.await_suspend(std::coroutine_handle<hello_world::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+        __f->__suspend_index = 1;
+        __f->__initial_await_suspend_called = true;
+        return;
+      } 
+      
+      __resume_execute_1:
+      __f->__suspend_9_30.await_resume();
+      
+      /* co_await Issue526.cpp:9 */
+      __f->__suspend_9_51 = hello_logic{};
+      if(!__f->__suspend_9_51.await_ready()) {
+        __f->__suspend_9_51.await_suspend(std::coroutine_handle<hello_world::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
+      __resume_execute_2:
+      __f->__suspend_9_51.await_resume();
+      goto __final_suspend;
+    } catch(...) {
+      if(!__f->__initial_await_suspend_called) {
+        throw ;
+      } 
+      
+      __f->__promise.unhandled_exception();
+    }
+    
+    __final_suspend:
+    
+    /* co_await Issue526.cpp:9 */
+    __f->__suspend_9_30_1 = __f->__promise.final_suspend();
+    if(!__f->__suspend_9_30_1.await_ready()) {
+      __f->__suspend_9_30_1.await_suspend(std::coroutine_handle<hello_world::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    } 
+    
+    ;
+  }
+  
+  /* This function invoked by coroutine_handle<>::destroy() */
+  void __executeDestroy(__executeFrame * __f)
+  {
+    /* destroy all variables with dtors */
+    __f->~__executeFrame();
+    /* Deallocating the coroutine frame */
+    /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+    operator delete(static_cast<void *>(__f));
+  }
+  
+  
+  // inline constexpr executable() noexcept = default;
+};
+
+#endif
+
+struct hello_logic
+{
+  inline bool await_ready() const noexcept
+  {
+    return true;
+  }
+  
+  inline void await_suspend(std::coroutine_handle<void>) const noexcept
+  {
+  }
+  
+  inline void await_resume() const noexcept
+  {
+    std::operator<<(std::cout, "Hello, world").operator<<(std::endl);
+  }
+  
+};
+
+
+struct hello_world : public executable<hello_logic, hello_world>
+{
+  struct promise_type
+  {
+    inline hello_world get_return_object()
+    {
+      return hello_world(this);
+    }
+    
+    inline std::suspend_never initial_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline std::suspend_never final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline void return_void()
+    {
+    }
+    
+    inline void unhandled_exception()
+    {
+    }
+    
+    // inline constexpr promise_type() noexcept = default;
+  };
+  
+  using coro_handle = std::coroutine_handle<promise_type>;
+  inline hello_world(promise_type * promise)
+  : executable<hello_logic, hello_world>()
+  , handle_{std::coroutine_handle<promise_type>::from_promise(*promise)}
+  {
+  }
+  
+  
+  private: 
+  std::coroutine_handle<promise_type> handle_;
+  public: 
+};
+
+
+
+int main()
+{
+  executable<hello_logic, hello_world>::execute();
+  return 0;
+}
+
