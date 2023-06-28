@@ -204,12 +204,21 @@ int main(int argc, const char** argv)
         return 1;
     }
 
+    // In STDINMode, we override the file content with the <stdin> input.
+    // Since `tool.mapVirtualFile` takes `StringRef`, we define `Code` outside of
+    // the if-block so that `Code` is not released after the if-block.
+    std::unique_ptr<llvm::MemoryBuffer> inMemoryCode{};
+
     CommonOptionsParser& op{opExpected.get()};
     ClangTool            tool(op.getCompilations(), op.getSourcePathList());
     llvm::StringRef      sourceFilePath = op.getSourcePathList().front();
 
     if(gStdinMode) {
-        assert((op.getSourcePathList().size() == 1) and "Expect exactly one file path in STDINMode.");
+        if(op.getSourcePathList().size() != 1) {
+            llvm::errs() << "Expect exactly one file path in STDINMode.\n"sv;
+            return 1;
+        }
+
         llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> codeOrErr = llvm::MemoryBuffer::getSTDIN();
 
         if(const std::error_code errorCode = codeOrErr.getError()) {
@@ -217,10 +226,7 @@ int main(int argc, const char** argv)
             return 1;
         }
 
-        // In STDINMode, we override the file content with the <stdin> input.
-        // Since `tool.mapVirtualFile` takes `StringRef`, we define `Code` outside of
-        // the if-block so that `Code` is not released after the if-block.
-        std::unique_ptr<llvm::MemoryBuffer> inMemoryCode{std::move(codeOrErr.get())};
+        inMemoryCode = std::move(codeOrErr.get());
 
         if(inMemoryCode->getBufferSize() == 0) {
             Error("empty file\n");

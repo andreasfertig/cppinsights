@@ -1,23 +1,29 @@
 #! /bin/bash
 
+# fail immediately
+set -e
 
-cat AutoHandler3Test.cpp | $1 -stdin x.cpp -- -std=c++1z > /dev/null
+testCppfile="testSTDIN.cpp"
 
-echo "" | $1 -stdin x.cpp -- -std=c++1z > /dev/null
+# Good case
+cat AutoHandler3Test.cpp | $1 -stdin $testCppfile -- -std=c++17 > /dev/null
 
-`echo -n ""` | $1 -stdin x.cpp -- -std=c++1z > /dev/null
+# More than one file in STDIN mode -> not allowed
+cat AutoHandler3Test.cpp | $1 -stdin $testCppfile other.cpp -- -std=c++17 > /dev/null || echo -n ""
 
-#$1 -stdin x.cpp -- -std=c++1z > /dev/null
+# blank file -> allowed
+echo "" | $1 -stdin $testCppfile -- -std=c++17 > /dev/null
 
-#$1 -stdin x.cpp -- -std=c++1z 0>&-
+# empty file -> not allowed
+`echo -n ""` | $1 -stdin $testCppfile -- -std=c++17 > /dev/null || echo -n ""
 
-
+# Testing an option
 $1 -version
 
 # close stdin
 exec 0<&-
 
 # results in: Bad file descriptor
-$1 -stdin x.cpp -- -std=c++1z
+$1 -stdin $testCppfile -- -std=c++17 || echo -n ""
 
 exit 0
