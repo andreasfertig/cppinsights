@@ -201,7 +201,7 @@ __lambda_32_27 lWithParamsAndNTTP = __lambda_32_27{};
 
 void WithParamsAndNTTP()
 {
-  int res = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27(2, 3);
+  int res = lWithParamsAndNTTP.operator()<1, 0>(2, 3);
   using FuncPtr_41 = int (*)(int, int);
   FuncPtr_41 fp = static_cast<int (*)(int, int)>(lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27());
 }
