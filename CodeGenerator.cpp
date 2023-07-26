@@ -597,7 +597,7 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
         // Handle a special case where we have a lambda static invoke operator. In that case use the appropriate
         // using retType as return type
         if(const auto* m = dyn_cast_or_null<CXXMethodDecl>(meDecl)) {
-            if(const auto* rd = m->getParent(); rd and rd->isLambda()) {
+            if(const auto* rd = m->getParent(); rd and rd->isLambda() and isa<CXXConversionDecl>(m)) {
                 skipTemplateArgs = true;
 
                 return StrCat(kwOperatorSpace, GetLambdaName(*rd), "::"sv, BuildRetTypeName(*rd));

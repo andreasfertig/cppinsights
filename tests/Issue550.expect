@@ -1,0 +1,92 @@
+// cmdline:-std=c++20
+
+//this is correct
+
+class __lambda_4_13
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_4_13 = void (*)();
+  inline constexpr operator retType_4_13 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_4_13{}.operator()();
+  }
+  
+  
+  public:
+  // /*constexpr */ __lambda_4_13() = default;
+  
+};
+
+__lambda_4_13 temp = __lambda_4_13{};
+
+
+//wrong
+
+class __lambda_7_14
+{
+  public: 
+  template<typename type_parameter_0_0>
+  inline /*constexpr */ auto operator()() const
+  {
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ void operator()<int>() const
+  {
+  }
+  #endif
+  
+  private: 
+  template<typename type_parameter_0_0>
+  static inline /*constexpr */ auto __invoke()
+  {
+    return __lambda_7_14{}.operator()<type_parameter_0_0>();
+  }
+  
+  public:
+  // /*constexpr */ __lambda_7_14() = default;
+  
+};
+
+__lambda_7_14 temp2 = __lambda_7_14{};
+
+
+int main()
+{
+  temp.operator()();
+  temp2.operator()<int>();
+  int v = 1;
+    
+  class __lambda_17_16
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    private: 
+    int v;
+    
+    public:
+    __lambda_17_16(int & _v)
+    : v{_v}
+    {}
+    
+  };
+  
+  __lambda_17_16 temp3 = __lambda_17_16{v};
+  temp3.operator()();
+  return 0;
+}
+
