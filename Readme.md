@@ -15,7 +15,7 @@
 - [Why](#why)
 - [Building](#building)
 - [Usage](#usage)
-- [Get Involved](#getinvolved)
+- [Get Involved](#get-involved)
 - [Support](#support)
 
 
