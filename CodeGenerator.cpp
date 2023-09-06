@@ -3159,6 +3159,13 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         } else {
             InsertTemplateSpecializationHeader();
         }
+        // Render a out-of-line struct declared inside a class template
+    } else if(stmt->getLexicalDeclContext() != stmt->getDeclContext()) {
+        if(const auto* parent = dyn_cast_or_null<CXXRecordDecl>(stmt->getDeclContext())) {
+            if(const auto* outerClasTemplateDecl = parent->getDescribedClassTemplate()) {
+                InsertTemplateParameters(*outerClasTemplateDecl->getTemplateParameters());
+            }
+        }
     }
 
     mOutputFormatHelper.Append(GetTagDeclTypeName(*stmt));

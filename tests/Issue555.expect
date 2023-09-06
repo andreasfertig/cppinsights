@@ -1,0 +1,34 @@
+template<typename T>
+struct foo
+{
+  struct bar;
+};
+
+/* First instantiated from: Issue555.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct foo<int>
+{
+  struct bar
+  {
+    // inline constexpr bar() noexcept = default;
+  };
+  
+};
+
+#endif
+
+
+template<typename T>
+struct foo<T>::bar
+{
+};
+
+
+
+int main()
+{
+  foo<int>::bar b;
+  return 0;
+}
+
