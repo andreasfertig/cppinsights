@@ -21,6 +21,9 @@ using namespace clang::ast_matchers;
 namespace clang::ast_matchers {
 const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDecl;  // NOLINT
 
+const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl>
+    varTemplateSpecializationDecl;  // NOLINT
+
 const internal::VariadicDynCastAllOfMatcher<Decl, ConceptDecl> conceptDecl;
 }  // namespace clang::ast_matchers
 
@@ -88,6 +91,7 @@ constexpr auto idFunc{"func"sv};
 constexpr auto idFunc2{"func2"sv};
 constexpr auto idClass{"class"sv};
 constexpr auto idVar{"vd"sv};
+constexpr auto idVarSpec{"vdspec"sv};
 //-----------------------------------------------------------------------------
 
 TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
@@ -120,6 +124,8 @@ TemplateHandler::TemplateHandler(Rewriter& rewrite, MatchFinder& matcher)
         this);
 
     matcher.addMatcher(varTemplateDecl(hasThisTUParent).bind(idVar), this);
+
+    matcher.addMatcher(varTemplateSpecializationDecl(hasThisTUParent).bind(idVarSpec), this);
 }
 //-----------------------------------------------------------------------------
 
@@ -229,12 +235,34 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         if(auto sourceRange = vd->getSourceRange(); not IsMacroLocation(sourceRange)) {
             const auto endOfCond = FindLocationAfterSemi(vd->getEndLoc(), result);
 
-            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond.getLocWithOffset(1)}, outputFormatHelper);
+            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond}, outputFormatHelper);
 
         } else {
             // We're just interested in the start location, -1 work(s|ed)
             const auto startLoc =
                 GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::No).getBegin().getLocWithOffset(-1);
+
+            InsertIndentedText(startLoc, outputFormatHelper);
+        }
+    } else if(const auto* vdspec = result.Nodes.getNodeAs<VarTemplateSpecializationDecl>(idVarSpec)) {
+        // Only handle explicit specializations here. Implicit ones are handled by the `VarTemplateDecl` itself.
+        if(TSK_ExplicitSpecialization != vdspec->getSpecializationKind()) {
+            return;
+        }
+
+        if(const auto* init = vdspec->getAnyInitializer()) {
+            init->dump();
+        }
+
+        OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(vdspec);
+
+        if(auto sourceRange = vdspec->getSourceRange(); not IsMacroLocation(sourceRange)) {
+            const auto endOfCond = FindLocationAfterSemi(vdspec->getEndLoc(), result);
+
+            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond.getLocWithOffset(1)}, outputFormatHelper);
+
+        } else {
+            const auto startLoc = GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::No).getBegin();
 
             InsertIndentedText(startLoc, outputFormatHelper);
         }

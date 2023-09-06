@@ -6,6 +6,7 @@ constexpr const bool is_v = false;
 template<>
 constexpr const bool is_v<int> = false;
 
+
 class Foo
 {
   public: 
