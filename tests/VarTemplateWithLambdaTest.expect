@@ -59,6 +59,7 @@ constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
 
 
 
+
 template<typename T>
 
 class __lambda_11_29
@@ -109,6 +110,7 @@ constexpr const auto funcBraced = __lambda_11_29{};
 
 template<>
 constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
+
 
 double f(int x)
 {

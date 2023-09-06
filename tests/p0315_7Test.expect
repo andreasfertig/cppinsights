@@ -34,7 +34,7 @@ bool test = true;
 
 template<>
 bool test<__lambda_3_29> = true;
-
+ // fails without initializer
 
 //template<class F = decltype([]() -> bool { return true; })>
 //class X{};

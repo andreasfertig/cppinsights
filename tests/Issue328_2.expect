@@ -6,6 +6,7 @@ constexpr const bool is_v = false;
 template<>
 constexpr const bool is_v<void (int)> = false;
 
+
 struct out
 {
   inline void operator<<(bool)
