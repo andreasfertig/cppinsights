@@ -3363,10 +3363,19 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     }
                 }
 
+                const std::string_view elips{Ellipsis([&] {
+                    if(const auto* type = fieldDeclType->getPointeeType().getTypePtrOrNull();
+                       type and isa<PackExpansionType>(type)) {
+                        return true;
+                    }
+
+                    return false;
+                }())};
+
                 // To avoid seeing the templates stuff from std::move (typename...) the canonical type is used here.
                 fieldDeclType = fieldDeclType.getCanonicalType();
 
-                ctorInitializerList.push_back(StrCat(fieldName, "{"sv, fname, "}"sv));
+                ctorInitializerList.push_back(StrCat(fieldName, "{"sv, fname, elips, "}"sv));
 
                 if(not isThis and expr) {
                     OutputFormatHelper ofm{};
@@ -3379,6 +3388,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                         } else {
                             codeGenerator.InsertArg(expr);
                         }
+
+                        //        if(isa<PackExpansionType>(stmt->getDecl()->getType().getTypePtrOrNull())) {
+                        //            mOutputFormatHelper.Append(kwElipsisSpace);
+                        //        }
 
                         ctorArguments.append(ofm);
                     } else {

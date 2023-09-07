@@ -42,7 +42,7 @@ void f2(Args... args)
     
     public:
     __lambda_19_15(const type_parameter_0_0... & _args)
-    : args{_args}
+    : args{_args...}
     {}
     
   };

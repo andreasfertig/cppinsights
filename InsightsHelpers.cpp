@@ -942,6 +942,58 @@ static bool NeedsNamespace(const Decl& decl, UseLexicalParent useLexicalParent)
 }
 //-----------------------------------------------------------------------------
 
+static const SubstTemplateTypeParmType* GetSubstTemplateTypeParmType(const Type* t)
+{
+    if(const auto* substTemplateTypeParmType = dyn_cast_or_null<SubstTemplateTypeParmType>(t)) {
+        return substTemplateTypeParmType;
+    } else if(const auto& pointeeType = t->getPointeeType(); not pointeeType.isNull()) {
+        return GetSubstTemplateTypeParmType(pointeeType.getTypePtrOrNull());
+    }
+
+    return nullptr;
+}
+//-----------------------------------------------------------------------------
+
+/*
+ * \brief Get a usable name from a template parameter pack.
+ *
+ * A template parameter pack, args, as in:
+ * \code
+template<typename F, typename ...Types>
+auto forward(F f, Types &&...args) {
+  f(args...);
+}
+
+forward(f,1, 2,3);
+ * \endcode
+ *
+ * gets expanded by clang as
+ * \code
+f(args, args, args);
+ * \endcode
+ *
+ * which would obviously not compile. For clang AST dump it is the right thing. For C++ Insights where the resulting
+ * code should be compilable it is not. What this function does is, figure out whether it is a pack expansion and if so,
+ * make the parameters unique, such that \c args becomes \c __args1 to \c __args3.
+ *
+ * The expected type for \c T currently is \c ValueDecl or \c VarDecl.
+ */
+static std::string GetTemplateParameterPackArgumentName(std::string_view name, const Decl* decl)
+{
+    if(const auto* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(decl)) {
+        if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {
+            if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull())) {
+                if(substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
+                    return StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
+                }
+            }
+        }
+    }
+
+    return std::string{name};
+}
+//-----------------------------------------------------------------------------
+
 std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName)
 {
     std::string name{};
@@ -958,7 +1010,7 @@ std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName)
 
     name += nd.getNameAsString();  // Must be getNameAsString because NamedDecl is no identifier.
 
-    return ScopeHandler::RemoveCurrentScope(name);
+    return ScopeHandler::RemoveCurrentScope(GetTemplateParameterPackArgumentName(name, &nd));
 }
 //-----------------------------------------------------------------------------
 
@@ -1188,58 +1240,6 @@ bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl)
     }
 
     return false;
-}
-//-----------------------------------------------------------------------------
-
-static const SubstTemplateTypeParmType* GetSubstTemplateTypeParmType(const Type* t)
-{
-    if(const auto* substTemplateTypeParmType = dyn_cast_or_null<SubstTemplateTypeParmType>(t)) {
-        return substTemplateTypeParmType;
-    } else if(const auto& pointeeType = t->getPointeeType(); not pointeeType.isNull()) {
-        return GetSubstTemplateTypeParmType(pointeeType.getTypePtrOrNull());
-    }
-
-    return nullptr;
-}
-//-----------------------------------------------------------------------------
-
-/*
- * \brief Get a usable name from a template parameter pack.
- *
- * A template parameter pack, args, as in:
- * \code
-template<typename F, typename ...Types>
-auto forward(F f, Types &&...args) {
-  f(args...);
-}
-
-forward(f,1, 2,3);
- * \endcode
- *
- * gets expanded by clang as
- * \code
-f(args, args, args);
- * \endcode
- *
- * which would obviously not compile. For clang AST dump it is the right thing. For C++ Insights where the resulting
- * code should be compilable it is not. What this function does is, figure out whether it is a pack expansion and if so,
- * make the parameters unique, such that \c args becomes \c __args1 to \c __args3.
- *
- * The expected type for \c T currently is \c ValueDecl or \c VarDecl.
- */
-static std::string GetTemplateParameterPackArgumentName(std::string_view name, const Decl* decl)
-{
-    if(const auto* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(decl)) {
-        if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {
-            if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull())) {
-                if(substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
-                    return StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
-                }
-            }
-        }
-    }
-
-    return std::string{name};
 }
 //-----------------------------------------------------------------------------
 
