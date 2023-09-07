@@ -233,9 +233,17 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
         RETURN_IF(outputFormatHelper.empty());
 
         if(auto sourceRange = vd->getSourceRange(); not IsMacroLocation(sourceRange)) {
-            const auto endOfCond = FindLocationAfterSemi(vd->getEndLoc(), result);
+            const auto tmpLoc = [&] {
+                if(const auto* init = vd->getTemplatedDecl()->getInit()) {
+                    return init->getEndLoc();
+                }
 
-            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond}, outputFormatHelper);
+                return vd->getEndLoc();
+            }();
+
+            const auto endOfCond = FindLocationAfterSemi(tmpLoc, result);
+
+            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond.getLocWithOffset(-1)}, outputFormatHelper);
 
         } else {
             // We're just interested in the start location, -1 work(s|ed)
@@ -250,16 +258,20 @@ void TemplateHandler::run(const MatchFinder::MatchResult& result)
             return;
         }
 
-        if(const auto* init = vdspec->getAnyInitializer()) {
-            init->dump();
-        }
-
         OutputFormatHelper outputFormatHelper = InsertInstantiatedTemplate(vdspec);
 
         if(auto sourceRange = vdspec->getSourceRange(); not IsMacroLocation(sourceRange)) {
-            const auto endOfCond = FindLocationAfterSemi(vdspec->getEndLoc(), result);
+            const auto tmpLoc = [&] {
+                if(const auto* init = vdspec->getInit()) {
+                    return init->getEndLoc();
+                }
 
-            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond.getLocWithOffset(1)}, outputFormatHelper);
+                return vdspec->getEndLoc();
+            }();
+
+            const auto endOfCond = FindLocationAfterSemi(tmpLoc, result);
+
+            mRewrite.ReplaceText({sourceRange.getBegin(), endOfCond}, outputFormatHelper);
 
         } else {
             const auto startLoc = GetSourceRangeAfterSemi(sourceRange, result, RequireSemi::No).getBegin();

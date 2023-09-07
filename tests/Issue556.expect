@@ -7,3 +7,4 @@ int Value = 10;
 
 template<>
 double Value<char> = 0.0;
+
