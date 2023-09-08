@@ -97,12 +97,14 @@ auto* mkBoolLiteral(bool value)
 
 auto* mkMemberExpr(Expr* expr, ValueDecl* vd, bool isArrow = true)
 {
-    return MemberExpr::CreateImplicit(GetGlobalAST(), expr, isArrow, vd, vd->getType(), VK_LValue, OK_Ordinary);
+    return MemberExpr::CreateImplicit(
+        GetGlobalAST(), expr, isArrow, vd, vd->getType().getNonReferenceType(), VK_LValue, OK_Ordinary);
 }
 
 auto* mkBinaryOperator(Expr* lhs, Expr* rhs, BinaryOperator::Opcode opc, QualType resType)
 {
-    return BinaryOperator::Create(GetGlobalAST(), lhs, rhs, opc, resType, VK_LValue, OK_Ordinary, {}, {});
+    return BinaryOperator::Create(
+        GetGlobalAST(), lhs, rhs, opc, resType.getNonReferenceType(), VK_LValue, OK_Ordinary, {}, {});
 }
 
 auto* mkAssign(DeclRefExpr* declRef, FieldDecl* field, Expr* assignExpr)
@@ -877,12 +879,21 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         funParams = funParamStorage;
     }
 
+    auto getNonRefType = [&](auto* var) -> QualType {
+        if(const auto* et = var->getType().getNonReferenceType()->template getAs<ElaboratedType>()) {
+            return et->getNamedType();
+        } else {
+            return QualType(var->getType().getNonReferenceType().getTypePtrOrNull(), 0);
+        }
+    };
+
     for(auto* promiseTypeRecordDecl = mASTData.mPromiseField->getType()->getAsCXXRecordDecl();
         auto* ctor : promiseTypeRecordDecl->ctors()) {
+
         // XXX: use ranges once available
         if(not std::equal(
                ctor->param_begin(), ctor->param_end(), funParams.begin(), funParams.end(), [&](auto& a, auto& b) {
-                   return a->getType().getNonReferenceType() == b->getType().getNonReferenceType();
+                   return getNonRefType(a) == getNonRefType(b);
                })) {
             continue;
         }
@@ -891,7 +902,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         // as it can only be taken as a reference.
         OnceTrue derefFirstParam{};
 
-        if(not ctor->param_empty() and (ctor->getParamDecl(0)->getType().getNonReferenceType() == cxxMethodType)) {
+        if(not ctor->param_empty() and
+           (getNonRefType(ctor->getParamDecl(0)) == QualType(cxxMethodType.getTypePtrOrNull(), 0))) {
             if(0 == mASTData.mThisExprs.size()) {
                 mASTData.mThisExprs.push_back(new(ctx) CXXThisExpr({}, ctx.getPointerType(cxxMethodType), false));
             }
@@ -939,7 +951,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
                            {asRef},
                            SourceRange{},
                            Optional<Expr*>{},
-                           CXXNewExpr::CallInit,
+                           CXXNewExpr::ListInit,
                            ctorArgs,
                            ctx.getPointerType(mASTData.mPromiseField->getType()),
                            ctx.getTrivialTypeSourceInfo(ctx.getPointerType(mASTData.mPromiseField->getType())),
