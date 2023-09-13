@@ -33,7 +33,7 @@ jobs:
           }
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 2
 
@@ -173,7 +173,7 @@ jobs:
         #   }
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 2
         path: cppinsights
@@ -218,7 +218,7 @@ jobs:
 
     - name: Cache Ninja and CMake
       id: cache-ninja-and-cmake
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
             ${{ github.workspace }}/ninja*
@@ -254,7 +254,7 @@ jobs:
 
     - name: Cache Clang
       id: cache-clang-binary
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
             ${{ github.workspace }}/current
@@ -301,7 +301,7 @@ jobs:
 
     - name: Cache grcov
       id: cache-grcov-binary
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
             ${{ github.workspace }}/grcov.exe
@@ -444,7 +444,7 @@ jobs:
         file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
         file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       if:  matrix.config.upload == 'Yes'
       with:
         name: insights-artifact-${{ matrix.config.os }}
@@ -519,7 +519,7 @@ jobs:
           }
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         path: cppinsights
 
@@ -632,7 +632,7 @@ jobs:
         file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
         file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       if:  matrix.config.upload == 'Yes'
       with:
         name: insights-artifact-ubuntu
@@ -650,7 +650,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         path: cppinsights
         fetch-depth: 0
@@ -665,7 +665,7 @@ jobs:
         npm install github-release-notes -g
 
     - name: Download artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
           path: ~/binaries
 
