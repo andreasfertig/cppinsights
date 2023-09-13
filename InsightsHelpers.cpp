@@ -321,10 +321,15 @@ std::string BuildRetTypeName(const Decl& decl)
 const QualType GetDesugarType(const QualType& QT)
 {
     if(QT.getTypePtrOrNull()) {
-        if(auto autoType = QT->getAs<clang::AutoType>()) {
-            if(autoType->isSugared()) {
-                return autoType->getDeducedType();
+        if(const auto* autoType = QT->getAs<clang::AutoType>(); autoType and autoType->isSugared()) {
+            const auto dt = autoType->getDeducedType();
+
+            if(const auto* et = dt->getAs<ElaboratedType>()) {
+                return et->getNamedType();
+            } else {
+                return dt;
             }
+
         } else if(auto declType = QT->getAs<clang::DecltypeType>()) {
             return declType->desugar();
         }
@@ -905,14 +910,24 @@ static std::string GetName(QualType                    t,
                                                    (isa<AutoType>(t.getTypePtrOrNull())) ? InsightsCanonicalTypes::Yes
                                                                                          : InsightsCanonicalTypes::No};
 
+    QualType tt = t;
+
+    if(const auto* et = tt->getAs<ElaboratedType>()) {
+        if((nullptr == et->getQualifier()) and (nullptr == et->getOwnedTagDecl())) {
+            const auto quals = tt.getLocalFastQualifiers();
+            tt               = et->getNamedType();
+            tt.setLocalFastQualifiers(quals);
+        }
+    }
+
     if(SimpleTypePrinter st{t, printingPolicy}; st.GetTypeString()) {
         return ScopeHandler::RemoveCurrentScope(st.GetString());
 
     } else if(true == printingPolicy.CppInsightsUnqualified) {
-        return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(t.getUnqualifiedType(), printingPolicy));
+        return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(tt.getUnqualifiedType(), printingPolicy));
     }
 
-    return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(t, printingPolicy));
+    return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(tt, printingPolicy));
 }
 }  // namespace details
 //-----------------------------------------------------------------------------
