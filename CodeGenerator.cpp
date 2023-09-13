@@ -2921,8 +2921,10 @@ void CodeGenerator::InsertArg(const UsingDecl* stmt)
             RETURN_IF(isa<ConstructorUsingShadowDecl>(shadow));
 
             if(const auto* shadowUsing = dyn_cast_or_null<UsingShadowDecl>(shadow)) {
-                UsingCodeGenerator codeGenerator{ofm};
-                codeGenerator.InsertArg(shadowUsing->getTargetDecl());
+                if(const auto* targetDecl = shadowUsing->getTargetDecl(); not isa<TypeAliasDecl>(targetDecl)) {
+                    UsingCodeGenerator codeGenerator{ofm};
+                    codeGenerator.InsertArg(targetDecl);
+                }
             }
         }
     }
