@@ -258,6 +258,13 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     llvm_config(LLVM_PACKAGE_VERSION "--version")
     string(REPLACE "git" "" LLVM_PACKAGE_VERSION_PLAIN "${LLVM_PACKAGE_VERSION}")
 
+    # With Clang 16 the location (path) of the include folder changed. Previously it was 15.0.0 now it is 16.
+    if(${LLVM_PACKAGE_VERSION_PLAIN} VERSION_GREATER_EQUAL "15.0.0")
+        string(REGEX REPLACE "([0-9]+).[0-9]+.[0-9]+" "\\1" LLVM_PACKAGE_VERSION_MAJOR_PLAIN "${LLVM_PACKAGE_VERSION_PLAIN}")
+    else()
+        set(LLVM_PACKAGE_VERSION_MAJOR_PLAIN "${LLVM_PACKAGE_VERSION_PLAIN}")
+    endif()
+
     # always generate the compile commands
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     if(WIN32)

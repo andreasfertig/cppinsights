@@ -171,8 +171,18 @@ auto* mkFunctionDecl(std::string_view name, QualType returnType, const params_ve
 auto* mkStdFunctionDecl(std::string_view name, QualType returnType, const params_vector& parameters)
 {
     auto&          ctx   = GetGlobalAST();
-    NamespaceDecl* stdNs = NamespaceDecl::Create(
-        const_cast<ASTContext&>(ctx), ctx.getTranslationUnitDecl(), false, {}, {}, &ctx.Idents.get("std"), nullptr);
+    NamespaceDecl* stdNs = NamespaceDecl::Create(const_cast<ASTContext&>(ctx),
+                                                 ctx.getTranslationUnitDecl(),
+                                                 false,
+                                                 {},
+                                                 {},
+                                                 &ctx.Idents.get("std"),
+                                                 nullptr
+#if IS_CLANG_NEWER_THAN(15)
+                                                 ,
+                                                 false
+#endif
+    );
 
     return mkFunctionDeclBase(name, returnType, parameters, stdNs);
 }
@@ -950,7 +960,11 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
                            false,
                            {asRef},
                            SourceRange{},
+#if IS_CLANG_NEWER_THAN(15)
+                           std::optional<Expr*>{},
+#else
                            Optional<Expr*>{},
+#endif
                            CXXNewExpr::ListInit,
                            ctorArgs,
                            ctx.getPointerType(mASTData.mPromiseField->getType()),
