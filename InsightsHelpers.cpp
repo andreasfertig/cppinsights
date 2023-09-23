@@ -1236,13 +1236,26 @@ static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 
 APValue* GetEvaluatedValue(const VarDecl& varDecl)
 {
-    if((nullptr != varDecl.ensureEvaluatedStmt()) and (nullptr != varDecl.ensureEvaluatedStmt()->Value)) {
+    if((nullptr != varDecl.ensureEvaluatedStmt()) and
+#if IS_CLANG_NEWER_THAN(16)
+       varDecl.ensureEvaluatedStmt()->Value.isValid()
+#else
+       (nullptr != varDecl.ensureEvaluatedStmt()->Value)
+#endif
+    ) {
 
+#if IS_CLANG_NEWER_THAN(16)
+        if(not varDecl.getInit()->isValueDependent()) {
+
+            return varDecl.evaluateValue();
+        }
+#else
         const auto* init = cast<Expr>(varDecl.ensureEvaluatedStmt()->Value);
         if(not init->isValueDependent()) {
 
             return varDecl.evaluateValue();
         }
+#endif
     }
 
     return nullptr;

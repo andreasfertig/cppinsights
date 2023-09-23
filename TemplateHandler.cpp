@@ -24,7 +24,10 @@ const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateDecl> varTemplateDe
 const internal::VariadicDynCastAllOfMatcher<Decl, VarTemplateSpecializationDecl>
     varTemplateSpecializationDecl;  // NOLINT
 
+#if IS_CLANG_NEWER_THAN(16)
+#else
 const internal::VariadicDynCastAllOfMatcher<Decl, ConceptDecl> conceptDecl;
+#endif
 }  // namespace clang::ast_matchers
 
 namespace clang::insights {
