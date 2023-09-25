@@ -10,11 +10,11 @@ int main()
     {
       volatile char buffer[10];
       {
-        volatile char (&__range1)[10] = buffer;
-        volatile char * __begin1 = __range1;
-        volatile char * __end1 = __range1 + 10L;
-        for(; __begin1 != __end1; ++__begin1) {
-          volatile char & c = *__begin1;
+        volatile char (&__range2)[10] = buffer;
+        volatile char * __begin2 = __range2;
+        volatile char * __end2 = __range2 + 10L;
+        for(; __begin2 != __end2; ++__begin2) {
+          volatile char & c = *__begin2;
           c = 1;
         }
         

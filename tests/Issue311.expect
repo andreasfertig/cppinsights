@@ -1,4 +1,4 @@
-struct alignas(alignof(double)) foo
+struct alignas(double) foo
 {
   int i;
 };

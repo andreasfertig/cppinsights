@@ -43,7 +43,7 @@ namespace Test
   };
   
   #endif
-  template<typename T, bool  = static_cast<bool>(has<T>::value)>
+  template<typename T, bool  = has<T>::value>
   struct dependentScope
   {
     inline static constexpr const bool result = true;

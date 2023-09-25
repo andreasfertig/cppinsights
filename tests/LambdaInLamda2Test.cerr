@@ -1,28 +1,28 @@
 .tmp.cpp:8:27: error: unknown type name 'S'
-    inline /*constexpr */ S operator()() const
-                          ^
+    8 |     inline /*constexpr */ S operator()() const
+      |                           ^
 .tmp.cpp:19:25: error: unknown type name 'S'
-    using retType_5_7 = S (*)();
-                        ^
+   19 |     using retType_5_7 = S (*)();
+      |                         ^
 .tmp.cpp:20:31: error: unknown type name 'retType_5_7'
-    inline constexpr operator retType_5_7 () const noexcept
-                              ^
+   20 |     inline constexpr operator retType_5_7 () const noexcept
+      |                               ^
 .tmp.cpp:26:34: error: unknown type name 'S'
-    static inline /*constexpr */ S __invoke()
-                                 ^
+   26 |     static inline /*constexpr */ S __invoke()
+      |                                  ^
 .tmp.cpp:16:16: warning: braces around scalar initializer [-Wbraced-scalar-init]
-      return S{{676}};
-               ^~~~~
+   16 |       return S{{676}};
+      |                ^~~~~
 .tmp.cpp:16:14: error: no viable conversion from returned value of type 'S' to function return type 'int'
-      return S{{676}};
-             ^~~~~~~~
+   16 |       return S{{676}};
+      |              ^~~~~~~~
 .tmp.cpp:37:27: error: unknown type name 'S'
-    inline /*constexpr */ S operator()()
-                          ^
+   37 |     inline /*constexpr */ S operator()()
+      |                           ^
 .tmp.cpp:44:5: error: unknown type name 'S'
-    S s;
-    ^
+   44 |     S s;
+      |     ^
 .tmp.cpp:47:24: error: unknown type name 'S'
-    __lambda_4_5(const S & _s)
-                       ^
+   47 |     __lambda_4_5(const S & _s)
+      |                        ^
 1 warning and 8 errors generated.

@@ -19,7 +19,7 @@ struct AlignedStructWithPack
 template<>
 struct AlignedStructWithPack<int, char, double>
 {
-  alignas(alignof(int)) alignas(alignof(char)) alignas(alignof(double)) char data;
+  alignas(int) alignas(char) alignas(double) char data;
   // inline AlignedStructWithPack() noexcept = default;
 };
 

@@ -1,43 +1,43 @@
 .tmp.cpp:279:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_56_24 = simpleReturn(__f->v);
-                         ^
+  279 |     __f->__suspend_56_24 = simpleReturn(__f->v);
+      |                          ^
 .tmp.cpp:72:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
+   72 |   inline generator(generator && rhs)
+      |          ^
 .tmp.cpp:290:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_56_51 = simpleReturn(__f->v + 1);
-                         ^
+  290 |     __f->__suspend_56_51 = simpleReturn(__f->v + 1);
+      |                          ^
 .tmp.cpp:72:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
+   72 |   inline generator(generator && rhs)
+      |          ^
 .tmp.cpp:412:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_60_24 = simpleReturn(__f->v);
-                         ^
+  412 |     __f->__suspend_60_24 = simpleReturn(__f->v);
+      |                          ^
 .tmp.cpp:72:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
+   72 |   inline generator(generator && rhs)
+      |          ^
 .tmp.cpp:423:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_60_51 = simpleReturn(__f->v + 1);
-                         ^
+  423 |     __f->__suspend_60_51 = simpleReturn(__f->v + 1);
+      |                          ^
 .tmp.cpp:72:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
+   72 |   inline generator(generator && rhs)
+      |          ^
 .tmp.cpp:434:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_60_80 = simpleReturn(__f->v + 2);
-                         ^
+  434 |     __f->__suspend_60_80 = simpleReturn(__f->v + 2);
+      |                          ^
 .tmp.cpp:72:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
+   72 |   inline generator(generator && rhs)
+      |          ^
 .tmp.cpp:553:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_67_24 = simpleReturn(__f->v);
-                         ^
+  553 |     __f->__suspend_67_24 = simpleReturn(__f->v);
+      |                          ^
 .tmp.cpp:72:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
+   72 |   inline generator(generator && rhs)
+      |          ^
 .tmp.cpp:564:26: error: object of type 'generator' cannot be assigned because its copy assignment operator is implicitly deleted
-    __f->__suspend_67_51 = simpleReturn(__f->v + 1);
-                         ^
+  564 |     __f->__suspend_67_51 = simpleReturn(__f->v + 1);
+      |                          ^
 .tmp.cpp:72:10: note: copy assignment operator is implicitly deleted because 'generator' has a user-declared move constructor
-  inline generator(generator && rhs)
-         ^
+   72 |   inline generator(generator && rhs)
+      |          ^
 7 errors generated.

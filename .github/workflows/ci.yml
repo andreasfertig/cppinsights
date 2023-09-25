@@ -14,7 +14,7 @@ on:
 env:
   CMAKE_VERSION: 3.16.2
   NINJA_VERSION: 1.10.0
-  LLVM_VERSION: 16.0.0
+  LLVM_VERSION: 17.0.0
 
 jobs:
   checks:
@@ -29,7 +29,7 @@ jobs:
             name: "Linux Clang - Format check",
             os: ubuntu-20.04,
             build_type: Release,
-            cformat_name: 'clang-format-16'
+            cformat_name: 'clang-format-17'
           }
 
     steps:
@@ -42,7 +42,7 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 16
+        sudo ./llvm.sh 17
         sudo apt-get install ${{ matrix.config.cformat_name }}
 
     - name: clang-format check
@@ -64,11 +64,11 @@ jobs:
         config:
         # AppleClang
         - {
-            name: "Clang 16 / LLVM 16 @ macOS Release",
+            name: "Clang 17 / LLVM 17 @ macOS Release",
             os: macos-11,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "16.0.0",
+            llvm_version: "17.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -82,11 +82,11 @@ jobs:
 
         # AppleClang
         - {
-            name: "Clang 16 / LLVM 16 @ macOS Debug",
+            name: "Clang 17 / LLVM 17 @ macOS Debug",
             os: macos-11,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "16.0.0",
+            llvm_version: "17.0.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -100,11 +100,11 @@ jobs:
 
         # # AppleClang
         # - {
-        #     name: "Clang 16 / LLVM 16 @ macOS Coverage & Debug",
+        #     name: "Clang 17 / LLVM 17 @ macOS Coverage & Debug",
         #     os: macos-11,
         #     build_type: Release,
         #     cxx: "clang++",
-        #     llvm_version: "16.0.0",
+        #     llvm_version: "17.0.0",
         #     llvm_config: "llvm-config",
         #     coverage: "Yes",
         #     static: "No",
@@ -118,11 +118,11 @@ jobs:
 
           # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 16 @ Windows Release",
+          #   name: "MSVC 2022 / LLVM 17 @ Windows Release",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "16.0.0",
+          #   llvm_version: "17.0.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "No",
@@ -137,11 +137,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 16 @ Windows Debug",
+          #   name: "MSVC 2022 / LLVM 17 @ Windows Debug",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "16.0.0",
+          #   llvm_version: "17.0.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "Yes",
@@ -155,11 +155,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-        #     name: "MSVC 2022 / LLVM 16 @ Windows Code Coverage & Debug",
+        #     name: "MSVC 2022 / LLVM 17 @ Windows Code Coverage & Debug",
         #     os: windows-2022,
         #     build_type: Release,
         #     cxx: "clang-cl.exe",
-        #     llvm_version: "16.0.0",
+        #     llvm_version: "17.0.0",
         #     llvm_config: "current/bin/llvm-config.exe",
         #     coverage: "Yes",
         #     static: "Yes",
@@ -322,7 +322,7 @@ jobs:
         export HOMEBREW_NO_AUTO_UPDATE=1
         brew update > /dev/null
         brew install lcov || brew upgrade lcov
-        brew install gcc@10 || brew upgrade gcc@10 # for Clang 16 and newer gcov
+        brew install gcc@10 || brew upgrade gcc@10 # for Clang 17 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
@@ -465,13 +465,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # GCC 12 / LLVM 16
+        # GCC 12 / LLVM 17
         - {
-            name: "GCC 12 / LLVM 16 @ Ubuntu Release @docker",
+            name: "GCC 12 / LLVM 17 @ Ubuntu Release @docker",
             build_type: Release,
             cxx: "g++-12",
-            llvm_version: "16.0.0",
-            llvm_config: "/usr/bin/llvm-config-16",
+            llvm_version: "17.0.0",
+            llvm_config: "/usr/bin/llvm-config-17",
             coverage: "No",
             static: "Yes",
             debug: "No",
@@ -484,13 +484,13 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 12 / LLVM 16
+        # GCC 12 / LLVM 17
         - {
-            name: "GCC 12 / LLVM 16 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 12 / LLVM 17 @ Ubuntu Code Coverage & Debug @docker",
             build_type: Release,
             cxx: "g++-12",
-            llvm_version: "16.0.0",
-            llvm_config: "/usr/bin/llvm-config-16",
+            llvm_version: "17.0.0",
+            llvm_config: "/usr/bin/llvm-config-17",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -501,13 +501,13 @@ jobs:
             archive_name: "insights-ubuntu-14.04",
           }
 
-        # GCC 12 / LLVM 16
+        # GCC 12 / LLVM 17
         - {
-            name: "GCC 12 / LLVM 16 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 12 / LLVM 17 @ Ubuntu Code Coverage (libc++) @docker",
             build_type: Release,
             cxx: "g++-12",
-            llvm_version: "16.0.0",
-            llvm_config: "/usr/bin/llvm-config-16",
+            llvm_version: "17.0.0",
+            llvm_config: "/usr/bin/llvm-config-17",
             coverage: "Yes",
             static: "No",
             debug: "Yes",

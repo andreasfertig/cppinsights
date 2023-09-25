@@ -1,7 +1,7 @@
 .tmp.cpp:35:37: error: '__invoke' is a private member of '__lambda_7_32'
-static LambdaInNTTP<&__lambda_7_32::__invoke> lambdaInNTTP();
-                                    ^
+   35 | static LambdaInNTTP<&__lambda_7_32::__invoke> lambdaInNTTP();
+      |                                     ^
 .tmp.cpp:25:37: note: declared private here
-  static inline /*constexpr */ void __invoke()
-                                    ^
+   25 |   static inline /*constexpr */ void __invoke()
+      |                                     ^
 1 error generated.

@@ -3,7 +3,7 @@
 #include <iostream>
 
 // Example taken from Nicolai Josuttis slides
-template<auto sep = static_cast<auto>(' '), typename T1, typename ... Types>
+template<auto sep = ' ', typename T1, typename ... Types>
 void print(const T1 & arg1, const Types &... args)
 {
   std::cout << arg1;

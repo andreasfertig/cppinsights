@@ -1,7 +1,7 @@
 .tmp.cpp:8:37: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[3]'
-  return std::initializer_list<int>{__list54, 3};
-                                    ^~~~~~~~
+    8 |   return std::initializer_list<int>{__list54, 3};
+      |                                     ^~~~~~~~
 .tmp.cpp:15:37: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[1]'
-  return std::initializer_list<int>{__list41, 1};
-                                    ^~~~~~~~
+   15 |   return std::initializer_list<int>{__list41, 1};
+      |                                     ^~~~~~~~
 2 errors generated.

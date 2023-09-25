@@ -8,5 +8,4 @@ struct Foo
 using MemberVarPtr_4 = decltype(auto) (Foo::*)();
 MemberVarPtr_4 bar;
 
-decltype(auto) (Foo::*bar)();
 
