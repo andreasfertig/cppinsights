@@ -40,7 +40,7 @@ inline const int & Normalize<int>(const int & arg)
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline const std::basic_string<char>::value_type * Normalize<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & arg)
+inline const value_type * Normalize<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & arg)
 {
   if constexpr(true) {
     return arg.c_str();

@@ -43,7 +43,7 @@ struct Test
     inline constexpr operator retType_7_29 () const noexcept
     {
       return __invoke;
-    }
+    };
     
     private: 
     static inline /*constexpr */ void __invoke()
