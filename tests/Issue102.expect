@@ -406,7 +406,7 @@ int test<int>(int && value)
       return operator+(value, " Hi!");
     }
     
-    using retType_73_4 = std::string (*)(std::string);
+    using retType_73_4 = string (*)(std::string);
     inline constexpr operator retType_73_4 () const noexcept
     {
       return __invoke;
@@ -484,7 +484,7 @@ int test<const char (&)[3]>(const char (&value)[3])
       return operator+(value, " Hi!");
     }
     
-    using retType_73_4 = std::string (*)(std::string);
+    using retType_73_4 = string (*)(std::string);
     inline constexpr operator retType_73_4 () const noexcept
     {
       return __invoke;
@@ -572,7 +572,7 @@ std::basic_string<char, std::char_traits<char>, std::allocator<char> > test<std:
       return operator+(value, " Hi!");
     }
     
-    using retType_73_4 = std::string (*)(std::string);
+    using retType_73_4 = string (*)(std::string);
     inline constexpr operator retType_73_4 () const noexcept
     {
       return __invoke;

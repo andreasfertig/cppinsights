@@ -28,8 +28,8 @@ inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn() requi
 /* First instantiated from: conceptsTest.cpp:84 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn<a::A>() requires requires(a::A t) {
-  a::f(a::A(t));
+inline constexpr bool FunctionWithRequiresForTemplateParametersAndReturn<a::A>() requires requires(T t) {
+  f(t);
 }
 {
   return true;
@@ -70,8 +70,8 @@ inline constexpr bool FunctionWithRequiresForReturn() requires requires(T t) {
 /* First instantiated from: conceptsTest.cpp:86 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-inline constexpr bool FunctionWithRequiresForReturn<a::A>() requires requires(a::A t) {
-  a::f(a::A(t));
+inline constexpr bool FunctionWithRequiresForReturn<a::A>() requires requires(T t) {
+  f(t);
 }
 {
   return true;

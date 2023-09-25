@@ -46,7 +46,6 @@ struct generator
       this->current_value = v;
     }
     
-    // inline constexpr promise_type() noexcept = default;
   };
   
   inline generator(generator && rhs)

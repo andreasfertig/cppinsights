@@ -37,7 +37,7 @@ struct CustomerHash
 {
   inline std::size_t operator()(const Customer & c) const
   {
-    return std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >().operator()(c.getName());
+    return static_cast<const std::__string_hash<char, std::allocator<char> >&>(std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >()).operator()(c.getName());
   }
   
   // inline constexpr CustomerHash() noexcept = default;

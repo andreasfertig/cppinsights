@@ -5,7 +5,7 @@
     template<class type_parameter_0_0>
     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from .tmp.cpp:1:
-In file included from ... vector:278:
+In file included from ... vector:285:
 In file included from ... remove.h:13:
 ... find_if.h:25:9: error: no matching function for call to object of type '__lambda_12_26'
     if (__pred(*__first))
