@@ -1923,7 +1923,8 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
 
     mOutputFormatHelper.Append("if"sv, ValueOrDefault(stmt->isConstexpr(), kwSpaceConstExpr));
 
-    WrapInParens(
+    WrapInParensIfNeeded(
+        not stmt->isConsteval(),
         [&]() {
             mShowConstantExprValue = ShowConstantExprValue::Yes;
 
@@ -1932,6 +1933,9 @@ void CodeGenerator::InsertArg(const IfStmt* stmt)
             mShowConstantExprValue = ShowConstantExprValue::No;
         },
         AddSpaceAtTheEnd::Yes);
+
+    mOutputFormatHelper.Append(ValueOrDefault(stmt->isNegatedConsteval(), " !"sv),
+                               ValueOrDefault(stmt->isConsteval(), kwSpaceConstEvalSpace));
 
     WrapInCompoundIfNeeded(stmt->getThen(), AddNewLineAfter::No);
 

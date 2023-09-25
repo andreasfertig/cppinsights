@@ -180,6 +180,7 @@ inline constexpr std::string_view kwSpaceCCommentEnd{BUILD_WITH_SPACE_BEFORE("*/
 //-----------------------------------------------------------------------------
 
 inline constexpr std::string_view kwSpaceCCommentEndSpace{BUILD_WITH_SPACE_BEFORE("*/ ")};
+inline constexpr std::string_view kwSpaceConstEvalSpace{BUILD_WITH_SPACE_BEFORE(BUILD_WITH_SPACE_AFTER(KW_CONSTEVAL))};
 
 inline constexpr std::string_view memberVariablePointerPrefix{"MemberVarPtr_"};
 inline constexpr std::string_view functionPointerPrefix{"FuncPtr_"};
