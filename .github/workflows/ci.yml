@@ -180,41 +180,41 @@ jobs:
 
     - name: Download Ninja and CMake
       id: cmake_and_ninja_setup
-      shell: cmake -P {0}
+      shell: bash
       run: |
-        set(cmake_version $ENV{CMAKE_VERSION})
-        set(ninja_version $ENV{NINJA_VERSION})
+        cmake_version=$CMAKE_VERSION
+        ninja_version=$NINJA_VERSION
 
-        message(STATUS "Using host CMake version: ${CMAKE_VERSION}")
+        echo "Using host CMake version: ${CMAKE_VERSION}"
 
-        if ("${{ runner.os }}" STREQUAL "Windows")
-          set(ninja_suffix "win.zip")
-          set(cmake_suffix "win64-x64.zip")
-          set(cmake_base_dir "cmake-${cmake_version}-win64-x64")
-          set(cmake_dir "${cmake_base_dir}/bin")
-        elseif ("${{ runner.os }}" STREQUAL "Linux")
-          set(ninja_suffix "linux.zip")
-          set(cmake_suffix "Linux-x86_64.tar.gz")
-          set(cmake_base_dir "cmake-${cmake_version}-Linux-x86_64")
-          set(cmake_dir "${cmake_base_dir}/bin")
-        elseif ("${{ runner.os }}" STREQUAL "macOS")
-          set(ninja_suffix "mac.zip")
-          set(cmake_suffix "Darwin-x86_64.tar.gz")
-          set(cmake_base_dir "cmake-${cmake_version}-Darwin-x86_64")
-          set(cmake_dir "${cmake_base_dir}/CMake.app/Contents/bin")
-        endif()
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          ninja_suffix="win.zip"
+          cmake_suffix="win64-x64.zip"
+          cmake_base_dir="cmake-${cmake_version}-win64-x64"
+          cmake_dir="${cmake_base_dir}/bin"
+        elif [ "$RUNNER_OS" == "Linux" ]; then
+          ninja_suffix="linux.zip"
+          cmake_suffix="Linux-x86_64.tar.gz"
+          cmake_base_dir="cmake-${cmake_version}-Linux-x86_64"
+          cmake_dir="${cmake_base_dir}/bin"
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          ninja_suffix="mac.zip"
+          cmake_suffix="Darwin-x86_64.tar.gz"
+          cmake_base_dir="cmake-${cmake_version}-Darwin-x86_64"
+          cmake_dir="${cmake_base_dir}/CMake.app/Contents/bin"
+        fi
 
-        set(ninja_url "https://github.com/ninja-build/ninja/releases/download/v${ninja_version}/ninja-${ninja_suffix}")
-        message("::set-output name=ninja_url::${ninja_url}")
+        ninja_url="https://github.com/ninja-build/ninja/releases/download/v${ninja_version}/ninja-${ninja_suffix}"
+        echo "ninja_url=${ninja_url}" >> $GITHUB_OUTPUT
 
-        set(cmake_url "https://github.com/Kitware/CMake/releases/download/v${cmake_version}/cmake-${cmake_version}-${cmake_suffix}")
-        message("::set-output name=cmake_url::${cmake_url}")
-
-        # preserve it for the next steps
-        message("::set-output name=cmake_dir::${cmake_dir}")
+        cmake_url="https://github.com/Kitware/CMake/releases/download/v${cmake_version}/cmake-${cmake_version}-${cmake_suffix}"
+        echo "cmake_url=${cmake_url}" >> $GITHUB_OUTPUT
 
         # preserve it for the next steps
-        message("::set-output name=cmake_base_dir::${cmake_base_dir}")
+        echo "cmake_dir=${cmake_dir}" >> $GITHUB_OUTPUT
+
+        # preserve it for the next steps
+        echo "cmake_base_dir=${cmake_base_dir}" >> $GITHUB_OUTPUT
 
     - name: Cache Ninja and CMake
       id: cache-ninja-and-cmake
