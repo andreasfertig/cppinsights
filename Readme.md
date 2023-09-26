@@ -36,33 +36,49 @@ class Derived : public Base {
 
 int main() {
   Derived d;
+
+  Derived d2 = d;
+
+  d2 = d;
+
   Base& b = d;
 }
 ```
 
-Nothing special and of course it compiles. This is the compilers view on it:
+Nothing special, and of course, it compiles. This is the compiler's view on it:
 
 ```.cpp
-class Base {
-/* public: inline constexpr Base() noexcept; */
-/* public: inline ~Base(); */
-/* public: inline constexpr Base(const Base &); */
-/* public: inline constexpr Base(Base &&); */
+class Base
+{
+  public:
+  // inline constexpr Base() noexcept = default;
+  // inline constexpr Base(const Base &) noexcept = default;
+  // inline constexpr Base & operator=(const Base &) noexcept = default;
 };
 
-class Derived : public Base {
-/* public: inline constexpr Derived() noexcept; */
-/* public: inline constexpr Derived(const Derived &); */
-/* public: inline constexpr Derived(Derived &&); */
+
+
+class Derived : public Base
+{
+  public:
+  // inline constexpr Derived() noexcept = default;
+  // inline constexpr Derived(const Derived &) noexcept = default;
+  // inline constexpr Derived & operator=(const Derived &) noexcept = default;
 };
 
-int main(){
+
+
+int main()
+{
   Derived d;
-  Base& b = static_cast<Base&>(d);
+  Derived d2 = Derived(d);
+  d2.operator=(d);
+  Base & b = static_cast<Base&>(d);
+  return 0;
 }
 ```
 
-You can see all the compiler-provided functions as well as the downcast from `Derived` to `Base`.
+You can see all the compiler-provided special member functions and the downcast from `Derived` to `Base`.
 
 ## Why
 
@@ -70,15 +86,15 @@ You can see all the compiler-provided functions as well as the downcast from `De
 The goal of C++ Insights is to make things visible that normally and intentionally happen behind the scenes. It's about the magic the compiler does
 for us to make things work. Or looking through the classes of a compiler.
 
-In 2017 I started looking into some new things we got with C++11, C++14, and C++17. Amazing things like lambdas, range-based for-loops,
+In 2017, I started looking into some new things we got with C++11, C++14, and C++17. Amazing things like lambdas, range-based for-loops,
 and structured bindings. I put it together in a talk. You can find the [slides](https://andreasfertig.com/talks/dl/afertig-ndcolo-2017-fast-and-small.pdf)
 and a [video](https://youtu.be/Bt7KzFxcbgc) online.
 
-However, all that research and some of my training and teaching got me to start thinking about how it would be if we could see with the eyes of the
-compiler. Sure, there is an AST dump, at least for Clang. With tools like Compiler Explorer, we can see what code the compiler generates
-from a C++ source snippet. However, what we see is assembler. Neither the AST nor the Compiler Explorer output is in the language I write
-code, and therefore I'm most familiar with. Plus, when teaching students C++ showing an AST and explaining that it is all there was not
-quite satisfying for me.
+However, all that research and some of my training and teaching got me to start thinking about how it would be if we could see with the eyes
+of the compiler. Sure, there is an AST dump, at least for Clang. We can see what code the compiler generates from a C++ source snippet with
+tools like Compiler Explorer. However, what we see is assembler. Neither the AST nor the Compiler Explorer output is in the language I write
+code. Hence, I'm not very familiar with this output. Plus, when teaching students C++, showing an AST and explaining that it is all there was
+not quite satisfying for me.
 
 I started to write a Clang-based tool that can transform a range-based for-loop into the compiler-internal version. Then, I did the same
 for structured bindings and lambdas. In the end, I did much more than initially planned. It shows where operators are
@@ -124,7 +140,7 @@ mkdir build && cd build
 cmake -G"Ninja" ../cppinsights
 ninja
 ```
-The resulting binary (insights) can be found in the build-folder.
+The resulting binary (insights) can be found in the `build` folder.
 
 ### Building inside Clang
 
@@ -137,11 +153,11 @@ git clone https://github.com/andreasfertig/cppinsights.git
 echo "add_subdirectory(cppinsights)" >> CMakeLists.txt
 ```
 
-Then build Clang as you normally do.
+Then, build Clang as you normally do.
 
 ### cmake options
 
-There are a couple of options which can be enable with [cmake](https://cmake.org):
+There are a couple of options that can be enabled with [cmake](https://cmake.org):
 
 | Option              | Description                | Default |
 |---------------------|:---------------------------| --------|
@@ -161,7 +177,7 @@ cd build_eclipse
 cmake -G"Eclipse CDT4 - Unix Makefiles" ../cppinsights/
 ```
 
-Then in [Cevelop](https://www.cevelop.com) Import -> General -> Existing Project into Workspace. Select `build_eclipse`. Enjoy editing with
+Then, in [Cevelop](https://www.cevelop.com) Import -> General -> Existing Project into Workspace. Select `build_eclipse`. Enjoy editing with
 [Cevelop](https://www.cevelop.com).
 
 ## Usage
@@ -172,9 +188,9 @@ Using C++ Insights is fairly simple:
 insights <YOUR_CPP_FILE> -- -std=c++17
 ```
 
-Things get complicated when it comes to the system include paths. These paths are hard-coded in the binary, which seems
+Things get complicated when it comes to the system-include paths. These paths are hard-coded in the binary, which seems
 to come from the compiler C++ Insights was built with. To help with that, check out [scripts/getinclude.py](scripts/getinclude.py). The script tries to
-collect the system include paths, from the compiler. Without an option, `getinclude.py` uses `g++`. You can also pass another compiler
+collect the system-include paths from the compiler. Without an option, `getinclude.py` uses `g++`. You can also pass another compiler
 as a first argument.
 
 Here is an example:
@@ -204,7 +220,7 @@ Here "`${GCC_11_2_0_INSTALL_PATH}`" is the installation directory of your custom
 
 ### Ready to use Docker container
 
-There is also another GitHub project which sets up a docker container with the latest C++ Insights version in it: [C++
+There is also another GitHub project that sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
 ### C++ Insights @ Vim
@@ -218,17 +234,25 @@ An extension for Visual Studio Code is available at the VS Code marketplace: [C+
 Insights - VSCode Extension](https://marketplace.visualstudio.com/items?itemName=devtbi.vscode-cppinsights).
 
 
+### C++ Insights @ brew
+
+At least for macOS, you can install C++ Insights via Homebrew thanks to [this formulae](https://formulae.brew.sh/formula/cppinsights):
+
+```
+brew install cppinsights
+```
+
 
 ## Compatibility
 
-I aim that the repository compiles with the latest version of Clang and at least the one before. The website tries to
+I aim for the repository to compile with the latest version of Clang and at least the one before. The website tries to
 stay close to the latest release of Clang. However, due to certain issues (building Clang for Windows), the website's
-version is often delayed a few months.
+version is often delayed by a few months.
 
 
 ## C++ Insights @ YouTube
 
-I created a [YouTube](https://www.youtube.com/c/AndreasFertig-info) channel where I release a new video each month. In
+I created a [YouTube](https://youtube.com/@andreas_fertig) channel where I release a new video each month. In
 these videos, I use C++ Insights to show and explain certain C++ constructs, and sometimes I explain C++ Insights as well.
 
 
@@ -243,5 +267,5 @@ See [TODO](TODO.md).
 
 ## Support
 
-If you like to support the project, consider [submitting](CONTRIBUTING.md) a patch. Another alternative is to become a [Patreon](https://www.patreon.com/cppinsights) supporter.
+If you like to support the project, consider [submitting](CONTRIBUTING.md) a patch. Another alternative is to become a [GitHub Sponsor](https://github.com/sponsors/andreasfertig) or a [Patreon](https://www.patreon.com/cppinsights) supporter.
 
