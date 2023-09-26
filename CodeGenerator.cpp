@@ -1711,9 +1711,10 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
 
     InsertArg(stmt->getCallee());
 
-    if(isa<UserDefinedLiteral>(stmt)) {
-        if(const auto* declRefExpr = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
-            if(const auto* fd = dyn_cast_or_null<FunctionDecl>(declRefExpr->getDecl())) {
+    if(const auto* declRefExpr = dyn_cast_or_null<DeclRefExpr>(stmt->getCallee()->IgnoreImpCasts())) {
+        if(const auto* fd = dyn_cast_or_null<FunctionDecl>(declRefExpr->getDecl())) {
+            if((not declRefExpr->getNumTemplateArgs() and GetInsightsOptions().ShowAllCallExprTemplateParameters) or
+               isa<UserDefinedLiteral>(stmt)) {
                 InsertTemplateArgs(*fd);
             }
         }
