@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <iostream>
+#include <cctype>
+
+template<class ... Match>
+bool search(char ch, Match &&... matchers)
+{
+  return (matchers(ch) || ...);
+}
+
+
+/* First instantiated from: Issue506.cpp:12 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+bool search<int (&)(int), int (&)(int), __lambda_12_50>(char ch, int (&__matchers1)(int), int (&__matchers2)(int), __lambda_12_50 && __matchers3)
+{
+  return static_cast<bool>(__matchers1(static_cast<int>(ch))) || (static_cast<bool>(__matchers2(static_cast<int>(ch))) || __matchers3.operator()(ch));
+}
+#endif
+
+
+int main()
+{
+      
+  class __lambda_12_50
+  {
+    public: 
+    inline /*constexpr */ bool operator()(char ch) const
+    {
+      return static_cast<int>(ch) == static_cast<int>('_');
+    }
+    
+    using retType_12_50 = bool (*)(char);
+    inline constexpr operator retType_12_50 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline /*constexpr */ bool __invoke(char ch)
+    {
+      return __lambda_12_50{}.operator()(ch);
+    }
+    
+    
+  };
+  
+  std::cout.operator<<(search('A', ::isalpha, ::isdigit, __lambda_12_50{}));
+  return 0;
+}
+
+

@@ -1,0 +1,28 @@
+bool Fun(char)
+{
+  return false;
+}
+
+
+template<class ... Match>
+bool search(char ch, Match &&... matchers)
+{
+  return (matchers(ch) || ...);
+}
+
+
+/* First instantiated from: Issue506_2.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+bool search<bool (&)(char)>(char ch, bool (&__matchers1)(char))
+{
+  return __matchers1(ch);
+}
+#endif
+
+
+int main()
+{
+  return static_cast<int>(search('A', Fun));
+}
+

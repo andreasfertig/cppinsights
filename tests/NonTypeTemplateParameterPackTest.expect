@@ -79,10 +79,10 @@ class Test
   /* First instantiated from: NonTypeTemplateParameterPackTest.cpp:18 */
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline int summ<int &, int &>(int & i, int & rest)
+  inline int summ<int &, int &>(int & i, int & __rest1)
   {
     if constexpr(true) {
-      return i + this->summ<int &>(rest);
+      return i + this->summ<int &>(__rest1);
     } 
     
   }

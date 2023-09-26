@@ -997,9 +997,21 @@ static std::string GetTemplateParameterPackArgumentName(std::string_view name, c
 {
     if(const auto* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(decl)) {
         if(const auto& originalType = parmVarDecl->getOriginalType(); not originalType.isNull()) {
-            if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull())) {
-                if(substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
-                    return StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
+            if(const auto* substTemplateTypeParmType = GetSubstTemplateTypeParmType(originalType.getTypePtrOrNull());
+               substTemplateTypeParmType and substTemplateTypeParmType->getReplacedParameter()->isParameterPack()) {
+                return StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
+
+            } else if(const auto* fd = parmVarDecl->getParentFunctionOrMethod()) {
+                // Get the primary template, if possible and check whether its parameters contain a parameter pack
+                if(const auto* primTmpl = dyn_cast_or_null<FunctionDecl>(fd)->getPrimaryTemplate();
+                   primTmpl and primTmpl->getTemplateParameters()->hasParameterPack()) {
+                    // if so, then search for the matching parameter name.
+                    for(const auto* pa : primTmpl->getTemplatedDecl()->parameters()) {
+                        // if one is found we suffix it with its function scope index
+                        if(pa->isParameterPack() and (parmVarDecl->getNameAsString() == pa->getNameAsString())) {
+                            return StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
+                        }
+                    }
                 }
             }
         }
