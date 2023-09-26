@@ -399,8 +399,8 @@ public:
                             Stmt*                                 stmt,
                             llvm::DenseMap<VarDecl*, MemberExpr*> varNamePrefix,
                             Stmt*                                 prev = nullptr)
-    : mASTData{coroutineASTData}
-    , mPrevStmt{prev}
+    : mPrevStmt{prev}
+    , mASTData{coroutineASTData}
     , mSuspendsCount{suspendsCounter}
     , mVarNamePrefix{varNamePrefix}
     {
@@ -653,8 +653,6 @@ public:
 
         mASTData.mPromiseField = AddField(mASTData, GetName(*varDecl), varDecl->getType());
         auto* me               = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
-        auto* assign =
-            asthelpers::mkBinaryOperator(me, varDecl->getInit(), BO_Assign, mASTData.mPromiseField->getType());
 
         mVarNamePrefix.insert(std::make_pair(varDecl, me));
 
@@ -677,10 +675,8 @@ public:
                     if(auto* declRef = FindDeclRef(varDecl2->getAnyInitializer())) {
                         auto* varDecl = dyn_cast<ParmVarDecl>(declRef->getDecl());
 
-                        auto* field  = AddField(mASTData, GetName(*varDecl), varDecl->getType());
-                        auto* me     = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, field);
-                        auto* assign = asthelpers::mkBinaryOperator(
-                            me, const_cast<Expr*>(varDecl2->getInit()), BO_Assign, field->getType());
+                        auto* field = AddField(mASTData, GetName(*varDecl), varDecl->getType());
+                        auto* me    = asthelpers::mkMemberExpr(mASTData.mFrameAccessDeclRef, field);
 
                         mVarNamePrefix.insert(std::make_pair(const_cast<ParmVarDecl*>(varDecl), me));
                     }
@@ -915,7 +911,14 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         if(not ctor->param_empty() and
            (getNonRefType(ctor->getParamDecl(0)) == QualType(cxxMethodType.getTypePtrOrNull(), 0))) {
             if(0 == mASTData.mThisExprs.size()) {
-                mASTData.mThisExprs.push_back(new(ctx) CXXThisExpr({}, ctx.getPointerType(cxxMethodType), false));
+                mASTData.mThisExprs.push_back(
+#if IS_CLANG_NEWER_THAN(17)
+                    CXXThisExpr::Create(ctx, {}, ctx.getPointerType(cxxMethodType), false)
+#else
+                    new(ctx) CXXThisExpr{{}, ctx.getPointerType(cxxMethodType), false}
+#endif
+
+                );
             }
         } else {
             (void)static_cast<bool>(derefFirstParam);  // set it to false
@@ -1373,7 +1376,7 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
             const auto fieldName{StrCat(std::string_view{s.value()}.substr(CORO_FRAME_ACCESS.size()), "_res"sv)};
             mOutputFormatHelper.Append(CORO_FRAME_ACCESS, fieldName, hlpAssing);
 
-            auto* promiseField = AddField(fieldName, resumeExpr->getType());
+            AddField(fieldName, resumeExpr->getType());
         }
     }
 
