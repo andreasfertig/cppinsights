@@ -641,6 +641,82 @@ jobs:
             ${{ github.workspace }}/build/archive/*
 
 #------------------------------------------------------------------------------
+# BUILD INSIDE CLANG SOURCE TREE
+#------------------------------------------------------------------------------
+  insource:
+    name: CMake in source tree check
+    if: github.event.pull_request.merged == false
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout Clang
+      with:
+        repository: llvm/llvm-project
+        ref: llvmorg-16.0.0
+        path: llvm-project
+        fetch-tags: true
+
+    - uses: actions/checkout@v4
+      name: Checkout Cpp Insights
+      with:
+        fetch-depth: 2
+        path: llvm-project/clang-tools-extra/cppinsights
+
+    - name: Download Ninja and CMake
+      id: cmake_and_ninja_setup
+      shell: bash
+      run: |
+        cmake_version=$CMAKE_VERSION
+
+        echo "Using host CMake version: ${CMAKE_VERSION}"
+
+        cmake_base_dir="cmake-${CMAKE_VERSION}-linux-x86_64"
+        cmake_dir="${cmake_base_dir}/bin"
+
+        ninja_url="https://github.com/ninja-build/ninja/releases/download/v${NINJA_VERSION}/ninja-linux.zip"
+        wget -q $ninja_url -O ninja.zip
+        unzip ./ninja.zip
+
+        cmake_url="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${cmake_base_dir}.tar.gz"
+        wget -q $cmake_url -O cmake.tar.gz
+        tar -xf ./cmake.tar.gz
+
+        ls -l
+        ls -l cmake-3.16.2-Linux-x86_64
+        ls -l cmake-3.16.2-Linux-x86_64/bin
+
+        chmod +x ninja
+        #        chmod +x ${cmake_dir}/cmake
+
+        echo "${cmake_dir}" >> $GITHUB_PATH
+
+    - name: Building
+      shell: bash
+      working-directory: ${{ env.HOME }}
+      env:
+        CXX: g++
+        CC: gcc
+      run: |
+        cd ${GITHUB_WORKSPACE}/
+        git -C ${GITHUB_WORKSPACE}/llvm-project/clang-tools-extra/cppinsights diff HEAD^ -- CMakeLists.txt
+
+        if [ $? == 0 ]; then
+          export PATH=`pwd`:$PATH
+          echo "add_subdirectory(cppinsights)" >> ${GITHUB_WORKSPACE}/llvm-project/clang-tools-extra/CMakeLists.txt
+
+          BUILD_DIR=${GITHUB_WORKSPACE}/build_llvm-${LLVM_VERSION}
+
+          mkdir -p ${BUILD_DIR}
+          cd ${BUILD_DIR}
+
+          cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=20 -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" ${GITHUB_WORKSPACE}/llvm-project/llvm
+          cmake --build .
+        else
+          echo -e "\033[1;32m\xE2\x9C\x93 CMakeLists.txt unchanged:\033[0m $1";
+        fi
+
+#------------------------------------------------------------------------------
 # DEPLOY
 #------------------------------------------------------------------------------
   deploy:
