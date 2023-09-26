@@ -445,9 +445,6 @@ else()
   set(GIT_COMMIT_HASH "")
 endif()
 
-# Get the include dir
-llvm_config(LLVM_INCLUDE_DIR "--includedir")
-
 
 message(STATUS "Generating version.h")
 

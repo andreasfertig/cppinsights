@@ -144,14 +144,21 @@ The resulting binary (insights) can be found in the `build` folder.
 
 ### Building inside Clang
 
-For building it inside the Clang source tree, assuming you have your source tree already prepared:
+For building it inside the Clang source tree, assuming you have your source tree already prepared under `llvm-project`:
 
 ```
-cd llvm/tools/clang/tools/extra
+cd llvm-project/clang-tools-extra/
 git clone https://github.com/andreasfertig/cppinsights.git
 
 echo "add_subdirectory(cppinsights)" >> CMakeLists.txt
 ```
+
+To activate the C++ Insights build you have to set `-DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"` for `cmake`:
+
+```
+cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -G "Unix Makefiles" ../llvm-project
+```
+
 
 Then, build Clang as you normally do.
 
