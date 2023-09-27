@@ -10,13 +10,11 @@ struct count<double>
 
 #endif
 
-
 template<>
 struct count<>
 {
   static const int value = 0;
 };
-
 
 
 template<typename T, typename ... Args>
@@ -26,7 +24,4 @@ struct count<T, Args...>
 };
 
 
-
 /* PASSED: static_assert(count<double>::value == 1, "2 elements"); */
-
-

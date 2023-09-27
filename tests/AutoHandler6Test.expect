@@ -7,4 +7,3 @@ int main()
   char (&k)[20] = buffer;
   return 0;
 }
-

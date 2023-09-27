@@ -42,6 +42,3 @@ int main()
   test::coroutine_handle<void> b = a.operator test::coroutine_handle<void>();
   return 0;
 }
-
-
-

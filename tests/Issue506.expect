@@ -8,7 +8,6 @@ bool search(char ch, Match &&... matchers)
   return (matchers(ch) || ...);
 }
 
-
 /* First instantiated from: Issue506.cpp:12 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -48,5 +47,3 @@ int main()
   std::cout.operator<<(search('A', ::isalpha, ::isdigit, __lambda_12_50{}));
   return 0;
 }
-
-

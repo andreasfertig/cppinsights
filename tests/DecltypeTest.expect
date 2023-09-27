@@ -5,4 +5,3 @@ int main()
   const char *const cas = cs;
   return 0;
 }
-

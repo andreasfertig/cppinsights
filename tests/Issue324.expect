@@ -15,13 +15,9 @@ struct Str
 };
 
 
-
 Str globalString = Str("test");
-
-
 
 const char * getString(bool empty)
 {
   return (empty ? Str("") : Str(globalString)).operator const char *();
 }
-

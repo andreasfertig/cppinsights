@@ -27,5 +27,3 @@ int main()
   int x = __lambda_3_13.operator()();
   return 0;
 }
-
-

@@ -39,7 +39,6 @@ struct demonstrator
 };
 
 
-
 int demonstrate()
 {
   demonstrator D;
@@ -48,5 +47,3 @@ int demonstrate()
   D.templated_function<double>();
   return 42;
 }
-
-  

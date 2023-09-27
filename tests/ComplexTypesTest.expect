@@ -4,4 +4,3 @@ int main()
   _Complex int ic = {};
   return 0;
 }
-

@@ -26,17 +26,12 @@ class Singleton
 };
 
 
-
-
 static size_t counter = 0;
 
-
-Singleton& Singleton::Instance()
+Singleton & Singleton::Instance()
 {
   static Singleton singleton;
-
   static bool passed = true;
-
   return singleton;
 }
 
@@ -47,4 +42,3 @@ int main()
   s.Set(22);
   return s.Get();
 }
-

@@ -1,8 +1,5 @@
-// cmdline:-std=c++2a
 #include <iostream>
 
-// Moved this out of main to get a version that compiles after transformation. As it is not allowed for a user to
-// declare a method template in a function.
 
 class __lambda_6_12
 {
@@ -35,10 +32,8 @@ class __lambda_6_12
 
 __lambda_6_12 foo = __lambda_6_12{};
 
-
 int main()
 {
   foo.operator()(3);
   return 0;
 }
-

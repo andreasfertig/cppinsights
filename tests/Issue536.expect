@@ -4,8 +4,6 @@
  *************************************************************************************/
 #include <new> // for thread-safe static's placement new
 #include <stdint.h> // for uint64_t under Linux/GCC
-// cmdline:-std=c++20
-// cmdlineinsights:-edu-show-coroutine-transformation
 
 #include <coroutine>
 #include <utility>
@@ -75,7 +73,6 @@ struct my_resumable
   // inline constexpr my_resumable(const my_resumable &) /* noexcept */ = delete;
   // inline my_resumable & operator=(const my_resumable &) /* noexcept */ = delete;
 };
-
 
 
 struct __coroFrame
@@ -176,5 +173,4 @@ void __coroDestroy(__coroFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
 

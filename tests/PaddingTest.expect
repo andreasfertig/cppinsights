@@ -1,5 +1,3 @@
-// cmdlineinsights:-edu-show-padding
-
 struct __attribute__((packed)) test0  /* size: 10, align: 1 */
 {
   int i;                          /* offset: 0, size: 4 */
@@ -7,7 +5,6 @@ struct __attribute__((packed)) test0  /* size: 10, align: 1 */
   char c2;                        /* offset: 5, size: 1 */
   float f;                        /* offset: 6, size: 4 */
 };
-
 
 
 struct test1  /* size: 12, align: 4 */
@@ -20,14 +17,12 @@ struct test1  /* size: 12, align: 4 */
 };
 
 
-
 struct test2  /* size: 8, align: 4 */
 {
   int i;                          /* offset: 0, size: 4 */
   char c;                         /* offset: 4, size: 1
   char __padding[3];                            size: 3 */
 };
-
 
 
 struct test3  /* size: 20, align: 4 */
@@ -47,13 +42,10 @@ struct test3  /* size: 20, align: 4 */
 };
 
 
-
-
 struct NVBase  /* size: 4, align: 4 */
 {
   int x;                          /* offset: 0, size: 4 */
 };
-
 
 
 struct NVDerived : public NVBase  /* size: 8, align: 4 */
@@ -63,13 +55,11 @@ struct NVDerived : public NVBase  /* size: 8, align: 4 */
 };
 
 
-
 struct NVDerived2 : public NVDerived  /* size: 12, align: 4 */
 {
   /* base (NVDerived)                offset: 0, size: 8 */
   int x;                          /* offset: 8, size: 4 */
 };
-
 
 
 struct NVBase2  /* size: 4, align: 4 */
@@ -78,17 +68,12 @@ struct NVBase2  /* size: 4, align: 4 */
 };
 
 
-
 struct NVDerived3 : public NVBase, public NVBase2  /* size: 12, align: 4 */
 {
   /* base (NVBase)                   offset: 0, size: 4 */
   /* base (NVBase2)                  offset: 4, size: 4 */
   int x;                          /* offset: 8, size: 4 */
 };
-
-
-
-
 
 
 struct Base  /* size: 8, align: 8 */
@@ -101,7 +86,6 @@ struct Base  /* size: 8, align: 8 */
 };
 
 
-
 struct Derived : public Base  /* size: 16, align: 8 */
 {
   /* base (Base)                     offset: 0, size: 8 */
@@ -110,12 +94,9 @@ struct Derived : public Base  /* size: 16, align: 8 */
 };
 
 
-
-
 struct Empty  /* size: 1, align: 1 */
 {
 };
-
 
 
 struct test5  /* size: 4, align: 4 */
@@ -124,13 +105,11 @@ struct test5  /* size: 4, align: 4 */
 };
 
 
-
 struct test4  /* size: 8, align: 8 */
 {
   alignas(sizeof(int) * 2) int i;  /* offset: 0, size: 4
   char __padding[4];                            size: 4 */
 };
-
 
 
 struct Data  /* size: 8, align: 4 */
@@ -142,15 +121,11 @@ struct Data  /* size: 8, align: 4 */
 };
 
 
-
-
-
 struct alignas(64) Test5  /* size: 64, align: 64 */
 {
   int i;                          /* offset: 0, size: 4
   char __padding[60];                           size: 60 */
 };
-
 
 
 struct Test6 : public Test5  /* size: 128, align: 64 */
@@ -159,6 +134,4 @@ struct Test6 : public Test5  /* size: 128, align: 64 */
   int u;                          /* offset: 64, size: 4
   char __padding[60];                           size: 60 */
 };
-
-
 

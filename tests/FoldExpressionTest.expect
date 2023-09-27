@@ -1,13 +1,8 @@
-// + - * / % ^ & | = < > << >> += -= *= /= %= ^= &= |= <<= >>= == != <= >= && || , .* ->*
-
-// Tests for some of the 32 operators
-
 template<typename ... Args>
 inline constexpr auto plus(Args... args)
 {
   return (... + args);
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -24,7 +19,6 @@ inline constexpr auto minus(Args... args)
   return (... - args);
 }
 
-
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr int minus<int, int, int>(int __args0, int __args1, int __args2)
@@ -39,7 +33,6 @@ inline constexpr auto times(Args... args)
 {
   return (... * args);
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -56,7 +49,6 @@ inline constexpr auto div(Args... args)
   return (... / args);
 }
 
-
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr int div<int, int, int>(int __args0, int __args1, int __args2)
@@ -71,7 +63,6 @@ inline constexpr auto mod(Args... args)
 {
   return (... % args);
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -88,7 +79,6 @@ inline constexpr auto bitwiseXOr(Args... args)
   return (... ^ args);
 }
 
-
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr int bitwiseXOr<int, int, int>(int __args0, int __args1, int __args2)
@@ -103,7 +93,6 @@ inline constexpr auto bitwiseAnd(Args... args)
 {
   return (... & args);
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -120,7 +109,6 @@ inline constexpr auto bitwiseOr(Args... args)
   return (... | args);
 }
 
-
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr int bitwiseOr<int, int, int>(int __args0, int __args1, int __args2)
@@ -130,15 +118,11 @@ inline constexpr int bitwiseOr<int, int, int>(int __args0, int __args1, int __ar
 #endif
 
 
-
-// = 
-
 template<typename ... Args>
 inline constexpr auto lt(Args... args)
 {
   return (... < args);
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -155,7 +139,6 @@ inline constexpr auto gt(Args... args)
   return (... > args);
 }
 
-
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr bool gt<int, int, int>(int __args0, int __args1, int __args2)
@@ -165,13 +148,11 @@ inline constexpr bool gt<int, int, int>(int __args0, int __args1, int __args2)
 #endif
 
 
-
 template<typename ... Args>
 inline constexpr auto logicalAnd(Args... args)
 {
   return (... && args);
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -188,7 +169,6 @@ inline constexpr auto logicalOr(Args... args)
   return (... || args);
 }
 
-
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 inline constexpr bool logicalOr<bool, bool, bool, bool>(bool __args0, bool __args1, bool __args2, bool __args3)
@@ -203,7 +183,6 @@ inline constexpr auto comma(Args... args)
 {
   return (... , args);
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -233,5 +212,3 @@ int main()
   x = x / 2;
   return 0;
 }
-
-

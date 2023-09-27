@@ -1,4 +1,3 @@
-// cmdlineinsights:--show-all-implicit-casts
 class NullToMemberPtrTest
 {
   
@@ -10,7 +9,6 @@ class NullToMemberPtrTest
   
   int mMember;
 };
-
 
 
 int main()
@@ -25,5 +23,3 @@ int main()
   MemberVarPtr_18 Func2 = static_cast<int (NullToMemberPtrTest::*)(int)>(0);
   return 0;
 }
-
-

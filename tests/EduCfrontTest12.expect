@@ -6,7 +6,6 @@ void __cxa_start(void);
 void __cxa_atexit(void);
 void* malloc(unsigned int);
 extern "C" void free(void*);
-// cmdlineinsights:-edu-show-cfront
 
 int __main(void)
 {

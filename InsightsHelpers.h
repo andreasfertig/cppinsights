@@ -12,8 +12,6 @@
 #include "clang/AST/AST.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Lex/Lexer.h"
 
 #include <functional>
@@ -31,17 +29,6 @@ std::string BuildInternalVarName(const std::string_view& varName);
 //-----------------------------------------------------------------------------
 
 std::string MakeLineColumnName(const SourceManager& sm, const SourceLocation& loc, const std::string_view& prefix);
-//-----------------------------------------------------------------------------
-
-STRONG_BOOL(RequireSemi);
-//-----------------------------------------------------------------------------
-
-SourceLocation FindLocationAfterSemi(const SourceLocation                          loc,
-                                     const ast_matchers::MatchFinder::MatchResult& Result,
-                                     RequireSemi                                   requireSemi = RequireSemi::No);
-SourceRange    GetSourceRangeAfterSemi(const SourceRange                             range,
-                                       const ast_matchers::MatchFinder::MatchResult& Result,
-                                       RequireSemi                                   requireSemi = RequireSemi::No);
 //-----------------------------------------------------------------------------
 
 inline bool IsMacroLocation(const SourceLocation& loc)
@@ -128,12 +115,6 @@ void ReplaceAll(std::string& str, std::string_view from, std::string_view to);
 //-----------------------------------------------------------------------------
 
 void InsertBefore(std::string& source, const std::string_view& find, const std::string_view& replace);
-//-----------------------------------------------------------------------------
-
-inline const SourceManager& GetSM(const ast_matchers::MatchFinder::MatchResult& Result)
-{
-    return Result.Context->getSourceManager();
-}
 //-----------------------------------------------------------------------------
 
 inline const SourceManager& GetSM(const Decl& decl)
@@ -343,8 +324,8 @@ private:
     ScopeStackType& mStack;   //!< Access to the global \c ScopeHelper stack.
     ScopeHelper     mHelper;  //!< The \c ScopeHelper this item refers to.
 
-    static ScopeStackType mGlobalStack;  //!< Global stack to keep track of the scope elements.
-    static std::string    mScope;        //!< The entire scope we are already in.
+    static inline ScopeStackType mGlobalStack;  //!< Global stack to keep track of the scope elements.
+    static inline std::string    mScope;        //!< The entire scope we are already in.
 };
 //-----------------------------------------------------------------------------
 

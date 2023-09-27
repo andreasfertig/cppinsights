@@ -31,4 +31,3 @@ int main()
   int fak = std::accumulate(myVec.begin(), myVec.end(), 1, __lambda_8_57{});
   return 0;
 }
-

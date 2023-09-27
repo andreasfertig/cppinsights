@@ -6,12 +6,10 @@ __attribute__((visibility("default"))) __attribute__((returns_nonnull)) __attrib
   return malloc(size);
 }
 
-
 __attribute__((visibility("default"))) void operator delete(void * p) noexcept
 {
   free(p);
 }
-
 
 class Apple
 {
@@ -28,7 +26,6 @@ class Apple
   }
   
 };
-
 
 
 class Orange
@@ -48,9 +45,7 @@ class Orange
 };
 
 
-
 int main()
 {
   return 0;
 }
-

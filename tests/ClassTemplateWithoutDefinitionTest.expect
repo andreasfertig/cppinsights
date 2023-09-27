@@ -14,15 +14,12 @@ class Foo<double>
 
 #endif
 
+using IntFoo = Foo<int>;
 
-typedef Foo<int> IntFoo; // this type is never instantiated which results in a 
-                         // CXXRecordDecl without a definition
-typedef Foo<double> DoubleFoo;
-
+using DoubleFoo = Foo<double>;
 
 int main()
 {
   Foo<double> df;
   return 0;
 }
-

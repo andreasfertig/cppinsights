@@ -1,21 +1,21 @@
-.tmp.cpp:133:36: error: no type named 'retType_25_16' in '__lambda_25_16'; did you mean '__lambda_5_14::retType_5_14'?
-  133 |   FuncPtr_29 fp = glambda.operator __lambda_25_16::retType_25_16();
+.tmp.cpp:127:36: error: no type named 'retType_25_16' in '__lambda_25_16'; did you mean '__lambda_5_14::retType_5_14'?
+  127 |   FuncPtr_29 fp = glambda.operator __lambda_25_16::retType_25_16();
       |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       |                                    __lambda_5_14::retType_5_14
-.tmp.cpp:15:11: note: '__lambda_5_14::retType_5_14' declared here
-   15 |     using retType_5_14 = int (*)();
+.tmp.cpp:13:11: note: '__lambda_5_14::retType_5_14' declared here
+   13 |     using retType_5_14 = int (*)();
       |           ^
-.tmp.cpp:133:27: error: no member named 'operator int (*)()' in '__lambda_25_16'
-  133 |   FuncPtr_29 fp = glambda.operator __lambda_25_16::retType_25_16();
+.tmp.cpp:127:27: error: no member named 'operator int (*)()' in '__lambda_25_16'
+  127 |   FuncPtr_29 fp = glambda.operator __lambda_25_16::retType_25_16();
       |                   ~~~~~~~ ^
-.tmp.cpp:206:47: error: no type named 'retType_32_27' in '__lambda_32_27'; did you mean '__lambda_14_20::retType_14_20'?
-  206 |   FuncPtr_41 fp = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27();
+.tmp.cpp:198:47: error: no type named 'retType_32_27' in '__lambda_32_27'; did you mean '__lambda_14_20::retType_14_20'?
+  198 |   FuncPtr_41 fp = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27();
       |                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       |                                               __lambda_14_20::retType_14_20
-.tmp.cpp:49:9: note: '__lambda_14_20::retType_14_20' declared here
-   49 |   using retType_14_20 = int (*)(int, int);
+.tmp.cpp:46:9: note: '__lambda_14_20::retType_14_20' declared here
+   46 |   using retType_14_20 = int (*)(int, int);
       |         ^
-.tmp.cpp:206:38: error: no member named 'operator int (*)(int, int)' in '__lambda_32_27'
-  206 |   FuncPtr_41 fp = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27();
+.tmp.cpp:198:38: error: no member named 'operator int (*)(int, int)' in '__lambda_32_27'
+  198 |   FuncPtr_41 fp = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27();
       |                   ~~~~~~~~~~~~~~~~~~ ^
 4 errors generated.

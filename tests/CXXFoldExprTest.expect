@@ -1,4 +1,3 @@
-// This wrapper is needed, because currently the base template is not rewritten if it has a TU as direct parent.
 class CXXFoldExprTest
 {
   
@@ -62,7 +61,6 @@ class CXXFoldExprTest
 };
 
 
-
 int main()
 {
   CXXFoldExprTest cxxFoldExprTest = {};
@@ -72,5 +70,3 @@ int main()
   cxxFoldExprTest.BinaryLeftFold<int, int, int, int>(2, 3, 4, 5);
   return 0;
 }
-
-

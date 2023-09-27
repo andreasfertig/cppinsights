@@ -1,5 +1,3 @@
-// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3559.pdf
-
 int main()
 {
       
@@ -53,5 +51,3 @@ int main()
   FuncPtr_4 fp = __lambda_4_28{}.operator __lambda_4_28::retType_4_28();
   return 0;
 }
-
-

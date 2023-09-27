@@ -8,7 +8,6 @@ void foo(T & t)
   auto it = t.find(42);
 }
 
-
 /* First instantiated from: AutoHandler2Test.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -29,7 +28,6 @@ void foo<std::set<int, std::less<int>, std::allocator<int> > >(std::set<int, std
 #endif
 
 
-
 int main()
 {
   std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > m = std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > >();
@@ -38,4 +36,3 @@ int main()
   foo(s);
   return 0;
 }
-

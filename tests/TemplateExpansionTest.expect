@@ -23,7 +23,6 @@ template_tuple<Templates...> f7()
 {
 }
 
-
 /* First instantiated from: TemplateExpansionTest.cpp:9 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -38,15 +37,12 @@ void foo2()
   f7<identity>();
 }
 
-
-
-  template<typename type_parameter_0_0>
+template<typename type_parameter_0_0>
 class A
 {
 };
 
-
-  template<template <typename> typename... >
+template<template <typename> typename... >
 class B
 {
 };
@@ -61,11 +57,9 @@ class B<Test, Test>
 };
 
 #endif
+int foo();
 
-  int foo();
-  
-
-  template<typename type_parameter_0_0>
+template<typename type_parameter_0_0>
 class testType
 {
 };
@@ -81,8 +75,7 @@ class testType<int>
 
 #endif
 
-
-  template<int (*fp)()>
+template<int (*fp)()>
 class testDecl
 {
 };
@@ -104,8 +97,7 @@ class testDecl<nullptr>
 
 #endif
 
-
-  template<int >
+template<int >
 class testIntegral
 {
 };
@@ -121,14 +113,10 @@ class testIntegral<2>
 
 #endif
 
-
-  template<template <typename> typename >
+template<template <typename> typename >
 class testTemplate
 {
 };
-
-
-  
 
 template<>
 class testTemplate<A>
@@ -136,9 +124,7 @@ class testTemplate<A>
 };
 
 
-
-
-  template<template <typename> typename... T>
+template<template <typename> typename... T>
 class C
 {
   B<T...> testTemplateExpansion;
@@ -156,8 +142,7 @@ class C<Test, Test>
 
 #endif
 
-
-  template<int , int  = 0>
+template<int , int  = 0>
 class testExpr
 {
 };
@@ -173,8 +158,7 @@ class testExpr<4, 1>
 
 #endif
 
-
-  template<int , int ...>
+template<int , int ...>
 class testPack
 {
 };
@@ -190,13 +174,10 @@ class testPack<0, 1, 2, 4>
 
 #endif
 
-
-
 template<typename T>
 struct Test
 {
 };
-
 
 
 int main()
@@ -210,5 +191,3 @@ int main()
   testPack<0, 1, 2, 4> pack;
   return 0;
 }
-
-

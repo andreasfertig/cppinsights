@@ -4,8 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-void* malloc(unsigned int);
-// cmdlineinsights:-edu-show-cfront
 
 #include <cstdio>
 #include <cstdlib>
@@ -29,7 +27,6 @@ inline void Destructor_Apple(Apple * __this)
 {
   printf("~Apple\n");
 }
-
 
 
 int __main(void)

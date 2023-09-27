@@ -53,4 +53,3 @@ int main()
   __lambda_5_3.operator()() , __lambda_5_33.operator()();
   return 0;
 }
-

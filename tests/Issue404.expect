@@ -3,7 +3,6 @@ struct S
   // inline constexpr S() noexcept = default;
 };
 
-
 template<typename type_parameter_0_0>
 struct T
 {
@@ -19,10 +18,6 @@ struct T<int>
 
 #endif
 
-
-   int arr1[3][2];
-
-     S arr2[3][2];
-
+int arr1[3][2];
+S arr2[3][2];
 T<int> arr3[3][2];
-

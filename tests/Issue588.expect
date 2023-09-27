@@ -1,0 +1,50 @@
+struct A
+{
+  inline void f()
+  {
+  }
+  
+  // inline constexpr A() noexcept = default;
+};
+
+
+struct A a_var_1;
+
+struct B
+{
+  // inline constexpr B() noexcept = default;
+};
+
+struct B b_var_1;
+struct B b_var_2;
+struct B b_var_3;
+
+struct __anon_8_1
+{
+  // inline constexpr __anon_8_1() noexcept = default;
+};
+
+__anon_8_1 anonym_var_1;
+__anon_8_1 anonym_var_2;
+__anon_8_1 anonym_var_3;
+
+struct __anon_11_1
+{
+};
+
+__anon_11_1 anonym_var_assign = {};
+
+struct __anon_14_1
+{
+  // inline constexpr __anon_14_1() noexcept = default;
+};
+
+__anon_14_1 anonym_var_array[3];
+
+struct __anon_17_1
+{
+  // inline constexpr __anon_17_1() noexcept = default;
+};
+
+__anon_17_1 anonym_var_dummy;
+__anon_17_1 * anonym_var_ptr;

@@ -5,7 +5,6 @@ struct S
 };
 
 
-
 int main()
 {
   S s;
@@ -13,4 +12,3 @@ int main()
   MemberVarPtr_8 m = &S::mem;
   return 0;
 }
-

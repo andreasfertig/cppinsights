@@ -3,26 +3,20 @@ inline constexpr int factorial(int n)
   return n <= 1 ? 1 : (n * factorial(n - 1));
 }
 
-
 inline constexpr float factorialFloat(int n)
 {
   return n <= 1 ? 1.0F : (static_cast<float>(n) * factorialFloat(n - 1));
 }
-
-
 
 int dummy(int n)
 {
   return n <= 1 ? 1 : (n * dummy(n - 1));
 }
 
-
-
 inline constexpr float Get()
 {
   return 23.9699993F;
 }
-
 
 int main()
 {
@@ -36,4 +30,3 @@ int main()
   const float f2 = Get();
   return static_cast<int>(((((static_cast<float>(fact + d)) + factFloat) + static_cast<float>(fact2)) + static_cast<float>(fact3)) + static_cast<float>(fact4));
 }
-

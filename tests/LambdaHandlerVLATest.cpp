@@ -1,21 +1,3 @@
-#if 0
-int Test(int n) 
-{
-    char buffer[n];
-
-
-    [=]() mutable {
-        int x = buffer[0];
-    }();
-}
-
-int main()
-{
-    Test(2);
-}
-#endif
-
-
 template<unsigned int TA>
 struct SA
 {

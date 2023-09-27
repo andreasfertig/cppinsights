@@ -4,11 +4,9 @@ long long charPtrToInt(const char * str)
   return a;
 }
 
-
 int main()
 {
   const char * str = "123";
   charPtrToInt(str);
   return 0;
 }
-

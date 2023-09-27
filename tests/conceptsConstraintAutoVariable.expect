@@ -1,4 +1,3 @@
-// cmdline:-std=c++2a
 template<typename T>
 concept FWD = requires{
   T{};
@@ -11,4 +10,3 @@ int main()
   int x = 4;
   return 0;
 }
-

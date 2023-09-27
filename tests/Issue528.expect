@@ -1,4 +1,3 @@
-// cmdlineinsights:-alt-syntax-for
 #include <initializer_list>
 
 int main()
@@ -28,4 +27,3 @@ int main()
   }
   return 0;
 }
-

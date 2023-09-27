@@ -1,8 +1,6 @@
-// cmdline:-std=c++20
-
 #include <coroutine>
 #include <cstdint>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 #include <tuple>
 
@@ -54,7 +52,7 @@ struct generator
     std::coroutine_handle<promise_type> hco;
     bool done;
     inline iterator(std::coroutine_handle<promise_type> hco, bool done)
-    : hco{hco}
+    : hco(hco)
     , done{done}
     {
     }
@@ -100,7 +98,7 @@ struct generator
   }
   
   inline generator(generator<T> && rhs)
-  : p{rhs.p}
+  : p(rhs.p)
   {
     rhs.p = nullptr;
   }
@@ -116,7 +114,7 @@ struct generator
   
   private: 
   inline explicit generator(promise_type * p)
-  : p{std::coroutine_handle<promise_type>::from_promise(*p)}
+  : p(std::coroutine_handle<promise_type>::from_promise(*p))
   {
   }
   
@@ -241,7 +239,6 @@ struct generator<unsigned int>
 
 #endif
 
-
 generator<unsigned int> fibonaccis()
 {
   uint32_t a = 0;
@@ -253,7 +250,6 @@ generator<unsigned int> fibonaccis()
   }
   
 }
-
 
 generator<unsigned int> take(generator<unsigned int> & g, uint32_t end)
 {
@@ -276,9 +272,7 @@ generator<unsigned int> take(generator<unsigned int> & g, uint32_t end)
   }
 }
 
-
 uint32_t arr[10];
-
 int main()
 {
   generator<unsigned int> g = fibonaccis();
@@ -295,4 +289,3 @@ int main()
   }
   return 0;
 }
-

@@ -9,13 +9,10 @@ class StdArray
 };
 
 
-
 class StdVector
 {
   
   public: 
   std::vector<int, std::allocator<int> > v = std::vector<int, std::allocator<int> >{std::initializer_list<int>{1, 2, 3, 4, 5}};
 };
-
-
 

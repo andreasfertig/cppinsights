@@ -1,11 +1,9 @@
-// http://coliru.stacked-crooked.com/a/8cbbd3c00d92d0a3
-// https://stackoverflow.com/questions/8164567/how-to-make-my-custom-type-to-work-with-range-based-for-loops
 #include <type_traits>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
 
-    struct null_sentinal_t
+struct null_sentinal_t
 {
   template<class Rhs, std::enable_if_t<!std::is_same<Rhs, null_sentinal_t>{}, int>  = 0>
   friend inline bool operator==(const Rhs & ptr, null_sentinal_t)
@@ -59,7 +57,6 @@
 };
 
 
-
 template<class Char>
 struct str_view
 {
@@ -110,4 +107,3 @@ int main()
   }
   return 0;
 }
-

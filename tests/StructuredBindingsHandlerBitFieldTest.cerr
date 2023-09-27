@@ -1,13 +1,13 @@
-.tmp.cpp:16:7: error: non-const reference cannot bind to bit-field 'x'
-   16 | int & a2x = __pt12.x;
+.tmp.cpp:11:7: error: non-const reference cannot bind to bit-field 'x'
+   11 | int & a2x = __pt12.x;
+      |       ^     ~~~~~~~~
+.tmp.cpp:3:7: note: bit-field is declared here
+    3 |   int x:2;
+      |       ^
+.tmp.cpp:12:7: error: non-const reference cannot bind to bit-field 'y'
+   12 | int & a2y = __pt12.y;
       |       ^     ~~~~~~~~
 .tmp.cpp:4:7: note: bit-field is declared here
-    4 |   int x:2;
-      |       ^
-.tmp.cpp:17:7: error: non-const reference cannot bind to bit-field 'y'
-   17 | int & a2y = __pt12.y;
-      |       ^     ~~~~~~~~
-.tmp.cpp:5:7: note: bit-field is declared here
-    5 |   int y:6;
+    4 |   int y:6;
       |       ^
 2 errors generated.

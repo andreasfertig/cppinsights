@@ -9,8 +9,6 @@
 #define INSIGHTS_CODE_GENERATOR_H
 
 #include "clang/AST/ASTContext.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 #include "llvm/ADT/APInt.h"
 
@@ -163,31 +161,38 @@ protected:
 
     using LambdaStackType = StackList<class LambdaHelper>;
 
-    STRONG_BOOL(LambdaInInitCapture);  ///! Singal whether we are processing a lambda created and assigned to an init
+    STRONG_BOOL(LambdaInInitCapture);  ///! Signal whether we are processing a lambda created and assigned to an init
                                        /// capture of another lambda.
 
-    constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper,
-                            LambdaStackType&    lambdaStack,
-                            LambdaInInitCapture lambdaInitCapture)
+    STRONG_BOOL(
+        ProcessingPrimaryTemplate);  ///! We do not want to transform a primary template which contains a Coroutine.
+
+    constexpr CodeGenerator(OutputFormatHelper&       _outputFormatHelper,
+                            LambdaStackType&          lambdaStack,
+                            LambdaInInitCapture       lambdaInitCapture,
+                            ProcessingPrimaryTemplate processingPrimaryTemplate)
     : mOutputFormatHelper{_outputFormatHelper}
     , mLambdaStack{lambdaStack}
     , mLambdaInitCapture{lambdaInitCapture}
+    , mProcessingPrimaryTemplate{processingPrimaryTemplate}
     {
     }
 
 public:
     explicit constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper)
-    : CodeGenerator{_outputFormatHelper, mLambdaStackThis}
+    : CodeGenerator{_outputFormatHelper, mLambdaStackThis, ProcessingPrimaryTemplate::No}
     {
     }
 
     constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaInInitCapture lambdaInitCapture)
-    : CodeGenerator{_outputFormatHelper, mLambdaStackThis, lambdaInitCapture}
+    : CodeGenerator{_outputFormatHelper, mLambdaStackThis, lambdaInitCapture, ProcessingPrimaryTemplate::No}
     {
     }
 
-    constexpr CodeGenerator(OutputFormatHelper& _outputFormatHelper, LambdaStackType& lambdaStack)
-    : CodeGenerator{_outputFormatHelper, lambdaStack, LambdaInInitCapture::No}
+    constexpr CodeGenerator(OutputFormatHelper&       _outputFormatHelper,
+                            LambdaStackType&          lambdaStack,
+                            ProcessingPrimaryTemplate processingPrimaryTemplate)
+    : CodeGenerator{_outputFormatHelper, lambdaStack, LambdaInInitCapture::No, processingPrimaryTemplate}
     {
     }
 
@@ -442,6 +447,7 @@ protected:
     OutputFormatHelper* mOutputFormatHelperOutside{
         nullptr};                        //!< Helper output buffer for std::initializer_list expansion.
     bool mRequiresImplicitReturnZero{};  //!< Track whether this is a function with an imlpicit return 0.
+    ProcessingPrimaryTemplate mProcessingPrimaryTemplate{};
 };
 //-----------------------------------------------------------------------------
 
@@ -472,7 +478,7 @@ public:
     explicit MultiStmtDeclCodeGenerator(OutputFormatHelper& _outputFormatHelper,
                                         LambdaStackType&    lambdaStack,
                                         bool                insertVarDecl)
-    : CodeGenerator{_outputFormatHelper, lambdaStack}
+    : CodeGenerator{_outputFormatHelper, lambdaStack, ProcessingPrimaryTemplate::No}
     , mInsertVarDecl{insertVarDecl}
     , mInsertComma{}
     {
@@ -631,7 +637,9 @@ class CodeGeneratorVariant
         CodeGenerator       cg;
         CfrontCodeGenerator cfcg;
 
-        CodeGenerators(OutputFormatHelper& _outputFormatHelper, CodeGenerator::LambdaStackType& lambdaStack);
+        CodeGenerators(OutputFormatHelper&                      _outputFormatHelper,
+                       CodeGenerator::LambdaStackType&          lambdaStack,
+                       CodeGenerator::ProcessingPrimaryTemplate processingPrimaryTemplate);
         CodeGenerators(OutputFormatHelper& _outputFormatHelper, CodeGenerator::LambdaInInitCapture lambdaInitCapture);
 
         ~CodeGenerators();
@@ -648,8 +656,10 @@ public:
     {
     }
 
-    CodeGeneratorVariant(OutputFormatHelper& _outputFormatHelper, CodeGenerator::LambdaStackType& lambdaStack)
-    : cgs{_outputFormatHelper, lambdaStack}
+    CodeGeneratorVariant(OutputFormatHelper&                      _outputFormatHelper,
+                         CodeGenerator::LambdaStackType&          lambdaStack,
+                         CodeGenerator::ProcessingPrimaryTemplate processingPrimaryTemplate)
+    : cgs{_outputFormatHelper, lambdaStack, processingPrimaryTemplate}
     , ofm{_outputFormatHelper}
     , cg{}
     {

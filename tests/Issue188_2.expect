@@ -1,4 +1,3 @@
-// Modified version of #188 to not rely on libstd++ tuple.
 #include <type_traits>
 
 namespace mstd
@@ -48,12 +47,12 @@ namespace mstd
   struct _Head_base<_Idx, _Head, true> : public _Head
   {
     inline constexpr _Head_base()
-    : _Head{}
+    : _Head()
     {
     }
     
     inline constexpr _Head_base(const _Head & __h)
-    : _Head{__h}
+    : _Head(__h)
     {
     }
     
@@ -64,12 +63,12 @@ namespace mstd
   struct _Head_base<_Idx, _Head, false>
   {
     inline constexpr _Head_base()
-    : _M_head_impl{}
+    : _M_head_impl()
     {
     }
     
     inline constexpr _Head_base(const _Head & __h)
-    : _M_head_impl{__h}
+    : _M_head_impl(__h)
     {
     }
     
@@ -181,29 +180,27 @@ namespace mstd
     using _Inherited = _Tuple_impl<_Idx + 1, _Tail...>;
     using _Base = _Head_base<_Idx, _Head, __empty_not_final<_Head>::value>;
     inline constexpr _Tuple_impl()
-    : _Inherited{}
-    , _Base{}
+    : _Inherited()
+    , _Base()
     {
     }
     
     inline explicit constexpr _Tuple_impl(const _Head & __head, const _Tail &... __tail)
-    : _Inherited{__tail... }
-    , _Base{__head}
+    : _Inherited(__tail... )
+    , _Base(__head)
     {
     }
     
     template<typename ... _UElements>
     inline constexpr _Tuple_impl(const _Tuple_impl<_Idx, _UElements...> & __in)
-    : _Inherited{_Tuple_impl<_Idx, _UElements...>::_M_tail(__in)}
-    , _Base{_Tuple_impl<_Idx, _UElements...>::_M_head(__in)}
+    : _Inherited(_Tuple_impl<_Idx, _UElements...>::_M_tail(__in))
+    , _Base(_Tuple_impl<_Idx, _UElements...>::_M_head(__in))
     {
     }
     
   };
   
   
-}  // namespace std
+}
 
 mstd::_Tuple_impl<1, short, long> one_s_l = mstd::_Tuple_impl<1, short, long>();
-
-

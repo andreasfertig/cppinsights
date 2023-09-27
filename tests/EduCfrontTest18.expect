@@ -4,7 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 typedef struct Foo
 {
@@ -16,7 +15,6 @@ inline Foo * Constructor_Foo(Foo * __this, int foo)
   __this->mFoo = foo;
   return __this;
 }
-
 
 
 typedef struct Bar

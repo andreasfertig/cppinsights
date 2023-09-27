@@ -5,12 +5,8 @@ namespace test
   
 }
 
-
 test::jmp_buf x;
-
-
 
 using test::jmp_buf;
 
 test::jmp_buf t;
-

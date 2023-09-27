@@ -1,6 +1,5 @@
 #include <cstdio>
-//#include <vector>
-//#include <iostream>
+
 using namespace std;
 
 int main()
@@ -28,4 +27,3 @@ int main()
   __lambda_9_11 && l = __lambda_9_11{arr[1]};
   return 0;
 }
-

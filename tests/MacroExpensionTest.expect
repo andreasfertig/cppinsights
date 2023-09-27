@@ -1,19 +1,8 @@
-#define SOME_NS(name)                                                                                                  \
-    namespace name {                                                                                                   \
-        int x;                                                                                                         \
-    }
-
 namespace Test
 {
   int x;
   
 }
-
-#define SOME_ENUM(name)                                                                                                \
-    enum name {                                                                                                        \
-        good,                                                                                                          \
-        bad,                                                                                                           \
-    }
 
 enum eTest
 {
@@ -22,19 +11,7 @@ enum eTest
 };
 
 
-
-#define SOME_STATIC_ASSERT(cond) static_assert(cond)
-
 /* PASSED: static_assert(true); */
-
-
-#define SOME_VAR_TEMPLATE_DECL(V, name)                                                                                \
-    template<class T>                                                                                                  \
-    constexpr T pi    = T(3.1415926535897932385L);                                                                     \
-    auto        name  = pi<V>
-
-
-
 
 template<class T>
 constexpr const T pi = T(3.14159265358979323851L);
@@ -43,5 +20,3 @@ template<>
 constexpr const int pi<int> = int(3.14159265358979323851L);
 
 int i = pi<int>;
-
-

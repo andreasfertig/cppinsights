@@ -1,6 +1,3 @@
-// A test for future reference. As C++ Insights does currently not match a TemplateDecl
-// it is wrapped in a CXXRecordDecl which is matched. This should ensure that the code for
-// that stays alive to the day all Decl's are matched.
 class Test
 {
   
@@ -25,10 +22,8 @@ class Test
 };
 
 
-
 int main()
 {
   Test::Tmpl<int> x;
   return 0;
 }
-

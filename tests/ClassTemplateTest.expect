@@ -35,7 +35,6 @@ class Foo<int>
 
 #endif
 
-
 class Bar : public Foo<int>
 {
   
@@ -49,13 +48,9 @@ class Bar : public Foo<int>
 };
 
 
-
-
 int main()
 {
   Bar bar;
   bar.Do();
   return 0;
 }
-
-

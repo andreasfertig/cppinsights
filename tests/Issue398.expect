@@ -2,4 +2,3 @@ void f()
 {
   int * p = reinterpret_cast<int *>(5);
 }
-

@@ -1,25 +1,25 @@
-.tmp.cpp:14:5: error: templates cannot be declared inside of a local class
-   14 |     template<class type_parameter_1_0>
+.tmp.cpp:13:5: error: templates cannot be declared inside of a local class
+   13 |     template<class type_parameter_1_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:20:5: error: templates cannot be declared inside of a local class
-   20 |     template<class type_parameter_1_0>
+.tmp.cpp:19:5: error: templates cannot be declared inside of a local class
+   19 |     template<class type_parameter_1_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:43:5: error: templates cannot be declared inside of a local class
-   43 |     template<class type_parameter_0_0>
+.tmp.cpp:41:5: error: templates cannot be declared inside of a local class
+   41 |     template<class type_parameter_0_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:50:5: error: templates cannot be declared inside of a local class
-   50 |     template<>
+.tmp.cpp:48:5: error: templates cannot be declared inside of a local class
+   48 |     template<>
       |     ^~~~~~~~~~
-.tmp.cpp:59:5: error: templates cannot be declared inside of a local class
-   59 |     template<>
+.tmp.cpp:57:5: error: templates cannot be declared inside of a local class
+   57 |     template<>
       |     ^~~~~~~~~~
-.tmp.cpp:67:5: error: templates cannot be declared inside of a local class
-   67 |     template<class type_parameter_0_0>
+.tmp.cpp:65:5: error: templates cannot be declared inside of a local class
+   65 |     template<class type_parameter_0_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:70:42: error: 'type_parameter_0_0' does not refer to a value
-   70 |       return __lambda_11_28{}.operator()<type_parameter_0_0>(arg);
+.tmp.cpp:68:42: error: 'type_parameter_0_0' does not refer to a value
+   68 |       return __lambda_11_28{}.operator()<type_parameter_0_0>(arg);
       |                                          ^
-.tmp.cpp:67:20: note: declared here
-   67 |     template<class type_parameter_0_0>
+.tmp.cpp:65:20: note: declared here
+   65 |     template<class type_parameter_0_0>
       |                    ^
 7 errors generated.

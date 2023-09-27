@@ -4,4 +4,3 @@ int main()
   const int y = 30;
   return 0;
 }
-

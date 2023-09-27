@@ -3,7 +3,6 @@ void foo(T && t)
 {
 }
 
-
 /* First instantiated from: Issue50.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -19,11 +18,9 @@ struct Test
 };
 
 
-
 int main()
 {
   Test test;
   foo(test);
   return 0;
 }
-

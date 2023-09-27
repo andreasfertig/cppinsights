@@ -3,7 +3,6 @@ int foo(int a, int b)
   return a + b;
 }
 
-
 int main()
 {
   using FuncPtr_4 = int (*)(int, int);
@@ -12,5 +11,3 @@ int main()
   FuncPtr_6 add1 = foo;
   return 0;
 }
-
-

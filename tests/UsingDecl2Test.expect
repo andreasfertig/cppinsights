@@ -16,7 +16,6 @@ struct B
 };
 
 
- 
 struct D : public B
 {
   using B::f;
@@ -40,7 +39,6 @@ struct D : public B
 };
 
 
-
 struct ProtectedMember
 {
   
@@ -52,7 +50,6 @@ struct ProtectedMember
 };
 
 
-
 struct UsingProtectedToPublicMember : public ProtectedMember
 {
   using ProtectedMember::protectedMember;
@@ -61,7 +58,6 @@ struct UsingProtectedToPublicMember : public ProtectedMember
   using ProtectedMember::value_type;
   // inline UsingProtectedToPublicMember() noexcept = default;
 };
-
 
 
 int main()
@@ -78,5 +74,3 @@ int main()
   d.h(1);
   return 0;
 }
-
-

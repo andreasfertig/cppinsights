@@ -2,37 +2,27 @@
 
 std::tuple<int, float> foo = std::tuple<int, float>();
 
- 
 std::tuple<int, float> __foo5 = std::tuple<int, float>(foo);
 int && a = std::get<0UL>(static_cast<std::tuple<int, float> &&>(__foo5));
 float && b = std::get<1UL>(static_cast<std::tuple<int, float> &&>(__foo5));
-
 std::tuple<int, float> & __foo6 = foo;
 int & ra = std::get<0UL>(__foo6);
 float & rb = std::get<1UL>(__foo6);
 
-
-
 char c[3] = {'\0', '\0', '\0'};
-
 
 char __c11[3] = {c[0], c[1], c[2]};
 char & x = __c11[0];
 char & y = __c11[1];
 char & z = __c11[2];
 
-
 char (&__c13)[3] = c;
 char & cx = __c13[0];
 char & cy = __c13[1];
 char & cz = __c13[2];
 
-
-
 std::tuple<int, float> Func();
 
- 
 const std::tuple<int, float> & __Func18 = Func();
 const int & fa = std::get<0UL>(__Func18);
 const float & fb = std::get<1UL>(__Func18);
-

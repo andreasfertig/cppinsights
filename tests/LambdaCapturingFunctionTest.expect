@@ -5,7 +5,6 @@ void Dummy(int x)
   printf("%d\n", x);
 }
 
-
 int main()
 {
   using D = void (*)(int);
@@ -35,4 +34,3 @@ int main()
   l.operator()();
   return 0;
 }
-

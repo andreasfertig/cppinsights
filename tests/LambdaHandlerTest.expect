@@ -31,7 +31,6 @@ class Bar
 };
 
 
-
 int main()
 {
   int foo = 2;
@@ -301,4 +300,3 @@ int main()
   __lambda_48_20 lambda9 = __lambda_48_20{foo, b};
   return 0;
 }
-

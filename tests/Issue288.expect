@@ -159,4 +159,3 @@ int main()
   std::operator<<(std::operator<<(std::cout, "Ok?").operator<<(f.operator()(15)), '\n');
   return 0;
 }
-

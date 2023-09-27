@@ -1,11 +1,8 @@
-
-
 template<typename T>
 constexpr const bool is_v = false;
 
 template<>
 constexpr const bool is_v<void (int)> = false;
-
 
 struct out
 {
@@ -17,13 +14,10 @@ struct out
 };
 
 
-
 static out cout;
-
 
 int main()
 {
   cout.operator<<(is_v<void (int)>);
   return 0;
 }
-

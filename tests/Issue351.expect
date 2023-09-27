@@ -6,7 +6,6 @@ struct A
 };
 
 
-
 struct Test
 {
   Test(const A &);
@@ -16,10 +15,8 @@ struct Test
 };
 
 
-
 std::optional<Test> foo()
 {
   A a;
   return std::optional<Test>(static_cast<A &&>(a));
 }
-

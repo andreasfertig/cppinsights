@@ -8,7 +8,6 @@ class Test
 };
 
 
-
 class West : public Test
 {
   
@@ -21,11 +20,9 @@ class West : public Test
 };
 
 
-
 int main()
 {
   West w = West();
   w.Pure();
   return 0;
 }
-

@@ -1,4 +1,3 @@
-// cmdlineinsights:-alt-syntax-for
 int main()
 {
   int x = {};
@@ -12,4 +11,3 @@ int main()
   
   return 0;
 }
-

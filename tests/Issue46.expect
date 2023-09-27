@@ -25,7 +25,6 @@ class __lambda_1_10
 __lambda_1_10 x = __lambda_1_10{};
 
 
-
 class __lambda_5_11
 {
   public: 
@@ -46,9 +45,7 @@ class __lambda_5_11
 
 __lambda_5_11 x2 = __lambda_5_11{5};
 
-
 int main()
 {
   return 0;
 }
-

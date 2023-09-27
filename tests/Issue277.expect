@@ -6,13 +6,11 @@ struct Point
 };
 
 
-
 template<std::size_t N>
 inline constexpr int & get(Point & p)
 {
   return p.data[N];
 }
-
 
 /* First instantiated from: Issue277.cpp:20 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -50,7 +48,6 @@ struct type_t<int>
 
 #endif
 
-
 namespace std
 {
   template<>
@@ -73,4 +70,3 @@ int f(Point p)
   int & y = get<1UL>(__p20);
   return x;
 }
-

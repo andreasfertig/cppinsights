@@ -1,7 +1,5 @@
-// cmdline:-std=c++11
 #include <cstdio>
 #include <vector>
-
 
 int main()
 {
@@ -30,4 +28,3 @@ int main()
   }
   return 0;
 }
-

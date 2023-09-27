@@ -1,11 +1,11 @@
 #include <new> // for thread-safe static's placement new
 #include <stdint.h> // for uint64_t under Linux/GCC
+
 struct foo
 {
   foo();
   
 };
-
 
 
 const foo & create()
@@ -30,5 +30,3 @@ const foo & create()
   
   return *reinterpret_cast<const foo*>(__value);
 }
-
-

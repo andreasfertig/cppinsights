@@ -25,17 +25,8 @@ struct MyClass<7>
 
 #endif
 
-
 template<int val>
 int MyClass<val>::var = val;
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass<5>::var = 5;
-#endif
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass<7>::var = 7;
-#endif
-
-
 
 template<typename T, int val>
 struct MyClass2
@@ -62,17 +53,8 @@ struct MyClass2<char, 7>
 
 #endif
 
-
 template<typename T, int val>
 int MyClass2<T, val>::var = val;
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass2<int, 5>::var = 5;
-#endif
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass2<char, 7>::var = 7;
-#endif
-
-
 
 template<typename T, int val, typename ... Ts>
 struct MyClass3
@@ -99,16 +81,8 @@ struct MyClass3<char, 7>
 
 #endif
 
-
 template<typename T, int val, typename ... Ts>
 int MyClass3<T, val, Ts... >::var = val;
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass3<int, 5>::var = 5;
-#endif
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass3<char, 7>::var = 7;
-#endif
-
 
 namespace Test
 {
@@ -147,7 +121,6 @@ namespace Test
   
 }
 
-
 int main(int argc, char ** argv)
 {
   MyClass<5> a = {};
@@ -165,4 +138,23 @@ int main(int argc, char ** argv)
   return 0;
 }
 
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<5>::var = 5;
+#endif
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<7>::var = 7;
+#endif
 
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass2<int, 5>::var = 5;
+#endif
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass2<char, 7>::var = 7;
+#endif
+
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass3<int, 5>::var = 5;
+#endif
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass3<char, 7>::var = 7;
+#endif

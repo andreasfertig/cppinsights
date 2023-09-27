@@ -6,5 +6,3 @@ int main()
   std::__basic_node_handle<std::__tree_node<std::__value_type<int, char>, void *>, std::allocator<std::pair<const int, char> >, std::__map_node_handle_specifics> jandle = mm.extract(2019);
   return 0;
 }
-
-

@@ -4,10 +4,8 @@ const int & getTheData()
   return theData;
 }
 
-
 int main()
 {
   const int & x = getTheData();
   return 0;
 }
-

@@ -1,4 +1,3 @@
-// Source: https://twitter.com/shafikyaghmour/status/1331435286853689344
 int main()
 {
   switch(0) {
@@ -14,5 +13,3 @@ int main()
   }
   return 0;
 }
-
-

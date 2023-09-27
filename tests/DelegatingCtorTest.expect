@@ -10,7 +10,7 @@ struct Foo
   }
   
   inline Foo(int y)
-  : Foo<T>{'a', y}
+  : Foo<T>('a', y)
   {
   }
   
@@ -58,13 +58,11 @@ struct Foo<int>
 
 #endif
 
-
-
 template<typename T>
 struct Bar : public Foo<T>
 {
   inline Bar(int x)
-  : Foo<T>{x, 2}
+  : Foo<T>(x, 2)
   {
   }
   
@@ -84,7 +82,6 @@ struct Bar<char> : public Foo<char>
 
 #endif
 
-
 int main()
 {
   Foo<int> f = Foo<int>{1, 2};
@@ -92,4 +89,3 @@ int main()
   Bar<char> b = Bar<char>{1};
   return 0;
 }
-

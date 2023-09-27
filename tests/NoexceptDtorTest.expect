@@ -7,14 +7,11 @@ struct A
 };
 
 
-
 struct C
 {
   int i;
   inline ~C() /* noexcept */ = default;
 };
-
-
 
 
 struct D
@@ -24,14 +21,11 @@ struct D
 };
 
 
-
-
 struct E
 {
   A a{};
   inline ~E() noexcept = default;
 };
-
 
 
 int main()
@@ -40,5 +34,3 @@ int main()
   E e = {{}};
   return 0;
 }
-
-

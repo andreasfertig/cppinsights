@@ -54,6 +54,3 @@ int main()
   __lambda_4_5 l2 = __lambda_4_5(l);
   return 0;
 }
-
-
-

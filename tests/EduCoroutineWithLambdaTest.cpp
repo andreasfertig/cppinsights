@@ -18,7 +18,7 @@ struct generator {
         std::suspend_always final_suspend() noexcept { return {}; }
         generator           get_return_object() { return generator{this}; };
         void                unhandled_exception() { std::terminate(); }
-        void                return_value(int v) { current_value = v; }
+        void                return_void() {  }
     };
 
     generator(generator&& rhs)
@@ -41,6 +41,7 @@ private:
 template<typename _AwrT>
 void SyncAwait(_AwrT&& a)
 {
+    // XXX: In the primary template Clang says there is no capture for this lambda.
     auto asyncLambda = [&]() -> generator { co_await a; };
 
     asyncLambda();

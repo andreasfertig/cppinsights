@@ -39,4 +39,3 @@ int main()
   printf("c3: %d c4: %d\n", cp.x, cp.y);
   return 0;
 }
-

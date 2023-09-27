@@ -34,17 +34,17 @@ class Foo<char>
 
 #endif
 
-
-
 template<>
 void Foo<int>::Func()
 {
 }
 
+
 template<>
 void Foo<char>::Func()
 {
 }
+
 
 int main()
 {
@@ -52,4 +52,3 @@ int main()
   Foo<char> fc;
   return 0;
 }
-

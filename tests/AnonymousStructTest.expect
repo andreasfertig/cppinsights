@@ -1,5 +1,3 @@
-// The problem with an anonymous struct is, that the resulting VarDecl rewrites the same source location.
-// In a namespace, where the namespace itself is matched, it works.
 namespace works
 {
   struct __anon_4_1
@@ -12,7 +10,6 @@ namespace works
   
 }
 
-// However, the same code with the TU as root does not
 struct __anon_10_1
 {
   int c;
@@ -24,16 +21,14 @@ struct __anon_10_1
   // inline __anon_10_1() noexcept = default;
 };
 
+
 __anon_10_1 RR;
 
-
-// However, the same code with the TU as root does not
 struct __anon_20_1
 {
   int c;
   // inline __anon_20_1() noexcept = default;
 };
 
+
 __anon_20_1 RR2;
-
-

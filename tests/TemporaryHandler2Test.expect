@@ -1,6 +1,3 @@
-//: C08:ConstReturnValues.cpp
-// Constant return by value
-// Result cannot be used as an lvalue
 class X
 {
   int i;
@@ -14,35 +11,32 @@ class X
 };
 
 
-
 X::X(int ii)
 {
-    i = ii;
+  this->i = ii;
 }
+
 
 void X::modify()
 {
-    i++;
+  this->i++;
 }
+
 
 X f5()
 {
   return X(0);
 }
 
-
 const X f6()
 {
   return X(0);
 }
 
-
 void f7(X & x)
 {
   x.modify();
 }
-
-
 
 X f8(bool x, int y)
 {
@@ -53,7 +47,6 @@ X f8(bool x, int y)
   return X(0);
 }
 
-
 int main()
 {
   f5().operator=(X(1));
@@ -61,8 +54,6 @@ int main()
   f8(false, 5).operator=(X(2));
   return 0;
 }
-  ///:~
-
 
 #include <iostream>
 
@@ -78,7 +69,6 @@ class Base
 };
 
 
-
 class Foo : public Base
 {
   
@@ -91,24 +81,20 @@ class Foo : public Base
 };
 
 
-
 Base return_base()
 {
   return {};
 }
-
 Foo return_foo()
 {
   return {{}};
 }
-
 
 int main2()
 {
   const Base & b = {static_cast<const Base&>(return_foo())};
   return 2;
 }
-
 
 struct S
 {
@@ -127,5 +113,3 @@ void test()
 {
   const S & s_ref = S();
 }
-
-

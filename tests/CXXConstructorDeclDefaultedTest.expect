@@ -4,10 +4,8 @@ struct DefaultedCtorAndConstexpr
 };
 
 
-
 int main()
 {
   DefaultedCtorAndConstexpr t;
   return 0;
 }
-

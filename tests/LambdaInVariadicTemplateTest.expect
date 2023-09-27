@@ -1,12 +1,10 @@
 #include <iostream>
 
-
 template<class T, class Case, class ... Cases>
 decltype(auto) match(T && value, const Case & _case, const Cases &... cases)
 {
   return 1;
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -42,7 +40,6 @@ int match<float &, __lambda_13_4, __lambda_14_4, __lambda_15_4>(float & value, c
   return 1;
 }
 #endif
-
 
 
 template<class T>
@@ -119,7 +116,6 @@ decltype(auto) test(T && value)
   
   return match(value, __lambda_13_4{}, __lambda_14_4{}, __lambda_15_4{});
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -441,5 +437,3 @@ int main()
   std::cout.operator<<(test(2.0F)).operator<<(std::endl);
   return 0;
 }
-
-

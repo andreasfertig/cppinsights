@@ -1,5 +1,3 @@
-// From: https://en.cppreference.com/w/cpp/language/lambda
-
 
 class __lambda_3_12
 {
@@ -28,7 +26,6 @@ class __lambda_3_12
 };
 
 __lambda_3_12 Fwd = __lambda_3_12{};
-
 
 
 class __lambda_5_10
@@ -79,7 +76,4 @@ class __lambda_5_10
 
 __lambda_5_10 C = __lambda_5_10{};
 
-
 /* PASSED: static_assert(Fwd.operator()(C.operator __lambda_5_10::retType_5_10(), 3) == 3); */
-
-

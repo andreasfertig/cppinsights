@@ -25,6 +25,3 @@ void foo()
   
   __lambda_2_1.operator()();
 }
-
-
-

@@ -1,9 +1,6 @@
-// cmdlineinsights:--show-all-implicit-casts
-
 struct A
 {
 };
-
 
 struct B
 {
@@ -15,15 +12,12 @@ struct B
 };
 
 
-
 void DangerousFunc(const A &)
 {
 }
-
 
 int main()
 {
   DangerousFunc(static_cast<const A>(static_cast<A>(B{}.operator A())));
   return 0;
 }
-

@@ -4,13 +4,11 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 const int * Fun(const int * val)
 {
   return val;
 }
-
 
 int __main(void)
 {

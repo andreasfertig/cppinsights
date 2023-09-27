@@ -4,7 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 typedef struct Data
 {
@@ -14,7 +13,6 @@ typedef struct Data
 inline void Destructor_Data(Data * __this)
 {
 }
-
 
 
 typedef struct Test
@@ -40,32 +38,25 @@ inline Data get(Test * __this)
 }
 
 
-
 void Fun(Test t)
 {
 }
 
-
 void FunFun(Test t, Test tt)
 {
 }
-
 
 int FunFunInt(Test t, Test tt)
 {
   Test t3;
   return 3;
   Destructor_Test(&t3);
-  Destructor_Test(&tt);
-  Destructor_Test(&t);
   ;
 }
-
 
 void Fin(int)
 {
 }
-
 
 void Basic(void)
 {
@@ -81,7 +72,6 @@ void Basic(void)
   ;
 }
 
-
 void Advanced(void)
 {
   Test __temporary38_25;
@@ -92,14 +82,12 @@ void Advanced(void)
   ;
 }
 
-
 void WithVar(void)
 {
   Test __temporary43_22;
   Data * d = &get(Constructor_Test((Test *)&__temporary43_22, 4));
   Destructor_Test(&__temporary43_22);
 }
-
 
 int __main(void)
 {
@@ -117,6 +105,11 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
+  Destructor_Test(&tt);
+  Destructor_Test(&t);
+  Destructor_Test(&tt);
+  Destructor_Test(&t);
+  Destructor_Test(&t);
   ;
 }
 

@@ -2,11 +2,8 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++2a
-// cmdlineinsights:-edu-show-coroutine-transformation
-
 #include <coroutine>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 #include <utility>
 
@@ -74,7 +71,6 @@ struct generator
   // inline constexpr generator(const generator &) /* noexcept */ = delete;
   // inline generator & operator=(const generator &) /* noexcept */ = delete;
 };
-
 
 
 struct __funFrame
@@ -171,11 +167,8 @@ void __funDestroy(__funFrame * __f)
 }
 
 
-
 int main()
 {
   generator s = fun();
   return 0;
 }
-
-

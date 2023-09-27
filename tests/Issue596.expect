@@ -27,18 +27,20 @@ class Data<long>
 
 #endif
 
-
+template<typename T>
+Data(const T & t) -> Data<T>;
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 Data(const int & t) -> Data<int>;
 #endif
-Data(const char *) -> Data<std::string> ;
-Data(int)->Data<long> ;
+
+
+
+Data(const char *) -> Data<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
+Data(int) -> Data<long>;
 int main()
 {
   Data<long> d1 = Data<long>{5};
   return 0;
 }
-
-

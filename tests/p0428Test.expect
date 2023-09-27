@@ -1,5 +1,3 @@
-// cmdline:-std=c++2a
-
 
 class __lambda_3_10
 {
@@ -32,9 +30,7 @@ class __lambda_3_10
 
 __lambda_3_10 l = __lambda_3_10{};
 
-
 int main()
 {
   return static_cast<int>(l.operator()(3, 4) == 4);
 }
-

@@ -34,7 +34,6 @@ class X
 };
 
 
-
 struct V
 {
   inline V(int x)
@@ -48,7 +47,6 @@ struct V
 };
 
 
-
 struct Y
 {
   int x;
@@ -56,21 +54,16 @@ struct Y
 };
 
 
-
 void takes_y(Y y);
-
 
 void bar(std::initializer_list<int> x)
 {
 }
 
-
-
 template<typename T>
 void something(std::initializer_list<T>)
 {
 }
-
 
 /* First instantiated from: InitializerListTest.cpp:58 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -108,5 +101,3 @@ void foo()
   V v = V{std::initializer_list<int>{1}};
   V vv = V{std::initializer_list<int>{1, 2}};
 }
-
-

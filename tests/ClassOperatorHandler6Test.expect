@@ -1,7 +1,4 @@
 #include <typeinfo>
-#ifndef NULL
-#define NULL 0
-#endif
 
 #include <new>
 
@@ -10,7 +7,6 @@ class Bar
   public: 
   // inline constexpr Bar() noexcept = default;
 };
-
 
 
 class Woo
@@ -24,9 +20,6 @@ class Woo
   
   int mX;
 };
-
-
-
 
 
 class Foo : public Bar
@@ -96,9 +89,6 @@ class Foo : public Bar
 };
 
 
-
-
-
 int main()
 {
   Foo f1 = Foo{1};
@@ -128,5 +118,3 @@ int main()
   Foo f3 = Foo{'c'};
   return 0;
 }
-
-

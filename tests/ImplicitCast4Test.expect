@@ -7,7 +7,6 @@ void Test()
   using withCalculation = std::chrono::duration<double, std::ratio<31536000, 1> >;
 }
 
-
 /* First instantiated from: ImplicitCast4Test.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -18,7 +17,6 @@ void Test<int>()
 }
 #endif
 
-  
 
 int main()
 {
@@ -27,5 +25,3 @@ int main()
   Test<int>();
   return 0;
 }
-
-

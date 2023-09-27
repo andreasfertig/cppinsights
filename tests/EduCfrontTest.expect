@@ -4,7 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 typedef struct Apple
 {
@@ -51,7 +50,6 @@ inline Apple * operatorEqual(Apple * __this, const Apple * __rhs)
 }
 
 
-
 typedef struct Other
 {
   Apple mA;
@@ -73,7 +71,6 @@ inline Other * operatorEqual(Other * __this, Other * __rhs)
 }
 
 inline void Destructor_Other(Other * __this);
-
 
 
 int __main(void)

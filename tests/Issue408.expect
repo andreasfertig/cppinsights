@@ -4,5 +4,5 @@ namespace ns
   
 }
 
-int ns::a = 1;
 
+int ns::a = 1;

@@ -2,13 +2,11 @@
 
 int a[2];
 
-
 template<typename T>
 int (&&f(T i))[2]
 {
   return static_cast<int (&&)[2]>(a);
 }
-
 
 /* First instantiated from: Issue124_1Tmpl.cpp:14 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -38,4 +36,3 @@ int main()
   f(i);
   return 0;
 }
-

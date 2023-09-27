@@ -1,8 +1,6 @@
 int arr[5][3];
 
-
 int (&f(int i))[3]
 {
   return arr[i];
 }
-

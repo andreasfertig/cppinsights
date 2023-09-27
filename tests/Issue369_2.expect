@@ -1,12 +1,12 @@
 #include <new> // for thread-safe static's placement new
 #include <stdint.h> // for uint64_t under Linux/GCC
 #include <utility> // std::move
+
 struct foo
 {
   foo();
   
 };
-
 
 
 const void withNoexcept()
@@ -48,7 +48,6 @@ const void withNoexcept()
   } 
   
 }
-
 
 const void withNoexceptFalse()
 {
@@ -96,7 +95,6 @@ const void withNoexceptFalse()
   
 }
 
-
 const void withNoexceptTrue()
 {
       
@@ -137,12 +135,9 @@ const void withNoexceptTrue()
   
 }
 
-
-
 struct buh
 {
 };
-
 
 
 const void withNoexceptNoexceptCtor()
@@ -174,14 +169,10 @@ const void withNoexceptNoexceptCtor()
   static buh value = __lambda_19_23.operator()();
 }
 
-
-
 foo func()
 {
   return foo{};
 }
-
-
 
 void viaFunction()
 {
@@ -204,4 +195,3 @@ void viaFunction()
   } 
   
 }
-

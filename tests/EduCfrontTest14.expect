@@ -9,7 +9,6 @@ void* malloc(unsigned int);
 extern "C" void free(void*);
 extern "C" void* __cxa_vec_new(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));
 extern "C" void __cxa_vec_delete(void *, unsigned int, unsigned int, void* (*destructor)(void *) );
-// cmdlineinsights:-edu-show-cfront
 
 typedef struct A
 {
@@ -19,7 +18,6 @@ typedef struct A
 inline void Destructor_A(A * __this)
 {
 }
-
 
 
 typedef struct B
@@ -41,7 +39,6 @@ inline B * operatorEqual(B * __this, const B * __rhs)
 {
   return __this;
 }
-
 
 
 int __main(void)

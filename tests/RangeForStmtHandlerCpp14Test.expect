@@ -1,5 +1,3 @@
-// cmdline:-std=c++14
-
 int main()
 {
   char arr[3] = {2, 4, 6};
@@ -12,4 +10,3 @@ int main()
   }
   return 0;
 }
-

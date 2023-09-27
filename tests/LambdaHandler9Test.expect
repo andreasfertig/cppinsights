@@ -102,4 +102,3 @@ int main()
   f2.operator()();
   return 0;
 }
-

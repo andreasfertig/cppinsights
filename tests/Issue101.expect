@@ -14,15 +14,11 @@ struct typed_constant
 };
 
 
-
 template<auto V>
-using constant = typed_constant<std::remove_cv_t<decltype(V)>, V>;
-
-
+using constant = typed_constant<std::remove_cv_t<decltype(V)>, static_cast<std::remove_cv_t<decltype(V)>>(V)>;
 
 template<auto V>
 inline constexpr const auto constant_v = constant<V>{};
-
 
 template<typename T1, T1 v1, typename T2, T2 v2>
 inline constexpr constant<(v1 + v2)> operator+(typed_constant<T1, v1>, typed_constant<T2, v2>)
@@ -120,7 +116,6 @@ inline constexpr constant<(v1 || v2)> operator||(typed_constant<T1, v1>, typed_c
   return {};
 }
 
-
 template<typename T1, auto v1>
 inline constexpr constant<!v1> operator!(typed_constant<T1, v1>)
 {
@@ -132,8 +127,6 @@ inline constexpr constant<(~v1)> operator~(typed_constant<T1, v1>)
 {
   return {};
 }
-
-
 
 namespace detail
 {
@@ -262,7 +255,6 @@ struct list
 };
 
 
-
 template<template <typename> typename C>
 struct make
 {
@@ -271,8 +263,7 @@ struct make
 };
 
 
-
-template <typename F, typename T>
+template<typename F, typename T>
 using apply_one = typename F::template result<T>;
 
 struct identity
@@ -280,7 +271,6 @@ struct identity
   template<typename T>
   using result = T;
 };
-
 
 
 template<template <typename> typename T, typename ... Ts>
@@ -295,7 +285,6 @@ struct bind_front
   template<typename ... Vs>
   using result = typename helper<Vs...>::type;
 };
-
 
 
 template<template <typename> typename T>
@@ -319,7 +308,6 @@ struct from_type
 };
 
 
-
 template<template <typename> typename T>
 struct from_value
 {
@@ -333,8 +321,6 @@ struct from_value
   };
   
 };
-
-
 
 
 template<typename ... type_parameter_0_0>
@@ -464,7 +450,6 @@ struct compose<add_const, add_pointer>
 
 #endif
 
-
 template<>
 struct compose<>
 {
@@ -535,7 +520,6 @@ struct compose<>
 };
 
 
-
 template<typename F, typename ... Fs>
 struct compose<F, Fs...>
 {
@@ -544,11 +528,10 @@ struct compose<F, Fs...>
   struct to
   {
     template<typename ... Ts>
-    using result = typename compose<Fs...>::template compose<Fs...>::template to<typename F::template to<C> >::template result<Ts...>;
+    using result = typename compose<Fs...>::template to<typename F::template to<C> >::template result<Ts...>;
   };
   
 };
-
 
 
 struct add_const
@@ -631,7 +614,6 @@ struct add_const
   
   #endif
 };
-
 
 
 struct add_pointer
@@ -734,12 +716,10 @@ struct add_pointer
 };
 
 
-
 template<typename T>
 struct wrapped
 {
 };
-
 
 
 struct wrap
@@ -749,20 +729,14 @@ struct wrap
 };
 
 
-
-template <typename F, typename ... Ts>
+template<typename F, typename ... Ts>
 using apply = typename F::template to<>::template result<Ts...>;
-template <typename F, typename C, typename ... Ts>
+
+template<typename F, typename C, typename ... Ts>
 using apply_to = typename F::template to<C>::template result<Ts...>;
 
 /* PASSED: static_assert(std::is_same_v<int *, int *>); */
-
 /* PASSED: static_assert(std::is_same_v<const int *, const int *>); */
-
 /* PASSED: static_assert(std::is_same_v<int *const, int *const>); */
-
 /* PASSED: static_assert(std::is_same_v<wrapped<int *>, wrapped<int *> >); */
-
 /* PASSED: static_assert(std::is_same_v<wrapped<const int *>, wrapped<const int *> >); */
-
-

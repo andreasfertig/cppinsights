@@ -8,19 +8,16 @@ std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long l
   return std::chrono::duration<long long, std::ratio<1, 1> >(s, nullptr);
 }
 
-
 std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator""_str(const char * s, std::size_t len)
 {
   return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(s, len);
 }
-
 
 template<char ..._Digits>
 inline constexpr int operator""_cs()
 {
   return 0;
 }
-
 
 /* First instantiated from: Issue15.cpp:38 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -37,7 +34,6 @@ inline constexpr int operator""_x()
 {
   return 0;
 }
-
 
 /* First instantiated from: Issue15.cpp:33 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -59,4 +55,3 @@ int main()
   int cookedTemplateLiteral = operator""_cs<'4', '5', '6', '7'>();
   return 0;
 }
-

@@ -1,13 +1,13 @@
-.tmp.cpp:54:5: error: templates cannot be declared inside of a local class
-   54 |     template<class type_parameter_0_0>
+.tmp.cpp:50:5: error: templates cannot be declared inside of a local class
+   50 |     template<class type_parameter_0_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:83:5: error: templates cannot be declared inside of a local class
-   83 |     template<class type_parameter_0_0>
+.tmp.cpp:79:5: error: templates cannot be declared inside of a local class
+   79 |     template<class type_parameter_0_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:60:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
-   60 |           auto test;
+.tmp.cpp:56:16: error: declaration of variable 'test' with deduced type 'auto' requires an initializer
+   56 |           auto test;
       |                ^
-.tmp.cpp:93:10: error: no matching member function for call to 'operator()'
-   93 |   lambda.operator()(MyArrayWrapper<int>(vec));
+.tmp.cpp:89:10: error: no matching member function for call to 'operator()'
+   89 |   lambda.operator()(MyArrayWrapper<int>(vec));
       |   ~~~~~~~^~~~~~~~~~
 4 errors generated.

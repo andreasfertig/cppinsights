@@ -7,4 +7,3 @@ int main(int argc, char ** argv)
   int * p = const_cast<int *>(&a);
   return 0;
 }
-

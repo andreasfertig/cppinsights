@@ -7,7 +7,6 @@ class A
 };
 
 
-
 class B
 {
   
@@ -20,12 +19,10 @@ class B
 };
 
 
-
 class C : public B
 {
   public: 
 };
-
 
 
 void foo(const A &)
@@ -33,17 +30,13 @@ void foo(const A &)
   std::operator<<(std::cout, "A").operator<<(std::endl);
 }
 
-
 void foo(B &)
 {
   std::operator<<(std::cout, "B").operator<<(std::endl);
 }
-
 
 int main()
 {
   foo(static_cast<const B&>(C()).operator A());
   return 0;
 }
- 
-

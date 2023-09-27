@@ -1,4 +1,3 @@
-// cmdline:-std=c++2a
 namespace ConceptsDefinition
 {
   template<typename T>
@@ -37,7 +36,9 @@ namespace ConceptsDefinition
   
 }
 
-bool areEqual(ConceptsDefinition::CompoundRequirement auto a, ConceptsDefinition::CompoundRequirement auto b) {
+template<ConceptsDefinition::CompoundRequirement type_parameter_0_0, ConceptsDefinition::CompoundRequirement type_parameter_0_1>
+bool areEqual(type_parameter_0_0 a, type_parameter_0_1 b)
+{
   return a == b;
 }
 
@@ -56,4 +57,3 @@ int main()
   int x = 4;
   return static_cast<int>(areEqual(2, 3.0));
 }
-

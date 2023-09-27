@@ -28,7 +28,6 @@ class Foo
 };
 
 
-
 class Bar : public Foo
 {
   
@@ -51,7 +50,6 @@ class Bar : public Foo
 };
 
 
-
 int main()
 {
   Foo foo = Foo(10);
@@ -59,5 +57,3 @@ int main()
   printf("%d %d %d\n", foo.Mul(2), bar.Sum(), static_cast<Foo&>(bar).Mul(3));
   return 0;
 }
-
-

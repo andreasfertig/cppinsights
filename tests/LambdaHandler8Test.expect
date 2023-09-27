@@ -4,7 +4,6 @@ int Test(T && t)
   return t();
 }
 
-
 /* First instantiated from: LambdaHandler8Test.cpp:9 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -40,11 +39,8 @@ int get(int & v)
   return x;
 }
 
-
-
 int main()
 {
   int x = 2;
   return get(x);
 }
-

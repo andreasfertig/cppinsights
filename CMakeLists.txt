@@ -502,15 +502,10 @@ add_clang_tool(insights
     CfrontCodeGenerator.cpp
     CoroutinesCodeGenerator.cpp
     DPrint.cpp
-    FunctionDeclHandler.cpp
-    GlobalVariableHandler.cpp
     Insights.cpp
-    InsightsBase.cpp
     InsightsHelpers.cpp
     LifetimeTracker.cpp
     OutputFormatHelper.cpp
-    RecordDeclHandler.cpp
-    TemplateHandler.cpp
 )
 
 if(IS_MSVC_CL)
@@ -527,9 +522,9 @@ else()
     # general include also provided by clang-build
     target_link_libraries(insights
         PRIVATE
+        ${ADDITIONAL_LIBS}
         clangTooling
         clangASTMatchers
-        ${ADDITIONAL_LIBS}
     )
 endif()
 

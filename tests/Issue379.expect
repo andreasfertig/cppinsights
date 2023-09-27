@@ -33,4 +33,3 @@ struct C
   int m = 6;
 };
 
-

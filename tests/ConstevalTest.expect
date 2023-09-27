@@ -1,13 +1,9 @@
-// cmdline:-std=c++20
-
 inline consteval bool ConstantFun()
 {
   return true;
 }
 
-
 /* PASSED: static_assert(ConstantFun()); */
-
 
 struct Test
 {
@@ -19,9 +15,7 @@ struct Test
 };
 
 
-
 /* PASSED: static_assert(Test{}.Fun()); */
-
 
 
 class __lambda_16_15
@@ -51,5 +45,3 @@ class __lambda_16_15
 } __lambda_16_15{};
 
 /* PASSED: static_assert(__lambda_16_15.operator()()); */
-
-

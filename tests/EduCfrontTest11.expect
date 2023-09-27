@@ -6,7 +6,6 @@
 #include <assert.h> // _Static_assert
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 int __main(void)
 {

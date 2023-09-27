@@ -17,7 +17,6 @@ struct Foo
 };
 
 
-
 int main()
 {
   Foo f;
@@ -26,4 +25,3 @@ int main()
   Foo().bar();
   return 0;
 }
-

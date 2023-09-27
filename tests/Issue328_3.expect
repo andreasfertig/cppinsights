@@ -1,17 +1,13 @@
-
-
 template<typename T>
 constexpr const bool is_v = false;
 
 template<>
 constexpr const bool is_v<int> = false;
 
-
 class Foo
 {
   public: 
 };
-
 
 
 bool operator==(const Foo & left, const bool & right)
@@ -26,7 +22,6 @@ bool operator==(const bool & right, const Foo & left)
 }
 
 
-
 struct out
 {
   inline void operator<<(bool)
@@ -37,9 +32,7 @@ struct out
 };
 
 
-
 static out cout;
-
 
 int main()
 {
@@ -48,5 +41,3 @@ int main()
   cout.operator<<((operator==(is_v<int>, f)));
   return 0;
 }
-
-

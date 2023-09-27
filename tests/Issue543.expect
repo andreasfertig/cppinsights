@@ -2,14 +2,12 @@
 #include <csetjmp>
 std::jmp_buf jump_buffer;
 
-
 void foo()
 {
   printf("foo: Entered\n");
   longjmp(jump_buffer, 1);
   printf("foo: This won't be executed\n");
 }
-
 
 int main()
 {
@@ -23,4 +21,3 @@ int main()
   printf("main: Exiting\n");
   return 0;
 }
-

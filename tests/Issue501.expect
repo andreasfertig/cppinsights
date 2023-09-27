@@ -1,12 +1,7 @@
-// cmdlineinsights:-show-all-callexpr-template-parameters
-
 #include <utility>
 static int s1;
-
 static int s2;
-
 std::pair<const int &, const int &> fun()
 {
   return std::pair<const int &, const int &>(std::make_pair<int &, int &>(s1, s2));
 }
-

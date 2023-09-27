@@ -2,11 +2,8 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++20
-// cmdlineinsights:-edu-show-coroutine-transformation
-
 #include <coroutine>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 #include <utility>
 
@@ -25,7 +22,6 @@ struct Test
   
   // inline Test & operator=(const Test &) noexcept = default;
 };
-
 
 
 template<typename T>
@@ -154,9 +150,9 @@ struct generator<Test>
 
 #endif
 
-
-template <typename T>
-generator<T> fun() {
+template<typename T>
+generator<T> fun()
+{
   co_return 2;
 }
 
@@ -259,11 +255,8 @@ void __fun_TestDestroy(__fun_TestFrame * __f)
 #endif
 
 
-
 int main()
 {
   generator<Test> s = fun<Test>();
   return 0;
 }
-
-

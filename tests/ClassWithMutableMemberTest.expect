@@ -15,10 +15,8 @@ class C
 };
 
 
-
 int main()
 {
   C c;
   return c.Get();
 }
-

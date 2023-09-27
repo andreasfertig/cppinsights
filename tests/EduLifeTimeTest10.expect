@@ -2,8 +2,6 @@
  * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
  * buggy.                                                                            *
  *************************************************************************************/
-// cmdlineinsights:-edu-show-lifetime
-
 #include <initializer_list>
 
 struct Vector
@@ -16,11 +14,9 @@ struct Vector
 };
 
 
-
 void Fun(Vector)
 {
 }
-
 
 Vector createStrings()
 {
@@ -29,7 +25,6 @@ Vector createStrings()
   /* __temporary14_57 // lifetime ends here */
   ;
 }
-
 
 Vector createStrings2()
 {
@@ -41,7 +36,6 @@ Vector createStrings2()
   ;
 }
 
-
 void test()
 {
   const char *const __temporary26_54[6] = {"This", "is", "a", "vector", "of", "strings"};
@@ -49,4 +43,3 @@ void test()
   /* __temporary26_54 // lifetime ends here */
   ;
 }
-

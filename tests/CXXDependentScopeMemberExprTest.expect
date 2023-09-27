@@ -36,7 +36,6 @@ class Test<int>
 
 #endif
 
-
 struct S
 {
   void g();
@@ -45,11 +44,9 @@ struct S
 };
 
 
-
 int main()
 {
   Test<int> t;
   t.func<S>();
   return 0;
 }
-

@@ -28,5 +28,3 @@ int main()
   FuncPtr_8 fp = __lambda_8_26{}.operator __lambda_8_26::retType_8_26();
   return 0;
 }
-
-

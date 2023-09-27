@@ -1,10 +1,7 @@
-// cmdline:-std=c++20
-
 template<auto SIZE>
 class LambdaInNTTP
 {
 };
-
 
 
 
@@ -33,6 +30,3 @@ class __lambda_7_32
 };
 
 static LambdaInNTTP<&__lambda_7_32::__invoke> lambdaInNTTP();
-
-
-

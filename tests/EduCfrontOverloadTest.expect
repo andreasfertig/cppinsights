@@ -4,50 +4,39 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 void Fun_uintr(unsigned int * x)
 {
 }
-
 void Fun_intr(int * x)
 {
 }
-
 void Fun_double(double d)
 {
 }
-
 void Fun_intr(const int * x)
 {
 }
-
 void Fun_charppc(const char ** x)
 {
 }
-
 void Fun_intp(int *)
 {
 }
-
 void Fun_intpc(const int *)
 {
 }
 
-
 void Run_intr(int *)
 {
 }
-
 void Run_intR(int *)
 {
 }
 
-
 void Bun(int)
 {
 }
-
 
 int __main(void)
 {

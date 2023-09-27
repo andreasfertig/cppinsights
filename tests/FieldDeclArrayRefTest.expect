@@ -2,7 +2,6 @@
 
 static int x[2] = {1, 2};
 
-
 template<typename T, unsigned int SIZE>
 class array
 {
@@ -12,12 +11,12 @@ class array
   
   public: 
   inline array()
-  : data{x}
+  : data(x)
   {
   }
   
   inline array(T (&reference)[SIZE])
-  : data{reference}
+  : data(reference)
   {
   }
   
@@ -47,11 +46,9 @@ class array<int, 2>
 
 #endif
 
-
 int main()
 {
   array<int, 2> a = array<int, 2>();
   array<int, 2> ab = array<int, 2>{x};
   return 0;
 }
-

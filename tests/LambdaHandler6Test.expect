@@ -26,4 +26,3 @@ int main()
   __lambda_5_5.operator()();
   return 0;
 }
-

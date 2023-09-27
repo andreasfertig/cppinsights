@@ -1,7 +1,4 @@
-// cmdlineinsights:-edu-show-initlist
 #include <vector>
 
 const int __list4_21[2]{40, 2};
 std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >{std::initializer_list<int>{__list4_21, 2}};
-
-

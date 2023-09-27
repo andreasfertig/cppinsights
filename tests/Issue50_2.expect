@@ -7,12 +7,10 @@ struct Test
 };
 
 
-
 template<class T>
 void foo(T && t)
 {
 }
-
 
 /* First instantiated from: Issue50_2.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -51,4 +49,3 @@ int main()
   foo(std::move(l));
   return 0;
 }
-

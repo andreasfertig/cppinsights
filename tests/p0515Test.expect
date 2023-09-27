@@ -1,4 +1,3 @@
-// cmdline:-std=c++2a
 #include <compare>
 
 struct Spaceship
@@ -27,7 +26,6 @@ struct Spaceship
 };
 
 
-
 int main()
 {
   constexpr const int y = 2;
@@ -38,5 +36,3 @@ int main()
   /* PASSED: static_assert(!(millenniumFalcon.operator==(y))); */
   return 0;
 }
-
-

@@ -6,7 +6,6 @@ inline constexpr T min(const T & a, const T & b)
   return (a < b) ? a : b;
 }
 
-
 /* First instantiated from: StaticAndTemplatesTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -25,14 +24,13 @@ inline constexpr double min<double>(const double & a, const double & b)
   return (a < b) ? a : b;
 }
 #endif
- 
+
 
 template<typename T>
 static T max(const T & a, const T & b)
 {
   return (a > b) ? a : b;
 }
-
 
 /* First instantiated from: StaticAndTemplatesTest.cpp:25 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -52,7 +50,7 @@ double max<double>(const double & a, const double & b)
   return (a > b) ? a : b;
 }
 #endif
- 
+
 
 int main()
 {
@@ -66,5 +64,3 @@ int main()
   double ma2 = max(2.0, 4.0);
   return 0;
 }
-
-

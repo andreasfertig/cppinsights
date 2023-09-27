@@ -1,5 +1,4 @@
 #include <exception> // for noexcept transformation
-// cmdlineinsights:-edu-show-noexcept
 
 struct Data
 {
@@ -18,8 +17,6 @@ struct Data
 };
 
 
-
-
 int func() noexcept
 {
   try 
@@ -29,4 +26,3 @@ int func() noexcept
     std::terminate();
   }
 }
-

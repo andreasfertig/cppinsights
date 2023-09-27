@@ -28,11 +28,9 @@ std::basic_string<char, std::char_traits<char>, std::allocator<char> > trim(cons
   return final.substr(0, static_cast<unsigned long>(i + 1));
 }
 
-
 int main()
 {
   std::basic_string<char, std::char_traits<char>, std::allocator<char> > x = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{" ashj a a a aaa"};
   std::basic_string<char, std::char_traits<char>, std::allocator<char> > b = trim(x);
   return 0;
 }
-

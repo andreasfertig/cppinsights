@@ -2,7 +2,6 @@ void Foo()
 {
 }
 
-
 int main()
 {
   for(int i = 0; i < 2; ++i) {
@@ -20,4 +19,3 @@ int main()
   
   return 0;
 }
-

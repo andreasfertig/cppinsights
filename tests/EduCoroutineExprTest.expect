@@ -2,9 +2,6 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++20
-// cmdlineinsights:-edu-show-coroutine-transformation
-
 #include <coroutine>
 #include <cstdint>
 #include <exception>
@@ -74,7 +71,7 @@ struct task
   };
   
   inline task(std::coroutine_handle<promise_type> h)
-  : coro{h}
+  : coro(h)
   {
   }
   
@@ -236,7 +233,6 @@ struct task<int>
 
 #endif
 
-
 struct __get_randomFrame
 {
   void (*resume_fn)(__get_randomFrame *);
@@ -332,9 +328,7 @@ void __get_randomDestroy(__get_randomFrame * __f)
 }
 
 
-
 int Funa(int);
-
 
 struct __testVarDeclAndConditionalFrame
 {
@@ -683,7 +677,6 @@ void __testIfStmtDestroy(__testIfStmtFrame * __f)
 }
 
 
-
 struct __testCallExprFrame
 {
   void (*resume_fn)(__testCallExprFrame *);
@@ -793,7 +786,6 @@ void __testCallExprDestroy(__testCallExprFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
 
 
 struct __testSwitchFrame
@@ -907,7 +899,6 @@ void __testSwitchDestroy(__testSwitchFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
 
 
 struct __testWhileFrame
@@ -1025,7 +1016,6 @@ void __testWhileDestroy(__testWhileFrame * __f)
 }
 
 
-
 struct __testDoWhileFrame
 {
   void (*resume_fn)(__testDoWhileFrame *);
@@ -1139,7 +1129,6 @@ void __testDoWhileDestroy(__testDoWhileFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
 
 
 struct __testForLoopFrame
@@ -1296,6 +1285,4 @@ void __testForLoopDestroy(__testForLoopFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
-
 

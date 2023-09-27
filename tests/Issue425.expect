@@ -8,4 +8,3 @@ int main()
   char && b = std::get<1UL>(static_cast<std::pair<int, char> &&>(__p6));
   return 0;
 }
-

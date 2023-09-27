@@ -7,12 +7,10 @@ struct Point
 };
 
 
-
 struct Float
 {
   float f;
 };
-
 
 
 struct Char
@@ -24,20 +22,16 @@ struct Char
 };
 
 
-
 struct Bool
 {
   bool b;
 };
 
 
-
 struct Pointer
 {
   char * p;
 };
-
-
 
 
 struct Ints
@@ -47,13 +41,11 @@ struct Ints
 };
 
 
-
 struct Complex
 {
   _Complex float fc;
   _Complex int ic;
 };
-
 
 
 int main()
@@ -68,4 +60,3 @@ int main()
   Complex cc[5] = {{0.0f, 22}, {0.0f, 0}, {static_cast<float>(1.0), 3}, {0.0f, 0}, {0.0f, 0}};
   return 0;
 }
-

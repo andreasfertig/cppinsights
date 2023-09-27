@@ -1,7 +1,7 @@
-.tmp.cpp:24:51: error: too many arguments to function call, expected single argument 'value', have 2 arguments
-   24 |     return operator==((*this).operator<=>(value), std::_CmpUnspecifiedParam(0));
+.tmp.cpp:23:51: error: too many arguments to function call, expected single argument 'value', have 2 arguments
+   23 |     return operator==((*this).operator<=>(value), std::_CmpUnspecifiedParam(0));
       |            ~~~~~~~~~~                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:22:25: note: 'operator==' declared here
-   22 |   inline constexpr bool operator==(const int & value) const
+.tmp.cpp:21:25: note: 'operator==' declared here
+   21 |   inline constexpr bool operator==(const int & value) const
       |                         ^          ~~~~~~~~~~~~~~~~~
 1 error generated.

@@ -1,6 +1,6 @@
 #include <string_view>
 #include <iostream>
- 
+
 int main()
 {
   using namespace std::literals;
@@ -10,4 +10,3 @@ int main()
   std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "s2: ").operator<<(s2.size()), " \""), std::basic_string_view<char, std::char_traits<char> >(s2)), "\"\n");
   return 0;
 }
-

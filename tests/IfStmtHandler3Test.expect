@@ -11,10 +11,8 @@ int Test()
   return ret;
 }
 
-
 int main()
 {
   Test();
   return 0;
 }
-

@@ -1,4 +1,3 @@
-// dummy to have a range-based for ready container link thing
 template<class T>
 class MyArrayWrapper
 {
@@ -41,9 +40,6 @@ class MyArrayWrapper<int>
 };
 
 #endif
-
-
-
 
 void f()
 {
@@ -92,4 +88,3 @@ void f()
   MyArrayWrapper<int> vec;
   lambda.operator()(MyArrayWrapper<int>(vec));
 }
-

@@ -6,5 +6,3 @@ struct Test
   int x{2};
 };
 
-
-

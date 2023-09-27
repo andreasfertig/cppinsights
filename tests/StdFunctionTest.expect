@@ -7,12 +7,10 @@ void Func()
 {
 }
 
-
 template<typename T>
 void Test(T & t)
 {
 }
-
 
 /* First instantiated from: StdFunctionTest.cpp:17 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -29,4 +27,3 @@ int main()
   Test(x);
   return 0;
 }
-

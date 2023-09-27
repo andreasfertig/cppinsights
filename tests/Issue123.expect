@@ -14,13 +14,11 @@ struct Person
 };
 
 
-
 template<typename T>
-T Person<T>::run(T speed, bool left )
+T Person<T>::run(T speed, bool left)
 {
-	return speed + (left ? 1 : 0);
+  return speed + (left ? 1 : 0);
 }
-
 
 
 template<>
@@ -41,12 +39,9 @@ struct Person<int>
 };
 
 
-
-
 int main()
 {
   Person<int> f = Person<int>();
   int x = f.run(2, true);
   return 0;
 }
-

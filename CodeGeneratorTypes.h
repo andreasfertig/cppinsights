@@ -19,6 +19,7 @@ IGNORED_STMT(OMPParallelForDirective)
 
 IGNORED_DECL(UsingShadowDecl)
 IGNORED_DECL(UsingPackDecl)
+IGNORED_DECL(EmptyDecl)  // stray semicolon?
 
 SUPPORTED_DECL(BindingDecl)
 SUPPORTED_DECL(CXXDeductionGuideDecl)
@@ -45,6 +46,7 @@ SUPPORTED_DECL(NamespaceDecl)
 SUPPORTED_DECL(VarTemplateDecl)
 SUPPORTED_DECL(ConceptDecl)
 SUPPORTED_DECL(UnresolvedUsingValueDecl)
+SUPPORTED_DECL(LinkageSpecDecl)
 
 SUPPORTED_STMT(CXXDeleteExpr)
 SUPPORTED_STMT(CXXDefaultInitExpr)

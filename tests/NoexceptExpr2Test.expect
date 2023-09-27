@@ -2,20 +2,14 @@ void Foo() noexcept(false)
 {
 }
 
-
-// ConditionalOperator
 void Bar() noexcept(false)
 {
 }
 
-
-// BinaryOperator
 void BBar() noexcept(true)
 {
 }
 
-
 void FoBar() noexcept
 {
 }
-

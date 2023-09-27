@@ -4,7 +4,6 @@
 
 class Point;
 
-
 template<>
 struct std::tuple_size<Point> : public std::integral_constant<unsigned long, 2>
 {
@@ -23,7 +22,6 @@ struct std::tuple_element<1, Point>
 {
   using type = double;
 };
-
 
 
 class Point
@@ -146,7 +144,6 @@ class Point
 };
 
 
-
 int main()
 {
   Point p = Point{1, 2};
@@ -164,4 +161,3 @@ int main()
   const double && y2 = static_cast<const double>(__p273.get<1>());
   return 0;
 }
-

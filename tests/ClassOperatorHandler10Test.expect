@@ -8,13 +8,11 @@ enum class Color : int
 };
 
 
- 
 enum struct State : char
 {
   on, 
   off
 };
-
 
 
 int main()
@@ -23,5 +21,3 @@ int main()
   std::cout.operator<<(sizeof(State)).operator<<(std::endl);
   return 0;
 }
-
-

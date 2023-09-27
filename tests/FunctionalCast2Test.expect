@@ -25,14 +25,14 @@ namespace details
     
     
   }
-} /* namespace details::array_single_compare */
+  
+}
 
 template<typename T, size_t N, typename TTo>
 inline constexpr bool Compare(const T (&ar)[N], const TTo & to)
 {
   return details::array_single_compare::Compare(ar, to, std::make_index_sequence<N>{});
 }
-
 
 /* First instantiated from: FunctionalCast2Test.cpp:47 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -41,6 +41,12 @@ inline constexpr bool Compare<unsigned char, 6, int>(const unsigned char (&ar)[6
 {
   return details::array_single_compare::Compare(ar, to, std::integer_sequence<unsigned long, 0, 1, 2, 3, 4, 5>{});
 }
+#endif
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr bool Compare<unsigned char, 6, unsigned char[6]>(const unsigned char (&ar)[6], const unsigned char (&to)[6]);
 #endif
 
 
@@ -65,14 +71,14 @@ namespace details
     
     
   }
-} /* namespace details::array_compare */
+  
+}
 
 template<typename T, size_t N>
 inline constexpr bool Compare(const T (&ar)[N], const T (&to)[N])
 {
   return details::array_compare::Compare(ar, to, std::make_index_sequence<N>{});
 }
-
 
 /* First instantiated from: FunctionalCast2Test.cpp:51 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -84,12 +90,10 @@ inline constexpr bool Compare<unsigned char, 6>(const unsigned char (&ar)[6], co
 #endif
 
 
-
 struct MACAddress
 {
   unsigned char value[6];
 };
-
 
 
 void Main()
@@ -103,5 +107,3 @@ void Main()
   printf("Not equal: %d\n", static_cast<int>(!Compare(macA.value, macB.value)));
   printf("Equal: %d\n", static_cast<int>(Compare(macA.value, macC.value)));
 }
-
-

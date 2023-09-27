@@ -20,9 +20,8 @@ struct visitor<__lambda_8_7, __lambda_9_7> : public __lambda_8_7, public __lambd
 };
 
 #endif
-
-template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
-
+template<class ... Ts>
+visitor(Ts...) -> visitor<Ts...>;
 
 /* First instantiated from: VisitorTest.cpp:7 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -64,4 +63,3 @@ int main()
   static_cast<const __lambda_8_7&>(my_visitor).operator()(2);
   return 0;
 }
-

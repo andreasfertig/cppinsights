@@ -1,9 +1,6 @@
-// cmdlineinsights:-edu-show-padding
-
 struct Empty  /* size: 1, align: 1 */
 {
 };
-
 
 
 struct NoUniqueAddrTest  /* size: 4, align: 4 */
@@ -12,6 +9,4 @@ struct NoUniqueAddrTest  /* size: 4, align: 4 */
   [[no_unique_address]] Empty e;  /* offset: 0, size: 1
   char __padding[3];                            size: 3 */
 };
-
-
 

@@ -28,10 +28,8 @@ class Foo<int>
 
 #endif
 
-
 int main()
 {
   Foo<int> f = Foo<int>{2};
   return 0;
 }
-

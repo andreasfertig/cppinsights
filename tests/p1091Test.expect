@@ -5,7 +5,6 @@ struct S
 };
 
 
-
 int main()
 {
   static S __8 = S{0, 0};
@@ -13,4 +12,3 @@ int main()
   static int & b = __8.y;
   return 0;
 }
-
