@@ -3004,7 +3004,11 @@ void CodeGenerator::InsertArg(const CXXNoexceptExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
 {
+#if IS_CLANG_NEWER_THAN(16)
+    RETURN_IF(DeductionCandidate::Copy == stmt->getDeductionCandidateKind());
+#else
     RETURN_IF(stmt->isCopyDeductionCandidate());
+#endif
 
     const bool isImplicit{stmt->isImplicit()};
     const bool noSpecializations = [&] {

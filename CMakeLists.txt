@@ -257,6 +257,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
 
     llvm_config(LLVM_PACKAGE_VERSION "--version")
     string(REPLACE "git" "" LLVM_PACKAGE_VERSION_PLAIN "${LLVM_PACKAGE_VERSION}")
+    string(REPLACE "rc" "" LLVM_PACKAGE_VERSION_PLAIN "${LLVM_PACKAGE_VERSION_PLAIN}")
 
     # With Clang 16 the location (path) of the include folder changed. Previously it was 15.0.0 now it is 16.
     if(${LLVM_PACKAGE_VERSION_PLAIN} VERSION_GREATER_EQUAL "15.0.0")
