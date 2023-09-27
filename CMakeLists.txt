@@ -620,6 +620,7 @@ else()
     add_custom_target(tests
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK} ${TEST_USE_LIBCPP}
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights>
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testInvalidOption.sh ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights>
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
         COMMENT "Running tests" VERBATIM
@@ -630,6 +631,7 @@ if (NOT WIN32)
     add_custom_target(update-tests
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} --update-tests ${TEST_FAILURE_IS_OK}
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testInvalidOption.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
         COMMENT "Running tests" VERBATIM
