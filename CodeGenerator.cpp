@@ -3006,8 +3006,19 @@ void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
 {
     RETURN_IF(stmt->isCopyDeductionCandidate());
 
-    const bool isSpecialization{stmt->isFunctionTemplateSpecialization()};
     const bool isImplicit{stmt->isImplicit()};
+    const bool noSpecializations = [&] {
+        if(const auto* dt = stmt->getDescribedFunctionTemplate()) {
+            return dt->specializations().empty();
+        }
+
+        return false;
+    }();
+
+    // Block compiler generated deduction guides which are _overridden_ by user provided deduction guides.
+    RETURN_IF(not stmt->isUsed() and isImplicit and noSpecializations);
+
+    const bool isSpecialization{stmt->isFunctionTemplateSpecialization()};
     const bool needsTemplateGuard{isImplicit or isSpecialization};
 
     if(needsTemplateGuard) {
@@ -3018,6 +3029,8 @@ void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
 
     if(isSpecialization) {
         InsertTemplateSpecializationHeader();
+    } else if(const auto* e = stmt->getDescribedFunctionTemplate()) {
+        InsertTemplateParameters(*e->getTemplateParameters());
     } else {
         InsertTemplateParameters(*deducedTemplate->getTemplateParameters());
     }

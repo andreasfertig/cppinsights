@@ -62,9 +62,7 @@ namespace Test
   container(int t) -> container<int>;
   #endif
   
-  template<class T>
-  container(type_parameter_0_1 beg, type_parameter_0_1 end) -> container<T>;
-  template<class T>
+  template<class Iter>
   container(Iter b, Iter e) -> container<typename std::iterator_traits<Iter>::value_type>;
   
   /* First instantiated from: DeductionGuideTest.cpp:18 */
