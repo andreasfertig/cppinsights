@@ -3115,27 +3115,37 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
     // skip this attribute. Clang seems to tag final methods or classes with final
     RETURN_IF(attr::Final == attr.getKind());
 
-    // Clang's printPretty misses the parameter pack elipsis. Hence treat this special case here.
+    // Clang's printPretty misses the parameter pack ellipsis. Hence treat this special case here.
     if(const auto* alignedAttr = dyn_cast_or_null<AlignedAttr>(&attr)) {
-        if(const auto* unaryExpr = dyn_cast_or_null<UnaryExprOrTypeTraitExpr>(alignedAttr->getAlignmentExpr())) {
-            if(const auto* tmplTypeParam =
-                   dyn_cast_or_null<TemplateTypeParmType>(unaryExpr->getArgumentType().getTypePtrOrNull())) {
-                mOutputFormatHelper.Append(attr.getSpelling(),
-                                           "("sv,
-                                           kwAlignof,
-                                           "("sv,
-                                           GetName(unaryExpr->getArgumentType()),
-                                           ")"sv,
-                                           Ellipsis(tmplTypeParam->isParameterPack()),
-                                           ") "sv);
-                return;
+        auto insert = [&](const QualType type, const TemplateTypeParmType* tmplTypeParam) {
+            mOutputFormatHelper.Append(attr.getSpelling(),
+                                       "("sv,
+                                       kwAlignof,
+                                       "("sv,
+                                       GetName(type),
+                                       ")"sv,
+                                       Ellipsis(tmplTypeParam->isParameterPack()),
+                                       ") "sv);
+        };
+
+        if(alignedAttr->isAlignmentExpr()) {
+            if(const auto* unaryExpr = dyn_cast_or_null<UnaryExprOrTypeTraitExpr>(alignedAttr->getAlignmentExpr())) {
+                if(const auto* tmplTypeParam =
+                       dyn_cast_or_null<TemplateTypeParmType>(unaryExpr->getArgumentType().getTypePtrOrNull())) {
+                    insert(unaryExpr->getArgumentType(), tmplTypeParam);
+                    return;
+                }
             }
+        } else if(const auto* tmplTypeParam =
+                      alignedAttr->getAlignmentType()->getType()->getAs<TemplateTypeParmType>()) {
+            insert(alignedAttr->getAlignmentType()->getType(), tmplTypeParam);
+            return;
         }
     }
 
     StringStream   stream{};
-    PrintingPolicy pp{LangOptions{}};
-    pp.Alignof = true;
+    PrintingPolicy pp{GetGlobalAST().getLangOpts()};
+    pp.adjustForCPlusPlus();
 
     attr.printPretty(stream, pp);
 
