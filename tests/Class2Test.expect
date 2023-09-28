@@ -42,8 +42,7 @@ class Test
     return *this;
   }
   
-  using retType_40_3 = int;
-  inline operator retType_40_3 ()
+  inline operator int ()
   {
     return this->mV;
   }

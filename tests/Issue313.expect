@@ -7,8 +7,7 @@ struct A
 
 struct B
 {
-  using retType_5_4 = A;
-  inline operator retType_5_4 ()
+  inline explicit operator A ()
   {
     return {};
   }

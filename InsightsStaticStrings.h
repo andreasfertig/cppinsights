@@ -127,6 +127,7 @@ inline constexpr std::string_view kwElipsis{KW_ELIPSIS};
 inline constexpr std::string_view kwStaticAssert{KW_STATIC_ASSERT};
 inline constexpr std::string_view kwInternalThis{KW_INTERNAL_THIS};
 inline constexpr std::string_view kwThis{KwWithSpaceAfter(KwWithSpaceAfter(kwInternalThis))};
+inline constexpr std::string_view kwExplicit{KW_EXPLICIT};
 
 inline constexpr std::string_view hlpAssing{HLP_ASSIGN};
 inline constexpr std::string_view hlpArrow{HLP_ARROW};

@@ -9,8 +9,7 @@ struct Foo
   {
   }
   
-  using retType_12_5 = BT;
-  inline constexpr operator retType_12_5 () const
+  inline constexpr operator BT () const
   {
     return this->raw;
   }
@@ -39,8 +38,7 @@ struct Foo<char>
   inline constexpr Foo(const Foo<char> & v) /* noexcept */ = default;
   inline constexpr Foo(char v);
   
-  using retType_12_5 = char;
-  inline constexpr operator retType_12_5 () const;
+  inline constexpr operator char () const;
   
   inline constexpr Foo<char> & operator=(const Foo<char> & rhs) /* noexcept */ = default;
   inline Foo<char> & operator=(char v)
@@ -64,8 +62,7 @@ struct Foo<int>
   inline constexpr Foo(const Foo<int> & v) noexcept = default;
   inline constexpr Foo(int v);
   
-  using retType_12_5 = int;
-  inline constexpr operator retType_12_5 () const
+  inline constexpr operator int () const
   {
     return this->raw;
   }

@@ -12,8 +12,7 @@ class B
 {
   
   public: 
-  using retType_11_9 = A;
-  inline operator retType_11_9 () const
+  inline operator A () const
   {
     return A();
   }

@@ -10,8 +10,7 @@ void IntegralToBoolean(bool b)
 // CK_UserDefinedConversion
 struct A
 {
-  using retType_5_12 = int;
-  inline operator retType_5_12 ()
+  inline operator int ()
   {
     return 2;
   }

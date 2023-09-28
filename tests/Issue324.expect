@@ -5,8 +5,7 @@ struct Str
   {
   }
   
-  using retType_4_3 = const char *;
-  inline operator retType_4_3 () const
+  inline operator const char * () const
   {
     return this->string;
   }

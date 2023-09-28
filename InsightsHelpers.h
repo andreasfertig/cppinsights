@@ -235,6 +235,21 @@ const std::string_view GetConst(const FunctionDecl& decl);
 std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
 //-----------------------------------------------------------------------------
 
+template<typename QT, typename SUB_T>
+static bool TypeContainsSubType(const QualType& t)
+{
+    if(const auto* lref = dyn_cast_or_null<QT>(t.getTypePtrOrNull())) {
+        const auto  subType      = GetDesugarType(lref->getPointeeType());
+        const auto& ct           = subType.getCanonicalType();
+        const auto* plainSubType = ct.getTypePtrOrNull();
+
+        return isa<SUB_T>(plainSubType);
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 template<typename T, typename TFunc>
 void for_each(T start, T end, TFunc&& func)
 {
