@@ -2727,6 +2727,8 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 {
     mOutputFormatHelper.Append(stmt->getName());
 
+    InsertAttributes(stmt);
+
     if(const auto* initExpr = stmt->getInitExpr()) {
         mOutputFormatHelper.Append(hlpAssing);
 
@@ -2900,6 +2902,8 @@ void CodeGenerator::InsertArg(const NamespaceDecl* stmt)
     if(not stmt->isAnonymousNamespace()) {
         mOutputFormatHelper.Append(" "sv, stmt->getName());
     }
+
+    InsertAttributes(stmt);
 
     mOutputFormatHelper.AppendNewLine();
 
@@ -3094,6 +3098,16 @@ void CodeGenerator::InsertArg(const AttributedStmt* stmt)
 {
     for(const auto& attr : stmt->getAttrs()) {
         InsertAttribute(*attr);
+    }
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertAttributes(const Decl* stmt)
+{
+    if(stmt->hasAttrs()) {
+        mOutputFormatHelper.Append(" "sv);
+
+        InsertAttributes(stmt->attrs());
     }
 }
 //-----------------------------------------------------------------------------
