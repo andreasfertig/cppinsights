@@ -1,0 +1,19 @@
+// cmdline:-std=c++2b
+
+struct Test
+{
+  static inline int operator[](unsigned int idx)
+  {
+    return 2;
+  }
+  
+};
+
+
+
+int main()
+{
+  Test t = {};
+  return Test::operator[](4);
+}
+
