@@ -155,13 +155,9 @@ public:
     virtual ~CodeGenerator() = default;
 
 #define IGNORED_DECL(type)                                                                                             \
-    virtual void InsertArg(const type*)                                                                                \
-    {                                                                                                                  \
-    }
+    virtual void InsertArg(const type*) {}
 #define IGNORED_STMT(type)                                                                                             \
-    virtual void InsertArg(const type*)                                                                                \
-    {                                                                                                                  \
-    }
+    virtual void InsertArg(const type*) {}
 #define SUPPORTED_DECL(type) virtual void InsertArg(const type* stmt);
 #define SUPPORTED_STMT(type) virtual void InsertArg(const type* stmt);
 
@@ -232,6 +228,7 @@ public:
         mOutputFormatHelper.Append('>');
     }
 
+    void InsertAttributes(const Decl*);
     void InsertAttributes(const Decl::attr_range&);
     void InsertAttribute(const Attr&);
 
