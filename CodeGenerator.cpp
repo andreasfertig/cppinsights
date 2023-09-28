@@ -2644,8 +2644,12 @@ void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skip
             mOutputFormatHelper.AppendNewLine();
             WrapInCurlys([&]() {
                 mOutputFormatHelper.AppendNewLine();
-                mOutputFormatHelper.AppendSemiNewLine(
-                    "  "sv, kwReturn, " "sv, stmt->getParent()->getLambdaStaticInvoker()->getName());
+                mOutputFormatHelper.Append("  "sv, kwReturn, " "sv);
+                if(const auto* invoker = stmt->getParent()->getLambdaStaticInvoker()) {
+                    mOutputFormatHelper.AppendSemiNewLine(invoker->getName());
+                } else {
+                    mOutputFormatHelper.AppendSemiNewLine(kwOperator, "()"sv);
+                }
             });
         }
     }

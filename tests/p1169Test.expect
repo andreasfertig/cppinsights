@@ -1,0 +1,23 @@
+// cmdline:-std=c++2b
+ 
+
+class __lambda_3_13
+{
+  public: 
+  static inline /*constexpr */ int operator()()
+  {
+    return 4;
+  }
+  
+  using retType_3_13 = int (*)();
+  inline constexpr operator retType_3_13 () const noexcept
+  {
+    return operator();
+  };
+  
+  // /*constexpr */ __lambda_3_13() = default;
+  
+};
+
+__lambda_3_13 four = __lambda_3_13{};
+
