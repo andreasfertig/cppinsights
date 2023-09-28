@@ -1,0 +1,14 @@
+.tmp.cpp:26:5: error: 'auto' not allowed in non-static class member
+    auto f;
+    ^~~~
+.tmp.cpp:27:5: error: 'auto' not allowed in non-static class member
+    auto... args;
+    ^~~~
+.tmp.cpp:27:9: error: only function and template parameters can be parameter packs
+    auto... args;
+        ^
+error: templates cannot be declared inside of a local class
+.tmp.cpp:35:19: error: initializer contains unexpanded parameter pack 'args'
+  } __lambda_13_12{std::move(f), std::move(args)};
+                  ^                        ~~~~
+5 errors generated.

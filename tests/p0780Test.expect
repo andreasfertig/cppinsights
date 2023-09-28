@@ -1,0 +1,83 @@
+// cmdline:-std=c++20
+
+// Example from: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0780r2.html
+// Allow pack expansion in lambda init-capture
+#include <functional>
+#include <utility>
+
+void Func(int, int, int, int)
+{
+}
+
+
+template<class F, class ... Args>
+auto delay_invoke(F f, Args... args)
+{
+    
+  class __lambda_13_12
+  {
+    public: 
+    inline decltype(auto) operator()() const
+    {
+      return std::invoke(f, args... );
+    }
+    
+    private: 
+    auto f;
+    auto... args;
+    
+    public:
+    __lambda_13_12(auto _f, auto const &... _args)
+    : f{_f}
+    , args{_args...}
+    {}
+    
+  } __lambda_13_12{std::move(f), std::move(args)};
+  
+  return __lambda_13_12;
+}
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+__lambda_13_12 delay_invoke<void (*)(int, int, int, int), int, int, int, int>(void (*f)(int, int, int, int), int __args1, int __args2, int __args3, int __args4)
+{
+    
+  class __lambda_13_12
+  {
+    public: 
+    inline /*constexpr */ invoke_result_t<void (*const &)(int, int, int, int), const int &, const int &, const int &, const int &> operator()() const
+    {
+      return std::invoke(f, __args1, __args2, __args3, __args4);
+    }
+    
+    private: 
+    void (*f)(int, int, int, int);
+    int __args1;
+    int __args2;
+    int __args3;
+    int __args4;
+    
+    public:
+    __lambda_13_12(void (*_f)(int, int, int, int), int && ___args1, int && ___args2, int && ___args3, int && ___args4)
+    : f{_f}
+    , __args1{std::move(___args1)}
+    , __args2{std::move(___args2)}
+    , __args3{std::move(___args3)}
+    , __args4{std::move(___args4)}
+    {}
+    
+  } __lambda_13_12{std::move(f), std::move(__args1), std::move(__args2), std::move(__args3), std::move(__args4)};
+  
+  return __lambda_13_12;
+}
+#endif
+
+
+int main()
+{
+  delay_invoke(Func, 2, 3, 4, 5);
+  return 0;
+}
+
+

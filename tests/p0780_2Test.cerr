@@ -1,0 +1,30 @@
+.tmp.cpp:28:5: error: 'auto' not allowed in non-static class member
+    auto f;
+    ^~~~
+.tmp.cpp:29:5: error: 'auto' not allowed in non-static class member
+    auto... targs;
+    ^~~~
+.tmp.cpp:29:9: error: only function and template parameters can be parameter packs
+    auto... targs;
+        ^
+error: templates cannot be declared inside of a local class
+.tmp.cpp:37:19: error: initializer contains unexpanded parameter pack 'args'
+  } __lambda_15_12{std::move(f), std::move(args)};
+                  ^                        ~~~~
+.tmp.cpp:45:1: error: unknown type name '__lambda_15_12'
+__lambda_15_12 delay_invoke<void (*)(int, int, int, int), int, int, int, int>(void (*f)(int, int, int, int), int __args1, int __args2, int __args3, int __args4)
+^
+.tmp.cpp:51:27: error: no template named 'invoke_result_t'; did you mean 'std::invoke_result_t'?
+    inline /*constexpr */ invoke_result_t<void (*const &)(int, int, int, int), const int &, const int &, const int &, const int &> operator()() const
+                          ^~~~~~~~~~~~~~~
+                          std::invoke_result_t
+... invoke.h:532:1: note: 'std::invoke_result_t' declared here
+using invoke_result_t = typename invoke_result<_Fn, _Args...>::type;
+^
+.tmp.cpp:74:10: error: no viable conversion from returned value of type 'class __lambda_15_12' to function return type 'int'
+  return __lambda_15_12;
+         ^~~~~~~~~~~~~~
+.tmp.cpp:81:3: error: unknown type name '__lambda_15_12'
+  __lambda_15_12 df = delay_invoke(Func, 2, 3, 4, 5);
+  ^
+9 errors generated.

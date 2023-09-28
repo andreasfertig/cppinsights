@@ -969,6 +969,26 @@ static const SubstTemplateTypeParmType* GetSubstTemplateTypeParmType(const Type*
 }
 //-----------------------------------------------------------------------------
 
+static const DeclRefExpr* FindVarDeclRef(const Stmt* stmt)
+{
+    if(const auto* dref = dyn_cast_or_null<DeclRefExpr>(stmt)) {
+        if(const auto* vd = dyn_cast_or_null<VarDecl>(dref->getDecl())) {
+            return dref;
+        }
+    }
+
+    if(stmt) {
+        for(const auto* child : stmt->children()) {
+            if(const auto* childRef = FindVarDeclRef(child)) {
+                return childRef;
+            }
+        }
+    }
+
+    return nullptr;
+}
+//-----------------------------------------------------------------------------
+
 /*
  * \brief Get a usable name from a template parameter pack.
  *
@@ -1012,6 +1032,17 @@ static std::string GetTemplateParameterPackArgumentName(std::string_view name, c
                             return StrCat(BuildInternalVarName(name), parmVarDecl->getFunctionScopeIndex());
                         }
                     }
+                }
+            }
+        }
+    } else if(const auto* varDecl = dyn_cast_or_null<VarDecl>(decl)) {
+        // If it is an init-capture in C++2a p0780 brings "Allow pack expansion in lambda init-capture". We
+        // need to figure out, whether the initializer for this \c VarDecl comes from a parameter pack. If
+        // so, then we use this ParmVarDecl to get the index.
+        if(varDecl->isInitCapture()) {
+            if(const auto* drefExpr = FindVarDeclRef(varDecl->getInit())) {
+                if(const auto* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(drefExpr->getDecl())) {
+                    return GetTemplateParameterPackArgumentName(name, parmVarDecl);
                 }
             }
         }
