@@ -1,0 +1,36 @@
+// cmdline:-std=c++20
+
+#include <queue>
+#include <vector>
+
+void f()
+{
+      
+  class __lambda_10_34
+  {
+    public: 
+    inline /*constexpr */ bool operator()(int lhs, int rhs) const
+    {
+      return lhs > rhs;
+    }
+    
+    using retType_10_34 = bool (*)(int, int);
+    inline constexpr operator retType_10_34 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline /*constexpr */ bool __invoke(int lhs, int rhs)
+    {
+      return __lambda_10_34{}.operator()(lhs, rhs);
+    }
+    
+    public: 
+    // /*constexpr */ __lambda_10_34() = default;
+    
+  };
+  
+  std::priority_queue<int, std::vector<int, std::allocator<int> >, __lambda_10_34> min_heap = std::priority_queue<int, std::vector<int, std::allocator<int> >, __lambda_10_34>();
+}
+
