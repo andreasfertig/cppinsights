@@ -1506,10 +1506,15 @@ void CodeGenerator::InsertArg(const CXXDeleteExpr* stmt)
 
 void CodeGenerator::InsertConstructorExpr(const auto* stmt)
 {
-    if(P0315Visitor dt{*this}; not dt.TraverseType(stmt->getType())) {
+    {
+        CONDITIONAL_LAMBDA_SCOPE_HELPER(Decltype, not isa<DecltypeType>(stmt->getType()))
+
+        P0315Visitor dt{*this};
+        dt.TraverseType(stmt->getType());
+
         if(not mLambdaStack.empty()) {
             for(const auto& e : mLambdaStack) {
-                RETURN_IF(LambdaCallerType::VarDecl == e.callerType());
+                RETURN_IF((LambdaCallerType::MemberCallExpr == e.callerType()) and isa<DecltypeType>(stmt->getType()));
             }
         }
     }

@@ -1,0 +1,63 @@
+// cmdline:-std=c++20
+
+template<class T, class Container, class _Compare>
+class priority_queue
+{
+  
+  public: 
+  inline priority_queue()
+  {
+  }
+  
+};
+
+/* First instantiated from: Issue492_2.cpp:18 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class priority_queue<int, float, __lambda_18_34>
+{
+  
+  public: 
+  inline priority_queue()
+  {
+  }
+  
+};
+
+#endif
+
+
+
+void f()
+{
+      
+  class __lambda_18_34
+  {
+    public: 
+    inline /*constexpr */ bool operator()() const
+    {
+      return false;
+    }
+    
+    using retType_18_34 = bool (*)();
+    inline constexpr operator retType_18_34 () const noexcept
+    {
+      return __invoke;
+    };
+    
+    private: 
+    static inline /*constexpr */ bool __invoke()
+    {
+      return __lambda_18_34{}.operator()();
+    }
+    
+    
+    public:
+    // /*constexpr */ __lambda_18_34() = default;
+    
+  };
+  
+  priority_queue<int, float, __lambda_18_34> min_heap = priority_queue<int, float, __lambda_18_34>();
+}
+
+
