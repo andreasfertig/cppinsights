@@ -1,37 +1,37 @@
 int main()
 {
     
-  class __lambda_2_3
+      
+  class __lambda_2_8
   {
     public: 
     inline /*constexpr */ void operator()() const
     {
     }
     
-            
-    class __lambda_2_8
+    using retType_2_8 = auto (*)() -> void;
+    inline constexpr operator retType_2_8 () const noexcept
     {
-      public: 
-      inline /*constexpr */ void operator()() const
-      {
-      }
-      
-      using retType_2_8 = auto (*)() -> void;
-      inline constexpr operator retType_2_8 () const noexcept
-      {
-        return __invoke;
-      };
-      
-      private: 
-      static inline /*constexpr */ void __invoke()
-      {
-        __lambda_2_8{}.operator()();
-      }
-      
-      public: 
-      // inline /*constexpr */ __lambda_2_8 & operator=(const __lambda_2_8 &) /* noexcept */ = delete;
-      
+      return __invoke;
     };
+    
+    private: 
+    static inline /*constexpr */ void __invoke()
+    {
+      __lambda_2_8{}.operator()();
+    }
+    
+    public: 
+    // inline /*constexpr */ __lambda_2_8 & operator=(const __lambda_2_8 &) /* noexcept */ = delete;
+    
+  };
+  
+  class __lambda_2_3
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
     
     private: 
     __lambda_2_8 var;
@@ -41,7 +41,7 @@ int main()
     : var{_var}
     {}
     
-  } __lambda_2_3{__lambda_2_3::__lambda_2_8{}};
+  } __lambda_2_3{__lambda_2_8{}};
   
   return 0;
 }

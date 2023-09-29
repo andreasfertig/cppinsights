@@ -393,7 +393,8 @@ const DeclRefExpr* FindDeclRef(const Stmt* stmt);
 class P0315Visitor : public RecursiveASTVisitor<P0315Visitor>
 {
     std::variant<std::reference_wrapper<class OutputFormatHelper>, std::reference_wrapper<class CodeGenerator>>
-        mConsumer;
+                      mConsumer;
+    const LambdaExpr* mLambdaExpr{};
 
 public:
     P0315Visitor(class OutputFormatHelper& ofm)
@@ -407,6 +408,8 @@ public:
     }
 
     bool VisitLambdaExpr(const LambdaExpr* expr);
+
+    const LambdaExpr* Get() const { return mLambdaExpr; }
 };
 //-----------------------------------------------------------------------------
 

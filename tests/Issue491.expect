@@ -1,0 +1,43 @@
+
+
+class __lambda_1_16
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  using retType_1_16 = auto (*)() -> void;
+  inline constexpr operator retType_1_16 () const noexcept
+  {
+    return __invoke;
+  }
+  
+  private: 
+  static inline /*constexpr */ void __invoke()
+  {
+    __lambda_1_16{}.operator()();
+  }
+  
+  
+};
+
+class __lambda_1_10
+{
+  public: 
+  inline /*constexpr */ void operator()() const
+  {
+  }
+  
+  private: 
+  void (*var)();
+  
+  public:
+  __lambda_1_10(void (*_var)())
+  : var{_var}
+  {}
+  
+};
+
+__lambda_1_10 x = __lambda_1_10{+static_cast<void (*)()>(__lambda_1_16{}.operator __lambda_1_16::retType_1_16())};
+
