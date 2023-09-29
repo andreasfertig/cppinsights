@@ -185,6 +185,16 @@ private:
 };
 //-----------------------------------------------------------------------------
 
+class LambdaNameOnlyCodeGenerator final : public CodeGenerator
+{
+public:
+    using CodeGenerator::CodeGenerator;
+    using CodeGenerator::InsertArg;
+
+    void InsertArg(const LambdaExpr* stmt) override { mOutputFormatHelper.Append(GetLambdaName(*stmt), "{}"sv); }
+};
+//-----------------------------------------------------------------------------
+
 CodeGenerator::LambdaScopeHandler::LambdaScopeHandler(LambdaStackType&       stack,
                                                       OutputFormatHelper&    outputFormatHelper,
                                                       const LambdaCallerType lambdaCallerType)
@@ -3182,6 +3192,9 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
 
 void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
+    const size_t insertPosBeforeClass{mOutputFormatHelper.CurrentPos()};
+    const auto   indentAtInsertPosBeforeClass{mOutputFormatHelper.GetIndent()};
+
     SCOPE_HELPER(stmt);
 
     // Prevent a case like in #205 where the lambda appears twice.
@@ -3289,11 +3302,10 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
     mCurrentFieldPos = mOutputFormatHelper.CurrentPos();
 
-    OnceTrue              firstRecordDecl{};
-    OnceTrue              firstDecl{};
-    Decl::Kind            formerKind{};
-    std::optional<size_t> insertPosBeforeCtor{};
-    AccessSpecifier       lastAccess{stmt->isClass() ? AS_private : AS_public};
+    OnceTrue        firstRecordDecl{};
+    OnceTrue        firstDecl{};
+    Decl::Kind      formerKind{};
+    AccessSpecifier lastAccess{stmt->isClass() ? AS_private : AS_public};
     for(const auto* d : stmt->decls()) {
         if(isa<CXXRecordDecl>(d) and firstRecordDecl) {
             continue;
@@ -3321,10 +3333,6 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         }
 
         InsertArg(d);
-
-        if(lastAccess == AS_public and not insertPosBeforeCtor.has_value()) {
-            insertPosBeforeCtor = mOutputFormatHelper.CurrentPos();
-        }
 
         formerKind = d->getKind();
     }
@@ -3367,7 +3375,6 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 }
 
                 bool byConstRef{false};
-
                 auto fieldName{isThis ? kwInternalThis : name};
                 auto fieldDeclType{fd->getType()};
 
@@ -3441,9 +3448,17 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 ctorInitializerList.push_back(StrCat(fieldName, "{"sv, fname, elips, "}"sv));
 
                 if(not isThis and expr) {
-                    OutputFormatHelper ofm{};
-                    CodeGenerator      codeGenerator{ofm, mLambdaStack};
-                    if(not isa<LambdaExpr>(expr)) {
+
+                    LAMBDA_SCOPE_HELPER(Decltype);
+                    OutputFormatHelper ofmLambdaInCtor{};
+                    ofmLambdaInCtor.SetIndent(indentAtInsertPosBeforeClass);
+                    CodeGenerator cgLambdaInCtor{ofmLambdaInCtor, LambdaInInitCapture::Yes};
+
+                    if(P0315Visitor dt{cgLambdaInCtor}; dt.TraverseStmt(const_cast<Expr*>(expr))) {
+
+                        OutputFormatHelper ofm{};
+                        CodeGenerator      codeGenerator{ofm, mLambdaStack};
+
                         if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(expr);
                            ctorExpr and byConstRef and (1 == ctorExpr->getNumArgs())) {
                             codeGenerator.InsertArg(ctorExpr->getArg(0));
@@ -3457,20 +3472,15 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                         //        }
 
                         ctorArguments.append(ofm);
+
                     } else {
-                        // We need to fake the namespace of the current lambda and append the braced init...
-                        ctorArguments.append(StrCat(GetName(*stmt),
-                                                    "::"sv,
-                                                    GetName(*dyn_cast_or_null<LambdaExpr>(expr)->getLambdaClass()),
-                                                    "{}"sv));
+                        OutputFormatHelper          ofm{};
+                        LambdaNameOnlyCodeGenerator ccg{ofm};
+                        ccg.InsertArg(expr);
 
-                        OutputFormatHelper ofm{};
-                        ofm.SetIndent(mOutputFormatHelper);
+                        ctorArguments.append(ofm.GetString());
 
-                        CodeGenerator codeGenerator{ofm, LambdaInInitCapture::Yes};
-                        codeGenerator.InsertArg(expr);
-
-                        mOutputFormatHelper.InsertAt(insertPosBeforeCtor.value_or(-1), ofm);
+                        mOutputFormatHelper.InsertAt(insertPosBeforeClass, ofmLambdaInCtor);
                     }
                 } else {
                     if(isThis and not fieldDeclType->isPointerType()) {

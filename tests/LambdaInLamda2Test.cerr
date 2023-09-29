@@ -1,32 +1,28 @@
-.tmp.cpp:7:27: error: unknown type name 'S'
+.tmp.cpp:8:27: error: unknown type name 'S'
+    inline /*constexpr */ S operator()() const
+                          ^
+.tmp.cpp:19:25: error: unknown type name 'S'
+    using retType_5_7 = S (*)();
+                        ^
+.tmp.cpp:20:31: error: unknown type name 'retType_5_7'
+    inline constexpr operator retType_5_7 () const noexcept
+                              ^
+.tmp.cpp:26:34: error: unknown type name 'S'
+    static inline /*constexpr */ S __invoke()
+                                 ^
+.tmp.cpp:16:16: warning: braces around scalar initializer [-Wbraced-scalar-init]
+      return S{{676}};
+               ^~~~~
+.tmp.cpp:16:14: error: no viable conversion from returned value of type 'S' to function return type 'int'
+      return S{{676}};
+             ^~~~~~~~
+.tmp.cpp:37:27: error: unknown type name 'S'
     inline /*constexpr */ S operator()()
                           ^
-.tmp.cpp:14:5: error: unknown type name 'S'
+.tmp.cpp:44:5: error: unknown type name 'S'
     S s;
     ^
-.tmp.cpp:18:11: error: '__lambda_5_7' cannot be defined in a parameter type
-    class __lambda_5_7
-          ^
-.tmp.cpp:45:7: error: redefinition of parameter '__lambda_5_7'
-    } __lambda_5_7{};
-      ^
-.tmp.cpp:18:11: note: previous declaration is here
-    class __lambda_5_7
-          ^
-.tmp.cpp:45:19: error: expected ')'
-    } __lambda_5_7{};
-                  ^
-.tmp.cpp:17:17: note: to match this '('
-    __lambda_4_5(    
-                ^
-.tmp.cpp:47:11: error: unknown type name 'S'
-    const S & _s)
-          ^
-.tmp.cpp:47:17: error: expected ';' at end of declaration list
-    const S & _s)
-                ^
-                ;
-.tmp.cpp:53:33: error: use of undeclared identifier '__lambda_5_7'
-  __lambda_4_5 l = __lambda_4_5{__lambda_5_7.operator()()};
-                                ^
-8 errors generated.
+.tmp.cpp:47:24: error: unknown type name 'S'
+    __lambda_4_5(const S & _s)
+                       ^
+1 warning and 8 errors generated.

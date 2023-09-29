@@ -1518,6 +1518,8 @@ overloaded(Ts...) -> overloaded<Ts...>;
 
 bool P0315Visitor::VisitLambdaExpr(const LambdaExpr* expr)
 {
+    mLambdaExpr = expr;
+
     std::visit(overloaded{
                    [&](OutputFormatHelper& ofm) { ofm.Append(GetLambdaName(*expr)); },
                    [&](CodeGenerator& cg) { cg.InsertArg(expr); },

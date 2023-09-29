@@ -47,6 +47,18 @@ public:
 
     STRONG_BOOL(SkipIndenting);
 
+    auto GetIndent() const { return mDefaultIndent; }
+
+    /// \brief Set the indent level of this class to \c indent.
+    void SetIndent(const unsigned indent, const SkipIndenting skipIndenting = SkipIndenting::No)
+    {
+        mDefaultIndent = indent;
+
+        if(SkipIndenting::No == skipIndenting) {
+            Indent(mDefaultIndent);
+        }
+    }
+
     /// \brief Set the indent level of this class to that of \c rhs.
     void SetIndent(const OutputFormatHelper& rhs, const SkipIndenting skipIndenting = SkipIndenting::No)
     {
