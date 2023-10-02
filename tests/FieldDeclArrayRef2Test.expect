@@ -1,48 +1,22 @@
-template<typename T, unsigned int SIZE>
+#if 0
+template <typename T, unsigned int SIZE>
 class array
 {
-  
-  private: 
-  T (&data)[SIZE];
-  
-  public: 
-  inline array()
-  : data{*new T[1][SIZE]}
-  {
-  }
-  
-  inline array(T (&reference)[SIZE])
-  : data{reference}
-  {
-  }
-  
+private:
+    T (&data)[SIZE];
+public:
+    array() : data(*new T[1][SIZE]) { }
+    array(T (&reference)[SIZE]) : data(reference) { }
 };
-
-/* First instantiated from: FieldDeclArrayRef2Test.cpp:13 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-class array<int, 2>
-{
-  
-  private: 
-  int (&data)[2];
-  
-  public: 
-  inline array()
-  : data{*new int[1][2]}
-  {
-  }
-  
-  inline array(int (&reference)[2]);
-  
-};
-
-#endif
-
 
 int main()
 {
-  array<int, 2> a = array<int, 2>();
+    array<int, 2> a;
+}
+#else
+int main()
+{
   return 0;
 }
 
+#endif

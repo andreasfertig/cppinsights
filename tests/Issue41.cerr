@@ -1,16 +1,16 @@
 .tmp.cpp:14:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_0_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   14 |     template<class type_parameter_0_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:29:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_0_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   29 |     template<class type_parameter_0_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from .tmp.cpp:1:
-In file included from ... vector:285:
+In file included from ... vector:310:
 In file included from ... remove.h:13:
 ... find_if.h:25:9: error: no matching function for call to object of type '__lambda_12_26'
-    if (__pred(*__first))
-        ^~~~~~
+   25 |     if (__pred(*__first))
+      |         ^~~~~~
 .tmp.cpp:37:104: note: in instantiation of function template specialization 'std::find_if<std::__wrap_iter<std::string *>, __lambda_12_26>' requested here
-  std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
-                                                                                                       ^
+   37 |   std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
+      |                                                                                                        ^
 3 errors generated.

@@ -1,34 +1,25 @@
-.tmp.cpp:6:33: error: 'auto' not allowed here
-template<auto sep = static_cast<auto>(' '), typename T1, typename ... Types>
-                                ^~~~
 .tmp.cpp:14:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_1_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   14 |     template<class type_parameter_1_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:20:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_1_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   20 |     template<class type_parameter_1_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:43:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_0_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   43 |     template<class type_parameter_0_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:50:5: error: templates cannot be declared inside of a local class
-    template<>
-    ^~~~~~~~~~
+   50 |     template<>
+      |     ^~~~~~~~~~
 .tmp.cpp:59:5: error: templates cannot be declared inside of a local class
-    template<>
-    ^~~~~~~~~~
+   59 |     template<>
+      |     ^~~~~~~~~~
 .tmp.cpp:67:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_0_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   67 |     template<class type_parameter_0_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:70:42: error: 'type_parameter_0_0' does not refer to a value
-      return __lambda_11_28{}.operator()<type_parameter_0_0>(arg);
-                                         ^
+   70 |       return __lambda_11_28{}.operator()<type_parameter_0_0>(arg);
+      |                                          ^
 .tmp.cpp:67:20: note: declared here
-    template<class type_parameter_0_0>
-                   ^
-.tmp.cpp:84:3: error: no matching function for call to 'print'
-  print("hi", 7.5, str);
-  ^~~~~
-.tmp.cpp:7:6: note: candidate template ignored: couldn't infer template argument 'sep'
-void print(const T1 & arg1, const Types &... args)
-     ^
-9 errors generated.
+   67 |     template<class type_parameter_0_0>
+      |                    ^
+7 errors generated.

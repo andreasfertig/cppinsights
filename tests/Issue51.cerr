@@ -1,11 +1,11 @@
 .tmp:5:5: error: expected function body after function declarator
-    using Map = std::map<int, bool>;
-    ^
+    5 |     using Map = std::map<int, bool>;
+      |     ^
 .tmp:6:5: error: unknown type name 'Map'
-    Map m;
-    ^
+    6 |     Map m;
+      |     ^
 .tmp:8:1: error: extraneous closing brace ('}')
-}
-^
+    8 | }
+      | ^
 3 errors generated.
 

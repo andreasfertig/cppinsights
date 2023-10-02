@@ -1,7 +1,7 @@
 .tmp.cpp:174:3: error: unknown type name 'awaiter'
-  awaiter __suspend_54_5;
-  ^
+  174 |   awaiter __suspend_54_5;
+      |   ^
 .tmp.cpp:256:10: warning: expression result unused [-Wunused-value]
-    __f->__suspend_56_14_res;
-    ~~~  ^~~~~~~~~~~~~~~~~~~
+  256 |     __f->__suspend_56_14_res;
+      |     ~~~  ^~~~~~~~~~~~~~~~~~~
 1 warning and 1 error generated.

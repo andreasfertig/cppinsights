@@ -55,7 +55,7 @@ void f()
     inline /*constexpr */ auto operator()(type_parameter_0_0 container) const
     {
       {
-        auto && __range1 = container;
+        auto && __range2 = container;
         for(; ; ) {
           auto test;
         }
@@ -68,9 +68,9 @@ void f()
     inline /*constexpr */ void operator()<MyArrayWrapper<int> >(MyArrayWrapper<int> container) const
     {
       {
-        MyArrayWrapper<int> & __range1 = container;
-        int * __begin0 = __range1.begin();
-        int * __end0 = __range1.end();
+        MyArrayWrapper<int> & __range2 = container;
+        int * __begin0 = __range2.begin();
+        int * __end0 = __range2.end();
         for(; __begin0 != __end0; ++__begin0) {
           int test = *__begin0;
         }

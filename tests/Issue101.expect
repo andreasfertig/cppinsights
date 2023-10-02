@@ -194,7 +194,7 @@ namespace detail
     inline static constexpr const bool value = true;
   };
   
-  template<typename T, bool  = static_cast<bool>(has_continuation<T>::value)>
+  template<typename T, bool  = has_continuation<T>::value>
   struct to_
   {
     using type = T;

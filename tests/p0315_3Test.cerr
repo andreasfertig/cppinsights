@@ -1,20 +1,20 @@
 .tmp.cpp:39:26: error: 'auto' not allowed in type alias
-    using retType_9_14 = auto (*)();
-                         ^~~~
+   39 |     using retType_9_14 = auto (*)();
+      |                          ^~~~
 .tmp.cpp:40:31: error: unknown type name 'retType_9_14'; did you mean '__lambda_7_5::retType_7_5'?
-    inline constexpr operator retType_9_14 () const noexcept
-                              ^~~~~~~~~~~~
-                              __lambda_7_5::retType_7_5
+   40 |     inline constexpr operator retType_9_14 () const noexcept
+      |                               ^~~~~~~~~~~~
+      |                               __lambda_7_5::retType_7_5
 .tmp.cpp:13:11: note: '__lambda_7_5::retType_7_5' declared here
-    using retType_7_5 = auto (*)() -> void;
-          ^
+   13 |     using retType_7_5 = auto (*)() -> void;
+      |           ^
 .tmp.cpp:42:14: error: function '__invoke' with deduced return type cannot be used before it is defined
-      return __invoke;
-             ^
+   42 |       return __invoke;
+      |              ^
 .tmp.cpp:46:39: note: '__invoke' declared here
-    static inline /*constexpr */ auto __invoke()
-                                      ^
+   46 |     static inline /*constexpr */ auto __invoke()
+      |                                       ^
 .tmp.cpp:40:22: error: no return statement in constexpr function
-    inline constexpr operator retType_9_14 () const noexcept
-                     ^
+   40 |     inline constexpr operator retType_9_14 () const noexcept
+      |                      ^
 4 errors generated.

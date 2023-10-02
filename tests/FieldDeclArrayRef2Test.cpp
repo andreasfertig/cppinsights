@@ -1,3 +1,4 @@
+#if 0
 template <typename T, unsigned int SIZE>
 class array
 {
@@ -12,3 +13,9 @@ int main()
 {
     array<int, 2> a;
 }
+#else
+int main()
+{
+// disabled due to ICE in Clang 17
+}
+#endif

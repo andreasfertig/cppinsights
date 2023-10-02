@@ -8,7 +8,7 @@ void f()
     inline /*constexpr */ auto operator()(type_parameter_0_0 container) const
     {
       {
-        auto && __range1 = container;
+        auto && __range2 = container;
         for(; ; ) {
           auto test;
         }

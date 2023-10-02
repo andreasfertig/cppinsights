@@ -170,7 +170,11 @@ struct tnt::wrapper<my_type> final
   
   #ifdef INSIGHTS_USE_TEMPLATE
   template<>
-  inline constexpr void operator()<tnt::printer<my_type> >(tnt::printer<my_type> && vis) const;
+  inline constexpr void operator()<tnt::printer<my_type> >(tnt::printer<my_type> && vis) const
+  {
+    vis.operator()(std::basic_string_view<char, std::char_traits<char> >("a"), &my_type::a);
+    vis.operator()(std::basic_string_view<char, std::char_traits<char> >("b"), &my_type::b);
+  }
   #endif
   
   

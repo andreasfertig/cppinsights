@@ -1,10 +1,10 @@
 .tmp.cpp:19:11: error: templates cannot be declared inside of a local class
-          template<std::size_t ...I>
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   19 |           template<std::size_t ...I>
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:26:11: error: 'auto' not allowed in non-static class member
-          auto rhs;
-          ^~~~
+   26 |           auto rhs;
+      |           ^~~~
 .tmp.cpp:29:48: error: 'auto' not allowed in function prototype
-          __lambda_15_17(vector<T, N> * _this, auto _rhs)
-                                               ^~~~
+   29 |           __lambda_15_17(vector<T, N> * _this, auto _rhs)
+      |                                                ^~~~
 3 errors generated.

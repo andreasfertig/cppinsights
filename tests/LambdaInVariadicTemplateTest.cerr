@@ -1,19 +1,19 @@
 .tmp.cpp:61:26: error: 'auto' not allowed in type alias
-    using retType_13_4 = auto (*)(std::string);
-                         ^~~~
+   61 |     using retType_13_4 = auto (*)(std::string);
+      |                          ^~~~
 .tmp.cpp:62:31: error: unknown type name 'retType_13_4'
-    inline constexpr operator retType_13_4 () const noexcept
-                              ^
+   62 |     inline constexpr operator retType_13_4 () const noexcept
+      |                               ^
 .tmp.cpp:86:26: error: 'auto' not allowed in type alias
-    using retType_14_4 = auto (*)(int);
-                         ^~~~
+   86 |     using retType_14_4 = auto (*)(int);
+      |                          ^~~~
 .tmp.cpp:87:31: error: unknown type name 'retType_14_4'
-    inline constexpr operator retType_14_4 () const noexcept
-                              ^
+   87 |     inline constexpr operator retType_14_4 () const noexcept
+      |                               ^
 .tmp.cpp:105:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_1_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  105 |     template<class type_parameter_1_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:112:5: error: templates cannot be declared inside of a local class
-    template<class type_parameter_1_0>
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  112 |     template<class type_parameter_1_0>
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 6 errors generated.
