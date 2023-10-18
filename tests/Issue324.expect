@@ -22,6 +22,6 @@ Str globalString = Str("test");
 
 const char * getString(bool empty)
 {
-  return static_cast<const char *>((empty ? Str("") : Str(globalString)).operator const char *());
+  return (empty ? Str("") : Str(globalString)).operator const char *();
 }
 

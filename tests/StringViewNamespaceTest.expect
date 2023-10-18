@@ -5,7 +5,7 @@
 int main()
 {
   std::basic_string<char, std::char_traits<char>, std::allocator<char> > str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >("Some string");
-  std::basic_string_view<char, std::char_traits<char> > strView = static_cast<std::basic_string_view<char, std::char_traits<char> >>(str.operator std::basic_string_view<char, std::char_traits<char> >());
+  std::basic_string_view<char, std::char_traits<char> > strView = str.operator std::basic_string_view<char, std::char_traits<char> >();
   std::operator<<(std::operator<<(std::cout, "strView  : "), std::basic_string_view<char, std::char_traits<char> >(strView)).operator<<(std::endl);
   return 0;
 }

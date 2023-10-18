@@ -32,8 +32,8 @@ int main()
   l.operator()();
   l.operator()();
   l.operator()();
-  (+static_cast<void (*)()>(l.operator __lambda_5_14::retType_5_14()))();
-  (+static_cast<void (*)()>(l.operator __lambda_5_14::retType_5_14()))();
+  (+l.operator __lambda_5_14::retType_5_14())();
+  (+l.operator __lambda_5_14::retType_5_14())();
   return 0;
 }
 

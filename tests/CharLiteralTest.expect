@@ -89,25 +89,25 @@ class Test
   inline void Apply()
   {
     Foo<char> * data = this->mData;
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\0');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\n');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\\');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\'');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\a');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\b');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\f');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\r');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\t');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=('\v');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(L'\n'));
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(u8'\n');
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(u'\n'));
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(static_cast<char>(U'\n'));
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3U);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3UL);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3ULL);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3LL);
-    data[static_cast<int>(this->GetLength().operator int()) + 1].operator=(3L);
+    data[this->GetLength().operator int() + 1].operator=('\0');
+    data[this->GetLength().operator int() + 1].operator=('\n');
+    data[this->GetLength().operator int() + 1].operator=('\\');
+    data[this->GetLength().operator int() + 1].operator=('\'');
+    data[this->GetLength().operator int() + 1].operator=('\a');
+    data[this->GetLength().operator int() + 1].operator=('\b');
+    data[this->GetLength().operator int() + 1].operator=('\f');
+    data[this->GetLength().operator int() + 1].operator=('\r');
+    data[this->GetLength().operator int() + 1].operator=('\t');
+    data[this->GetLength().operator int() + 1].operator=('\v');
+    data[this->GetLength().operator int() + 1].operator=(static_cast<char>(L'\n'));
+    data[this->GetLength().operator int() + 1].operator=(u8'\n');
+    data[this->GetLength().operator int() + 1].operator=(static_cast<char>(u'\n'));
+    data[this->GetLength().operator int() + 1].operator=(static_cast<char>(U'\n'));
+    data[this->GetLength().operator int() + 1].operator=(3U);
+    data[this->GetLength().operator int() + 1].operator=(3UL);
+    data[this->GetLength().operator int() + 1].operator=(3ULL);
+    data[this->GetLength().operator int() + 1].operator=(3LL);
+    data[this->GetLength().operator int() + 1].operator=(3L);
   }
   
   inline Foo<int> GetLength() const

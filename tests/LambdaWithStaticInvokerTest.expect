@@ -32,7 +32,7 @@ void NoParams()
   
   __lambda_5_14 l = __lambda_5_14{};
   bool res = (1 == l.operator()());
-  bool res2 = (2 == (+static_cast<int (*)()>(l.operator __lambda_5_14::retType_5_14()))());
+  bool res2 = (2 == (+l.operator __lambda_5_14::retType_5_14())());
 }
 
 
@@ -70,7 +70,7 @@ __lambda_14_20 lWithParams = __lambda_14_20{};
 void WithParams()
 {
   bool res = (6 == lWithParams.operator()(2, 3));
-  bool res2 = (7 == (+static_cast<int (*)(int, int)>(lWithParams.operator __lambda_14_20::retType_14_20()))(2, 3));
+  bool res2 = (7 == (+lWithParams.operator __lambda_14_20::retType_14_20())(2, 3));
 }
 
 
@@ -130,7 +130,7 @@ __lambda_25_16 glambda = __lambda_25_16{};
 void WithParamsGeneric()
 {
   using FuncPtr_29 = int (*)(int);
-  FuncPtr_29 fp = static_cast<int (*)(int)>(glambda.operator __lambda_25_16::retType_25_16());
+  FuncPtr_29 fp = glambda.operator __lambda_25_16::retType_25_16();
 }
 
 
@@ -203,7 +203,7 @@ void WithParamsAndNTTP()
 {
   int res = lWithParamsAndNTTP.operator()<1, 0>(2, 3);
   using FuncPtr_41 = int (*)(int, int);
-  FuncPtr_41 fp = static_cast<int (*)(int, int)>(lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27());
+  FuncPtr_41 fp = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27();
 }
 
 

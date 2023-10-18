@@ -56,7 +56,6 @@ ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
 #   Priority:        3
 #   - Regex:           '.*'
 #    Priority:        1
-SortIncludes: false
 IncludeCategories: 
   - Regex:           '^<.*\.h>'
     Priority:        1

@@ -80,6 +80,6 @@ class __lambda_5_10
 __lambda_5_10 C = __lambda_5_10{};
 
 
-/* PASSED: static_assert(Fwd.operator()(static_cast<int (*)(int)>(C.operator __lambda_5_10::retType_5_10()), 3) == 3); */
+/* PASSED: static_assert(Fwd.operator()(C.operator __lambda_5_10::retType_5_10(), 3) == 3); */
 
 

@@ -56,7 +56,7 @@ struct Test
     
   };
   
-  void (*fp)() = (+static_cast<void (*)()>(__lambda_7_29{}.operator __lambda_7_29::retType_7_29()));
+  void (*fp)() = (+__lambda_7_29{}.operator __lambda_7_29::retType_7_29());
   
 };
 
