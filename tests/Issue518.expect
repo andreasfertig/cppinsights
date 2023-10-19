@@ -45,7 +45,7 @@ struct task
           if(previous) {
             return previous;
           } else {
-            return static_cast<std::coroutine_handle<void>>(std::noop_coroutine().operator std::coroutine_handle<void>());
+            return std::noop_coroutine().operator std::coroutine_handle<void>();
           } 
           
         }
@@ -154,10 +154,10 @@ struct task<int>
       {
         {
           std::coroutine_handle<void> previous = std::coroutine_handle<void>(h.promise().previous);
-          if(static_cast<bool>(previous.operator bool())) {
+          if(previous.operator bool()) {
             return std::coroutine_handle<void>(static_cast<std::coroutine_handle<void> &&>(previous));
           } else {
-            return static_cast<std::coroutine_handle<void>>(std::noop_coroutine().operator std::coroutine_handle<void>());
+            return std::noop_coroutine().operator std::coroutine_handle<void>();
           } 
           
         }

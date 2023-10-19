@@ -26,7 +26,7 @@ class __lambda_3_47
 };
 
 using FuncPtr_3 = auto (*)() -> void;
-FuncPtr_3 a = (+static_cast<void (*)()>(__lambda_3_47{}.operator __lambda_3_47::retType_3_47()));
+FuncPtr_3 a = (+__lambda_3_47{}.operator __lambda_3_47::retType_3_47());
 
 
 
@@ -56,5 +56,5 @@ class __lambda_5_16
 };
 
 using FuncPtr_5 = void (*)();
-FuncPtr_5 fp = static_cast<void (*)()>(__lambda_5_16{}.operator __lambda_5_16::retType_5_16());
+FuncPtr_5 fp = __lambda_5_16{}.operator __lambda_5_16::retType_5_16();
 

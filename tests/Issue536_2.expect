@@ -54,7 +54,7 @@ struct my_resumable
   
   inline ~my_resumable() noexcept
   {
-    if(static_cast<bool>(this->m_handle.operator bool())) {
+    if(this->m_handle.operator bool()) {
       this->m_handle.destroy();
     } 
     

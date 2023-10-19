@@ -220,7 +220,7 @@ struct generator<unsigned int>
   
   inline ~generator() noexcept
   {
-    if(static_cast<bool>(this->p.operator bool())) {
+    if(this->p.operator bool()) {
       this->p.destroy();
     } 
     

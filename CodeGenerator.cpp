@@ -1768,8 +1768,9 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
             case CastKind::CK_PointerToIntegral: [[fallthrough]];
             case CastKind::CK_BitCast: [[fallthrough]];
             case CastKind::CK_UncheckedDerivedToBase: [[fallthrough]];
-            case CastKind::CK_ToUnion: [[fallthrough]];
-            case CastKind::CK_UserDefinedConversion: [[fallthrough]];
+            case CastKind::CK_ToUnion:
+                [[fallthrough]];
+                //            case CastKind::CK_UserDefinedConversion: [[fallthrough]];
             case CastKind::CK_AtomicToNonAtomic: [[fallthrough]];
             case CastKind::CK_DerivedToBase: [[fallthrough]];
             case CastKind::CK_FloatingCast: [[fallthrough]];

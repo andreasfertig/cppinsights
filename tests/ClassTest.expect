@@ -28,7 +28,7 @@ class Test
   {
     Test tmp = Test(*this) /* NRVO variable */;
     this->operator++();
-    return Test(static_cast<int>(static_cast<Test &&>(tmp).operator int()));
+    return Test(static_cast<Test &&>(tmp).operator int());
   }
   
   inline Test & operator+=(const Test & rhs)
@@ -55,7 +55,7 @@ int main()
   Test t = Test(2);
   t.operator=(Test(3 * 2));
   Test tt = Test(4);
-  t.operator+=(Test(static_cast<int>(tt.operator int()) * 2));
+  t.operator+=(Test(tt.operator int() * 2));
   return 0;
 }
 

@@ -33,7 +33,7 @@ class Test
   {
     Test tmp = Test(*this) /* NRVO variable */;
     this->operator++();
-    return Test(static_cast<int>(static_cast<Test &&>(tmp).operator int()));
+    return Test(static_cast<Test &&>(tmp).operator int());
   }
   
   inline Test & operator+=(const Test & rhs)
@@ -72,7 +72,7 @@ int main()
   s.count.operator++(0);
   Test t = Test();
   char * raw = reinterpret_cast<char *>(&s + 1);
-  Test * p = reinterpret_cast<Test *>(&raw[static_cast<int>(s.count.operator int())]);
+  Test * p = reinterpret_cast<Test *>(&raw[s.count.operator int()]);
   (*p).operator=((t));
   (*p).operator=(s2.count);
   s.count.operator+=(Test(static_cast<int>(sizeof(p))));

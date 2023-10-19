@@ -39,7 +39,7 @@ namespace test
 int main()
 {
   test::coroutine_handle<int> a = {};
-  test::coroutine_handle<void> b = static_cast<test::coroutine_handle<void>>(a.operator test::coroutine_handle<void>());
+  test::coroutine_handle<void> b = a.operator test::coroutine_handle<void>();
   return 0;
 }
 
