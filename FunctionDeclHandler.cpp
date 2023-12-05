@@ -86,6 +86,8 @@ FunctionDeclHandler::FunctionDeclHandler(Rewriter& rewrite, MatchFinder& matcher
 void FunctionDeclHandler::run(const MatchFinder::MatchResult& result)
 {
     if(const auto* funcDecl = result.Nodes.getNodeAs<FunctionDecl>(idFunc)) {
+        RETURN_IF(isa<CXXDeductionGuideDecl>(funcDecl));
+
         const auto         columnNr = GetSM(result).getSpellingColumnNumber(funcDecl->getBeginLoc()) - 1;
         OutputFormatHelper outputFormatHelper{columnNr};
         CodeGenerator      codeGenerator{outputFormatHelper};
