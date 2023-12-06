@@ -1,0 +1,44 @@
+#include <iostream>
+#include <vector>
+
+template<typename T>
+class Data
+{
+  
+  public: 
+  inline Data(const T & t)
+  {
+  }
+  
+};
+
+/* First instantiated from: Issue596.cpp:13 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+class Data<long>
+{
+  
+  public: 
+  inline Data(const long & t)
+  {
+  }
+  
+};
+
+#endif
+
+
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+Data(const int & t) -> Data<int>;
+#endif
+Data(const char *) -> Data<std::string> ;
+Data(int)->Data<long> ;
+int main()
+{
+  Data<long> d1 = Data<long>{5};
+  return 0;
+}
+
+
