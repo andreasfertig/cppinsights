@@ -589,6 +589,12 @@ static std::optional<std::string> GetFieldDeclNameForLambda(const FieldDecl&    
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const SourceLocExpr* stmt)
+{
+    mOutputFormatHelper.Append(stmt->getBuiltinStr(), "()"sv);
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const MemberExpr* stmt)
 {
     const auto* base = stmt->getBase();

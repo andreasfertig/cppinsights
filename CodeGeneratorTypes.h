@@ -130,6 +130,7 @@ SUPPORTED_STMT(AttributedStmt)
 SUPPORTED_STMT(ConceptSpecializationExpr)
 SUPPORTED_STMT(RequiresExpr)
 SUPPORTED_STMT(StmtExpr)
+SUPPORTED_STMT(SourceLocExpr)
 SUPPORTED_STMT(CppInsightsCommentStmt)
 
 #undef IGNORED_DECL
