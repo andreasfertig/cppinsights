@@ -15,6 +15,7 @@ void func(const std::basic_string<char, std::char_traits<char>, std::allocator<c
     const std::basic_string<char, std::char_traits<char>, std::allocator<char> > arg;
     public: 
     // inline __lambda_5_11 & operator=(const __lambda_5_11 &) /* noexcept */ = delete;
+    // inline ~__lambda_5_11() noexcept = default;
     __lambda_5_11(const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & _arg)
     : arg{_arg}
     {}

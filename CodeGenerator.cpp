@@ -3329,7 +3329,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             // mOutputFormatHelper.AppendNewLine();
         }
 
-        if((stmt->isLambda() and isa<CXXDestructorDecl>(d))) {
+        if((stmt->isLambda() and isa<CXXDestructorDecl>(d)) and not d->isUsed()) {
             continue;
         }
 
