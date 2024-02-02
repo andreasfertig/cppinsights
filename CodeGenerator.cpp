@@ -3878,6 +3878,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 bool byConstRef{false};
                 auto fieldName{isThis ? kwInternalThis : name};
                 auto fieldDeclType{fd->getType()};
+                bool isMoved{};
 
                 std::string fname = StrCat("_"sv, name);
 
@@ -3923,13 +3924,23 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     ) {
                         // this must go before adding the L or R-value reference, otherwise we get T& const instead of
                         // const T&
-                        fieldDeclType.addConst();
+
+                        if(exprWithoutImpCasts->isPRValue() and isa<CXXBindTemporaryExpr>(exprWithoutImpCasts) and
+                           not exprWithoutImpCasts->getType().isConstQualified()) {
+                            fieldDeclType = stmt->getASTContext().getRValueReferenceType(fieldDeclType);
+                            EnableGlobalInsert(GlobalInserts::HeaderUtility);
+                            fname   = StrCat("std::move("sv, fname, ")"sv);
+                            isMoved = true;
+
+                        } else {
+                            fieldDeclType.addConst();
+                        }
                     }
 
                     if(exprWithoutImpCasts->isXValue()) {
                         fieldDeclType = stmt->getASTContext().getRValueReferenceType(fieldDeclType);
 
-                    } else {
+                    } else if(not isMoved) {
                         fieldDeclType = stmt->getASTContext().getLValueReferenceType(fieldDeclType);
                     }
                 }
