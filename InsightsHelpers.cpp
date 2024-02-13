@@ -1140,6 +1140,19 @@ static bool HasTypeWithSubType(const QualType& t)
 }
 //-----------------------------------------------------------------------------
 
+template<typename QT, typename SUB_T>
+static bool HasTypePath(const QualType& t)
+{
+    if(const auto* lref = dyn_cast_or_null<QT>(t.getTypePtrOrNull())) {
+        const auto subType = GetDesugarType(lref->getPointeeType());
+
+        return isa<SUB_T>(subType);
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqualified unqualified)
 {
     const bool isFunctionPointer =
@@ -1225,6 +1238,8 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
         } else {
             typeName += StrCat(" "sv, varName);
         }
+    } else if(HasTypePath<PointerType, ParenType>(t)) {
+        InsertAfter(typeName, "(*"sv, varName);
 
     } else if(not isRawArrayType and not varName.empty()) {
         typeName += StrCat(" "sv, varName);
