@@ -18,6 +18,7 @@ int main()
     public: 
     // inline /*constexpr */ __lambda_7_19(const __lambda_7_19 &) /* noexcept */ = delete;
     // inline __lambda_7_19 & operator=(const __lambda_7_19 &) /* noexcept */ = delete;
+    // inline ~__lambda_7_19() noexcept = default;
     __lambda_7_19(std::unique_ptr<int, std::default_delete<int> > && _x)
     : x{std::move(_x)}
     {}
