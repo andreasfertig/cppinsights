@@ -1,0 +1,29 @@
+.tmp.cpp:16:2: error: expected ';' after struct
+   16 | } Foo;
+      |  ^
+      |  ;
+.tmp.cpp:12:1: warning: typedef requires a name [-Wmissing-declarations]
+   12 | typedef struct Foo
+      | ^~~~~~~
+.tmp.cpp:16:3: warning: declaration does not declare anything [-Wmissing-declarations]
+   16 | } Foo;
+      |   ^~~
+.tmp.cpp:18:12: error: use of undeclared identifier 'T'
+   18 | inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, char x, int y)
+      |            ^
+.tmp.cpp:18:33: error: use of undeclared identifier 'T'
+   18 | inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, char x, int y)
+      |                                 ^
+.tmp.cpp:18:40: error: use of undeclared identifier 'T'
+   18 | inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, char x, int y)
+      |                                        ^
+.tmp.cpp:25:12: error: use of undeclared identifier 'T'
+   25 | inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, int y)
+      |            ^
+.tmp.cpp:25:33: error: use of undeclared identifier 'T'
+   25 | inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, int y)
+      |                                 ^
+.tmp.cpp:25:40: error: use of undeclared identifier 'T'
+   25 | inline Foo<T> * Constructor_Foo<T>(Foo<T> * __this, int y)
+      |                                        ^
+2 warnings and 7 errors generated.

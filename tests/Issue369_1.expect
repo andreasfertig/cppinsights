@@ -38,24 +38,21 @@ const foo & create()
   static uint64_t __valueGuard;
   alignas(foo) static char __value[sizeof(foo)];
   
-  if( ! __valueGuard )
-  {
-    if( __cxa_guard_acquire(&__valueGuard) )
-    {
+  if(!__valueGuard) {
+    if(__cxa_guard_acquire(&__valueGuard)) {
       try 
       {
-        new (&__value) foo(std::move(__lambda_4_23.operator()()));
+        new (&__value)foo{std::move(__lambda_4_23.operator()())};
         __valueGuard = true;
-      }
-      catch(...)
-      {
+      } catch(...) {
         __cxa_guard_abort(&__valueGuard);
-        throw;
+        throw ;
       }
-      
       __cxa_guard_release(&__valueGuard);
-    }
-  }
+    } 
+    
+  } 
+  
   return *reinterpret_cast<foo*>(__value);
 }
 

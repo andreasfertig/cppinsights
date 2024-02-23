@@ -1,0 +1,104 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+// cmdlineinsights:-edu-show-lifetime
+
+struct Data
+{
+  inline ~Data() noexcept
+  {
+  }
+  
+};
+
+
+
+struct Test
+{
+  inline Test(int)
+  {
+  }
+  
+  inline ~Test() noexcept
+  {
+  }
+  
+  inline Data get()
+  {
+    return {};
+  }
+  
+};
+
+
+
+void Fun(Test t)
+{
+}
+
+
+void FunFun(Test t, Test tt)
+{
+}
+
+
+int FunFunInt(Test t, Test tt)
+{
+  Test t3 = Test{9};
+  return 13;
+  t3.~Test();
+  tt.~Test();
+  t.~Test();
+  ;
+}
+
+
+void Fin(int)
+{
+}
+
+
+void Basic()
+{
+  Test __temporary31_15 = Test{4};
+  Fun(__temporary31_15);
+  __temporary31_15.~Test();
+  ;
+  Test __temporary33_18 = Test{2};
+  Test __temporary33_27 = Test{3};
+  FunFun(__temporary33_18, __temporary33_27);
+  __temporary33_27.~Test();
+  __temporary33_18.~Test();
+  ;
+}
+
+
+void Advanced()
+{
+  Test __temporary38_25 = Test{2};
+  Test __temporary38_34 = Test{3};
+  Fin(FunFunInt(__temporary38_25, __temporary38_34));
+  __temporary38_34.~Test();
+  __temporary38_25.~Test();
+  ;
+}
+
+
+void WithVar()
+{
+  Test __temporary43_22 = Test{5};
+  Data && d = static_cast<Data &&>(__temporary43_22.get());
+  __temporary43_22.~Test();
+}
+
+
+int main()
+{
+  Test __temporary48_22 = Test{6};
+  Data && d = static_cast<Data &&>(__temporary48_22.get());
+  return 0;
+  __temporary48_22.~Test();
+  ;
+}
+

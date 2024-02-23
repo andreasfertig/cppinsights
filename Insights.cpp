@@ -5,6 +5,7 @@
  *
  ****************************************************************************/
 
+#include <array>
 #include "clang/AST/ASTContext.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendActions.h"
@@ -90,11 +91,30 @@ const CompilerInstance&        GetGlobalCI()
 }
 //-----------------------------------------------------------------------------
 
+namespace clang::insights {
+std::string EmitGlobalVariableCtors();
+
+using GlobalInsertMap = std::pair<bool, std::string_view>;
+
+static constinit std::array<GlobalInsertMap, static_cast<size_t>(GlobalInserts::MAX)> gGlobalInserts{};
+
+void AddGLobalInsertMapEntry(GlobalInserts idx, std::string_view value)
+{
+    gGlobalInserts[static_cast<size_t>(idx)] = {false, value};
+}
+
+void EnableGlobalInsert(GlobalInserts idx)
+{
+    gGlobalInserts[static_cast<size_t>(idx)].first = true;
+}
+
+}  // namespace clang::insights
+
 class CppInsightASTConsumer final : public ASTConsumer
 {
 public:
     explicit CppInsightASTConsumer(Rewriter& rewriter)
-    : ASTConsumer()
+    : ASTConsumer{}
     , mMatcher{}
     , mRecordDeclHandler{rewriter, mMatcher}
     , mTemplateHandler{rewriter, mMatcher}
@@ -102,6 +122,13 @@ public:
     , mFunctionDeclHandler{rewriter, mMatcher}
     , mRewriter{rewriter}
     {
+        if(GetInsightsOptions().UseShow2C) {
+            gInsightsOptions.ShowLifetime = true;
+        }
+
+        if(GetInsightsOptions().ShowLifetime) {
+            gInsightsOptions.UseShowInitializerList = true;
+        }
     }
 
     void HandleTranslationUnit(ASTContext& context) override
@@ -111,36 +138,48 @@ public:
 
         // Check whether we had static local variables which we transformed. Then for the placement-new we need to
         // include the header <new>.
-        if(CodeGenerator::NeedToInsertNewHeader() or CodeGenerator::NeedToInsertExceptionHeader() or
-           CodeGenerator::NeedToInsertUtilityHeader() or GetInsightsOptions().ShowCoroutineTransformation) {
-            const auto& sm         = context.getSourceManager();
-            const auto& mainFileId = sm.getMainFileID();
-            const auto  loc        = sm.translateFileLineCol(sm.getFileEntryForID(mainFileId), 1, 1);
+        const auto& sm         = context.getSourceManager();
+        const auto& mainFileId = sm.getMainFileID();
+        const auto& fileEntry  = sm.getFileEntryForID(mainFileId);
+        const auto  loc        = sm.translateFileLineCol(fileEntry, 1, 1);
 
-            if(GetInsightsOptions().ShowCoroutineTransformation) {
-                mRewriter.InsertText(
-                    loc,
-                    R"(/*************************************************************************************
+        if(GetInsightsOptions().ShowCoroutineTransformation) {
+            mRewriter.InsertText(
+                loc,
+                R"(/*************************************************************************************
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
 )"sv);
+        } else if(GetInsightsOptions().UseShow2C or GetInsightsOptions().ShowLifetime) {
+            mRewriter.InsertText(
+                loc,
+                R"(/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+)"sv);
+        }
+
+        std::string inserts{};
+        for(const auto& [active, value] : gGlobalInserts) {
+            if(not active) {
+                continue;
             }
 
-            if(CodeGenerator::NeedToInsertNewHeader()) {
-                mRewriter.InsertText(
-                    loc,
-                    "#include <new> // for thread-safe static's placement new\n#include <stdint.h> // for "
-                    "uint64_t under Linux/GCC\n"sv);
-            }
+            inserts.append(value);
+            inserts.append("\n"sv);
+        }
 
-            if(CodeGenerator::NeedToInsertExceptionHeader()) {
-                mRewriter.InsertText(loc, "#include <exception> // for noexcept transformation\n"sv);
-            }
+        if(not inserts.empty()) {
+            mRewriter.InsertText(loc, inserts);
+        }
 
-            if(CodeGenerator::NeedToInsertUtilityHeader()) {
-                mRewriter.InsertText(loc, "#include <utility> // std::move\n"sv);
-            }
+        if(GetInsightsOptions().UseShow2C) {
+            auto       cxaStart = EmitGlobalVariableCtors();
+            const auto cxaLoc   = sm.translateFileLineCol(fileEntry, fileEntry->getSize(), 1);
+
+            mRewriter.InsertText(cxaLoc, cxaStart);
         }
     }
 
@@ -167,7 +206,7 @@ public:
     {
         gCI = &CI;
         mRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-        return std ::make_unique<CppInsightASTConsumer>(mRewriter);
+        return std::make_unique<CppInsightASTConsumer>(mRewriter);
     }
 
 private:
@@ -193,6 +232,36 @@ static void PrintVersion(raw_ostream& ostream)
 
 int main(int argc, const char** argv)
 {
+    // Headers go first
+    using enum GlobalInserts;
+    AddGLobalInsertMapEntry(HeaderNew,
+                            "#include <new> // for thread-safe static's placement new\n#include <stdint.h> // for "
+                            "uint64_t under Linux/GCC"sv);
+    AddGLobalInsertMapEntry(HeaderException, "#include <exception> // for noexcept transformation"sv);
+    AddGLobalInsertMapEntry(HeaderUtility, "#include <utility> // std::move"sv);
+    AddGLobalInsertMapEntry(HeaderStddef, "#include <stddef.h> // NULL and more"sv);
+    AddGLobalInsertMapEntry(HeaderAssert, "#include <assert.h> // _Static_assert"sv);
+
+    // Now all the forward declared functions
+    AddGLobalInsertMapEntry(FuncCxaStart, "void __cxa_start(void);"sv);
+    AddGLobalInsertMapEntry(FuncCxaAtExit, "void __cxa_atexit(void);"sv);
+    AddGLobalInsertMapEntry(FuncMalloc, "void* malloc(unsigned int);"sv);
+    AddGLobalInsertMapEntry(FuncFree, R"(extern "C" void free(void*);)"sv);
+    AddGLobalInsertMapEntry(FuncMemset, R"(extern "C" void* memset(void*, int, unsigned int);)"sv);
+    AddGLobalInsertMapEntry(FuncMemcpy, R"(void* memcpy(void*, const void*, unsigned int);)"sv);
+    AddGLobalInsertMapEntry(
+        FuncCxaVecNew,
+        R"(extern "C" void* __cxa_vec_new(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));)"sv);
+    AddGLobalInsertMapEntry(
+        FuncCxaVecCtor,
+        R"(extern "C" void* __cxa_vec_ctor(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));)"sv);
+    AddGLobalInsertMapEntry(
+        FuncCxaVecDel,
+        R"(extern "C" void __cxa_vec_delete(void *, unsigned int, unsigned int, void* (*destructor)(void *) );)"sv);
+    AddGLobalInsertMapEntry(
+        FuncCxaVecDtor,
+        R"(extern "C" void __cxa_vec_dtor(void *, unsigned int, unsigned int, void* (*destructor)(void *) );)"sv);
+
     llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
     llvm::cl::HideUnrelatedOptions(gInsightCategory);
     llvm::cl::SetVersionPrinter(&PrintVersion);
@@ -211,7 +280,6 @@ int main(int argc, const char** argv)
 
     CommonOptionsParser& op{opExpected.get()};
     ClangTool            tool(op.getCompilations(), op.getSourcePathList());
-    llvm::StringRef      sourceFilePath = op.getSourcePathList().front();
 
     if(gStdinMode) {
         if(op.getSourcePathList().size() != 1) {
@@ -233,6 +301,7 @@ int main(int argc, const char** argv)
             return 1;  // Skip empty files.
         }
 
+        llvm::StringRef sourceFilePath = op.getSourcePathList().front();
         tool.mapVirtualFile(sourceFilePath, inMemoryCode->getBuffer());
     }
 
@@ -262,6 +331,11 @@ int main(int argc, const char** argv)
 
     prependArgument(INSIGHTS_CLANG_RESOURCE_INCLUDE_DIR);
     prependArgument(INSIGHTS_CLANG_RESOURCE_DIR);
+
+    if(GetInsightsOptions().UseShow2C) {
+        EnableGlobalInsert(FuncCxaStart);
+        EnableGlobalInsert(FuncCxaAtExit);
+    }
 
     return tool.run(newFrontendActionFactory<CppInsightFrontendAction>().get());
 }

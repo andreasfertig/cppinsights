@@ -1,0 +1,64 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+void* malloc(unsigned int);
+extern "C" void free(void*);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Test
+{
+  int mX;
+} Test;
+
+inline Test * Constructor_Test(Test * __this, int x)
+{
+  __this->mX = x;
+  return __this;
+}
+
+
+
+Test * t = Constructor_Test((Test *)malloc(sizeof(Test)), 4);
+
+
+typedef struct West
+{
+  int mX;
+} West;
+
+inline West * Constructor_West(West * __this, int x, double d)
+{
+  __this->mX = x;
+  return __this;
+}
+
+
+
+West * w = Constructor_West((West *)malloc(sizeof(West)), 4, 5.5999999999999996);
+
+
+void Fun(Test *, int)
+{
+}
+
+
+void Call(void)
+{
+  Fun(Constructor_Test((Test *)malloc(sizeof(Test)), 5), 8);
+  if(w) {
+    free(w);
+  } 
+  
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

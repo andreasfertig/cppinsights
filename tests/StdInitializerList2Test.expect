@@ -5,8 +5,8 @@ int main(int argc, const char **)
 {
   int i;
   int x;
-  const int __list56[2]{i, x};
-  std::initializer_list<int> list = std::initializer_list<int>{__list56, 2};
+  const int __list8_43[2]{i, x};
+  std::initializer_list<int> list = std::initializer_list<int>{__list8_43, 2};
     
   class __lambda_10_17
   {
@@ -34,8 +34,8 @@ int main(int argc, const char **)
     public: 
     inline /*constexpr */ std::initializer_list<int> operator()() const
     {
-      const int __list127[2]{i, x};
-      return std::initializer_list<int>{__list127, 2};
+      const int __list14_56[2]{i, x};
+      return std::initializer_list<int>{__list14_56, 2};
     }
     
     private: 

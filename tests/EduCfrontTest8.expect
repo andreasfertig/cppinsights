@@ -1,0 +1,68 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+void* malloc(unsigned int);
+// cmdlineinsights:-edu-show-cfront
+
+#include <cstdio>
+#include <cstdlib>
+#include <new>
+
+typedef struct Apple
+{
+  char mX;
+  int mY;
+} Apple;
+
+inline Apple * Constructor_Apple(Apple * __this, int x, int y)
+{
+  printf("Apple\n");
+  __this->mX = (char)x;
+  __this->mY = y;
+  return __this;
+}
+
+inline void Destructor_Apple(Apple * __this)
+{
+  printf("~Apple\n");
+}
+
+
+
+int __main(void)
+{
+  Apple f;
+  ;
+  alignas(Apple) char buffer[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
+  Apple * b = Constructor_Apple((Apple *)(void *)buffer, 4, 5);
+  printf("Created\n");
+  Destructor_Apple(b);
+  char data[5] = {4, 5, 6, '\0', '\0'};
+  return 0;
+  /* data // lifetime ends here */
+  /* buffer // lifetime ends here */
+  Destructor_Apple(&f);
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

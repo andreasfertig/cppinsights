@@ -1,0 +1,131 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Data
+{
+  char __dummy;
+} Data;
+
+inline void Destructor_Data(Data * __this)
+{
+}
+
+
+
+typedef struct Test
+{
+  char __dummy;
+} Test;
+
+inline Test * Constructor_Test(Test * __this, int)
+{
+  return __this;
+}
+
+inline void Destructor_Test(Test * __this)
+{
+}
+
+inline Data get(Test * __this)
+{
+  Data __temporary13_26;
+  return __temporary13_26;
+  Destructor_Data(&__temporary13_26);
+  ;
+}
+
+
+
+void Fun(Test t)
+{
+}
+
+
+void FunFun(Test t, Test tt)
+{
+}
+
+
+int FunFunInt(Test t, Test tt)
+{
+  Test t3;
+  ;
+  return 3;
+  Destructor_Test(&t3);
+  Destructor_Test(&tt);
+  Destructor_Test(&t);
+  ;
+}
+
+
+void Fin(int)
+{
+}
+
+
+void Basic(void)
+{
+  Test __temporary31_15;
+  Fun(*Constructor_Test((Test *)&__temporary31_15, 4));
+  Destructor_Test(&__temporary31_15);
+  ;
+  Test __temporary33_18;
+  Test __temporary33_27;
+  FunFun(*Constructor_Test((Test *)&__temporary33_18, 2), *Constructor_Test((Test *)&__temporary33_27, 3));
+  Destructor_Test(&__temporary33_27);
+  Destructor_Test(&__temporary33_18);
+  ;
+}
+
+
+void Advanced(void)
+{
+  Test __temporary38_25;
+  Test __temporary38_34;
+  Fin(FunFunInt(*Constructor_Test((Test *)&__temporary38_25, 2), *Constructor_Test((Test *)&__temporary38_34, 3)));
+  Destructor_Test(&__temporary38_34);
+  Destructor_Test(&__temporary38_25);
+  ;
+}
+
+
+void WithVar(void)
+{
+  Test __temporary43_22;
+  Data * d = &get(Constructor_Test((Test *)&__temporary43_22, 4));
+  Destructor_Test(&__temporary43_22);
+}
+
+
+int __main(void)
+{
+  Test __temporary48_22;
+  Data * d = &get(Constructor_Test((Test *)&__temporary48_22, 4));
+  return 0;
+  Destructor_Test(&__temporary48_22);
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

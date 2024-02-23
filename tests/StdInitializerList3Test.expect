@@ -13,11 +13,11 @@ struct Foo
 
 class Test
 {
-  static inline const int __list15[3]{1, 2, 3};
+  static inline const int __list15_10[3]{1, 2, 3};
   
   public: 
   inline Test()
-  : v{Foo{std::initializer_list<int>{__list15, 3}}}
+  : v{Foo{std::initializer_list<int>{__list15_10, 3}}}
   {
   }
   
@@ -29,11 +29,11 @@ class Test
 
 class Best
 {
-  static inline const int __list15[2]{1, 2};
+  static inline const int __list23_8[2]{1, 2};
   
   public: 
   inline Best()
-  : v{Foo{std::initializer_list<int>{__list15, 2}}}
+  : v{Foo{std::initializer_list<int>{__list23_8, 2}}}
   {
   }
   
@@ -44,12 +44,12 @@ class Best
 
 class WestE
 {
-  static inline const int __list16[2]{1, 2};
+  static inline const int __list34_8[2]{1, 2};
   Foo v;
   
   public: 
   inline WestE()
-  : v{Foo{std::initializer_list<int>{__list16, 2}}}
+  : v{Foo{std::initializer_list<int>{__list34_8, 2}}}
   {
   }
   

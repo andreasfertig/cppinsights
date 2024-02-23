@@ -7,7 +7,8 @@ struct Data
   double d;
   inline double func() const noexcept
   {
-    try {
+    try 
+    {
       return this->d * static_cast<double>(this->i);
     } catch(...) {
       std::terminate();
@@ -21,7 +22,8 @@ struct Data
 
 int func() noexcept
 {
-  try {
+  try 
+  {
     return 4 * 6;
   } catch(...) {
     std::terminate();

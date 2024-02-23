@@ -1,0 +1,58 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+template<typename BT>
+typedef struct Foo
+{
+  BT raw;
+} Foo;
+
+inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this)
+{
+  return __this;
+}
+
+inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this, BT v)
+{
+  return __this;
+}
+
+typedef struct Foo
+{
+  int raw;
+} Foo;
+
+
+
+int __main(void)
+{
+  Foo<int> f;
+  ;
+  return 0;
+  /* f // lifetime ends here */
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

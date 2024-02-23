@@ -23,7 +23,8 @@ transforms into this:
 #include <exception> // for noexcept transformation
 void Fun() noexcept(true)
 {
-  try {
+  try 
+  {
     int i = 3;
   } catch(...) {
     std::terminate();

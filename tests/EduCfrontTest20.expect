@@ -1,0 +1,39 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+#include <utility>
+
+typedef struct X
+{
+  char __dummy;
+} X;
+
+inline X * Constructor_X(X * __this, std::initializer_list<int> x)
+{
+  return __this;
+}
+
+
+
+void fun(void)
+{
+  X __temporary13_14;
+  const int __list13_6[3]{1, 2, 3};
+  Constructor_X((X *)&__temporary13_14, std::initializer_list<int>{__list13_6, 3});
+  /* __temporary13_14 // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

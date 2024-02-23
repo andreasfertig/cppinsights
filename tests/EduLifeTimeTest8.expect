@@ -1,0 +1,44 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+const int * Fun(const int * val)
+{
+  return val;
+}
+
+
+int __main(void)
+{
+  const int __temporary10_27 = 42;
+  const int * cref = Fun(&__temporary10_27);
+  /* __temporary10_27 // lifetime ends here */
+  int x = *cref;
+  return *cref;
+  /* x // lifetime ends here */
+  /* cref // lifetime ends here */
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

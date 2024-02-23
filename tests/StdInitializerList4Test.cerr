@@ -1,4 +1,4 @@
 .tmp.cpp:5:112: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[2]'
-    5 | std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >{std::initializer_list<int>{__list0, 2}};
-      |                                                                                                                ^~~~~~~
+    5 | std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >{std::initializer_list<int>{__list4_21, 2}};
+      |                                                                                                                ^~~~~~~~~~
 1 error generated.

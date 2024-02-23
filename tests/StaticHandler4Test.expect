@@ -24,24 +24,21 @@ Sing & Test()
   static uint64_t __sGuard;
   alignas(Sing) static char __s[sizeof(Sing)];
   
-  if( ! __sGuard )
-  {
-    if( __cxa_guard_acquire(&__sGuard) )
-    {
+  if(!__sGuard) {
+    if(__cxa_guard_acquire(&__sGuard)) {
       try 
       {
-        new (&__s) Sing();
+        new (&__s)Sing();
         __sGuard = true;
-      }
-      catch(...)
-      {
+      } catch(...) {
         __cxa_guard_abort(&__sGuard);
-        throw;
+        throw ;
       }
-      
       __cxa_guard_release(&__sGuard);
-    }
-  }
+    } 
+    
+  } 
+  
   return *reinterpret_cast<Sing*>(__s);
 }
 

@@ -1,0 +1,33 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Test
+{
+  char __dummy;
+} Test;
+
+inline void Destructor_Test(Test * __this)
+{
+}
+
+
+
+void Fun2(void)
+{
+  Test y;
+  Destructor_Test(&y);
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

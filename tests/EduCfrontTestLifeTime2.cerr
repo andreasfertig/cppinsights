@@ -1,0 +1,7 @@
+.tmp.cpp:100:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
+  100 |   Data * d = &get(Constructor_Test((Test *)&__temporary43_22, 4));
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.tmp.cpp:108:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
+  108 |   Data * d = &get(Constructor_Test((Test *)&__temporary48_22, 4));
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors generated.

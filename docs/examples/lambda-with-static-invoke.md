@@ -25,22 +25,22 @@ int main()
     }
     
     using retType_3_28 = int (*)(int, char);
-    inline /*constexpr */ operator retType_3_28 () const noexcept
+    inline constexpr operator retType_3_28 () const noexcept
     {
       return __invoke;
     }
     
     private: 
-    static inline int __invoke(int a, char b)
+    static inline /*constexpr */ int __invoke(int a, char b)
     {
-      return a + static_cast<int>(b);
+      return __lambda_3_28{}.operator()(a, b);
     }
     
     
-  } __lambda_3_28{};
+  };
   
   using FuncPtr_3 = int (*)(int, char);
-  FuncPtr_3 fp = static_cast<int (*)(int, char)>(__lambda_3_28.operator __lambda_3_28::retType_3_28());
+  FuncPtr_3 fp = __lambda_3_28{}.operator __lambda_3_28::retType_3_28();
   return 0;
 }
 

@@ -45,8 +45,8 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
     if(const auto* cxxRecordDecl = result.Nodes.getNodeAs<CXXRecordDecl>(idRecordDecl)) {
         OutputFormatHelper outputFormatHelper{};
 
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(cxxRecordDecl);
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
+        codeGenerator->InsertArg(cxxRecordDecl);
 
         if(auto sourceRange = cxxRecordDecl->getSourceRange(); not IsMacroLocation(sourceRange)) {
             if(IsAnonymousStructOrUnion(cxxRecordDecl)) {
@@ -70,8 +70,8 @@ void RecordDeclHandler::run(const MatchFinder::MatchResult& result)
     } else if(const auto* decl = result.Nodes.getNodeAs<Decl>(idDecl)) {
         OutputFormatHelper outputFormatHelper{};
 
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(decl);
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
+        codeGenerator->InsertArg(decl);
 
         mRewrite.ReplaceText(GetSourceRangeAfterSemi(decl->getSourceRange(), result), outputFormatHelper);
     }

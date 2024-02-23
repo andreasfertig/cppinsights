@@ -109,9 +109,8 @@ transforms into this:
 #elif __has_include(<experimental/coroutine>)
 #include <experimental/coroutine>
 
-namespace std
-{
-  
+namespace std {
+using namespace std::experimental;
 }
 #else
 #error "No coroutine header"
@@ -166,14 +165,14 @@ struct generator
   
   inline ~generator() noexcept
   {
-    if() {
+    if(/* INSIGHTS-TODO: CodeGenerator.cpp:4287 stmt: RecoveryExpr */) {
     } 
     
   }
   
   inline void run()
   {
-    if() {
+    if(/* INSIGHTS-TODO: CodeGenerator.cpp:4287 stmt: RecoveryExpr */) {
     } 
     
   }

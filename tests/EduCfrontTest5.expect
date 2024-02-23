@@ -1,0 +1,167 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct WithDefaultCtor
+{
+  char __dummy;
+} WithDefaultCtor;
+
+inline WithDefaultCtor * Constructor_WithDefaultCtor(WithDefaultCtor * __this)
+{
+  return __this;
+}
+
+inline WithDefaultCtor * operatorEqual(WithDefaultCtor * __this, const WithDefaultCtor * __rhs)
+{
+  return __this;
+}
+
+inline WithDefaultCtor * operatorEqual(WithDefaultCtor * __this, WithDefaultCtor * __rhs)
+{
+  return __this;
+}
+
+
+
+typedef struct Type
+{
+  char __dummy;
+} Type;
+
+inline Type * Constructor_Type(Type * __this, int)
+{
+  return __this;
+}
+
+inline void Destructor_Type(Type * __this)
+{
+}
+
+inline Type * operatorEqual(Type * __this, const Type * __rhs)
+{
+  return __this;
+}
+
+
+
+typedef struct Base
+{
+  Type mY;
+} Base;
+
+inline void Destructor_Base(Base * __this)
+{
+}
+
+inline Base * operatorEqual(Base * __this, const Base * __rhs)
+{
+  operatorEqual(&__this->mY, &__rhs->mY);
+  return __this;
+}
+
+inline Base * Constructor_Base(Base * __this)
+{
+  Constructor_Type(&__this->mY, 5);
+  return __this;
+}
+
+
+
+typedef struct BaseSecond
+{
+  Type mX;
+} BaseSecond;
+
+inline void Destructor_BaseSecond(BaseSecond * __this)
+{
+}
+
+inline BaseSecond * operatorEqual(BaseSecond * __this, const BaseSecond * __rhs)
+{
+  operatorEqual(&__this->mX, &__rhs->mX);
+  return __this;
+}
+
+inline BaseSecond * Constructor_BaseSecond(BaseSecond * __this)
+{
+  Constructor_Type(&__this->mX, 5);
+  return __this;
+}
+
+
+
+typedef struct Derived
+{
+  Type mY;
+  Type mX;
+  double mD;
+  WithDefaultCtor mWd;
+} Derived;
+
+inline void Destructor_Derived(Derived * __this)
+{
+  __this->mD = 7;
+  Destructor_BaseSecond((BaseSecond *)__this);
+  Destructor_Base((Base *)__this);
+}
+
+inline Derived * operatorEqual(Derived * __this, const Derived * __rhs)
+{
+  operatorEqual(&__this->mY, &__rhs->mY);
+  operatorEqual((Base *)__this, (Base *)__rhs);
+  operatorEqual(&__this->mX, &__rhs->mX);
+  operatorEqual((BaseSecond *)__this, (BaseSecond *)__rhs);
+  __this->mD = __rhs->mD;
+  operatorEqual(&__this->mWd, &__rhs->mWd);
+  return __this;
+}
+
+inline Derived * Constructor_Derived(Derived * __this)
+{
+  Constructor_Base((Base *)__this);
+  Constructor_Type(&__this->mY, 5);
+  Constructor_BaseSecond((BaseSecond *)__this);
+  Constructor_Type(&__this->mX, 5);
+  Constructor_WithDefaultCtor(&__this->mWd);
+  return __this;
+}
+
+
+
+Derived d;
+
+
+int __main(int argc, const char ** argv)
+{
+  int x = 7;
+  ++x;
+  return 0;
+  /* x // lifetime ends here */
+  ;
+}
+
+int main(int argc, const char ** argv)
+{
+  __cxa_start();
+  int ret = __main(argc, argv);
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+  Constructor_Derived(&d);
+}
+
+void __cxa_atexit(void)
+{
+  Destructor_Derived(&d);
+}
+

@@ -17,6 +17,7 @@
 #include "clang/Lex/Lexer.h"
 
 #include <functional>
+#include <optional>
 #include <string>
 #include <variant>
 
@@ -79,6 +80,24 @@ inline bool IsInvalidLocation(const auto& t, auto... args)
 }
 //-----------------------------------------------------------------------------
 
+inline bool IsStaticStorageClass(const CXXMethodDecl* md)
+{
+    return SC_Static == md->getStorageClass();
+}
+//-----------------------------------------------------------------------------
+
+inline bool IsReferenceType(const ValueDecl* decl)
+{
+    return decl and decl->getType()->isReferenceType();
+}
+//-----------------------------------------------------------------------------
+
+inline bool IsReferenceType(const DeclRefExpr* decl)
+{
+    return decl and IsReferenceType(decl->getDecl());
+}
+//-----------------------------------------------------------------------------
+
 std::string BuildRetTypeName(const Decl& decl);
 //-----------------------------------------------------------------------------
 
@@ -105,11 +124,7 @@ inline bool Contains(const llvm::DenseMap<K, V>& map, const U& key)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T, typename U>
-inline bool Contains(const std::vector<T>& v, const U& key)
-{
-    return std::find(v.begin(), v.end(), key) != v.end();
-}
+void ReplaceAll(std::string& str, std::string_view from, std::string_view to);
 //-----------------------------------------------------------------------------
 
 void InsertBefore(std::string& source, const std::string_view& find, const std::string_view& replace);
@@ -177,6 +192,16 @@ inline std::string GetLambdaName(const LambdaExpr& lambda)
 std::string GetName(const CXXRecordDecl& RD);
 //-----------------------------------------------------------------------------
 
+std::string GetName(const CXXTemporaryObjectExpr& tmp);
+//-----------------------------------------------------------------------------
+
+std::string GetTemporaryName(const Expr& tmp);
+//-----------------------------------------------------------------------------
+
+/// \brief In Cfront mode we transform references to pointers
+QualType GetType(QualType);
+//-----------------------------------------------------------------------------
+
 /// \brief Check whether this is an anonymous struct or union.
 ///
 /// There is a dedicated function `isAnonymousStructOrUnion` which at this point no longer returns true. Hence this
@@ -233,6 +258,9 @@ const std::string_view GetConst(const FunctionDecl& decl);
 //-----------------------------------------------------------------------------
 
 std::string GetElaboratedTypeKeyword(const ElaboratedTypeKeyword keyword);
+//-----------------------------------------------------------------------------
+
+uint64_t GetSize(const ConstantArrayType*);
 //-----------------------------------------------------------------------------
 
 template<typename QT, typename SUB_T>
@@ -410,6 +438,72 @@ public:
     bool VisitLambdaExpr(const LambdaExpr* expr);
 
     const LambdaExpr* Get() const { return mLambdaExpr; }
+};
+//-----------------------------------------------------------------------------
+
+template<typename T, typename U>
+struct BackupAndRestore
+{
+    T& mValue;
+    T  mBackup{};
+
+    BackupAndRestore(T& value, U&& newVal)
+    : mValue(value)
+    , mBackup{mValue}
+    {
+        mValue = std::forward<U>(newVal);
+    }
+
+    ~BackupAndRestore() { mValue = mBackup; }
+};
+//-----------------------------------------------------------------------------
+
+template<class T>
+class MyOptional : public std::optional<T>
+{
+
+public:
+    using std::optional<T>::optional;
+
+    template<class Return>
+    MyOptional<Return> and_then(std::function<MyOptional<Return>(T)> func)
+        requires(not std::is_pointer_v<T>)
+    {
+        if(not this->has_value()) {
+            return {};
+        }
+
+        return func(this->value());
+    }
+
+    template<class Return>
+    MyOptional<Return> and_then(std::function<MyOptional<Return>(std::remove_pointer_t<T>&)> func)
+        requires(std::is_pointer_v<T>)
+    {
+        if(not this->has_value()) {
+            return {};
+        }
+
+        if(this->value() == nullptr) {
+            return {};
+        } else {
+            return func(*this->value());
+        }
+    }
+
+    template<class Return>
+    MyOptional<Return> and_not(std::function<MyOptional<Return>(T)> func)
+    {
+        if(not this->has_value()) {
+            return {};
+        }
+
+        if(not func(this->value()).has_value()) {
+            return *this;
+        }
+
+        return {};
+    }
 };
 //-----------------------------------------------------------------------------
 

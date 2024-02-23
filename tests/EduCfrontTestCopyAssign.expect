@@ -1,0 +1,75 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+typedef struct Apple
+{
+  int mX;
+} Apple;
+
+inline Apple * Constructor_Apple(Apple * __this)
+{
+  __this->mX = 0;
+  return __this;
+}
+
+inline Apple * Constructor_Apple(Apple * __this, int x)
+{
+  __this->mX = x;
+  return __this;
+}
+
+inline void Destructor_Apple(Apple * __this)
+{
+  __this->mX = 5;
+}
+
+inline Apple * CopyConstructor_Apple(Apple * __this, const Apple * __rhs)
+{
+  __this->mX = 0;
+  return __this;
+}
+
+inline Apple * operatorEqual(Apple * __this, const Apple * __rhs)
+{
+  __this->mX = __rhs->mX;
+  return __this;
+}
+
+
+
+int __main(void)
+{
+  Apple a;
+  ;
+  Apple b;
+  ;
+  operatorEqual(&b, &a);
+  return 0;
+  Destructor_Apple(&b);
+  Destructor_Apple(&a);
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

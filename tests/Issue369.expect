@@ -13,24 +13,21 @@ const foo & create()
   static uint64_t __valueGuard;
   alignas(const foo) static char __value[sizeof(const foo)];
   
-  if( ! __valueGuard )
-  {
-    if( __cxa_guard_acquire(&__valueGuard) )
-    {
+  if(!__valueGuard) {
+    if(__cxa_guard_acquire(&__valueGuard)) {
       try 
       {
-        new (&__value) foo();
+        new (&__value)foo{foo()};
         __valueGuard = true;
-      }
-      catch(...)
-      {
+      } catch(...) {
         __cxa_guard_abort(&__valueGuard);
-        throw;
+        throw ;
       }
-      
       __cxa_guard_release(&__valueGuard);
-    }
-  }
+    } 
+    
+  } 
+  
   return *reinterpret_cast<const foo*>(__value);
 }
 

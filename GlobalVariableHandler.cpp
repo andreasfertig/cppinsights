@@ -79,8 +79,8 @@ void GlobalVariableHandler::run(const MatchFinder::MatchResult& result)
             }
         }
 
-        CodeGenerator codeGenerator{outputFormatHelper};
-        codeGenerator.InsertArg(matchedDecl);
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
+        codeGenerator->InsertArg(matchedDecl);
 
         if(IsMacroLocation(sr)) {
             // Special case for AnonymousStructInMacroTest.cpp (#290) where a macro gets expanded

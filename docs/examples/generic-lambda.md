@@ -31,7 +31,7 @@ int main()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ int operator()(int x) const
+    inline /*constexpr */ int operator()<int>(int x) const
     {
       return x * x;
     }
@@ -40,7 +40,7 @@ int main()
     
     #ifdef INSIGHTS_USE_TEMPLATE
     template<>
-    inline /*constexpr */ double operator()(double x) const
+    inline /*constexpr */ double operator()<double>(double x) const
     {
       return x * x;
     }
@@ -48,9 +48,9 @@ int main()
     
     private: 
     template<class type_parameter_0_0>
-    static inline auto __invoke(type_parameter_0_0 x)
+    static inline /*constexpr */ auto __invoke(type_parameter_0_0 x)
     {
-      return x * x;
+      return __lambda_4_14{}.operator()<type_parameter_0_0>(x);
     }
     
   };

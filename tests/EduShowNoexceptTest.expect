@@ -3,7 +3,8 @@
 
 void Fun() noexcept(true)
 {
-  try {
+  try 
+  {
     int i = 3;
   } catch(...) {
     std::terminate();
@@ -19,7 +20,8 @@ void Fun2() noexcept(false)
 
 void Fun3() noexcept
 {
-  try {
+  try 
+  {
     int i = 3;
   } catch(...) {
     std::terminate();

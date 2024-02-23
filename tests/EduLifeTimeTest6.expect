@@ -1,0 +1,48 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+// cmdlineinsights:-edu-show-lifetime
+
+#include <vector>
+
+struct Keeper
+{
+  std::vector<int, std::allocator<int> > data;
+  inline std::vector<int, std::allocator<int> > items() const
+  {
+    return std::vector<int, std::allocator<int> >(this->data);
+  }
+  
+  // inline ~Keeper() noexcept = default;
+};
+
+
+
+Keeper get()
+{
+  return {std::vector<int, std::allocator<int> >{}};
+}
+
+
+int main()
+{
+  {
+    Keeper __temporary19_26 = get();
+    std::vector<int, std::allocator<int> > __temporary19_34 = static_cast<const Keeper &&>(__temporary19_26).items();
+    std::vector<int, std::allocator<int> > && __range1 = static_cast<std::vector<int, std::allocator<int> > &&>(__temporary19_34);
+    __temporary19_34.~vector();
+    __temporary19_26.~Keeper();
+    std::__wrap_iter<int *> __begin1 = __range1.begin();
+    std::__wrap_iter<int *> __end1 = __range1.end();
+    for(; std::operator!=(__begin1, __end1); __begin1.operator++()) {
+      int & item = __begin1.operator*();
+      /* item // lifetime ends here */
+    }
+    
+    /* __end1 // lifetime ends here */
+    /* __begin1 // lifetime ends here */
+  }
+  return 0;
+}
+

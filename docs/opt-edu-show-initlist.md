@@ -16,8 +16,8 @@ transforms into this:
 ```.cpp
 #include <vector>
 
-const int __list0[2]{40, 2};
-std::vector<int> vec = std::vector<int, std::allocator<int> >{std::initializer_list<int>{__list0, 2}};
+const int __list3_21[2]{40, 2};
+std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >{std::initializer_list<int>{__list3_21, 2}};
 
 
 ```

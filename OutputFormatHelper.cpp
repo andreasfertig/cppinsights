@@ -38,17 +38,16 @@ void OutputFormatHelper::AppendParameterList(const ArrayRef<ParmVarDecl*> parame
         }
 
         // Get the attributes and insert them, if there are any
-        CodeGenerator codeGenerator{*this};
-        codeGenerator.InsertAttributes(p->attrs());
+        CodeGeneratorVariant codeGenerator{*this};
+        codeGenerator->InsertAttributes(p->attrs());
 
-        if(NameOnly::No == nameOnly) {
-            const auto& type{p->getType()};
+        if(const auto type{GetType(p->getType())}; NameOnly::No == nameOnly) {
 
             Append(GetTypeNameAsParameter(type, name));
         } else {
             Append(name);
 
-            if(isa<PackExpansionType>(p->getType())) {
+            if(isa<PackExpansionType>(type)) {
                 Append(kwElipsis);
             }
         }

@@ -1,0 +1,52 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+// cmdlineinsights:-edu-show-lifetime
+
+#include <initializer_list>
+
+struct Vector
+{
+  inline Vector(std::initializer_list<const char *>)
+  {
+  }
+  
+  // inline constexpr Vector(Vector &&) noexcept = default;
+};
+
+
+
+void Fun(Vector)
+{
+}
+
+
+Vector createStrings()
+{
+  const char *const __temporary14_57[6] = {"This", "is", "a", "vector", "of", "strings"};
+  return Vector{std::initializer_list<const char *>{__temporary14_57, 6}};
+  /* __temporary14_57 // lifetime ends here */
+  ;
+}
+
+
+Vector createStrings2()
+{
+  const char *const __temporary19_58[6] = {"This", "is", "a", "vector", "of", "strings"};
+  Vector v = Vector{std::initializer_list<const char *>{__temporary19_58, 6}} /* NRVO variable */;
+  /* __temporary19_58 // lifetime ends here */
+  return Vector(static_cast<Vector &&>(v));
+  /* v // lifetime ends here */
+  ;
+}
+
+
+void test()
+{
+  const char *const __temporary26_54[6] = {"This", "is", "a", "vector", "of", "strings"};
+  Fun(Vector{std::initializer_list<const char *>{__temporary26_54, 6}});
+  /* __temporary26_54 // lifetime ends here */
+  ;
+}
+

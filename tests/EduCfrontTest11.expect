@@ -1,0 +1,38 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+#include <stddef.h> // NULL and more
+#include <assert.h> // _Static_assert
+void __cxa_start(void);
+void __cxa_atexit(void);
+// cmdlineinsights:-edu-show-cfront
+
+int __main(void)
+{
+  _Static_assert(sizeof(int) != 0);
+  _Static_assert(sizeof(int) != 0, "Just a test");
+  int * p = NULL;
+  typedef int myInt;
+  
+  return 0;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

@@ -13,7 +13,6 @@ int main()
   } catch(...) {
     return -3;
   }
-  ;
   return 0;
 }
 

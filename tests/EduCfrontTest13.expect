@@ -1,0 +1,121 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+void* malloc(unsigned int);
+extern "C" void free(void*);
+extern "C" void* __cxa_vec_new(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));
+extern "C" void* __cxa_vec_ctor(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));
+// cmdlineinsights:-edu-show-cfront
+
+#include <cstdio>
+
+typedef struct A
+{
+  char __dummy;
+} A;
+
+
+
+typedef struct B
+{
+  char __dummy;
+} B;
+
+
+
+typedef struct C
+{
+  char __dummy;
+} C;
+
+inline C * Constructor_C(C * __this, int)
+{
+  return __this;
+}
+
+
+
+typedef struct D
+{
+  int x;
+} D;
+
+inline D * Constructor_D(D * __this)
+{
+  return __this;
+}
+
+
+
+typedef struct E
+{
+  int x;
+} E;
+
+inline void Destructor_E(E * __this)
+{
+}
+
+inline E * Constructor_E(E * __this)
+{
+  return __this;
+}
+
+
+
+int __main(void)
+{
+  A avec[4];
+  A * a = (A *)malloc(sizeof(A) * 2);
+  C * c = (C *)__cxa_vec_new(malloc(sizeof(C) * 2), sizeof(C), 2, 0, (void *(*)(void *))Constructor_C, (void *(*)(void *))NULL);
+  C * c2 = Constructor_C((C *)malloc(sizeof(C)), 3);
+  D dvec[5];
+  __cxa_vec_ctor(dvec, sizeof(D), 5, 0, (void *(*)(void *))Constructor_D, (void *(*)(void *))NULL);
+  E e;
+  ;
+  E * ep = Constructor_E((E *)malloc(sizeof(E)));
+  if(a) {
+    free(a);
+  } 
+  
+  if(c) {
+    free(c);
+  } 
+  
+  if(c2) {
+    free(c2);
+  } 
+  
+  if(ep) {
+    Destructor_E(ep);
+    free(ep);
+  } 
+  
+  return 0;
+  Destructor_E(&e);
+  /* dvec // lifetime ends here */
+  /* avec // lifetime ends here */
+  ;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+  ;
+}
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

@@ -1,0 +1,27 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+// cmdlineinsights:-edu-show-lifetime
+
+struct Test
+{
+  inline ~Test() noexcept
+  {
+  }
+  
+  // inline constexpr Test() noexcept = default;
+};
+
+
+
+void Basic()
+{
+  Test t[2];
+  int x = {2};
+  ++x;
+  /* x // lifetime ends here */
+  t[0].~Test();
+  t[1].~Test();
+}
+
