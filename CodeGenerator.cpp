@@ -90,10 +90,14 @@ static std::string AccessToStringWithColon(const AccessSpecifier& access)
 
 using namespace asthelpers;
 
-static std::string_view GetCastName(const CastKind castKind)
+static std::string_view GetCastName(const CastKind castKind, bool constnessChange = false)
 {
     if(is{castKind}.any_of(CastKind::CK_BitCast, CastKind::CK_IntegralToPointer, CastKind::CK_PointerToIntegral)) {
         return kwReinterpretCast;
+    }
+
+    if((CastKind::CK_NoOp == castKind) and constnessChange) {
+        return "const_cast"sv;
     }
 
     return kwStaticCast;
@@ -2482,11 +2486,26 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
 }
 //-----------------------------------------------------------------------------
 
+static bool IsConstQualifiedType(QualType type)
+{
+    if(not type.isNull()) {
+        if(auto* typePtr = type.getTypePtrOrNull()) {
+            if(auto pointee = typePtr->getPointeeType(); not pointee.isNull()) {
+                return pointee.isConstQualified();
+            }
+        }
+    }
+
+    return false;
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CStyleCastExpr* stmt)
 {
     const auto     castKind     = stmt->getCastKind();
-    const auto     castName     = GetCastName(castKind);
     const QualType castDestType = stmt->getType().getCanonicalType();
+    const auto     castName     = GetCastName(
+        castKind, IsConstQualifiedType(castDestType) != IsConstQualifiedType(stmt->getSubExpr()->getType()));
 
     FormatCast(castName, castDestType, stmt->getSubExpr(), castKind);
 }
