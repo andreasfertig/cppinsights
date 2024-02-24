@@ -64,9 +64,7 @@ int __main(void)
   } 
   
   B b1;
-  ;
   B b2;
-  ;
   return 0;
   /* b2 // lifetime ends here */
   /* b1 // lifetime ends here */

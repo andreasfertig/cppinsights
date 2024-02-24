@@ -863,6 +863,8 @@ void CfrontCodeGenerator::InsertArg(const CXXConstructExpr* stmt)
             // InsertArg(Ref(vd));
         }
 
+        mInsertSemi = false;
+
     } else if(tmpObjectExpr) {
         auto* varNameRef = Ref(mkVarDeclRefExpr(GetName(*tmpObjectExpr), stmt->getType()));
 
