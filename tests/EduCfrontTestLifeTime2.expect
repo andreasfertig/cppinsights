@@ -54,7 +54,6 @@ void FunFun(Test t, Test tt)
 int FunFunInt(Test t, Test tt)
 {
   Test t3;
-  ;
   return 3;
   Destructor_Test(&t3);
   Destructor_Test(&tt);

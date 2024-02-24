@@ -75,7 +75,6 @@ int __main(void)
   D dvec[5];
   __cxa_vec_ctor(dvec, sizeof(D), 5, 0, (void *(*)(void *))Constructor_D, (void *(*)(void *))NULL);
   E e;
-  ;
   E * ep = Constructor_E((E *)malloc(sizeof(E)));
   if(a) {
     free(a);

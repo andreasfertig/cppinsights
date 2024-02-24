@@ -35,7 +35,6 @@ inline void Destructor_Apple(Apple * __this)
 int __main(void)
 {
   Apple f;
-  ;
   alignas(Apple) char buffer[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
   Apple * b = Constructor_Apple((Apple *)(void *)buffer, 4, 5);
   printf("Created\n");

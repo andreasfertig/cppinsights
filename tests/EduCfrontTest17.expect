@@ -32,7 +32,6 @@ typedef struct Foo
 int __main(void)
 {
   Foo<int> f;
-  ;
   return 0;
   /* f // lifetime ends here */
   ;

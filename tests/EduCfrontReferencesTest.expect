@@ -34,7 +34,6 @@ int __main(void)
   i = i + 2;
   Fun(&i);
   A a;
-  ;
   return 0;
   /* a // lifetime ends here */
   /* f // lifetime ends here */

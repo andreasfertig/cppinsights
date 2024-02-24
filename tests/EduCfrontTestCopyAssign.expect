@@ -45,9 +45,7 @@ inline Apple * operatorEqual(Apple * __this, const Apple * __rhs)
 int __main(void)
 {
   Apple a;
-  ;
   Apple b;
-  ;
   operatorEqual(&b, &a);
   return 0;
   Destructor_Apple(&b);

@@ -18,7 +18,6 @@ struct Far;
 int __main(void)
 {
   Foo f;
-  ;
   return 0;
   /* f // lifetime ends here */
   ;
