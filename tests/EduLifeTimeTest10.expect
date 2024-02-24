@@ -33,7 +33,6 @@ Vector createStrings2()
   /* __temporary19_58 // lifetime ends here */
   return Vector(static_cast<Vector &&>(v));
   /* v // lifetime ends here */
-  ;
 }
 
 void test()
@@ -41,5 +40,4 @@ void test()
   const char *const __temporary26_54[6] = {"This", "is", "a", "vector", "of", "strings"};
   Fun(Vector{std::initializer_list<const char *>{__temporary26_54, 6}});
   /* __temporary26_54 // lifetime ends here */
-  ;
 }

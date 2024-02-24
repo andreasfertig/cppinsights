@@ -31,7 +31,6 @@ inline list items(const Keeper * __this)
   list __temporary17_33;
   return __temporary17_33;
   /* __temporary17_33 // lifetime ends here */
-  ;
 }
 
 
@@ -40,7 +39,6 @@ Keeper get(void)
   Keeper __temporary22_13 = {'\0', '\0', '\0', '\0', '\0'};
   return __temporary22_13;
   /* __temporary22_13 // lifetime ends here */
-  ;
 }
 
 int __main(void)
@@ -67,7 +65,6 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  ;
 }
 
 void __cxa_start(void)

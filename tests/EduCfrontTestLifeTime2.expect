@@ -34,7 +34,6 @@ inline Data get(Test * __this)
   Data __temporary13_26;
   return __temporary13_26;
   Destructor_Data(&__temporary13_26);
-  ;
 }
 
 
@@ -51,7 +50,6 @@ int FunFunInt(Test t, Test tt)
   Test t3;
   return 3;
   Destructor_Test(&t3);
-  ;
 }
 
 void Fin(int)
@@ -63,13 +61,11 @@ void Basic(void)
   Test __temporary31_15;
   Fun(*Constructor_Test((Test *)&__temporary31_15, 4));
   Destructor_Test(&__temporary31_15);
-  ;
   Test __temporary33_18;
   Test __temporary33_27;
   FunFun(*Constructor_Test((Test *)&__temporary33_18, 2), *Constructor_Test((Test *)&__temporary33_27, 3));
   Destructor_Test(&__temporary33_27);
   Destructor_Test(&__temporary33_18);
-  ;
 }
 
 void Advanced(void)
@@ -79,7 +75,6 @@ void Advanced(void)
   Fin(FunFunInt(*Constructor_Test((Test *)&__temporary38_25, 2), *Constructor_Test((Test *)&__temporary38_34, 3)));
   Destructor_Test(&__temporary38_34);
   Destructor_Test(&__temporary38_25);
-  ;
 }
 
 void WithVar(void)
@@ -95,7 +90,6 @@ int __main(void)
   Data * d = &get(Constructor_Test((Test *)&__temporary48_22, 4));
   return 0;
   Destructor_Test(&__temporary48_22);
-  ;
 }
 
 int main(void)
@@ -110,7 +104,6 @@ int main(void)
   Destructor_Test(&tt);
   Destructor_Test(&t);
   Destructor_Test(&t);
-  ;
 }
 
 void __cxa_start(void)
