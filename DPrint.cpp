@@ -16,23 +16,24 @@
 
 namespace clang::insights {
 
-static void ToDo(const char* name, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
+static void ToDo(std::string_view name, OutputFormatHelper& outputFormatHelper, std::source_location loc)
 {
-    const auto fileName = [&]() {
-        if(llvm::sys::path::is_separator(file[0])) {
-            return std::string_view{llvm::sys::path::filename(file)};
+    const auto fileName = [&]() -> std::string_view {
+        if(llvm::sys::path::is_separator(loc.file_name()[0])) {
+            return llvm::sys::path::filename(loc.file_name());
         }
 
-        return file;
+        return loc.file_name();
     }();
 
-    outputFormatHelper.Append("/* INSIGHTS-TODO: "sv, fileName, ":"sv, line, " stmt: "sv, name, kwSpaceCCommentEnd);
+    outputFormatHelper.Append(
+        "/* INSIGHTS-TODO: "sv, fileName, ":"sv, loc.line(), " stmt: "sv, name, kwSpaceCCommentEnd);
 }
 //-----------------------------------------------------------------------------
 
-void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
+void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, std::source_location loc)
 {
-    const char* name = [&]() {
+    const std::string_view name = [&]() {
         if(stmt and stmt->getStmtClassName()) {
             Dump(stmt);
 
@@ -44,13 +45,13 @@ void ToDo(const Stmt* stmt, OutputFormatHelper& outputFormatHelper, std::string_
         return "";
     }();
 
-    ToDo(name, outputFormatHelper, file, line);
+    ToDo(name, outputFormatHelper, loc);
 }
 //-----------------------------------------------------------------------------
 
-void ToDo(const Decl* stmt, OutputFormatHelper& outputFormatHelper, std::string_view file, const int line)
+void ToDo(const Decl* stmt, OutputFormatHelper& outputFormatHelper, std::source_location loc)
 {
-    const char* name = [&]() {
+    const std::string_view name = [&]() {
         if(stmt and stmt->getDeclKindName()) {
             Dump(stmt);
             return stmt->getDeclKindName();
@@ -61,7 +62,15 @@ void ToDo(const Decl* stmt, OutputFormatHelper& outputFormatHelper, std::string_
         return "";
     }();
 
-    ToDo(name, outputFormatHelper, file, line);
+    ToDo(name, outputFormatHelper, loc);
+}
+//-----------------------------------------------------------------------------
+
+void ToDo(const class TemplateArgument& stmt, class OutputFormatHelper& outputFormatHelper, std::source_location loc)
+{
+    const std::string_view name{StrCat("tmplArgKind: ", stmt.getKind())};
+
+    ToDo(name, outputFormatHelper, loc);
 }
 //-----------------------------------------------------------------------------
 

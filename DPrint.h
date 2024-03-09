@@ -8,6 +8,8 @@
 #ifndef INSIGHTS_DPRINT_H
 #define INSIGHTS_DPRINT_H
 
+#include <source_location>
+
 #include "InsightsStrCat.h"
 //-----------------------------------------------------------------------------
 
@@ -118,13 +120,19 @@ inline void Error(const Stmt* stmt, const char* fmt, const auto&... args)
 //-----------------------------------------------------------------------------
 
 /// \brief Helper function to generate TODO comments for an unsupported \ref Stmt.
-void ToDo(const class Stmt* stmt, class OutputFormatHelper& outputFormatHelper, std::string_view file, const int line);
+void ToDo(const class Stmt*         stmt,
+          class OutputFormatHelper& outputFormatHelper,
+          std::source_location      loc = std::source_location::current());
 /// \brief Helper function to generate TODO comments for an unsupported \ref Decl.
-void ToDo(const class Decl* stmt, class OutputFormatHelper& outputFormatHelper, std::string_view file, const int line);
+void ToDo(const class Decl*         stmt,
+          class OutputFormatHelper& outputFormatHelper,
+          std::source_location      loc = std::source_location::current());
 //-----------------------------------------------------------------------------
-
-/// \brief Convenience marco to get file-name and line-number for better analysis.
-#define TODO(stmt, outputFormatHelper) ToDo(stmt, outputFormatHelper, __FILE__, __LINE__)
+/// \brief Helper function to generate TODO comments for an unsupported \ref TemplateArgument.
+void ToDo(const class TemplateArgument& stmt,
+          class OutputFormatHelper&     outputFormatHelper,
+          std::source_location          loc = std::source_location::current());
+//-----------------------------------------------------------------------------
 
 }  // namespace clang::insights
 
