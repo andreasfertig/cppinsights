@@ -30,7 +30,7 @@ Singleton& Singleton::Instance()
   return singleton;
 }
 
-
+#if 0
 class Bingleton
 {
 public:
@@ -68,4 +68,4 @@ int main()
 
     };
 }
-
+#endif

@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-// Example taken from Nicolai Josuttis slides
 template<auto sep = ' ', typename T1, typename ... Types>
 void print(const T1 & arg1, const Types &... args)
 {
@@ -28,7 +27,6 @@ void print(const T1 & arg1, const Types &... args)
   auto coutSpaceAndArg = __lambda_11_28{};
   (... , coutSpaceAndArg(args));
 }
-
 
 /* First instantiated from: TemplatesWithAutoAndLambdaTest.cpp:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -84,4 +82,3 @@ int main()
   print("hi", 7.5, str);
   return 0;
 }
-

@@ -20,7 +20,6 @@ struct Movable
 };
 
 
-
 int main()
 {
   Movable m = Movable();
@@ -70,4 +69,3 @@ int main()
   bun.operator()();
   return 0;
 }
-

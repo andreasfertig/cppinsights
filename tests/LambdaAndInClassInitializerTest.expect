@@ -1,4 +1,3 @@
-// std::function mock up
 template<typename ReturnValue, typename ... Args>
 class function
 {
@@ -51,8 +50,6 @@ class function<void ()>
 
 #endif
 
-
-// part of #205
 class EventContainer
 {
   
@@ -84,10 +81,8 @@ class EventContainer
 };
 
 
-
 int main()
 {
   EventContainer e = EventContainer();
   return 0;
 }
-

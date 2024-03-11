@@ -1,4 +1,3 @@
-// cmdlineinsights:-edu-show-initlist
 #include <initializer_list>
 
 int main(int argc, const char **)
@@ -54,6 +53,3 @@ int main(int argc, const char **)
   std::initializer_list<int> l2 = lamb2.operator()();
   return 0;
 }
-
-
-

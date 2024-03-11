@@ -2,11 +2,8 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++2a
-// cmdlineinsights:-edu-show-coroutine-transformation
-
 #include <coroutine>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 #include <utility>
 
@@ -137,12 +134,13 @@ struct generator<int>
 
 #endif
 
-
-template <typename T>
-generator<T> seq() {
-  for (T i = {};; ++i) {
+template<typename T>
+generator<T> seq()
+{
+  for(T i = {}; ; ++i) {
     co_yield i;
   }
+  
 }
 
 struct __seq_intFrame
@@ -259,11 +257,8 @@ void __seq_intDestroy(__seq_intFrame * __f)
 #endif
 
 
-
 int main()
 {
   generator<int> s = seq<int>();
   return 0;
 }
-
-

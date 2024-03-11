@@ -1,5 +1,3 @@
-// cmdline:-std=c++11
-
 #define INSIGHTS_USE_TEMPLATE
 
 struct Other
@@ -10,8 +8,6 @@ struct Other
   }
   
 };
-
-
 
 
 template<typename T>
@@ -43,11 +39,9 @@ struct Test<Other>
 
 #endif
 
-
 int main()
 {
   Test<Other> t = {};
   t.fun<double, int, double>(&Other::Callback);
   return 0;
 }
-

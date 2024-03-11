@@ -6,4 +6,3 @@ int main()
   char & y = __p4[1];
   return 0;
 }
-

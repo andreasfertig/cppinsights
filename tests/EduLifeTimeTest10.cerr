@@ -1,19 +1,19 @@
-.tmp.cpp:28:53: error: cannot initialize an array element of type 'const char *const' with an lvalue of type 'const char *const[6]'
-   28 |   return Vector{std::initializer_list<const char *>{__temporary14_57, 6}};
+.tmp.cpp:24:53: error: cannot initialize an array element of type 'const char *const' with an lvalue of type 'const char *const[6]'
+   24 |   return Vector{std::initializer_list<const char *>{__temporary14_57, 6}};
       |                                                     ^~~~~~~~~~~~~~~~
-.tmp.cpp:28:71: error: cannot initialize an array element of type 'const char *const' with an rvalue of type 'int'
-   28 |   return Vector{std::initializer_list<const char *>{__temporary14_57, 6}};
+.tmp.cpp:24:71: error: cannot initialize an array element of type 'const char *const' with an rvalue of type 'int'
+   24 |   return Vector{std::initializer_list<const char *>{__temporary14_57, 6}};
       |                                                                       ^
-.tmp.cpp:37:57: error: cannot initialize an array element of type 'const char *const' with an lvalue of type 'const char *const[6]'
-   37 |   Vector v = Vector{std::initializer_list<const char *>{__temporary19_58, 6}} /* NRVO variable */;
+.tmp.cpp:32:57: error: cannot initialize an array element of type 'const char *const' with an lvalue of type 'const char *const[6]'
+   32 |   Vector v = Vector{std::initializer_list<const char *>{__temporary19_58, 6}} /* NRVO variable */;
       |                                                         ^~~~~~~~~~~~~~~~
-.tmp.cpp:37:75: error: cannot initialize an array element of type 'const char *const' with an rvalue of type 'int'
-   37 |   Vector v = Vector{std::initializer_list<const char *>{__temporary19_58, 6}} /* NRVO variable */;
+.tmp.cpp:32:75: error: cannot initialize an array element of type 'const char *const' with an rvalue of type 'int'
+   32 |   Vector v = Vector{std::initializer_list<const char *>{__temporary19_58, 6}} /* NRVO variable */;
       |                                                                           ^
-.tmp.cpp:48:50: error: cannot initialize an array element of type 'const char *const' with an lvalue of type 'const char *const[6]'
-   48 |   Fun(Vector{std::initializer_list<const char *>{__temporary26_54, 6}});
+.tmp.cpp:42:50: error: cannot initialize an array element of type 'const char *const' with an lvalue of type 'const char *const[6]'
+   42 |   Fun(Vector{std::initializer_list<const char *>{__temporary26_54, 6}});
       |                                                  ^~~~~~~~~~~~~~~~
-.tmp.cpp:48:68: error: cannot initialize an array element of type 'const char *const' with an rvalue of type 'int'
-   48 |   Fun(Vector{std::initializer_list<const char *>{__temporary26_54, 6}});
+.tmp.cpp:42:68: error: cannot initialize an array element of type 'const char *const' with an rvalue of type 'int'
+   42 |   Fun(Vector{std::initializer_list<const char *>{__temporary26_54, 6}});
       |                                                                    ^
 6 errors generated.

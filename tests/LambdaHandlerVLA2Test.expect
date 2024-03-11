@@ -24,10 +24,8 @@ void Test(int n)
   __lambda_6_5.operator()(1, 2);
 }
 
-
 int main()
 {
   Test(2);
   return 0;
 }
-

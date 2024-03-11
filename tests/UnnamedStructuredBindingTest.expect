@@ -1,12 +1,10 @@
 using X = void (*)();
 
-
 struct RET
 {
   X x;
   int r;
 };
-
 
 
 int main()
@@ -16,5 +14,3 @@ int main()
   const int & e = __11.r;
   return 0;
 }
-
-

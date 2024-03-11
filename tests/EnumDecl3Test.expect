@@ -1,6 +1,5 @@
 #include <cstdio>
 
-
 int main()
 {
   enum struct Colour : int
@@ -13,4 +12,3 @@ int main()
   printf("%d %d %d\n", Colour::red, Colour::green, Colour::blue);
   return 0;
 }
-

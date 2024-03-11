@@ -4,4 +4,3 @@ struct Point
   int y:4;
 };
 
-

@@ -2,8 +2,6 @@
  * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
  * buggy.                                                                            *
  *************************************************************************************/
-// cmdlineinsights:-edu-show-lifetime
-
 #include <vector>
 
 struct Keeper
@@ -18,12 +16,10 @@ struct Keeper
 };
 
 
-
 Keeper get()
 {
   return {std::vector<int, std::allocator<int> >{}};
 }
-
 
 int main()
 {
@@ -45,4 +41,3 @@ int main()
   }
   return 0;
 }
-

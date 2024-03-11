@@ -1,4 +1,4 @@
- class Point
+class Point
 {
   
   public: 
@@ -36,14 +36,9 @@
 };
 
 
-
-
-
 int main()
 {
   constexpr const Point p = Point{2.0, 3.0};
   constexpr const double x = static_cast<const double>(2.0F);
   return static_cast<int>(p.GetX());
 }
-
-

@@ -13,13 +13,10 @@ struct FunctionArgs<int (__lambda_12_14::*)(int, int) const>
 
 #endif
 
-
 template<typename R, typename C, typename ... Args>
 struct FunctionArgs<R (C::*)(Args...) const>
 {
 };
-
-
 
 
 int main()
@@ -49,4 +46,3 @@ int main()
   FunctionArgs<int (__lambda_12_14::*)(int, int) const> a;
   return 0;
 }
-

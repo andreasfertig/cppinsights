@@ -8,10 +8,8 @@ namespace NamespaceAndOutOfNamespaceClassTemplateSpecializationTest
   
 }
 
-// Declare the specialization outside of the namespace with a namespace specifier
 template<>
 struct NamespaceAndOutOfNamespaceClassTemplateSpecializationTest::Base<int>
 {
 };
-
 

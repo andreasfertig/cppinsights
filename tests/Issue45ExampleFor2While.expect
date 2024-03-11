@@ -1,4 +1,3 @@
-// cmdlineinsights:-alt-syntax-for
 int main()
 {
   int x = 0;
@@ -64,4 +63,3 @@ int main()
   }
   return 0;
 }
-

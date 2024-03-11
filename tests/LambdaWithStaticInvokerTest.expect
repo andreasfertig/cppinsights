@@ -1,5 +1,3 @@
-// cmdline:-std=c++20
-
 void NoParams()
 {
     
@@ -36,7 +34,6 @@ void NoParams()
 }
 
 
-
 class __lambda_14_20
 {
   public: 
@@ -66,13 +63,11 @@ class __lambda_14_20
 
 __lambda_14_20 lWithParams = __lambda_14_20{};
 
-
 void WithParams()
 {
   bool res = (6 == lWithParams.operator()(2, 3));
   bool res2 = (7 == (+lWithParams.operator __lambda_14_20::retType_14_20())(2, 3));
 }
-
 
 
 class __lambda_25_16
@@ -126,13 +121,11 @@ class __lambda_25_16
 
 __lambda_25_16 glambda = __lambda_25_16{};
 
-
 void WithParamsGeneric()
 {
   using FuncPtr_29 = int (*)(int);
   FuncPtr_29 fp = glambda.operator __lambda_25_16::retType_25_16();
 }
-
 
 
 class __lambda_32_27
@@ -198,7 +191,6 @@ class __lambda_32_27
 
 __lambda_32_27 lWithParamsAndNTTP = __lambda_32_27{};
 
-
 void WithParamsAndNTTP()
 {
   int res = lWithParamsAndNTTP.operator()<1, 0>(2, 3);
@@ -206,12 +198,9 @@ void WithParamsAndNTTP()
   FuncPtr_41 fp = lWithParamsAndNTTP.operator __lambda_32_27::retType_32_27();
 }
 
-
 int main()
 {
   NoParams();
   WithParams();
   return 0;
 }
-
-

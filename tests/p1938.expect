@@ -1,10 +1,7 @@
-// cmdline:-std=c++2b
-
 inline consteval int f(int i)
 {
   return static_cast<int &&>(i);
 }
-
 
 inline constexpr int g(int i)
 {
@@ -16,8 +13,6 @@ inline constexpr int g(int i)
   
 }
 
-
-
 inline constexpr int Fun(int i)
 {
   if ! consteval {
@@ -28,9 +23,7 @@ inline constexpr int Fun(int i)
   
 }
 
-
 inline consteval int h(int i)
 {
   return f(i) + Fun(i);
 }
-

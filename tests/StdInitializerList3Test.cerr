@@ -1,10 +1,10 @@
-.tmp.cpp:20:38: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[3]'
-   20 |   : v{Foo{std::initializer_list<int>{__list15_10, 3}}}
+.tmp.cpp:18:38: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[3]'
+   18 |   : v{Foo{std::initializer_list<int>{__list15_10, 3}}}
       |                                      ^~~~~~~~~~~
-.tmp.cpp:36:38: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[2]'
-   36 |   : v{Foo{std::initializer_list<int>{__list23_8, 2}}}
+.tmp.cpp:32:38: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[2]'
+   32 |   : v{Foo{std::initializer_list<int>{__list23_8, 2}}}
       |                                      ^~~~~~~~~~
-.tmp.cpp:52:38: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[2]'
-   52 |   : v{Foo{std::initializer_list<int>{__list34_8, 2}}}
+.tmp.cpp:47:38: error: cannot initialize an array element of type 'const int' with an lvalue of type 'const int[2]'
+   47 |   : v{Foo{std::initializer_list<int>{__list34_8, 2}}}
       |                                      ^~~~~~~~~~
 3 errors generated.

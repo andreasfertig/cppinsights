@@ -3,7 +3,6 @@
 
 static const char c[12] = "Hello World";
 
-
 template<auto C>
 struct SC
 {
@@ -29,12 +28,9 @@ struct SC<&c>
 
 #endif
 
-
 int main()
 {
   SC<&c> sc;
   sc.Print();
   return 0;
 }
-
-

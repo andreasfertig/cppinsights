@@ -1,5 +1,3 @@
-// cmdline:-std=c++2a
-
 #include <cstdio>
 #include <type_traits>
 
@@ -91,5 +89,3 @@ int main()
   p0892::Fun(p0892::wrapper<p0892::A>(static_cast<p0892::A>(p0892::A(p0892::B{}))));
   return 0;
 }
-
-

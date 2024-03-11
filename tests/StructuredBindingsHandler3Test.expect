@@ -1,7 +1,5 @@
-//#include <tuple>
 using size_t = unsigned long;
 
-// Without this the compiler does not know a symbol tuple_size and hence can/will not decompose
 namespace std
 {
   template<typename T>
@@ -40,8 +38,7 @@ namespace std
   
   #endif
   
-} // expected-note 2{{here}}
-
+}
 
 namespace constant
 {
@@ -88,19 +85,18 @@ namespace constant
   
   
 }
+
 template<>
 struct std::tuple_size<constant::Q>
 {
   static const int value = 3;
 };
 
-
 template<unsigned long N>
 struct std::tuple_element<N, constant::Q>
 {
   using type = int;
 };
-
 
 namespace constant
 {

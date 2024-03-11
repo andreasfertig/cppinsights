@@ -13,12 +13,9 @@ enum class Color : int
 };
 
 
-
 int main()
 {
   Test::Fun();
   Color cl = Color::Red;
   return 0;
 }
-
-

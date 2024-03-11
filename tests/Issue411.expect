@@ -15,8 +15,6 @@ namespace ns
   
 }
 
-
-
 template<>
 struct ns::foo<double>
 {
@@ -24,10 +22,7 @@ struct ns::foo<double>
 };
 
 
-   // [2]
-
 int main()
 {
   return 0;
 }
-

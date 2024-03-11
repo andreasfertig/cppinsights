@@ -6,12 +6,9 @@ struct C
 };
 
 
-
 int main()
 {
   int i;
   C c = {i};
   return 0;
 }
-
-

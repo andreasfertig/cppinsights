@@ -1,14 +1,13 @@
-// cmdline:-std=c++20
-
 #include <concepts>
 
-auto foo(auto x)
+template<class type_parameter_0_0>
+auto foo(type_parameter_0_0 x)
 {
-   if constexpr (std::same_as<int, decltype(x)>)
-   {
-      return 1;
-   }
-   return 2;
+  if constexpr(std::same_as<int, decltype(x)>) {
+    return 1;
+  } 
+  
+  return 2;
 }
 
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -42,4 +41,3 @@ int main()
   foo(1.0);
   return 0;
 }
-

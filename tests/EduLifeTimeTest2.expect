@@ -2,8 +2,6 @@
  * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
  * buggy.                                                                            *
  *************************************************************************************/
-// cmdlineinsights:-edu-show-lifetime
-
 struct Data
 {
   inline ~Data() noexcept
@@ -11,7 +9,6 @@ struct Data
   }
   
 };
-
 
 
 struct Test
@@ -32,32 +29,25 @@ struct Test
 };
 
 
-
 void Fun(Test t)
 {
 }
 
-
 void FunFun(Test t, Test tt)
 {
 }
-
 
 int FunFunInt(Test t, Test tt)
 {
   Test t3 = Test{9};
   return 13;
   t3.~Test();
-  tt.~Test();
-  t.~Test();
   ;
 }
-
 
 void Fin(int)
 {
 }
-
 
 void Basic()
 {
@@ -73,7 +63,6 @@ void Basic()
   ;
 }
 
-
 void Advanced()
 {
   Test __temporary38_25 = Test{2};
@@ -84,14 +73,12 @@ void Advanced()
   ;
 }
 
-
 void WithVar()
 {
   Test __temporary43_22 = Test{5};
   Data && d = static_cast<Data &&>(__temporary43_22.get());
   __temporary43_22.~Test();
 }
-
 
 int main()
 {
@@ -101,4 +88,3 @@ int main()
   __temporary48_22.~Test();
   ;
 }
-

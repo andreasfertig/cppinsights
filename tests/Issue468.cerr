@@ -1,7 +1,7 @@
-.tmp.cpp:12:24: error: 'auto' not allowed in type alias
-   12 |   using retType_3_29 = auto (*)();
+.tmp.cpp:10:24: error: 'auto' not allowed in type alias
+   10 |   using retType_3_29 = auto (*)();
       |                        ^~~~
-.tmp.cpp:13:29: error: unknown type name 'retType_3_29'
-   13 |   inline constexpr operator retType_3_29 () const noexcept
+.tmp.cpp:11:29: error: unknown type name 'retType_3_29'
+   11 |   inline constexpr operator retType_3_29 () const noexcept
       |                             ^
 2 errors generated.

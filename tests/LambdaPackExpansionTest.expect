@@ -6,7 +6,6 @@ int g(Args...)
   return 1;
 }
 
-
 /* First instantiated from: LambdaPackExpansionTest.cpp:19 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -16,14 +15,6 @@ int g<int, int, int, int, int>(int __0, int __1, int __2, int __3, int __4)
 }
 #endif
 
-
-#if 0
-template<class... Args>
-void f(Args... args) {
-    auto lm = [&] { return g(args...); };
-    lm();
-}
-#endif
 
 template<class ... Args>
 void f2(Args... args)
@@ -50,7 +41,6 @@ void f2(Args... args)
   auto lm = __lambda_19_15{args};
   lm();
 }
-
 
 /* First instantiated from: LambdaPackExpansionTest.cpp:26 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -95,4 +85,3 @@ int main()
   f2(1, 2, 3, 4, 5);
   return 0;
 }
-

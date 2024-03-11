@@ -10,16 +10,17 @@ class X
 };
 
 
-
 X::X(int ii)
 {
-    i = ii;
+  this->i = ii;
 }
+
 
 void X::modify()
 {
-    i++;
+  this->i++;
 }
+
 
 int main()
 {
@@ -27,4 +28,3 @@ int main()
   x.modify();
   return 0;
 }
-

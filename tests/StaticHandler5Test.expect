@@ -1,11 +1,10 @@
 #include <new> // for thread-safe static's placement new
 #include <stdint.h> // for uint64_t under Linux/GCC
-// cmdline:-std=c++98
+
 void X()
 {
   throw ;
 }
-
 
 class Sing
 {
@@ -17,7 +16,6 @@ class Sing
   }
   
 };
-
 
 
 Sing & Test()
@@ -32,4 +30,3 @@ Sing & Test()
   
   return *reinterpret_cast<Sing*>(__s);
 }
-

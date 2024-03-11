@@ -1,4 +1,3 @@
-// https://mbevin.wordpress.com/2012/11/14/range-based-for/
 class MyArrayWrapper
 {
   int * data;
@@ -19,8 +18,6 @@ class MyArrayWrapper
 };
 
 
-
-
 int main()
 {
   MyArrayWrapper arr;
@@ -35,4 +32,3 @@ int main()
   }
   return 0;
 }
-

@@ -1,19 +1,12 @@
 #include <tuple>
 
 std::tuple<int, int> tup = std::tuple<int, int>{2, 5};
-
 std::tuple<int, int> __tup4 = std::tuple<int, int>(tup);
 int && a1 = std::get<0UL>(static_cast<std::tuple<int, int> &&>(__tup4));
 int && b1 = std::get<1UL>(static_cast<std::tuple<int, int> &&>(__tup4));
 
-
-
 int i = 5;
-
 std::tuple<int, int &> tup2 = std::tuple<int, int &>{2, i};
-
 std::tuple<int, int &> __tup29 = std::tuple<int, int &>(tup2);
 int && a2 = std::get<0UL>(static_cast<std::tuple<int, int &> &&>(__tup29));
 int & b2 = std::get<1UL>(static_cast<std::tuple<int, int &> &&>(__tup29));
-
-

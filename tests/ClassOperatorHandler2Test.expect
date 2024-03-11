@@ -10,7 +10,6 @@ void f(int &)
   std::operator<<(std::operator<<(std::operator<<(std::operator<<(std::cout, "bello"), "&\n"), "world"), "\n");
 }
 
-
 class Foo
 {
   
@@ -67,7 +66,6 @@ class Foo
   // inline constexpr Foo(const Foo &) noexcept = default;
   // inline constexpr Foo(Foo &&) noexcept = default;
 };
-
 
 
 int main()
@@ -142,4 +140,3 @@ int main()
   printf("%d\n", f.Get());
   return 0;
 }
-

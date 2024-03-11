@@ -69,7 +69,6 @@ class Test
 };
 
 
-
 class Fest
 {
   
@@ -94,8 +93,6 @@ class Fest
   int mX;
   public: 
 };
-
-
 
 
 namespace Hello
@@ -140,13 +137,13 @@ namespace Hello
     static Fest sF = Fest{3};
     
   }
+  
 }
 
 inline bool operator<(const Fest & LHS, const Fest & RHS)
 {
   return LHS.Get() < RHS.Get();
 }
-
 
 int main()
 {
@@ -189,4 +186,3 @@ int main()
   Hello::Bello::sF.operator<<(Hello::Bello::sF).operator<<(Hello::Bello::sF);
   return 0;
 }
-

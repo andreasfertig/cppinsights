@@ -33,8 +33,6 @@ struct A
 };
 
 
-
-
 struct B
 {
   inline B()
@@ -81,18 +79,15 @@ struct B
 };
 
 
-
 int * begin(A & v)
 {
   return &v.v[0];
 }
 
-
 int * end(A & v)
 {
   return &v.v[10];
 }
-
 
 int main()
 {
@@ -154,4 +149,3 @@ int main()
   }
   return 0;
 }
-

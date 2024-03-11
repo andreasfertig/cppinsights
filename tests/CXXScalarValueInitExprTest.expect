@@ -6,7 +6,6 @@ T create(Args &&... args)
   return T(std::forward<Args>(args)... );
 }
 
-
 /* First instantiated from: CXXScalarValueInitExprTest.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -22,5 +21,3 @@ int main()
   double doub = create<double>();
   return 0;
 }
-
-

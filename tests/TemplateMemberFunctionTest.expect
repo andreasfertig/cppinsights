@@ -53,7 +53,6 @@ class Foo
 };
 
 
-
 int main()
 {
   Foo f;
@@ -134,4 +133,3 @@ int main()
   f.DoBar<1, 116>(__lambda_37_21{});
   return 0;
 }
-

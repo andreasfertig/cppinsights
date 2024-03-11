@@ -4,9 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
-
-// cmdlineinsights:-edu-show-lifetime
 
 typedef struct list
 {
@@ -24,7 +21,6 @@ inline char * end(list * __this)
 }
 
 
-
 typedef struct Keeper
 {
   list data;
@@ -39,7 +35,6 @@ inline list items(const Keeper * __this)
 }
 
 
-
 Keeper get(void)
 {
   Keeper __temporary22_13 = {'\0', '\0', '\0', '\0', '\0'};
@@ -47,7 +42,6 @@ Keeper get(void)
   /* __temporary22_13 // lifetime ends here */
   ;
 }
-
 
 int __main(void)
 {

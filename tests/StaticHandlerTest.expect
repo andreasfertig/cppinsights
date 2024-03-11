@@ -1,8 +1,9 @@
 #include <new> // for thread-safe static's placement new
 #include <stdint.h> // for uint64_t under Linux/GCC
+
 #include <cstdio>
 #include <cstring>
-#include <new> // need this for after the transformation when a placement new is used
+#include <new>
 
 class Singleton
 {
@@ -32,18 +33,24 @@ class Singleton
 };
 
 
-
-
 static size_t counter = 0;
 
-
-Singleton& Singleton::Instance()
+Singleton & Singleton::Instance()
 {
-  static Singleton singleton;
-
+  static uint64_t __singletonGuard;
+  alignas(Singleton) static char __singleton[sizeof(Singleton)];
+  
+  if(!__singletonGuard) {
+    if(__cxa_guard_acquire(&__singletonGuard)) {
+      new (&__singleton)Singleton();
+      __singletonGuard = true;
+      __cxa_guard_release(&__singletonGuard);
+    } 
+    
+  } 
+  
   static bool passed = true;
-
-  return singleton;
+  return *reinterpret_cast<Singleton*>(__singleton);
 }
 
 
@@ -73,8 +80,6 @@ class Bingleton
 };
 
 
-
-
 void B()
 {
   static uint64_t __bbGuard;
@@ -90,7 +95,6 @@ void B()
   } 
   
 }
-
 
 Bingleton * B(bool c)
 {
@@ -113,8 +117,6 @@ Bingleton * B(bool c)
   return &*reinterpret_cast<Bingleton*>(__bb);
 }
 
-
-
 Bingleton & BB(bool c)
 {
   static uint64_t __bbGuard;
@@ -136,8 +138,6 @@ Bingleton & BB(bool c)
   return *reinterpret_cast<Bingleton*>(__bb);
 }
 
-
-
 int main()
 {
   Singleton & s = Singleton::Instance();
@@ -147,4 +147,3 @@ int main()
   Bingleton & b2 = BB(true);
   return s.Get();
 }
-

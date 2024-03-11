@@ -36,4 +36,3 @@ int main()
   (+l.operator __lambda_5_14::retType_5_14())();
   return 0;
 }
-

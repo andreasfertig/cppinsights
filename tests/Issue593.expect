@@ -5,7 +5,4 @@ struct A
 };
 
 
- 
 int & ir = A().operator int &();
-
-

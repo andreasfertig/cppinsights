@@ -31,7 +31,6 @@ class Test
 };
 
 
-
 int main()
 {
   Test ti;
@@ -40,4 +39,3 @@ int main()
   tc.operator=('a');
   return 0;
 }
-

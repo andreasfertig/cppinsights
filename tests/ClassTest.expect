@@ -49,7 +49,6 @@ class Test
 };
 
 
-
 int main()
 {
   Test t = Test(2);
@@ -58,5 +57,3 @@ int main()
   t.operator+=(Test(tt.operator int() * 2));
   return 0;
 }
-
-

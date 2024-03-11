@@ -4,7 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 typedef struct Type
 {
@@ -31,7 +30,6 @@ inline Type * operatorEqual(Type * __this, const Type * __rhs)
 }
 
 
-
 typedef struct DefaultCtorType
 {
   char __dummy;
@@ -46,7 +44,6 @@ inline DefaultCtorType * operatorEqual(DefaultCtorType * __this, DefaultCtorType
 {
   return __this;
 }
-
 
 
 typedef struct Base
@@ -69,7 +66,6 @@ inline Base * Constructor_Base(Base * __this)
   Constructor_Type(&__this->mX, 5);
   return __this;
 }
-
 
 
 typedef struct BaseSecond
@@ -100,7 +96,6 @@ inline BaseSecond * Constructor_BaseSecond(BaseSecond * __this)
 }
 
 
-
 typedef struct BaseThird
 {
   Type mZ;
@@ -121,7 +116,6 @@ inline BaseThird * Constructor_BaseThird(BaseThird * __this)
   Constructor_Type(&__this->mZ, 5);
   return __this;
 }
-
 
 
 typedef struct Derived
@@ -162,7 +156,6 @@ inline Derived * Constructor_Derived(Derived * __this)
   __this->g = 4;
   return __this;
 }
-
 
 
 Derived d;

@@ -27,7 +27,6 @@ struct B
 };
 
 
- 
 template<typename T>
 struct D : public B
 {
@@ -85,9 +84,6 @@ struct D<int> : public B
 
 #endif
 
-
-
-
 namespace Test
 {
   struct Alloc
@@ -124,8 +120,11 @@ namespace Test
         
         
       }
+      
     }
+    
   }
+  
 }
 
 int main()
@@ -146,4 +145,3 @@ int main()
   using Test::Inner::Void;
   return 0;
 }
-

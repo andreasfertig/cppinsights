@@ -28,7 +28,6 @@ struct std::tuple_element<1, Point>
 };
 
 
-
 class Point
 {
   
@@ -110,7 +109,6 @@ class Point
 };
 
 
-
 int main()
 {
   Point p = Point{1, 2};
@@ -148,4 +146,3 @@ int main()
   double && dd = std::get<2UL>(static_cast<std::tuple<int, char, double> &&>(__muple82));
   return 0;
 }
-

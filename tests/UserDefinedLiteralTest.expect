@@ -1,11 +1,8 @@
 #include <chrono>
 
 using nanoseconds_t = std::chrono::duration<long long, std::ratio<1, 1000000000> >;
-
 using milliseconds_t = std::chrono::duration<long long, std::ratio<1, 1000> >;
-
 using seconds_t = std::chrono::duration<long long>;
-
 
 inline constexpr std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long long s)
 {
@@ -17,8 +14,4 @@ inline constexpr std::chrono::duration<long double, std::ratio<1, 1> > operator"
   return std::chrono::duration<long double, std::ratio<1, 1> >(s, nullptr);
 }
 
-//------------------------------------------------------------------------------
-
 static constexpr const std::chrono::duration<long long, std::ratio<1, 1> > TIMEOUT = {operator""_s(1ULL)};
-
-

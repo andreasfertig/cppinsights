@@ -1,10 +1,10 @@
-.tmp.cpp:9:5: error: templates cannot be declared inside of a local class
-    9 |     template<class type_parameter_0_0, class type_parameter_0_1>
+.tmp.cpp:7:5: error: templates cannot be declared inside of a local class
+    7 |     template<class type_parameter_0_0, class type_parameter_0_1>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:35:5: error: templates cannot be declared inside of a local class
-   35 |     template<class type_parameter_0_0, class type_parameter_0_1>
+.tmp.cpp:33:5: error: templates cannot be declared inside of a local class
+   33 |     template<class type_parameter_0_0, class type_parameter_0_1>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:53:58: error: no type named 'retType_4_28' in '__lambda_4_28'
-   53 |   FuncPtr_4 fp = __lambda_4_28{}.operator __lambda_4_28::retType_4_28();
+.tmp.cpp:51:58: error: no type named 'retType_4_28' in '__lambda_4_28'
+   51 |   FuncPtr_4 fp = __lambda_4_28{}.operator __lambda_4_28::retType_4_28();
       |                                           ~~~~~~~~~~~~~~~^
 3 errors generated.

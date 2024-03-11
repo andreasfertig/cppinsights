@@ -81,7 +81,6 @@ class Test<float>
 
 #endif
 
-
 int main()
 {
   Test<int> ti;
@@ -92,5 +91,3 @@ int main()
   tc.operator=(ti);
   return 0;
 }
-
-

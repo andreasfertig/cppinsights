@@ -58,11 +58,7 @@ namespace details
   };
   
   
-}  // namespace details
-
-#define ARRAY_SIZE(var_x)                             \
-  details::extent<typename details::remove_reference< \
-    decltype(var_x)>::type>::value
+}
 
 class B
 {
@@ -71,13 +67,11 @@ class B
 };
 
 
-
 class E
 {
   public: 
   // inline constexpr E() noexcept = default;
 };
-
 
 
 template<typename T>
@@ -106,7 +100,6 @@ class S<int> : public B
 
 #endif
 
-
 template<typename T>
 class Y : public S<T>, public E
 {
@@ -123,8 +116,6 @@ class Y<double> : public S<double>, public E
 
 #endif
 
-
-
 void test()
 {
   int buffer[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -133,11 +124,7 @@ void test()
   Y<double> y;
 }
 
-
-
 int main()
 {
   return 0;
 }
-
-

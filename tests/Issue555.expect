@@ -18,12 +18,10 @@ struct foo<int>
 
 #endif
 
-
 template<typename T>
 struct foo<T>::bar
 {
 };
-
 
 
 int main()
@@ -31,4 +29,3 @@ int main()
   foo<int>::bar b;
   return 0;
 }
-

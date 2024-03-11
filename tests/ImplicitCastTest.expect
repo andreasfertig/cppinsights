@@ -5,13 +5,11 @@ class Base
 };
 
 
-
 class Derived : public Base
 {
   public: 
   // inline constexpr Derived() noexcept = default;
 };
-
 
 
 int main()
@@ -20,4 +18,3 @@ int main()
   Base & b = static_cast<Base&>(d);
   return 0;
 }
-

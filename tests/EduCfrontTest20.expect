@@ -4,7 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 #include <utility>
 
@@ -17,7 +16,6 @@ inline X * Constructor_X(X * __this, std::initializer_list<int> x)
 {
   return __this;
 }
-
 
 
 void fun(void)

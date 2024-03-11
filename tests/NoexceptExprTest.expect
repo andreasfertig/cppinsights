@@ -4,22 +4,17 @@ void Foo() noexcept(false)
 {
 }
 
-
 void Bar() noexcept(true)
 {
 }
-
 
 void BarFoo() noexcept
 {
 }
 
-
 void FooFoo() noexcept(false)
 {
 }
-
-
 
 int main()
 {
@@ -27,4 +22,3 @@ int main()
   printf("Bar: %d\n", static_cast<int>(noexcept(true)));
   return 0;
 }
-

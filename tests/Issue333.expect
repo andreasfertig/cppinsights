@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-// replacement of a minimal set of functions:
 __attribute__((visibility("default"))) __attribute__((returns_nonnull)) __attribute__((alloc_size(1))) void * operator new(std::size_t sz)
 {
   printf("global op new called, size = %zu\n", sz);
@@ -22,4 +21,3 @@ int main()
   delete[] p2;
   return 0;
 }
-

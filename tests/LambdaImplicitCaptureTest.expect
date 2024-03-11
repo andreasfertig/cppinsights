@@ -27,4 +27,3 @@ int main()
   printf("x: %d z: %d\n", x, z);
   return 0;
 }
-

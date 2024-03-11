@@ -1,5 +1,4 @@
 #include <exception> // for noexcept transformation
-// cmdlineinsights:-edu-show-noexcept
 
 void Fun() noexcept(true)
 {
@@ -11,12 +10,10 @@ void Fun() noexcept(true)
   }
 }
 
-
 void Fun2() noexcept(false)
 {
   int i = 3;
 }
-
 
 void Fun3() noexcept
 {
@@ -28,11 +25,7 @@ void Fun3() noexcept
   }
 }
 
-
 void Fun4()
 {
   int i = 3;
 }
-
-
-

@@ -1,16 +1,16 @@
-.tmp.cpp:175:5: error: templates cannot be declared inside of a local class
-  175 |     template<class type_parameter_0_0>
+.tmp.cpp:174:5: error: templates cannot be declared inside of a local class
+  174 |     template<class type_parameter_0_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:202:11: error: no matching member function for call to 'operator()'
-  202 |   lambda7.operator()(foo, 2);
+.tmp.cpp:201:11: error: no matching member function for call to 'operator()'
+  201 |   lambda7.operator()(foo, 2);
       |   ~~~~~~~~^~~~~~~~~~
-.tmp.cpp:207:5: error: templates cannot be declared inside of a local class
-  207 |     template<class type_parameter_0_0>
+.tmp.cpp:206:5: error: templates cannot be declared inside of a local class
+  206 |     template<class type_parameter_0_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:228:5: error: templates cannot be declared inside of a local class
-  228 |     template<class type_parameter_0_0, class type_parameter_0_1>
+.tmp.cpp:227:5: error: templates cannot be declared inside of a local class
+  227 |     template<class type_parameter_0_0, class type_parameter_0_1>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:255:12: error: no matching member function for call to 'operator()'
-  255 |   lambda73.operator()(foo, b, 44);
+.tmp.cpp:254:12: error: no matching member function for call to 'operator()'
+  254 |   lambda73.operator()(foo, b, 44);
       |   ~~~~~~~~~^~~~~~~~~~
 5 errors generated.

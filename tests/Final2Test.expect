@@ -12,12 +12,8 @@ class FinalTest<int> final
 
 #endif
 
-
-
 int main()
 {
   FinalTest<int> a = {};
   return 0;
 }
-
-

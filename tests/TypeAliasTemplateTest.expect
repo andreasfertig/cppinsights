@@ -5,7 +5,6 @@ struct bool_constant
 };
 
 
-
 template<typename ... A>
 struct F
 {
@@ -42,10 +41,8 @@ struct F<int>
 
 #endif
 
-
 int main()
 {
   F<int> f1 = F<int>(3);
   return 0;
 }
-

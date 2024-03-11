@@ -1,8 +1,5 @@
 #define INSIGHTS_USE_TEMPLATE
 
-//CXXDependentScopeMemberExpr
-// http://lists.llvm.org/pipermail/cfe-dev/2017-January/052433.html
-
 template<typename T>
 struct A
 {
@@ -39,7 +36,6 @@ struct A<int *>
 
 #endif
 
-
 template<typename T>
 struct A<T *>
 {
@@ -53,14 +49,12 @@ struct A<T *>
 };
 
 
-
 template<typename T>
 void foo()
 {
   A<T> a;
   a.foo(3);
 }
-
 
 /* First instantiated from: ClassOperatorHandler7Test.cpp:26 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -84,10 +78,6 @@ void foo<int *>()
 #endif
 
 
-template void foo<int>(); // first case
-template void foo<int*>(); // second case
-
-
 #include <vector>
 
 template<typename T>
@@ -96,7 +86,6 @@ bool foo2()
   std::vector<T> vec;
   return vec.empty();
 }
-
 
 /* First instantiated from: ClassOperatorHandler7Test.cpp:52 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -115,8 +104,6 @@ bool bar()
   return vec.empty();
 }
 
-
-
 int main()
 {
   foo<int>();
@@ -124,4 +111,3 @@ int main()
   foo2<int>();
   return 0;
 }
-

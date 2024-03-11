@@ -1,4 +1,3 @@
-// cmdline:-std=c++2a
 namespace RequiresRequires
 {
   template<typename T>
@@ -22,8 +21,8 @@ namespace RequiresRequires
   
 }
 
+
 int main()
 {
   return RequiresRequires::add(2, 5);
 }
-

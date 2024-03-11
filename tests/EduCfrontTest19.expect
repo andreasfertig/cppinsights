@@ -4,7 +4,6 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
-// cmdlineinsights:-edu-show-cfront
 
 typedef struct Foo
 {
@@ -13,7 +12,6 @@ typedef struct Foo
 
 struct Bar;
 struct Far;
-
 
 int __main(void)
 {

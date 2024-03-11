@@ -2,8 +2,6 @@
  * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
  * buggy.                                                                            *
  *************************************************************************************/
-// cmdlineinsights:-edu-show-lifetime
-
 struct Outer
 {
   inline Outer()
@@ -11,7 +9,6 @@ struct Outer
   }
   
 };
-
 
 
 struct Inner
@@ -23,7 +20,6 @@ struct Inner
 };
 
 
-
 Inner Test()
 {
   Outer __temporary15_24 = Outer{};
@@ -33,4 +29,3 @@ Inner Test()
   /* __temporary15_25 // lifetime ends here */
   ;
 }
-

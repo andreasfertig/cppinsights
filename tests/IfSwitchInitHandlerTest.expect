@@ -2,14 +2,10 @@ int Open()
 {
   return 0;
 }
-
 int Write()
 {
   return 0;
 }
-
-#define SUCCESS 1
-
 
 int Foo()
 {
@@ -33,8 +29,6 @@ int Foo()
   return 1;
 }
 
-
-
 void Fun()
 {
   {
@@ -52,12 +46,8 @@ void Fun()
   }
 }
 
-
-
 int main()
 {
   Foo();
   return 0;
 }
-
-

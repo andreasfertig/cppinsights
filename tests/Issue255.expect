@@ -152,7 +152,6 @@ struct Iterable
 };
 
 
-
 void test()
 {
   Iterable container = Iterable();
@@ -171,4 +170,3 @@ void test()
   }
   
 }
-

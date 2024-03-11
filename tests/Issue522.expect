@@ -1,5 +1,3 @@
 #include <typeinfo>
 const std::type_info & tiA = typeid(int);
-
 const std::type_info & tiB = typeid(0);
-

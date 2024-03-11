@@ -20,7 +20,6 @@ struct One
 };
 
 
-
 int main()
 {
   One one;
@@ -28,4 +27,3 @@ int main()
   One::Two::Three three;
   return 0;
 }
-

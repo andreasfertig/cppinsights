@@ -2,9 +2,6 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++2b
-// cmdlineinsights:-edu-show-coroutine-transformation
-
 #include <coroutine>
 #include <iostream>
 #include <exception>
@@ -133,7 +130,6 @@ static inline hello_world execute()
 };
 
 #endif
-
 struct hello_logic
 {
   inline bool await_ready() const noexcept
@@ -197,10 +193,8 @@ struct hello_world : public executable<hello_logic, hello_world>
 };
 
 
-
 int main()
 {
   executable<hello_logic, hello_world>::execute();
   return 0;
 }
-

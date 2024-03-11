@@ -20,4 +20,3 @@ int main()
   printf("i %% j: %#x %% %#x = %#x\n", i, j, (static_cast<unsigned int>(i) % j));
   return 0;
 }
-

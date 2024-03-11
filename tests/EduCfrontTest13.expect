@@ -8,7 +8,6 @@ void* malloc(unsigned int);
 extern "C" void free(void*);
 extern "C" void* __cxa_vec_new(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));
 extern "C" void* __cxa_vec_ctor(void*, unsigned int, unsigned int, unsigned int, void* (*)(void*), void* (*)(void*));
-// cmdlineinsights:-edu-show-cfront
 
 #include <cstdio>
 
@@ -18,12 +17,10 @@ typedef struct A
 } A;
 
 
-
 typedef struct B
 {
   char __dummy;
 } B;
-
 
 
 typedef struct C
@@ -37,7 +34,6 @@ inline C * Constructor_C(C * __this, int)
 }
 
 
-
 typedef struct D
 {
   int x;
@@ -47,7 +43,6 @@ inline D * Constructor_D(D * __this)
 {
   return __this;
 }
-
 
 
 typedef struct E
@@ -63,7 +58,6 @@ inline E * Constructor_E(E * __this)
 {
   return __this;
 }
-
 
 
 int __main(void)

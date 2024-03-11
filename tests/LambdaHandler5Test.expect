@@ -78,5 +78,3 @@ int main()
   __lambda_13_5.operator()(a, b);
   return 0;
 }
-
-

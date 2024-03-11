@@ -53,8 +53,6 @@ class Foo
 };
 
 
-
-
 int main()
 {
   Foo f1 = Foo{1};
@@ -62,4 +60,3 @@ int main()
   const bool b2 = f1.operator==(f2.get<1>());
   return 0;
 }
-

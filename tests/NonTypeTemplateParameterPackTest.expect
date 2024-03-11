@@ -140,8 +140,6 @@ class Test
 };
 
 
-
-
 int main()
 {
   Test t;
@@ -149,4 +147,3 @@ int main()
   Test::Map<int, int, my_array> a;
   return t.sum<1>();
 }
-

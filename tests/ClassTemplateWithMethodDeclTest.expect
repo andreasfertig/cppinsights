@@ -21,11 +21,11 @@ struct Foo<int>
 
 #endif
 
-
 template<typename T>
 void Foo<T>::bar()
 {
 }
+
 
 int main()
 {
@@ -33,5 +33,3 @@ int main()
   f.bar();
   return 0;
 }
-
-

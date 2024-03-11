@@ -14,9 +14,7 @@
 #include "CodeGenerator.h"
 #include "DPrint.h"
 #include "Insights.h"
-#include "InsightsBase.h"
 #include "InsightsHelpers.h"
-#include "InsightsMatchers.h"
 #include "InsightsOnce.h"
 #include "InsightsStrCat.h"
 #include "NumberIterator.h"
@@ -202,7 +200,7 @@ public:
     explicit LambdaInitCaptureCodeGenerator(OutputFormatHelper& outputFormatHelper,
                                             LambdaStackType&    lambdaStack,
                                             std::string_view    varName)
-    : CodeGenerator{outputFormatHelper, lambdaStack}
+    : CodeGenerator{outputFormatHelper, lambdaStack, ProcessingPrimaryTemplate::No}
     , mVarName{varName}
     {
     }
@@ -1097,6 +1095,7 @@ std::string EmitGlobalVariableCtors()
 
     OutputFormatHelper ofm{};
     ofm.AppendNewLine();
+    ofm.AppendNewLine();
     CodeGeneratorVariant cg{ofm};
     cg->InsertArg(cxaStartFun);
 
@@ -1125,6 +1124,30 @@ void CodeGenerator::StartLifetimeScope()
 void CodeGenerator::EndLifetimeScope()
 {
     mLifeTimeTracker.EndScope(mOutputFormatHelper, false);
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const LinkageSpecDecl* stmt)
+{
+    mOutputFormatHelper.Append("extern \"",
+                               (
+#if IS_CLANG_NEWER_THAN(17)
+                                   LinkageSpecLanguageIDs::C
+#else
+                                   LinkageSpecDecl::lang_c
+#endif
+                                   == stmt->getLanguage())
+                                   ? "C"sv
+                                   : "C++"sv,
+                               "\"");
+    mOutputFormatHelper.OpenScope();
+
+    for(const auto* decl : stmt->decls()) {
+        InsertArg(decl);
+    }
+
+    mOutputFormatHelper.CloseScope();
+    mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
 
@@ -1454,6 +1477,10 @@ void CodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
         } else {
             InsertArg(temporary);
         }
+    } else if(const auto* unaryexpr = dyn_cast_or_null<UnaryOperator>(stmt->getOperand())) {
+        if(const auto* callExpr = dyn_cast_or_null<CallExpr>(unaryexpr->getSubExpr())) {
+            InsertArg(callExpr->getArg(0));
+        }
     }
 }
 //-----------------------------------------------------------------------------
@@ -1476,7 +1503,8 @@ void CodeGenerator::InsertMethodBody(const FunctionDecl* stmt, const size_t posB
             }
         }
 
-        return (FunctionDecl::TK_FunctionTemplate == stmt->getTemplatedKind());
+        return (FunctionDecl::TK_FunctionTemplate == stmt->getTemplatedKind()) or
+               (ProcessingPrimaryTemplate::Yes == mProcessingPrimaryTemplate);
     };
 
     if(stmt->doesThisDeclarationHaveABody()) {
@@ -3010,7 +3038,7 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
     // Traverse the ctor inline init statements first to find a potential CXXInheritedCtorInitExpr. This carries the
     // name and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
-        CodeGeneratorVariant codeGenerator{initOutputFormatHelper, mLambdaStack};
+        CodeGeneratorVariant codeGenerator{initOutputFormatHelper, mLambdaStack, mProcessingPrimaryTemplate};
         codeGenerator->mCurrentPos                = mCurrentPos;
         codeGenerator->mCurrentFieldPos           = mCurrentFieldPos;
         codeGenerator->mOutputFormatHelperOutside = &mOutputFormatHelper;
@@ -3026,6 +3054,7 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
             }
 
             // in case of delegating or base initializer there is no member.
+#if 0
             if(const auto* member = init->getMember()) {
                 initOutputFormatHelper.Append(member->getName());
                 codeGenerator->InsertCurlysIfRequired(init->getInit());
@@ -3045,6 +3074,36 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
 
                 codeGenerator->WrapInCurliesIfNeeded(useCurlies, [&] { codeGenerator->InsertArg(inlineInit); });
             }
+#else
+            const auto* inlineInit = init->getInit();
+
+            // in case of delegating or base initializer there is no member.
+            if(const auto* member = init->getMember()) {
+                initOutputFormatHelper.Append(member->getName());
+
+                if(isa<ParenListExpr>(inlineInit)) {
+                    codeGenerator->WrapInParens([&] { codeGenerator->InsertArg(inlineInit); });
+                } else {
+                    codeGenerator->InsertCurlysIfRequired(inlineInit);
+                }
+
+            } else if(const auto* cxxInheritedCtorInitExpr = dyn_cast_or_null<CXXInheritedCtorInitExpr>(inlineInit)) {
+                cxxInheritedCtorDecl = cxxInheritedCtorInitExpr->getConstructor();
+
+                codeGenerator->InsertArg(inlineInit);
+
+                // Insert the base class name only, if it is not a CXXContructorExpr and not a
+                // CXXDependentScopeMemberExpr which already carry the type.
+            } else if(init->isBaseInitializer() and not isa<CXXConstructExpr>(inlineInit)) {
+                initOutputFormatHelper.Append(GetUnqualifiedScopelessName(init->getBaseClass()));
+
+                const auto braceKind = isa<ParenListExpr>(inlineInit) ? BraceKind::Parens : BraceKind::Curlys;
+
+                codeGenerator->WrapInParensOrCurlys(braceKind, [&] { codeGenerator->InsertArg(inlineInit); });
+            } else {
+                codeGenerator->InsertArg(inlineInit);
+            }
+#endif
         }
     }
 
@@ -3069,7 +3128,7 @@ void CodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody skip
 
     InsertCXXMethodHeader(stmt, initOutputFormatHelper);
 
-    if(not stmt->isUserProvided()) {
+    if(not stmt->isUserProvided() or stmt->isExplicitlyDefaulted()) {
         InsertTemplateGuardEnd(stmt);
         return;
     }
@@ -3357,6 +3416,7 @@ void CodeGenerator::InsertArg(const NamespaceDecl* stmt)
     }
 
     mOutputFormatHelper.CloseScope();
+    mOutputFormatHelper.AppendNewLine();
 }
 //-----------------------------------------------------------------------------
 
@@ -3482,14 +3542,14 @@ void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
         InsertTemplateSpecializationHeader();
     } else if(const auto* e = stmt->getDescribedFunctionTemplate()) {
         InsertTemplateParameters(*e->getTemplateParameters());
-    } else {
-        InsertTemplateParameters(*deducedTemplate->getTemplateParameters());
     }
 
     mOutputFormatHelper.Append(GetName(*deducedTemplate));
 
     if(stmt->getNumParams()) {
         WrapInParens([&] { mOutputFormatHelper.AppendParameterList(stmt->parameters()); });
+    } else {
+        mOutputFormatHelper.Append("()"sv);
     }
 
     mOutputFormatHelper.AppendSemiNewLine(hlpArrow, GetName(stmt->getReturnType()));
@@ -3510,12 +3570,21 @@ void CodeGenerator::InsertTemplate(const FunctionTemplateDecl* stmt, bool withSp
 {
     LAMBDA_SCOPE_HELPER(TemplateHead);
 
+    mProcessingPrimaryTemplate = ProcessingPrimaryTemplate::Yes;
+
     // InsertTemplateParameters(*stmt->getTemplateParameters());
     InsertArg(stmt->getTemplatedDecl());
+
+    mProcessingPrimaryTemplate = ProcessingPrimaryTemplate::No;
 
     RETURN_IF(not withSpec);
 
     for(const auto* spec : stmt->specializations()) {
+        // For specializations we will see them later
+        if(spec->getPreviousDecl()) {
+            continue;
+        }
+
         mOutputFormatHelper.AppendNewLine();
         InsertArg(spec);
         mOutputFormatHelper.AppendNewLine();
@@ -3885,7 +3954,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     if(P0315Visitor dt{cgLambdaInCtor}; dt.TraverseStmt(const_cast<Expr*>(expr))) {
 
                         OutputFormatHelper   ofm{};
-                        CodeGeneratorVariant codeGenerator{ofm, mLambdaStack};
+                        CodeGeneratorVariant codeGenerator{ofm, mLambdaStack, mProcessingPrimaryTemplate};
 
                         if(const auto* ctorExpr = dyn_cast_or_null<CXXConstructExpr>(expr);
                            ctorExpr and byConstRef and (1 == ctorExpr->getNumArgs())) {
@@ -4545,7 +4614,7 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
     OutputFormatHelper& outputFormatHelper = lambdaHelper.buffer();
 
     outputFormatHelper.AppendNewLine();
-    LambdaCodeGenerator codeGenerator{outputFormatHelper, mLambdaStack};
+    LambdaCodeGenerator codeGenerator{outputFormatHelper, mLambdaStack, mProcessingPrimaryTemplate};
     codeGenerator.mCapturedThisAsCopy = [&] {
         for(const auto& c : lambda->captures()) {
             const auto captureKind = c.getCaptureKind();
@@ -4649,24 +4718,35 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
             kwUsingSpace, BuildRetTypeName(decl), hlpAssing, GetName(desugaredReturnType));
     }
 
+    if(isCXXMethodDecl and decl.isOutOfLine()) {
+        if(const auto* parent = methodDecl->getParent()) {
+            if(const auto* outerClasTemplateDecl = parent->getDescribedClassTemplate()) {
+                InsertTemplateParameters(*outerClasTemplateDecl->getTemplateParameters());
+            }
+        }
+    }
+
     if(decl.isTemplated()) {
         if(decl.getDescribedTemplate()) {
             InsertTemplateParameters(*decl.getDescribedTemplate()->getTemplateParameters());
         }
 
-    } else if(decl.isFunctionTemplateSpecialization()) {
+    } else if(decl.isFunctionTemplateSpecialization() or (isClassTemplateSpec and decl.isOutOfLine() and
+                                                          (decl.getLexicalDeclContext() != methodDecl->getParent()))) {
         InsertTemplateSpecializationHeader();
     }
 
     InsertAttributes(decl.attrs());
 
     if(not decl.isFunctionTemplateSpecialization() or (isCXXMethodDecl and isFirstCxxMethodDecl)) {
-        mOutputFormatHelper.Append(GetStorageClassAsStringWithSpace(decl.getStorageClass()));
+        if(not decl.isOutOfLine() or (decl.getStorageClass() == SC_Extern)) {
+            mOutputFormatHelper.Append(GetStorageClassAsStringWithSpace(decl.getStorageClass()));
+        }
 
         // [class.free]: Any allocation function for a class T is a static member (even if not explicitly declared
         // static). (https://eel.is/c++draft/class.free#1)
         // However, Clang does not add `static` to `getStorageClass` so this needs to be check independently.
-        if(isCXXMethodDecl) {
+        if(isCXXMethodDecl and not decl.isOutOfLine()) {
             // GetStorageClassAsStringWithSpace already carries static, if the method was marked so explicitly
             if((not IsStaticStorageClass(methodDecl)) and (methodDecl->isStatic())) {
                 mOutputFormatHelper.Append(kwStaticSpace);
@@ -4742,7 +4822,12 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     OutputFormatHelper outputFormatHelper{};
 
     if(methodDecl) {
-        if(not isFirstCxxMethodDecl or InsertNamespace()) {
+        if(not isFirstCxxMethodDecl or InsertNamespace() and decl.getQualifier()) {
+            CodeGeneratorVariant cg{outputFormatHelper};
+            cg->InsertNamespace(decl.getQualifier());
+
+            // This comes from a using Base::SomeFunc
+        } else if(not isFirstCxxMethodDecl or InsertNamespace() and not decl.getQualifier()) {
             const auto* parent = methodDecl->getParent();
             outputFormatHelper.Append(parent->getName());
 

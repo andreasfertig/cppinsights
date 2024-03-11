@@ -12,4 +12,3 @@ int main()
   printf("%d %d %d\n", static_cast<int>(red), static_cast<int>(green), static_cast<int>(blue));
   return 0;
 }
-

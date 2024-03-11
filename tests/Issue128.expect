@@ -3,7 +3,6 @@ void foo(T, ...)
 {
 }
 
-
 /* First instantiated from: Issue128.cpp:5 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -18,4 +17,3 @@ int main()
   foo(1, 2.0);
   return 0;
 }
-

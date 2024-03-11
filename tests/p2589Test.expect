@@ -1,5 +1,3 @@
-// cmdline:-std=c++2b
-
 struct Test
 {
   static inline int operator[](unsigned int idx)
@@ -10,10 +8,8 @@ struct Test
 };
 
 
-
 int main()
 {
   Test t = {};
   return Test::operator[](4);
 }
-

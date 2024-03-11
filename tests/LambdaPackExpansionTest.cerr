@@ -1,23 +1,23 @@
-.tmp.cpp:41:9: error: only function and template parameters can be parameter packs
-   41 |     Args... args;
+.tmp.cpp:32:9: error: only function and template parameters can be parameter packs
+   32 |     Args... args;
       |         ^
-.tmp.cpp:41:13: error: data member type contains unexpanded parameter pack 'Args'
-   41 |     Args... args;
+.tmp.cpp:32:13: error: data member type contains unexpanded parameter pack 'Args'
+   32 |     Args... args;
       |     ~~~~    ^
-.tmp.cpp:44:26: error: unknown type name 'type_parameter_0_0'
-   44 |     __lambda_19_15(const type_parameter_0_0... & _args)
+.tmp.cpp:35:26: error: unknown type name 'type_parameter_0_0'
+   35 |     __lambda_19_15(const type_parameter_0_0... & _args)
       |                          ^
-.tmp.cpp:44:44: error: '...' must immediately precede declared identifier
-   44 |     __lambda_19_15(const type_parameter_0_0... & _args)
+.tmp.cpp:35:44: error: '...' must immediately precede declared identifier
+   35 |     __lambda_19_15(const type_parameter_0_0... & _args)
       |                                            ^~~
       |                                                  ...
-.tmp.cpp:44:44: error: type 'const int &' of function parameter pack does not contain any unexpanded parameter packs
-   44 |     __lambda_19_15(const type_parameter_0_0... & _args)
+.tmp.cpp:35:44: error: type 'const int &' of function parameter pack does not contain any unexpanded parameter packs
+   35 |     __lambda_19_15(const type_parameter_0_0... & _args)
       |                    ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
-.tmp.cpp:45:17: error: pack expansion does not contain any unexpanded parameter packs
-   45 |     : args{_args...}
+.tmp.cpp:36:17: error: pack expansion does not contain any unexpanded parameter packs
+   36 |     : args{_args...}
       |            ~~~~~^
-.tmp.cpp:50:13: error: initializer contains unexpanded parameter pack 'args'
-   50 |   auto lm = __lambda_19_15{args};
+.tmp.cpp:41:13: error: initializer contains unexpanded parameter pack 'args'
+   41 |   auto lm = __lambda_19_15{args};
       |             ^              ~~~~
 7 errors generated.

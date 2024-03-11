@@ -8,13 +8,10 @@ class Foo
 
 
 /* PASSED: static_assert(noexcept(true), ""); */
-
 /* PASSED: static_assert(!noexcept(false), ""); */
-
 
 int main()
 {
   Foo f;
   return 0;
 }
-

@@ -8,7 +8,6 @@ struct S
 };
 
 
-
 struct SS
 {
   int i;
@@ -17,8 +16,6 @@ struct SS
   // inline constexpr SS(SS &&) noexcept = default;
   // inline constexpr SS & operator=(const SS &) noexcept = default;
 };
-
-
 
 
 class C
@@ -31,7 +28,6 @@ class C
 };
 
 
-
 class D
 {
   
@@ -42,7 +38,6 @@ class D
   // inline constexpr D(D &&) noexcept = default;
   // inline constexpr D & operator=(const D &) noexcept = default;
 };
-
 
 
 class E
@@ -59,7 +54,6 @@ class E
   int i;
   public: 
 };
-
 
 
 int main()
@@ -85,4 +79,3 @@ int main()
   E e = E{6};
   return 0;
 }
-

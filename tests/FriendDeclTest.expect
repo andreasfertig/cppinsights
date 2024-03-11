@@ -29,18 +29,14 @@ class Foo
 };
 
 
-
 void ChangePrivate(Foo & i)
 {
   ++i.mI;
 }
 
-
 class DearFriend : public Foo::Secrect
 {
 };
-
-
 
 
 int main()
@@ -51,4 +47,3 @@ int main()
   sPoint.Print();
   return 0;
 }
-

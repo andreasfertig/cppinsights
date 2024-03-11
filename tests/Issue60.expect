@@ -13,13 +13,23 @@ struct Person
 };
 
 
-
 template<typename Key, typename POD>
 Key extractKey(Key POD::*pMember);
-;
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int extractKey<int, Person>(int Person::*pMember);
+#endif
+
+
 template<typename Key, typename POD>
 POD extractPOD(Key POD::*pMember);
-;
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+Person extractPOD<int, Person>(int Person::*pMember);
+#endif
+
 
 template<auto pMember>
 using Key_t = decltype(extractKey(pMember));
@@ -56,6 +66,4 @@ struct Index<&Person::age>
 
 #endif
 
-
 Index<&Person::age> myAgeIndex = Index<&Person::age>();
-

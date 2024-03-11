@@ -19,7 +19,6 @@ class Test
 };
 
 
-
 int main()
 {
   Test t;
@@ -37,4 +36,3 @@ int main()
   t.foo<__lambda_13_12>(__lambda_13_12{});
   return 0;
 }
-

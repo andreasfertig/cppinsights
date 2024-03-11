@@ -2,14 +2,11 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++2a
-// cmdlineinsights:-edu-show-coroutine-transformation
-
 #include <coroutine>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 #include <utility>
- 
+
 struct generator
 {
   struct promise_type
@@ -130,8 +127,6 @@ struct generator
 };
 
 
-
-
 struct auto_await_suspend
 {
   bool await_ready();
@@ -153,8 +148,6 @@ struct auto_await_suspend
   void await_resume();
   
 };
-
-
 
 
 struct __seqFrame
@@ -275,7 +268,6 @@ void __seqDestroy(__seqFrame * __f)
 }
 
 
-
 int main()
 {
   generator s = seq(3);
@@ -290,4 +282,3 @@ int main()
   }
   return 0;
 }
-

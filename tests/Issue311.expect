@@ -4,7 +4,4 @@ struct alignas(double) foo
 };
 
 
-
 /* PASSED: static_assert(sizeof(foo) == 8); */
-
-

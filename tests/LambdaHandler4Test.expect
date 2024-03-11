@@ -78,9 +78,6 @@ class Foo
 };
 
 
-
-
-// http://en.cppreference.com/w/cpp/language/lambda
 struct X
 {
   int x;
@@ -111,5 +108,4 @@ struct X
   }
   
 };
-
 

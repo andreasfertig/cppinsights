@@ -1,16 +1,12 @@
-// cmdline:-std=c++20
-
 #include <type_traits>
 
 struct B
 {
 };
 
-
 struct C
 {
 };
-
 
 
 struct A
@@ -30,7 +26,6 @@ struct A
   }
   
 };
-
 
 
 template<typename T>
@@ -75,9 +70,7 @@ struct Wrapper<A>
 
 #endif
 
-
 void Fun(Wrapper<A> a);
-  // #A Takes Wrapper<A> now
 
 void Use()
 {
@@ -86,15 +79,12 @@ void Use()
   Fun(Wrapper<A>(C{}));
 }
 
-
 void Fun(Wrapper<A> a)
 {
 }
-
 
 int main()
 {
   Use();
   return 0;
 }
-

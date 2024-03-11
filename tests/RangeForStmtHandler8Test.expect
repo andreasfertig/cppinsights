@@ -28,14 +28,10 @@ struct A
 };
 
 
-
 bool operator!=(const A &, const int &)
 {
   return true;
 }
-
-
-
 
 int main()
 {
@@ -52,5 +48,3 @@ int main()
   }
   return 0;
 }
-
-

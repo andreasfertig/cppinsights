@@ -2,14 +2,11 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++20
-// cmdlineinsights:-edu-show-coroutine-transformation
-
 #include <coroutine>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 #include <utility>
- 
+
 struct generator
 {
   struct promise_type
@@ -94,7 +91,6 @@ struct generator
   // inline constexpr generator(const generator &) /* noexcept */ = delete;
   // inline generator & operator=(const generator &) /* noexcept */ = delete;
 };
-
 
 
 struct __simpleReturnFrame
@@ -196,8 +192,6 @@ void __simpleReturnDestroy(__simpleReturnFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
-
 
 
 struct __additionAwaitReturnFrame
@@ -327,7 +321,6 @@ void __additionAwaitReturnDestroy(__additionAwaitReturnFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
 
 
 struct __additionAwaitReturn2Frame
@@ -473,7 +466,6 @@ void __additionAwaitReturn2Destroy(__additionAwaitReturn2Frame * __f)
 }
 
 
-
 struct __additionAwaitReturnWithIntFrame
 {
   void (*resume_fn)(__additionAwaitReturnWithIntFrame *);
@@ -603,8 +595,6 @@ void __additionAwaitReturnWithIntDestroy(__additionAwaitReturnWithIntFrame * __f
 }
 
 
-
-
 int main()
 {
   generator a = additionAwaitReturn(2);
@@ -612,4 +602,3 @@ int main()
   generator c = additionAwaitReturnWithInt(6);
   return 0;
 }
-

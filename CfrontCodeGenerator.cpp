@@ -32,13 +32,16 @@ static MemberExpr* AccessMember(std::string_view name, const ValueDecl* vd, Qual
 }
 //-----------------------------------------------------------------------------
 
-CodeGeneratorVariant::CodeGenerators::CodeGenerators(OutputFormatHelper&             _outputFormatHelper,
-                                                     CodeGenerator::LambdaStackType& lambdaStack)
+CodeGeneratorVariant::CodeGenerators::CodeGenerators(OutputFormatHelper&                      _outputFormatHelper,
+                                                     CodeGenerator::LambdaStackType&          lambdaStack,
+                                                     CodeGenerator::ProcessingPrimaryTemplate processingPrimaryTemplate)
 {
     if(GetInsightsOptions().UseShow2C) {
-        new(&cfcg) CfrontCodeGenerator{_outputFormatHelper, lambdaStack, CodeGenerator::LambdaInInitCapture::No};
+        new(&cfcg) CfrontCodeGenerator{
+            _outputFormatHelper, lambdaStack, CodeGenerator::LambdaInInitCapture::No, processingPrimaryTemplate};
     } else {
-        new(&cg) CodeGenerator{_outputFormatHelper, lambdaStack, CodeGenerator::LambdaInInitCapture::No};
+        new(&cg) CodeGenerator{
+            _outputFormatHelper, lambdaStack, CodeGenerator::LambdaInInitCapture::No, processingPrimaryTemplate};
     }
 }
 //-----------------------------------------------------------------------------
@@ -253,9 +256,9 @@ void CfrontCodeGenerator::InsertArg(const CXXNewExpr* cstmt)
     auto allocatedType = stmt->getAllocatedType();
     auto ctorName      = StrCat("Constructor_"sv, GetName(allocatedType));
 
-    EnableGlobalInsert(GlobalInserts::FuncMalloc);
-
     if(stmt->isArray()) {
+        EnableGlobalInsert(GlobalInserts::FuncMalloc);
+
         auto* arraySizeExpr = stmt->getArraySize().value();
         auto* callMalloc    = Call("malloc"sv, {Mul(Sizeof(allocatedType), arraySizeExpr)});
 
@@ -322,6 +325,8 @@ void CfrontCodeGenerator::InsertArg(const CXXNewExpr* cstmt)
         if(stmt->getNumPlacementArgs()) {
             return stmt->getPlacementArg(0);
         }
+
+        EnableGlobalInsert(GlobalInserts::FuncMalloc);
 
         return Call("malloc"sv, {Sizeof(allocatedType)});
     }();

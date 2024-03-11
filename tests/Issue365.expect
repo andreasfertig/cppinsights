@@ -27,14 +27,6 @@ class String<128, 128, wchar_t>
 
 #endif
 
-
-
-/* First instantiated from: Issue365.cpp:10 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-String -> String<128, 128, wchar_t>;
-#endif
-
 void FTest()
 {
   double d = {};
@@ -42,4 +34,12 @@ void FTest()
   s.Format(L"%i", d);
 }
 
+template<long Len = 128, long BlockSize = 128, class T = wchar_t>
+String() -> String<Len, BlockSize, T>;
+
+/* First instantiated from: Issue365.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+String() -> String<128, 128, wchar_t>;
+#endif
 

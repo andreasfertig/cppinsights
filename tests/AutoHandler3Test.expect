@@ -4,18 +4,15 @@ struct S
   
 };
 
-
 struct T
 {
 };
-
 
 
 template<typename T>
 decltype(T{}.f()) f(T, int)
 {
 }
-
 
 /* First instantiated from: AutoHandler3Test.cpp:15 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -30,6 +27,11 @@ template<typename T>
 void f(T, ...)
 {
 }
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void f<S>(S, ...);
+#endif
 
 
 /* First instantiated from: AutoHandler3Test.cpp:16 */
@@ -47,4 +49,3 @@ int main()
   f(T{}, 0);
   return 0;
 }
-

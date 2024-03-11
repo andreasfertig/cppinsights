@@ -13,7 +13,6 @@ class Foo
 };
 
 
-
 class Bar : public Foo
 {
   
@@ -33,7 +32,6 @@ class Bar : public Foo
 };
 
 
-
 class Bla : public Foo
 {
   
@@ -49,8 +47,6 @@ class Bla : public Foo
 };
 
 
-
-
 int main()
 {
   Bar bar0 = Bar{100.0};
@@ -59,4 +55,3 @@ int main()
   Bla bla = Bla(1, 2);
   return 0;
 }
-

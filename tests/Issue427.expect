@@ -45,19 +45,8 @@ class MyClass<9>
 
 #endif
 
-
 template<int val>
 int MyClass<val>::var = val;
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass<5>::var = 5;
-#endif
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass<7>::var = 7;
-#endif
-#ifdef INSIGHTS_USE_TEMPLATE
-int MyClass<9>::var = 9;
-#endif
-
 
 int main(int argc, char ** argv)
 {
@@ -68,4 +57,12 @@ int main(int argc, char ** argv)
   return 0;
 }
 
-
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<5>::var = 5;
+#endif
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<7>::var = 7;
+#endif
+#ifdef INSIGHTS_USE_TEMPLATE
+int MyClass<9>::var = 9;
+#endif

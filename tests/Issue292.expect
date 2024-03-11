@@ -1,4 +1,3 @@
-// cmdlineinsights:--show-all-implicit-casts
 class H
 {
   
@@ -12,9 +11,7 @@ class H
 };
 
 
-
 H foo()
 {
   return H{static_cast<const char *>("hai"), 4, static_cast<double *>(0)};
 }
-

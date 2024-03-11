@@ -6,8 +6,6 @@ struct Point
 };
 
 
-
-
 int main()
 {
   Point pt = Point();
@@ -22,4 +20,3 @@ int main()
   using T5 = Point &&;
   return 0;
 }
-

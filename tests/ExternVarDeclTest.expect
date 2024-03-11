@@ -4,6 +4,4 @@ int main()
   return err;
 }
 
-
 int err = 2;
-

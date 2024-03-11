@@ -4,9 +4,4 @@ struct S
 };
 
 
-
 /* PASSED: static_assert(sizeof(S) == sizeof(int)); */
-
-
-//static_assert(sizeof(S) != sizeof(int));
-

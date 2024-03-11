@@ -4,6 +4,4 @@ struct S
 };
 
 
-
 const int S::x = 3;
-

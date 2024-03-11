@@ -2,8 +2,6 @@
  * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
  * buggy.                                                                            *
  *************************************************************************************/
-// cmdlineinsights:-edu-show-lifetime
-
 struct Data
 {
   int mData[5]{0, 0, 0, 0, 0};
@@ -20,7 +18,6 @@ struct Data
 };
 
 
-
 struct Keeper
 {
   Data data{{2, 3, 4, 0, 0}};
@@ -32,12 +29,10 @@ struct Keeper
 };
 
 
-
 Keeper get()
 {
   return {{{2, 3, 4, 0, 0}}};
 }
-
 
 int main()
 {
@@ -56,4 +51,3 @@ int main()
   }
   return 0;
 }
-

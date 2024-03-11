@@ -9,7 +9,6 @@ class Base
 };
 
 
-
 class Derived : public Base
 {
   
@@ -24,11 +23,8 @@ class Derived : public Base
 };
 
 
-  
-  
 int main()
 {
   Derived d = Derived(3.1400000000000001);
   return 0;
 }
-

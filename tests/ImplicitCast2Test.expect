@@ -1,13 +1,10 @@
 void FloatingCast(double d)
 {
 }
-
 void IntegralToBoolean(bool b)
 {
 }
 
-
-// CK_UserDefinedConversion
 struct A
 {
   inline operator int ()
@@ -17,7 +14,6 @@ struct A
   
 };
 
- 
 
 int main()
 {
@@ -28,4 +24,3 @@ int main()
   int ii = int(A().operator int());
   return 0;
 }
-

@@ -35,10 +35,8 @@ class EventContainer
 };
 
 
-
 int main()
 {
   EventContainer e = EventContainer();
   return 0;
 }
-

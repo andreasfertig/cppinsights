@@ -1,5 +1,3 @@
-// cmdline:-std=c++2b
- 
 
 class __lambda_3_13
 {
@@ -20,4 +18,3 @@ class __lambda_3_13
 };
 
 __lambda_3_13 four = __lambda_3_13{};
-

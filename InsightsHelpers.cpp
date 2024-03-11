@@ -19,10 +19,6 @@
 
 namespace clang::insights {
 
-ScopeHandler::ScopeStackType ScopeHandler::mGlobalStack{};  // NOLINT
-std::string                  ScopeHandler::mScope{};        // NOLINT
-//-----------------------------------------------------------------------------
-
 ScopeHandler::ScopeHandler(const Decl* d)
 : mStack{mGlobalStack}
 , mHelper{mScope.length()}
@@ -166,7 +162,9 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
 {
     RETURN_IF(not stmt);
 
-    if(const auto* prefix = stmt->getPrefix()) {
+    if(const auto* prefix = stmt->getPrefix();
+       prefix and not((NestedNameSpecifier::TypeSpecWithTemplate == stmt->getKind()) and
+                      isa<DependentTemplateSpecializationType>(stmt->getAsType()))) {
         BuildNamespace(fullNamespace, prefix, ignoreNamespace);
     }
 
@@ -181,7 +179,18 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
 
         case NestedNameSpecifier::NamespaceAlias: fullNamespace.append(stmt->getAsNamespaceAlias()->getName()); break;
 
-        case NestedNameSpecifier::TypeSpecWithTemplate: fullNamespace.append(kwTemplateSpace); [[fallthrough]];
+        case NestedNameSpecifier::TypeSpecWithTemplate:
+            if(
+#if IS_CLANG_NEWER_THAN(17)
+                ElaboratedTypeKeyword::Typename
+#else
+                ElaboratedTypeKeyword::ETK_Typename
+#endif
+                == stmt->getAsType()->getAs<DependentTemplateSpecializationType>()->getKeyword()) {
+                fullNamespace.append(kwTemplateSpace);
+            }
+
+            [[fallthrough]];
 
         case NestedNameSpecifier::TypeSpec:
             fullNamespace.append(GetUnqualifiedScopelessName(stmt->getAsType(), InsightsSuppressScope::Yes));
@@ -226,70 +235,6 @@ BuildInternalVarName(const std::string_view& varName, const SourceLocation& loc,
     const auto lineNo = sm.getSpellingLineNumber(loc);
 
     return StrCat(BuildInternalVarName(varName), lineNo);
-}
-//-----------------------------------------------------------------------------
-
-static const LangOptions& GetLangOpts(const ast_matchers::MatchFinder::MatchResult& result)
-{
-    return result.Context->getLangOpts();
-}
-//-----------------------------------------------------------------------------
-
-SourceLocation FindLocationAfterSemi(const SourceLocation                          loc,
-                                     const ast_matchers::MatchFinder::MatchResult& result,
-                                     RequireSemi                                   requireSemi)
-{
-    auto findLocation = [&](const tok::TokenKind tKind) {
-        return clang::Lexer::findLocationAfterToken(loc, tKind, GetSM(result), GetLangOpts(result), false);
-    };
-
-    if(const auto locEnd{findLocation(tok::semi)}; locEnd.isValid()) {
-        return locEnd;
-
-    } else if(RequireSemi::Yes == requireSemi) {
-        // if we do not find a ; then it can possibly be a brace init like this:
-        // auto x {23};
-        // Try to find the right curly which seems to also contain the semi.
-        if(const auto locEnd2{findLocation(tok::r_brace)}; locEnd2.isValid()) {
-            return locEnd2;
-        }
-        // if we do not find a ; then it can possibly be a paren init like this:
-        // int x(23);
-        // Try to find the right paren which seems to also contain the semi.
-        else if(const auto locEnd3{findLocation(tok::r_paren)}; locEnd3.isValid()) {
-            return locEnd3;
-        }
-    }
-
-    return loc;
-}
-//-----------------------------------------------------------------------------
-
-SourceRange GetSourceRangeAfterSemi(const SourceRange                             range,
-                                    const ast_matchers::MatchFinder::MatchResult& result,
-                                    RequireSemi                                   requireSemi)
-{
-    const SourceLocation locEnd = FindLocationAfterSemi(range.getEnd(), result, requireSemi);
-
-    // Special handling for macro locations.
-    const auto startLoc = [&] {
-        if(range.getBegin().isMacroID()) {
-            return GetSM(result).getImmediateExpansionRange(range.getBegin()).getBegin();
-        }
-
-        return range.getBegin();
-    }();
-
-    // Special handling for macro locations.
-    const auto locEnd2 = [&] {
-        if(locEnd.isMacroID()) {
-            return GetSM(result).getImmediateExpansionRange(locEnd).getEnd();
-        }
-
-        return locEnd;
-    }();
-
-    return {startLoc, locEnd2};
 }
 //-----------------------------------------------------------------------------
 

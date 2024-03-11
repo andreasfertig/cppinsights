@@ -13,22 +13,19 @@ namespace ExplicitClassTemplateSpecializationTest
   
 }
 
-  template<typename T>
+template<typename T>
 struct Base
 {
 };
 
 
-
-  template<>
+template<>
 struct Base<bool>
 {
 };
-
 
 
 int main()
 {
   return 0;
 }
-

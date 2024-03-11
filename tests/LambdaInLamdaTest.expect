@@ -42,4 +42,3 @@ int main()
   __lambda_4_5.operator()();
   return 0;
 }
-

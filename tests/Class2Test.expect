@@ -54,15 +54,12 @@ class Test
 };
 
 
-
-
 struct S
 {
   Test count;
   // inline constexpr S(S &&) /* noexcept */ = delete;
   // inline S() noexcept(false) = default;
 };
-
 
 
 int main()
@@ -80,4 +77,3 @@ int main()
   s.count.operator+=(Test(p ? 1 : 2));
   return 0;
 }
-

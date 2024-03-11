@@ -1,93 +1,93 @@
-.tmp.cpp:29:7: error: redefinition of '__lambda_8_23' as different kind of symbol
-   29 | class __lambda_8_23
+.tmp.cpp:23:7: error: redefinition of '__lambda_8_23' as different kind of symbol
+   23 | class __lambda_8_23
       |       ^
-.tmp.cpp:11:7: note: previous definition is here
-   11 | class __lambda_8_23
+.tmp.cpp:5:7: note: previous definition is here
+    5 | class __lambda_8_23
       |       ^
-.tmp.cpp:55:29: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_8_23'
-   55 | constexpr const auto func = __lambda_8_23{};
+.tmp.cpp:49:29: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_8_23'
+   49 | constexpr const auto func = __lambda_8_23{};
       |                             ^
-.tmp.cpp:11:7: note: candidate template ignored: couldn't infer template argument 'T'
-   11 | class __lambda_8_23
+.tmp.cpp:5:7: note: candidate template ignored: couldn't infer template argument 'T'
+    5 | class __lambda_8_23
       |       ^
-.tmp.cpp:11:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
-   11 | class __lambda_8_23
+.tmp.cpp:5:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
+    5 | class __lambda_8_23
       |       ^~~~~~~~~~~~~
-.tmp.cpp:57:1: error: extraneous 'template<>' in declaration of variable 'func'
-   57 | template<>
+.tmp.cpp:51:1: error: extraneous 'template<>' in declaration of variable 'func'
+   51 | template<>
       | ^~~~~~~~~~
-.tmp.cpp:58:31: error: redefinition of 'func'
-   58 | constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
+.tmp.cpp:52:31: error: redefinition of 'func'
+   52 | constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
       |                               ^
-.tmp.cpp:55:22: note: previous definition is here
-   55 | constexpr const auto func = __lambda_8_23{};
+.tmp.cpp:49:22: note: previous definition is here
+   49 | constexpr const auto func = __lambda_8_23{};
       |                      ^
-.tmp.cpp:58:31: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_8_23'
-   58 | constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
+.tmp.cpp:52:31: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_8_23'
+   52 | constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
       |                               ^
-.tmp.cpp:11:7: note: candidate template ignored: couldn't infer template argument 'T'
-   11 | class __lambda_8_23
+.tmp.cpp:5:7: note: candidate template ignored: couldn't infer template argument 'T'
+    5 | class __lambda_8_23
       |       ^
-.tmp.cpp:11:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
-   11 | class __lambda_8_23
+.tmp.cpp:5:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
+    5 | class __lambda_8_23
       |       ^~~~~~~~~~~~~
-.tmp.cpp:58:35: error: expected ';' at end of declaration
-   58 | constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
+.tmp.cpp:52:35: error: expected ';' at end of declaration
+   52 | constexpr const __lambda_8_23 func<double> = __lambda_8_23{};
       |                                   ^
       |                                   ;
-.tmp.cpp:58:35: error: expected unqualified-id
-.tmp.cpp:83:7: error: redefinition of '__lambda_11_29' as different kind of symbol
-   83 | class __lambda_11_29
+.tmp.cpp:52:35: error: expected unqualified-id
+.tmp.cpp:74:7: error: redefinition of '__lambda_11_29' as different kind of symbol
+   74 | class __lambda_11_29
       |       ^
-.tmp.cpp:65:7: note: previous definition is here
-   65 | class __lambda_11_29
+.tmp.cpp:56:7: note: previous definition is here
+   56 | class __lambda_11_29
       |       ^
-.tmp.cpp:109:35: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_11_29'
-  109 | constexpr const auto funcBraced = __lambda_11_29{};
+.tmp.cpp:100:35: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_11_29'
+  100 | constexpr const auto funcBraced = __lambda_11_29{};
       |                                   ^
-.tmp.cpp:65:7: note: candidate template ignored: couldn't infer template argument 'T'
-   65 | class __lambda_11_29
+.tmp.cpp:56:7: note: candidate template ignored: couldn't infer template argument 'T'
+   56 | class __lambda_11_29
       |       ^
-.tmp.cpp:65:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
-   65 | class __lambda_11_29
+.tmp.cpp:56:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
+   56 | class __lambda_11_29
       |       ^~~~~~~~~~~~~~
-.tmp.cpp:111:1: error: extraneous 'template<>' in declaration of variable 'funcBraced'
-  111 | template<>
+.tmp.cpp:102:1: error: extraneous 'template<>' in declaration of variable 'funcBraced'
+  102 | template<>
       | ^~~~~~~~~~
-.tmp.cpp:112:32: error: redefinition of 'funcBraced'
-  112 | constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
+.tmp.cpp:103:32: error: redefinition of 'funcBraced'
+  103 | constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
       |                                ^
-.tmp.cpp:109:22: note: previous definition is here
-  109 | constexpr const auto funcBraced = __lambda_11_29{};
+.tmp.cpp:100:22: note: previous definition is here
+  100 | constexpr const auto funcBraced = __lambda_11_29{};
       |                      ^
-.tmp.cpp:112:32: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_11_29'
-  112 | constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
+.tmp.cpp:103:32: error: no viable constructor or deduction guide for deduction of template arguments of '__lambda_11_29'
+  103 | constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
       |                                ^
-.tmp.cpp:65:7: note: candidate template ignored: couldn't infer template argument 'T'
-   65 | class __lambda_11_29
+.tmp.cpp:56:7: note: candidate template ignored: couldn't infer template argument 'T'
+   56 | class __lambda_11_29
       |       ^
-.tmp.cpp:65:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
-   65 | class __lambda_11_29
+.tmp.cpp:56:7: note: candidate function template not viable: requires 1 argument, but 0 were provided
+   56 | class __lambda_11_29
       |       ^~~~~~~~~~~~~~
-.tmp.cpp:112:42: error: expected ';' at end of declaration
-  112 | constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
+.tmp.cpp:103:42: error: expected ';' at end of declaration
+  103 | constexpr const __lambda_11_29 funcBraced<int> = __lambda_11_29{};
       |                                          ^
       |                                          ;
-.tmp.cpp:112:42: error: expected unqualified-id
-.tmp.cpp:117:21: error: expected '(' for function-style cast or type construction
-  117 |   return func<double>.operator()(x);
+.tmp.cpp:103:42: error: expected unqualified-id
+.tmp.cpp:107:21: error: expected '(' for function-style cast or type construction
+  107 |   return func<double>.operator()(x);
       |               ~~~~~~^
-.tmp.cpp:117:22: error: expected expression
-  117 |   return func<double>.operator()(x);
+.tmp.cpp:107:22: error: expected expression
+  107 |   return func<double>.operator()(x);
       |                      ^
-.tmp.cpp:123:44: error: expected '(' for function-style cast or type construction
-  123 |   return static_cast<double>(funcBraced<int>.operator()(x));
+.tmp.cpp:113:44: error: expected '(' for function-style cast or type construction
+  113 |   return static_cast<double>(funcBraced<int>.operator()(x));
       |                                         ~~~^
-.tmp.cpp:123:45: error: expected expression
-  123 |   return static_cast<double>(funcBraced<int>.operator()(x));
+.tmp.cpp:113:45: error: expected expression
+  113 |   return static_cast<double>(funcBraced<int>.operator()(x));
       |                                             ^
-.tmp.cpp:123:45: error: expected ')'
-.tmp.cpp:123:29: note: to match this '('
-  123 |   return static_cast<double>(funcBraced<int>.operator()(x));
+.tmp.cpp:113:45: error: expected ')'
+.tmp.cpp:113:29: note: to match this '('
+  113 |   return static_cast<double>(funcBraced<int>.operator()(x));
       |                             ^
 19 errors generated.

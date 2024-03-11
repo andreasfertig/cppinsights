@@ -5,7 +5,7 @@ struct Foo
   inline Foo() = default;
   inline Foo(const Foo<BT> & v) = default;
   inline constexpr Foo(BT v)
-  : BT{v}
+  : BT(v)
   {
   }
   
@@ -76,11 +76,8 @@ struct Foo<int>
 
 #endif
 
-
 using Int = Foo<int>;
-
 using Char = Foo<char>;
-
 
 class Test
 {
@@ -124,11 +121,9 @@ class Test
 };
 
 
-
 int main()
 {
   Test t;
   t.Apply();
   return 0;
 }
-

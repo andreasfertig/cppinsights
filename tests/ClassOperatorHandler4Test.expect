@@ -1,4 +1,3 @@
-
 class Foo
 {
   
@@ -12,14 +11,10 @@ class Foo
 };
 
 
-
-
 bool operator==(const Foo & left, const Foo & right)
 {
   return left.mX == right.mX;
 }
-
-
 
 
 int main()
@@ -35,4 +30,3 @@ int main()
   
   return 0;
 }
-

@@ -2,13 +2,10 @@
  * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
  * buggy.                                                                            *
  *************************************************************************************/
-// cmdlineinsights:-edu-show-lifetime
-
 struct Data
 {
   int mData[5]{0, 0, 0, 0, 0};
 };
-
 
 
 int main()
@@ -22,4 +19,3 @@ int main()
   /* v // lifetime ends here */
   ;
 }
-

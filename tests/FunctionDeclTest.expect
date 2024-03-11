@@ -6,20 +6,16 @@ int main()
   return 0;
 }
 
-
 extern int Foo(double d)
 {
   return static_cast<int>(2 * d);
 }
-
 
 float Bar(int x, float y)
 {
   return static_cast<float>(x) + y;
 }
 
-
 static void Char()
 {
 }
-

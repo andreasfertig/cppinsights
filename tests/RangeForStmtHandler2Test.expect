@@ -1,7 +1,5 @@
-// empty range base for loops
 #include <cstdio>
 #include <vector>
-
 
 int main()
 {
@@ -36,4 +34,3 @@ int main()
   }
   return 0;
 }
-

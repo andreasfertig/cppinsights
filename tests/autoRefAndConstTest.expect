@@ -1,5 +1,6 @@
 #include <new> // for thread-safe static's placement new
 #include <stdint.h> // for uint64_t under Linux/GCC
+
 #include <vector>
 
 const std::vector<int, std::allocator<int> > & getTheData()
@@ -19,10 +20,8 @@ const std::vector<int, std::allocator<int> > & getTheData()
   return *reinterpret_cast<std::vector<int, std::allocator<int> >*>(__theData);
 }
 
-
 int main()
 {
   const std::vector<int, std::allocator<int> > & x = getTheData();
   return 0;
 }
-

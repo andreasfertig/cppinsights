@@ -4,7 +4,6 @@ int Is(const T x)
   return x(22);
 }
 
-
 /* First instantiated from: LambdaHandler3Test.cpp:10 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -39,5 +38,3 @@ int main()
   
   return Is(__lambda_10_13{y});
 }
-
-

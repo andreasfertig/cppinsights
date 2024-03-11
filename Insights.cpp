@@ -17,18 +17,15 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/raw_ostream.h"
 
+#include <vector>
+
 #include "CodeGenerator.h"
 #include "DPrint.h"
-#include "FunctionDeclHandler.h"
-#include "GlobalVariableHandler.h"
 #include "Insights.h"
-#include "RecordDeclHandler.h"
-#include "TemplateHandler.h"
 #include "version.h"
 //-----------------------------------------------------------------------------
 
 using namespace clang;
-using namespace clang::ast_matchers;
 using namespace clang::driver;
 using namespace clang::tooling;
 using namespace clang::insights;
@@ -110,17 +107,76 @@ void EnableGlobalInsert(GlobalInserts idx)
 
 }  // namespace clang::insights
 
+using IncludeData = std::pair<const SourceLocation, std::string>;
+
+class FindIncludes : public PPCallbacks
+{
+    SourceManager&            mSm;
+    Preprocessor&             mPP;
+    std::vector<IncludeData>& mIncludes;
+
+public:
+    FindIncludes(SourceManager& sm, Preprocessor& pp, std::vector<IncludeData>& incData)
+    : PPCallbacks{}
+    , mSm{sm}
+    , mPP{pp}
+    , mIncludes{incData}
+    {
+    }
+
+    void InclusionDirective(SourceLocation hashLoc,
+                            const Token& /*IncludeTok*/,
+                            StringRef fileName,
+                            bool      isAngled,
+                            CharSourceRange /*FilenameRange*/,
+                            OptionalFileEntryRef /*file*/,
+                            StringRef /*SearchPath*/,
+                            StringRef /*RelativePath*/,
+                            const Module* /*Imported*/,
+                            SrcMgr::CharacteristicKind /*FileType*/) override
+    {
+        auto expansionLoc = mSm.getExpansionLoc(hashLoc);
+
+        if(expansionLoc.isInvalid() or mSm.isInSystemHeader(expansionLoc)) {
+            return;
+        }
+
+        // XXX: distinguish between include and import via the IncludeTok
+        if(isAngled) {
+            mIncludes.emplace_back(expansionLoc, StrCat("#include <"sv, fileName, ">\n"sv));
+
+        } else {
+            mIncludes.emplace_back(expansionLoc, StrCat("#include \""sv, fileName, "\"\n"sv));
+        }
+    }
+
+    void MacroDefined(const Token& macroNameTok, const MacroDirective* md) override
+    {
+        const auto loc = md->getLocation();
+        if(not mSm.isWrittenInMainFile(loc)) {
+            return;
+        }
+
+        auto name = mPP.getSpelling(macroNameTok);
+
+        if(not name.starts_with("INSIGHTS_"sv)) {
+            return;
+        }
+
+        mIncludes.emplace_back(loc, StrCat("#define "sv, name, "\n"sv));
+    }
+};
+
 class CppInsightASTConsumer final : public ASTConsumer
 {
+    Rewriter&                 mRewriter;
+    std::vector<IncludeData>& mIncludes;
+
 public:
-    explicit CppInsightASTConsumer(Rewriter& rewriter)
+    explicit CppInsightASTConsumer(Rewriter& rewriter, std::vector<IncludeData>& includes)
     : ASTConsumer{}
-    , mMatcher{}
-    , mRecordDeclHandler{rewriter, mMatcher}
-    , mTemplateHandler{rewriter, mMatcher}
-    , mGlobalVariableHandler{rewriter, mMatcher}
-    , mFunctionDeclHandler{rewriter, mMatcher}
     , mRewriter{rewriter}
+    , mIncludes{includes}
     {
         if(GetInsightsOptions().UseShow2C) {
             gInsightsOptions.ShowLifetime = true;
@@ -133,27 +189,75 @@ public:
 
     void HandleTranslationUnit(ASTContext& context) override
     {
-        gAST = &context;
-        mMatcher.matchAST(context);
+        gAST     = &context;
+        auto& sm = context.getSourceManager();
 
-        // Check whether we had static local variables which we transformed. Then for the placement-new we need to
-        // include the header <new>.
-        const auto& sm         = context.getSourceManager();
+        auto isExpansionInSystemHeader = [&sm](const Decl* d) {
+            auto expansionLoc = sm.getExpansionLoc(d->getLocation());
+
+            return expansionLoc.isInvalid() or sm.isInSystemHeader(expansionLoc);
+        };
+
         const auto& mainFileId = sm.getMainFileID();
-        const auto& fileEntry  = sm.getFileEntryForID(mainFileId);
-        const auto  loc        = sm.translateFileLineCol(fileEntry, 1, 1);
+
+        mRewriter.ReplaceText({sm.getLocForStartOfFile(mainFileId), sm.getLocForEndOfFile(mainFileId)}, "");
+
+        OutputFormatHelper   outputFormatHelper{};
+        CodeGeneratorVariant codeGenerator{outputFormatHelper};
+
+        auto include = mIncludes.begin();
+
+        auto insertBlankLineIfRequired = [&](std::optional<SourceLocation>& lastLoc, SourceLocation nextLoc) {
+            if(lastLoc.has_value() and
+               (2 <= (sm.getSpellingLineNumber(nextLoc) - sm.getSpellingLineNumber(lastLoc.value())))) {
+                outputFormatHelper.AppendNewLine();
+            }
+
+            lastLoc = nextLoc;
+        };
+
+        for(std::optional<SourceLocation> lastLoc{}; const auto* d : context.getTranslationUnitDecl()->decls()) {
+            if(isExpansionInSystemHeader(d)) {
+                continue;
+            }
+
+            // includes before this decl
+            for(; (mIncludes.end() != include) and (include->first < d->getLocation()); include = std::next(include)) {
+                insertBlankLineIfRequired(lastLoc, include->first);
+                outputFormatHelper.Append(include->second);
+            }
+
+            // ignore includes inside this decl
+            include = std::find_if_not(include, mIncludes.end(), [&](auto& inc) {
+                return ((inc.first >= d->getLocation()) and (inc.first <= d->getEndLoc()));
+            });
+
+            if(isa<LinkageSpecDecl>(d) and d->isImplicit()) {
+                continue;
+
+                // Only handle explicit specializations here. Implicit ones are handled by the `VarTemplateDecl`
+                // itself.
+            } else if(const auto* vdspec = dyn_cast_or_null<VarTemplateSpecializationDecl>(d);
+                      vdspec and (TSK_ExplicitSpecialization != vdspec->getSpecializationKind())) {
+                continue;
+            }
+
+            insertBlankLineIfRequired(lastLoc, d->getLocation());
+
+            codeGenerator->InsertArg(d);
+        }
+
+        std::string insightsIncludes{};
 
         if(GetInsightsOptions().ShowCoroutineTransformation) {
-            mRewriter.InsertText(
-                loc,
+            insightsIncludes.append(
                 R"(/*************************************************************************************
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
 )"sv);
         } else if(GetInsightsOptions().UseShow2C or GetInsightsOptions().ShowLifetime) {
-            mRewriter.InsertText(
-                loc,
+            insightsIncludes.append(
                 R"(/*************************************************************************************
  * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
  * buggy.                                                                            *
@@ -161,6 +265,8 @@ public:
 )"sv);
         }
 
+        // Check whether we had static local variables which we transformed. Then for the placement-new we need to
+        // include the header <new>.
         std::string inserts{};
         for(const auto& [active, value] : gGlobalInserts) {
             if(not active) {
@@ -172,29 +278,30 @@ public:
         }
 
         if(not inserts.empty()) {
-            mRewriter.InsertText(loc, inserts);
+            insightsIncludes.append(inserts);
+            insightsIncludes.append("\n");
         }
 
+        outputFormatHelper.InsertAt(0, insightsIncludes);
+
+        mRewriter.InsertText(sm.getLocForStartOfFile(mainFileId), outputFormatHelper.GetString());
+
         if(GetInsightsOptions().UseShow2C) {
-            auto       cxaStart = EmitGlobalVariableCtors();
-            const auto cxaLoc   = sm.translateFileLineCol(fileEntry, fileEntry->getSize(), 1);
+            const auto& fileEntry = sm.getFileEntryForID(mainFileId);
+            auto        cxaStart  = EmitGlobalVariableCtors();
+            const auto  cxaLoc    = sm.translateFileLineCol(fileEntry, fileEntry->getSize(), 1);
 
             mRewriter.InsertText(cxaLoc, cxaStart);
         }
     }
-
-private:
-    MatchFinder           mMatcher;
-    RecordDeclHandler     mRecordDeclHandler;
-    TemplateHandler       mTemplateHandler;
-    GlobalVariableHandler mGlobalVariableHandler;
-    FunctionDeclHandler   mFunctionDeclHandler;
-    Rewriter&             mRewriter;
 };
 //-----------------------------------------------------------------------------
 
 class CppInsightFrontendAction final : public ASTFrontendAction
 {
+    Rewriter                 mRewriter{};
+    std::vector<IncludeData> mIncludes{};
+
 public:
     CppInsightFrontendAction() = default;
     void EndSourceFileAction() override
@@ -205,12 +312,13 @@ public:
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& CI, StringRef /*file*/) override
     {
         gCI = &CI;
-        mRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-        return std::make_unique<CppInsightASTConsumer>(mRewriter);
-    }
 
-private:
-    Rewriter mRewriter;
+        Preprocessor& pp = CI.getPreprocessor();
+        pp.addPPCallbacks(std::make_unique<FindIncludes>(CI.getSourceManager(), pp, mIncludes));
+
+        mRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
+        return std::make_unique<CppInsightASTConsumer>(mRewriter, mIncludes);
+    }
 };
 //-----------------------------------------------------------------------------
 

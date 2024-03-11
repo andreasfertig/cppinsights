@@ -13,5 +13,3 @@ int main()
   S s = S();
   return 0;
 }
-
-

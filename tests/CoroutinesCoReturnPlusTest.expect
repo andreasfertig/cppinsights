@@ -1,6 +1,5 @@
-// cmdline:-std=c++2a
 #include <coroutine>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 
 struct generator
@@ -89,32 +88,25 @@ struct generator
 };
 
 
-
 generator simpleReturn(int v)
 {
   co_return static_cast<int &&>(v);
 }
-
-
-
 
 generator additionAwaitReturn(int v)
 {
   co_return (co_await simpleReturn(v) + co_await simpleReturn(v)) + co_await simpleReturn(v + 1);
 }
 
-
 generator awaitReturn(int v)
 {
   co_return co_await simpleReturn(v + 41);
 }
 
-
 generator bracedReturn(int v)
 {
   co_return {v};
 }
-
 
 int main()
 {
@@ -124,4 +116,3 @@ int main()
   generator br = bracedReturn(5);
   return 0;
 }
-

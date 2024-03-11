@@ -35,7 +35,6 @@ namespace detail
 template<typename ... type_parameter_0_0>
 struct compose;
 
-
 template<>
 struct compose<>
 {
@@ -62,10 +61,8 @@ struct compose<>
 };
 
 
-
 int main()
 {
   compose<>::to<int>::result<int, char> a;
   return 0;
 }
-

@@ -1,7 +1,4 @@
 #define INSIGHTS_USE_TEMPLATE
-// source: https://en.cppreference.com/w/cpp/language/variable_template
-
-
 
 template<class T>
 constexpr const T pi = T(3.14159265358979323851L);
@@ -9,13 +6,11 @@ constexpr const T pi = T(3.14159265358979323851L);
 template<>
 constexpr const int pi<int> = int(3.14159265358979323851L);
 
- 
 template<class T>
 T circular_area(T r)
 {
   return (pi<T> * r) * r;
 }
-
 
 /* First instantiated from: VarTemplateDecl3Test.cpp:33 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -45,13 +40,11 @@ struct X<int>
 
 #endif
 
-
 template<typename T>
 X<T> DoIt(T x)
 {
   return {circular_area(x), circular_area(x + 2)};
 }
-
 
 /* First instantiated from: VarTemplateDecl3Test.cpp:30 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -71,5 +64,3 @@ int main()
   int & b = __DoIt30.y;
   return circular_area(x);
 }
-
-

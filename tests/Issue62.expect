@@ -1,10 +1,10 @@
 #define INSIGHTS_USE_TEMPLATE
+
 template<typename ... T>
 int func(T... t)
 {
   return func(t... );
 }
-
 
 /* First instantiated from: Issue62.cpp:6 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -15,5 +15,5 @@ int func<int, int>(int __t0, int __t1)
 }
 #endif
 
-int _ = func(5, 5);
 
+int _ = func(5, 5);

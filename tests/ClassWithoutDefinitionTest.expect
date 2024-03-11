@@ -18,10 +18,8 @@ class Foo<int>
 
 #endif
 
-
 int main()
 {
   Foo<int> f;
   return 0;
 }
-

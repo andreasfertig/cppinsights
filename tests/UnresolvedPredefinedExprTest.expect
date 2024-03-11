@@ -1,6 +1,5 @@
 #define INSIGHTS_USE_TEMPLATE
 
-// Put the namespace here to force rewriting of the primary template
 namespace UnresolvedLookupExprTest
 {
   template<typename T>
@@ -39,4 +38,3 @@ int main()
   UnresolvedLookupExprTest::Test<int> t = UnresolvedLookupExprTest::Test<int>();
   return 0;
 }
-

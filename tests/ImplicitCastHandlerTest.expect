@@ -12,4 +12,3 @@ int main()
   c++;
   return static_cast<int>(c);
 }
-

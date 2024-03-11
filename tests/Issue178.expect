@@ -9,7 +9,6 @@ struct X
 };
 
 
-
 struct Y : public X
 {
   int f(float);
@@ -20,5 +19,4 @@ struct Y : public X
   // int X::f();
   
 };
-
 

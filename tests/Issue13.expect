@@ -6,7 +6,6 @@ std::shared_ptr<int> create()
   return std::make_shared<int>(42);
 }
 
-
 int main()
 {
   const std::shared_ptr<int> & car = create();
@@ -18,4 +17,3 @@ int main()
   volatile std::shared_ptr<int> && vcarte = create();
   return 0;
 }
-

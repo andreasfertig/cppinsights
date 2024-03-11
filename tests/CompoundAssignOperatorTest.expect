@@ -32,4 +32,3 @@ int main()
   d = d + d;
   return 0;
 }
-

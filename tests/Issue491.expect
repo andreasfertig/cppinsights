@@ -40,4 +40,3 @@ class __lambda_1_10
 };
 
 __lambda_1_10 x = __lambda_1_10{+__lambda_1_16{}.operator __lambda_1_16::retType_1_16()};
-

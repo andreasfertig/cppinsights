@@ -121,7 +121,7 @@ namespace DependentScopeDeclRefExpr
     A<T>::template foo<T>;
   }
   
-} // namespace DependentScopeDeclRefExpr
+}
 
 int main()
 {
@@ -131,4 +131,3 @@ int main()
   bool d = Test::dependentScope4<bool>::result;
   return 0;
 }
-

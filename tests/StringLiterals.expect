@@ -12,4 +12,3 @@ int main()
   const char32_t * s4 = U"hello";
   return 0;
 }
-  

@@ -11,13 +11,11 @@ struct C
 };
 
 
-
 C f()
 {
   C namedC /* NRVO variable */;
   return C(static_cast<const C &&>(namedC));
 }
-
 
 C f2()
 {
@@ -26,8 +24,6 @@ C f2()
   return C(static_cast<const C &&>(namedC2));
 }
 
-
-
 int main()
 {
   printf("Hello\n");
@@ -35,4 +31,3 @@ int main()
   C obj2 = f2();
   return 0;
 }
-

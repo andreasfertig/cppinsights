@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <string>
+
 template<typename T>
 static inline decltype(auto) Normalize(const T & arg)
 {
@@ -10,7 +11,6 @@ static inline decltype(auto) Normalize(const T & arg)
   } 
   
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -56,7 +56,6 @@ void Log(const char * fmt, const Ts &... ts)
   printf(fmt, Normalize(ts)... );
 }
 
-
 /* First instantiated from: TemplateArgumentsTest.cpp:23 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -96,4 +95,3 @@ int main()
   Log("%s\n", test);
   return 0;
 }
-

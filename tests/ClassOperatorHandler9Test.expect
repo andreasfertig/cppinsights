@@ -9,12 +9,12 @@ class MyVector
   
   public: 
   inline MyVector(const std::size_t n)
-  : v{n}
+  : v(n)
   {
   }
   
   inline MyVector(const std::size_t n, const double initialValue)
-  : v{n, initialValue}
+  : v(n, initialValue)
   {
   }
   
@@ -74,9 +74,7 @@ class MyVector<int>
 
 #endif
 
-
 using vec_t = MyVector<int>;
-
 
 MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
 {
@@ -88,7 +86,6 @@ MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
   return MyVector<int>(static_cast<MyVector<int> &&>(result));
 }
 
-
 template<typename T>
 MyVector<T> operator*(const MyVector<T> & a, const MyVector<T> & b)
 {
@@ -99,7 +96,6 @@ MyVector<T> operator*(const MyVector<T> & a, const MyVector<T> & b)
   
   return result;
 }
-
 
 /* First instantiated from: ClassOperatorHandler9Test.cpp:70 */
 #ifdef INSIGHTS_USE_TEMPLATE
@@ -126,7 +122,6 @@ MyVector<int> Foo(const MyVector<int> & a, const MyVector<int> & b)
   return MyVector<int>(static_cast<MyVector<int> &&>(result));
 }
 
-
 int main()
 {
   MyVector<int> vecA = MyVector<int>(4, 2);
@@ -136,4 +131,3 @@ int main()
   operator*(vecA, vecB);
   return 0;
 }
-

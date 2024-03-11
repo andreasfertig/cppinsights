@@ -2,13 +2,8 @@
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-// cmdline:-std=c++20
-// cmdlineinsights:-edu-show-coroutine-transformation
-
-
-// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4736.pdf
 #include <coroutine>
-#include <exception> // std::terminate
+#include <exception>
 #include <new>
 #include <utility>
 #include <chrono>
@@ -97,7 +92,6 @@ struct my_future<int>
 
 #endif
 
-
 template<class Rep, class Period>
 auto operator co_await(std::chrono::duration<Rep, Period> d)
 {
@@ -126,7 +120,6 @@ auto operator co_await(std::chrono::duration<Rep, Period> d)
   
   return awaiter{{d}};
 }
-
 
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -159,10 +152,10 @@ awaiter operator co_await<long long, std::ratio<1, 1000> >(std::chrono::duration
 }
 #endif
 
+
 using namespace std::chrono;
 
 my_future<int> h();
-
 struct __gFrame
 {
   void (*resume_fn)(__gFrame *);
@@ -283,6 +276,4 @@ void __gDestroy(__gFrame * __f)
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
   operator delete(static_cast<void *>(__f));
 }
-
-
 

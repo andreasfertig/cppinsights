@@ -20,7 +20,6 @@ class Customer
 };
 
 
-
 struct CustomerEq
 {
   inline bool operator()(const Customer & c0, const Customer & c1) const
@@ -32,7 +31,6 @@ struct CustomerEq
 };
 
 
-
 struct CustomerHash
 {
   inline std::size_t operator()(const Customer & c) const
@@ -42,7 +40,6 @@ struct CustomerHash
   
   // inline constexpr CustomerHash() noexcept = default;
 };
-
 
 
 template<typename ... Bases>
@@ -82,7 +79,6 @@ struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, pu
 
 #endif
 
-
 int main()
 {
   std::unordered_set<Customer, CustomerHash, CustomerEq, std::allocator<Customer> > set1 = std::unordered_set<Customer, CustomerHash, CustomerEq, std::allocator<Customer> >();
@@ -93,4 +89,3 @@ int main()
   set3.emplace<const char (&)[5]>("Test");
   return 0;
 }
-

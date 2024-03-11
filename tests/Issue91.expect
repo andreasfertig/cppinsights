@@ -4,7 +4,6 @@ inline constexpr int fold_minus_impl()
   return (Ints - ... - 5);
 }
 
-
 /* First instantiated from: Issue91.cpp:8 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -31,7 +30,6 @@ inline constexpr int fold_minus()
   return fold_minus_impl<0, Ints... >();
 }
 
-
 /* First instantiated from: Issue91.cpp:11 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -54,16 +52,9 @@ inline constexpr int fold_minus<0>()
 
 /* PASSED: static_assert(fold_minus() == -5); */
 
-
 template<int b>
 class print_int;
 
-
 int i = fold_minus<0>();
-
 /* PASSED: static_assert(fold_minus<0>() == 5); */
-
 /* PASSED: static_assert(((0 - 0) - 5) == -5); */
-
-
-//print_int<fold_minus<0>()> p;

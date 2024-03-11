@@ -5,7 +5,6 @@ void foo(F && f)
 {
 }
 
-
 /* First instantiated from: Issue50_3.cpp:18 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
@@ -17,12 +16,10 @@ void foo<int &&(&)(int &&)>(int &&(&f)(int &&))
 
 using F = int &&(int &&);
 
-
 int && f(int && i)
 {
   return static_cast<int &&>(i);
 }
-
 
 int main()
 {
@@ -30,4 +27,3 @@ int main()
   foo(rf);
   return 0;
 }
-

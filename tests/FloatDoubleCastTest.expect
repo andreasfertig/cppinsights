@@ -7,5 +7,3 @@ int main()
   fl = static_cast<float>(i);
   return 0;
 }
-
-

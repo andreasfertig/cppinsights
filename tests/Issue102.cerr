@@ -1,19 +1,19 @@
-.tmp.cpp:332:26: error: 'auto' not allowed in type alias
-  332 |     using retType_73_4 = auto (*)(std::string);
+.tmp.cpp:402:26: error: 'auto' not allowed in type alias
+  402 |     using retType_73_4 = auto (*)(std::string);
       |                          ^~~~
-.tmp.cpp:333:31: error: unknown type name 'retType_73_4'
-  333 |     inline constexpr operator retType_73_4 () const noexcept
+.tmp.cpp:403:31: error: unknown type name 'retType_73_4'
+  403 |     inline constexpr operator retType_73_4 () const noexcept
       |                               ^
-.tmp.cpp:357:26: error: 'auto' not allowed in type alias
-  357 |     using retType_74_4 = auto (*)(int);
+.tmp.cpp:427:26: error: 'auto' not allowed in type alias
+  427 |     using retType_74_4 = auto (*)(int);
       |                          ^~~~
-.tmp.cpp:358:31: error: unknown type name 'retType_74_4'
-  358 |     inline constexpr operator retType_74_4 () const noexcept
+.tmp.cpp:428:31: error: unknown type name 'retType_74_4'
+  428 |     inline constexpr operator retType_74_4 () const noexcept
       |                               ^
-.tmp.cpp:376:5: error: templates cannot be declared inside of a local class
-  376 |     template<class type_parameter_1_0>
+.tmp.cpp:446:5: error: templates cannot be declared inside of a local class
+  446 |     template<class type_parameter_1_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:383:5: error: templates cannot be declared inside of a local class
-  383 |     template<class type_parameter_1_0>
+.tmp.cpp:453:5: error: templates cannot be declared inside of a local class
+  453 |     template<class type_parameter_1_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 6 errors generated.
