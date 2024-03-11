@@ -18,6 +18,9 @@
 #include <algorithm>
 //-----------------------------------------------------------------------------
 
+namespace ranges = std::ranges;
+//-----------------------------------------------------------------------------
+
 namespace clang::insights {
 
 constexpr std::string_view CORO_FRAME_NAME{"__f"sv};
@@ -560,8 +563,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         // this parameter.
         funParamStorage.push_back(Parameter(&fd, CORO_FRAME_ACCESS_THIS, cxxMethodType));
 
-        // XXX: use ranges once available
-        std::copy(funParams.begin(), funParams.end(), std::back_inserter(funParamStorage));
+        ranges::copy(funParams, std::back_inserter(funParamStorage));
 
         funParams = funParamStorage;
     }
@@ -577,11 +579,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     for(auto* promiseTypeRecordDecl = mASTData.mPromiseField->getType()->getAsCXXRecordDecl();
         auto* ctor : promiseTypeRecordDecl->ctors()) {
 
-        // XXX: use ranges once available
-        if(not std::equal(
-               ctor->param_begin(), ctor->param_end(), funParams.begin(), funParams.end(), [&](auto& a, auto& b) {
-                   return getNonRefType(a) == getNonRefType(b);
-               })) {
+        if(not ranges::equal(
+               ctor->parameters(), funParams, [&](auto& a, auto& b) { return getNonRefType(a) == getNonRefType(b); })) {
             continue;
         }
 

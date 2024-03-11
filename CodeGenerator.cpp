@@ -38,6 +38,8 @@
     }
 //-----------------------------------------------------------------------------
 
+namespace ranges = std::ranges;
+//-----------------------------------------------------------------------------
 namespace clang::insights {
 
 #define BUILD_OPT_AND(name, param) std::function name = [](param t) -> MyOptional<param>
@@ -1524,11 +1526,8 @@ void CodeGenerator::InsertMethodBody(const FunctionDecl* stmt, const size_t posB
 
             // handle C++ [basic.start.main] §5: main can have no return statement
             if(stmt->hasImplicitReturnZero()) {
-                // TODO replace with ranges::find_if
-                const auto cmpBody = dyn_cast<CompoundStmt>(stmt->getBody())->body();
-                mRequiresImplicitReturnZero =
-                    std::end(cmpBody) ==
-                    std::find_if(cmpBody.begin(), cmpBody.end(), [](const Stmt* e) { return isa<ReturnStmt>(e); });
+                mRequiresImplicitReturnZero = ranges::none_of(dyn_cast<CompoundStmt>(stmt->getBody())->body(),
+                                                              [](const Stmt* e) { return isa<ReturnStmt>(e); });
             }
 
             const auto* body = stmt->getBody();
@@ -1754,11 +1753,10 @@ void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
     }
 
     // Sort specializations by POI to make dependent specializations work.
-    std::sort(specializations.begin(),
-              specializations.end(),
-              [](const ClassTemplateSpecializationDecl* a, const ClassTemplateSpecializationDecl* b) {
-                  return a->getPointOfInstantiation() < b->getPointOfInstantiation();
-              });
+    ranges::sort(specializations,
+                 [](const ClassTemplateSpecializationDecl* a, const ClassTemplateSpecializationDecl* b) {
+                     return a->getPointOfInstantiation() < b->getPointOfInstantiation();
+                 });
 
     for(const auto* spec : specializations) {
         InsertArg(spec);
@@ -4621,17 +4619,8 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
 
     outputFormatHelper.AppendNewLine();
     LambdaCodeGenerator codeGenerator{outputFormatHelper, mLambdaStack, mProcessingPrimaryTemplate};
-    codeGenerator.mCapturedThisAsCopy = [&] {
-        for(const auto& c : lambda->captures()) {
-            const auto captureKind = c.getCaptureKind();
-
-            if(c.capturesThis() and (captureKind == LCK_StarThis)) {
-                return true;
-            }
-        }
-
-        return false;
-    }();
+    codeGenerator.mCapturedThisAsCopy = ranges::any_of(
+        lambda->captures(), [](auto& c) { return (c.capturesThis() and (c.getCaptureKind() == LCK_StarThis)); });
 
     codeGenerator.mLambdaExpr = lambda;
     codeGenerator.InsertArg(lambda->getLambdaClass());
