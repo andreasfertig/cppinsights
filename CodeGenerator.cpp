@@ -947,7 +947,12 @@ public:
                                                   {},
                                                  &ctx.Idents.get(mTempName),
                                                  expr->getType(),
-                                                 ImplicitParamDecl::Other);
+#if IS_CLANG_NEWER_THAN(17)
+                                                 ImplicitParamKind::Other
+#else
+                                                 ImplicitParamDecl::Other
+#endif
+            );
 
 #endif
 
@@ -1385,7 +1390,7 @@ void CodeGenerator::InsertInstantiationPoint(const SourceManager&  sm,
 {
     const auto  lineNo = sm.getSpellingLineNumber(instLoc);
     const auto& fileId = sm.getFileID(instLoc);
-    if(const auto* file = sm.getFileEntryForID(fileId)) {
+    if(const auto file = sm.getFileEntryRefForID(fileId)) {
         const auto fileWithDirName = file->getName();
         const auto fileName        = llvm::sys::path::filename(fileWithDirName);
 
@@ -2752,12 +2757,16 @@ void CodeGenerator::InsertArg(const GNUNullExpr* /*stmt*/)
 
 void CodeGenerator::InsertArg(const CharacterLiteral* stmt)
 {
+#if IS_CLANG_NEWER_THAN(17)
+#else
+#define CharacterLiteralKind CharacterLiteral
+#endif
     switch(stmt->getKind()) {
-        case CharacterLiteral::Ascii: break;
-        case CharacterLiteral::Wide: mOutputFormatHelper.Append('L'); break;
-        case CharacterLiteral::UTF8: mOutputFormatHelper.Append("u8"sv); break;
-        case CharacterLiteral::UTF16: mOutputFormatHelper.Append('u'); break;
-        case CharacterLiteral::UTF32: mOutputFormatHelper.Append('U'); break;
+        case CharacterLiteralKind::Ascii: break;
+        case CharacterLiteralKind::Wide: mOutputFormatHelper.Append('L'); break;
+        case CharacterLiteralKind::UTF8: mOutputFormatHelper.Append("u8"sv); break;
+        case CharacterLiteralKind::UTF16: mOutputFormatHelper.Append('u'); break;
+        case CharacterLiteralKind::UTF32: mOutputFormatHelper.Append('U'); break;
     }
 
     switch(unsigned value = stmt->getValue()) {
@@ -2774,7 +2783,7 @@ void CodeGenerator::InsertArg(const CharacterLiteral* stmt)
         case '\t': mOutputFormatHelper.Append("'\\t'"sv); break;
         case '\v': mOutputFormatHelper.Append("'\\v'"sv); break;
         default:
-            if(((value & ~0xFFu) == ~0xFFu) and (stmt->getKind() == CharacterLiteral::Ascii)) {
+            if(((value & ~0xFFu) == ~0xFFu) and (stmt->getKind() == CharacterLiteralKind::Ascii)) {
                 value &= 0xFFu;
             }
 
@@ -3563,6 +3572,11 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
     // skip this attribute. Clang seems to tag final methods or classes with final
     RETURN_IF(attr::Final == attr.getKind());
 
+#if IS_CLANG_NEWER_THAN(17)
+    // skip this custom clang attribute
+    RETURN_IF(attr::NoInline == attr.getKind());
+#endif
+
     // Clang's printPretty misses the parameter pack ellipsis. Hence treat this special case here.
     if(const auto* alignedAttr = dyn_cast_or_null<AlignedAttr>(&attr)) {
         auto insert = [&](const QualType type, const TemplateTypeParmType* tmplTypeParam) {
@@ -4264,7 +4278,7 @@ void CodeGenerator::InsertArg(const Decl* stmt)
 
 #include "CodeGeneratorTypes.h"
 
-    TODO(stmt, mOutputFormatHelper);
+    ToDo(stmt, mOutputFormatHelper);
 }
 //-----------------------------------------------------------------------------
 
@@ -4287,7 +4301,7 @@ void CodeGenerator::InsertArg(const Stmt* stmt)
 
 #include "CodeGeneratorTypes.h"
 
-    TODO(stmt, mOutputFormatHelper);
+    ToDo(stmt, mOutputFormatHelper);
 }
 //-----------------------------------------------------------------------------
 
@@ -4383,6 +4397,9 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             mOutputFormatHelper.Append(GetName(*arg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()));
             break;
         case TemplateArgument::Null: mOutputFormatHelper.Append("null"sv); break;
+#if IS_CLANG_NEWER_THAN(17)
+        case TemplateArgument::StructuralValue: ToDo(arg, mOutputFormatHelper); break;
+#endif
     }
 }
 //-----------------------------------------------------------------------------
@@ -4411,7 +4428,11 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
                                         ctx.getConstantArrayType(ctx.CharTy,
                                                                  llvm::APInt(ctx.getTypeSize(ctx.getSizeType()), 0),
                                                                  Sizeof(stmt->getType()),
-                                                                 ArrayType::ArraySizeModifier::Normal,
+#if IS_CLANG_NEWER_THAN(17)
+#else
+                                                                 ArrayType::
+#endif
+                                                                 ArraySizeModifier::Normal,
                                                                  0));
 
     compilerStorageVar->setStorageClass(StorageClass::SC_Static);
@@ -4815,7 +4836,11 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     // template requires-clause during creation of the template head.
     InsertConceptConstraint(&decl);
 
+#if IS_CLANG_NEWER_THAN(17)
+    if(decl.isPureVirtual()) {
+#else
     if(decl.isPure()) {
+#endif
         mOutputFormatHelper.Append(" = 0"sv);
     }
 }

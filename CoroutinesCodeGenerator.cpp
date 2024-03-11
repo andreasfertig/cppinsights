@@ -548,7 +548,13 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     if(const auto* cxxMethodDecl = dyn_cast_or_null<CXXMethodDecl>(&fd)) {
         funParamStorage.reserve(funParams.size() + 1);
 
-        cxxMethodType = cxxMethodDecl->getThisObjectType();
+        cxxMethodType = cxxMethodDecl->
+#if IS_CLANG_NEWER_THAN(17)
+                        getFunctionObjectParameterType()
+#else
+                        getThisObjectType()
+#endif
+            ;
 
         // In case we have a member function the first parameter is a reference to this. The following code injects
         // this parameter.

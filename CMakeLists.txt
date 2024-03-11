@@ -383,14 +383,15 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         clangLex
         clangBasic
         clangRewrite
+        clangSupport
         ${LLVM_LIBS}
         ${LLVM_SYSTEM_LIBS}
     )
 
-    if(${LLVM_PACKAGE_VERSION_PLAIN} VERSION_GREATER_EQUAL "15.0.0")
+    if(${LLVM_PACKAGE_VERSION_PLAIN} VERSION_GREATER_EQUAL "18.0.0")
         set(ADDITIONAL_LIBS
             ${ADDITIONAL_LIBS}
-            clangSupport
+            clangAPINotes
         )
     endif()
 
