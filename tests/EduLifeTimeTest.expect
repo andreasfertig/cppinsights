@@ -71,14 +71,12 @@ void Fun(void)
     Destructor_Test(&y);
     /* x // lifetime ends here */
     Destructor_Test(&t);
-    ;
   } 
   
   if((bool)x % 2) {
     return;
     /* x // lifetime ends here */
     Destructor_Test(&t);
-    ;
   } else {
     ++x;
   } 
@@ -100,14 +98,12 @@ int Fun2(void)
     Destructor_Test(&y);
     /* x // lifetime ends here */
     Destructor_Test(&t);
-    ;
   } 
   
   if((bool)x % 2) {
     return 3;
     /* x // lifetime ends here */
     Destructor_Test(&t);
-    ;
   } else {
     ++x;
   } 
@@ -116,7 +112,6 @@ int Fun2(void)
   return 3;
   /* x // lifetime ends here */
   Destructor_Test(&t);
-  ;
 }
 
 void __cxa_start(void)

@@ -65,7 +65,6 @@ int __main(void)
   return 0;
   /* b2 // lifetime ends here */
   /* b1 // lifetime ends here */
-  ;
 }
 
 int main(void)
@@ -75,7 +74,6 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  ;
 }
 
 void __cxa_start(void)

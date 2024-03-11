@@ -75,8 +75,8 @@ public:
 
     void removeTop();
     void StartScope(bool funcStart);
-    void Return(OutputFormatHelper& ofm);
-    void EndScope(OutputFormatHelper& ofm, bool clear);
+    bool Return(OutputFormatHelper& ofm);
+    bool EndScope(OutputFormatHelper& ofm, bool clear);
 };
 
 /// \brief More or less the heart of C++ Insights.
@@ -447,6 +447,7 @@ protected:
     OutputFormatHelper* mOutputFormatHelperOutside{
         nullptr};                        //!< Helper output buffer for std::initializer_list expansion.
     bool mRequiresImplicitReturnZero{};  //!< Track whether this is a function with an imlpicit return 0.
+    bool mSkipSemi{};
     ProcessingPrimaryTemplate mProcessingPrimaryTemplate{};
 };
 //-----------------------------------------------------------------------------

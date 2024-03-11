@@ -17,5 +17,4 @@ int main()
   /* dummy // lifetime ends here */
   /* __temporary10_33 // lifetime ends here */
   /* v // lifetime ends here */
-  ;
 }

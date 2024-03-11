@@ -91,7 +91,6 @@ int __main(void)
   Destructor_E(&e);
   /* dvec // lifetime ends here */
   /* avec // lifetime ends here */
-  ;
 }
 
 int main(void)
@@ -101,7 +100,6 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  ;
 }
 
 void __cxa_start(void)

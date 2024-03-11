@@ -135,7 +135,6 @@ int __main(int argc, const char ** argv)
   ++x;
   return 0;
   /* x // lifetime ends here */
-  ;
 }
 
 int main(int argc, const char ** argv)
@@ -146,7 +145,6 @@ int main(int argc, const char ** argv)
   return ret;
   /* ret // lifetime ends here */
   Destructor_Derived(&d);
-  ;
 }
 
 void __cxa_start(void)

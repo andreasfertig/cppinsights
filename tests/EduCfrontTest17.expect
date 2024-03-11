@@ -32,7 +32,6 @@ int __main(void)
   Foo<int> f;
   return 0;
   /* f // lifetime ends here */
-  ;
 }
 
 int main(void)
@@ -42,7 +41,6 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  ;
 }
 
 void __cxa_start(void)

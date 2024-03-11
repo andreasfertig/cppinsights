@@ -27,5 +27,4 @@ Inner Test()
   return __temporary15_25;
   /* __temporary15_24 // lifetime ends here */
   /* __temporary15_25 // lifetime ends here */
-  ;
 }

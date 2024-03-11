@@ -45,7 +45,6 @@ int __main(void)
   const int __temporary21_9 = 2;
   Fun_intr(&__temporary21_9);
   /* __temporary21_9 // lifetime ends here */
-  ;
   Fun_double(3.1400000000000001);
   Fun_intp(p);
   Fun_intpc(cp);
@@ -56,7 +55,6 @@ int __main(void)
   int __temporary32_9 = 4;
   Run_intR(&__temporary32_9);
   /* __temporary32_9 // lifetime ends here */
-  ;
   int i = 0;
   Run_intr(&i);
   Bun(4);
@@ -64,7 +62,6 @@ int __main(void)
   /* i // lifetime ends here */
   /* ur // lifetime ends here */
   /* r // lifetime ends here */
-  ;
 }
 
 int main(void)
@@ -74,7 +71,6 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  ;
 }
 
 void __cxa_start(void)

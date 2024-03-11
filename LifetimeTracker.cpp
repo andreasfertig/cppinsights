@@ -62,36 +62,34 @@ void LifetimeTracker::InsertDtorCall(const VarDecl* vd, OutputFormatHelper& ofm)
         return;
     }
 
-    auto* dtorDecl = type->getAsCXXRecordDecl()->getDestructor();
-    auto* ic       = CastLToRValue(vd);
+    auto*                dtorDecl = type->getAsCXXRecordDecl()->getDestructor();
+    auto*                ic       = CastLToRValue(vd);
+    CodeGeneratorVariant cg{ofm};
+
+    auto insertDtor = [&](Expr* member) {
+        auto* mem = AccessMember(member, dtorDecl, vd->getType()->isPointerType());
+        cg->InsertArg(CallMemberFun(mem, dtorDecl->getType()));
+        ofm.AppendSemiNewLine();
+    };
 
     if(const auto* ar = dyn_cast_or_null<ConstantArrayType>(vd->getType()); ar and not GetInsightsOptions().UseShow2C) {
         // not nice but call the destructor for each array element
         for(const auto& i : NumberIterator{GetSize(ar)}) {
-            auto* mem      = AccessMember(ArraySubscript(ic, i, type), dtorDecl, vd->getType()->isPointerType());
-            auto* callDtor = CallMemberFun(mem, dtorDecl->getType());
-
-            CodeGeneratorVariant cg{ofm};
-            cg->InsertArg(callDtor);
-            ofm.AppendSemiNewLine();
+            insertDtor(ArraySubscript(ic, i, type));
         }
 
         return;
     }
 
-    auto* mem      = AccessMember(ic, dtorDecl, vd->getType()->isPointerType());
-    auto* callDtor = CallMemberFun(mem, dtorDecl->getType());
-
-    CodeGeneratorVariant cg{ofm};
-    cg->InsertArg(callDtor);
-
-    ofm.AppendSemiNewLine();
+    insertDtor(ic);
 }
 //-----------------------------------------------------------------------------
 
-void LifetimeTracker::Return(OutputFormatHelper& ofm)
+bool LifetimeTracker::Return(OutputFormatHelper& ofm)
 {
-    RETURN_IF(not GetInsightsOptions().ShowLifetime or objects.empty())
+    RETURN_FALSE_IF(not GetInsightsOptions().ShowLifetime or objects.empty())
+
+    bool ret{};
 
     for(OnceTrue needsSemi{}; auto& e : llvm::reverse(objects)) {
         if(LifetimeEntry::FuncStart::Yes == e.funcStart) {
@@ -108,7 +106,10 @@ void LifetimeTracker::Return(OutputFormatHelper& ofm)
         }
 
         InsertDtorCall(e.item, ofm);
+        ret = true;
     }
+
+    return ret;
 }
 //-----------------------------------------------------------------------------
 
@@ -123,9 +124,11 @@ void LifetimeTracker::removeTop()
 }
 //-----------------------------------------------------------------------------
 
-void LifetimeTracker::EndScope(OutputFormatHelper& ofm, bool coveredByReturn)
+bool LifetimeTracker::EndScope(OutputFormatHelper& ofm, bool coveredByReturn)
 {
-    RETURN_IF(not GetInsightsOptions().ShowLifetime or objects.empty())
+    RETURN_FALSE_IF(not GetInsightsOptions().ShowLifetime or objects.empty())
+
+    bool ret{};
 
     if(not coveredByReturn) {
         for(auto& e : llvm::reverse(objects)) {
@@ -138,10 +141,13 @@ void LifetimeTracker::EndScope(OutputFormatHelper& ofm, bool coveredByReturn)
             }
 
             InsertDtorCall(e.item, ofm);
+            ret = true;
         }
     }
 
     removeTop();
+
+    return ret;
 }
 //-----------------------------------------------------------------------------
 

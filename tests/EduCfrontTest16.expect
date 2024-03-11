@@ -38,7 +38,6 @@ int __main(void)
   Alloc a;
   return 0;
   Destructor_Alloc(&a);
-  ;
 }
 
 int main(void)
@@ -48,7 +47,6 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  ;
 }
 
 void __cxa_start(void)

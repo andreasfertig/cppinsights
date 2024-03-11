@@ -86,7 +86,6 @@ int __main(void)
   Destructor_Apple(&c);
   Destructor_Apple(&b);
   Destructor_Apple(&a);
-  ;
 }
 
 int main(void)
@@ -96,7 +95,6 @@ int main(void)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  ;
 }
 
 void __cxa_start(void)

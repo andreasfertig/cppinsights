@@ -1123,7 +1123,7 @@ void CodeGenerator::StartLifetimeScope()
 
 void CodeGenerator::EndLifetimeScope()
 {
-    mLifeTimeTracker.EndScope(mOutputFormatHelper, false);
+    mSkipSemi = mLifeTimeTracker.EndScope(mOutputFormatHelper, false) or mSkipSemi;
 }
 //-----------------------------------------------------------------------------
 
@@ -2292,10 +2292,13 @@ void CodeGenerator::InsertArg(const CompoundStmt* stmt)
 
     if(requiresImplicitReturnZero) {
         InsertArg(Return(Int32(0)));
-        InsertArg(mkNullStmt());
+
+        if(not mSkipSemi) {
+            InsertArg(mkNullStmt());
+        }
     }
 
-    mLifeTimeTracker.EndScope(mOutputFormatHelper, mLastStmt and isa<ReturnStmt>(mLastStmt));
+    mSkipSemi = mLifeTimeTracker.EndScope(mOutputFormatHelper, mLastStmt and isa<ReturnStmt>(mLastStmt));
 
     mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
 }
@@ -2327,9 +2330,11 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
                                SwitchStmt,
                                CXXTryStmt,
                                CppInsightsCommentStmt>(item) and
-           InsertSemi() and not skipSemiForLambda) {
+           InsertSemi() and not skipSemiForLambda and not mSkipSemi) {
             mOutputFormatHelper.AppendSemiNewLine();
         }
+
+        mSkipSemi = false;
     }
 }
 //-----------------------------------------------------------------------------
@@ -2853,7 +2858,7 @@ void CodeGenerator::InsertArg(const ExprWithCleanups* stmt)
         mOutputFormatHelper.AppendSemiNewLine();
     }
 
-    mLifeTimeTracker.EndScope(mOutputFormatHelper, false);
+    mSkipSemi = mLifeTimeTracker.EndScope(mOutputFormatHelper, false);
 }
 //-----------------------------------------------------------------------------
 
@@ -4134,7 +4139,7 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
         }
     }
 
-    mLifeTimeTracker.Return(mOutputFormatHelper);
+    mSkipSemi = mLifeTimeTracker.Return(mOutputFormatHelper);
 
     // the InsertArg above changes the start
     mLastStmt = stmt;
@@ -4146,6 +4151,7 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 void CodeGenerator::InsertArg(const NullStmt* /*stmt*/)
 {
     mOutputFormatHelper.AppendSemiNewLine();
+    mSkipSemi = true;
 }
 //-----------------------------------------------------------------------------
 
