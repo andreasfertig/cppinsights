@@ -1,0 +1,33 @@
+#include <utility> // std::move
+
+#include <cstdio>
+#include <functional>
+#include <memory>
+
+using namespace std;
+
+int main()
+{
+    
+  class __lambda_11_5
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    private: 
+    std::unique_ptr<int, std::default_delete<int> > a;
+    public: 
+    // inline /*constexpr */ __lambda_11_5(const __lambda_11_5 &) /* noexcept */ = delete;
+    // inline /*constexpr */ __lambda_11_5 & operator=(const __lambda_11_5 &) /* noexcept */ = delete;
+    // inline /*constexpr */ ~__lambda_11_5() noexcept = default;
+    __lambda_11_5(std::unique_ptr<int, std::default_delete<int> > && _a)
+    : a{std::move(_a)}
+    {}
+    
+  } __lambda_11_5{std::make_unique<int>(42)};
+  
+  ;
+  return 0;
+}
