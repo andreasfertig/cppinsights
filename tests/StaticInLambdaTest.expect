@@ -40,11 +40,12 @@ Singleton & Singleton::Instance()
   static uint64_t __singletonGuard;
   alignas(Singleton) static char __singleton[sizeof(Singleton)];
   
-  if(!__singletonGuard) {
+  if((__singletonGuard & 255) == 0) {
     if(__cxa_guard_acquire(&__singletonGuard)) {
       new (&__singleton)Singleton();
       __singletonGuard = true;
       __cxa_guard_release(&__singletonGuard);
+      /* __cxa_atexit(Singleton::~Singleton, &__singleton, &__dso_handle); */
     } 
     
   } 

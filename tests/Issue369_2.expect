@@ -38,11 +38,12 @@ const void withNoexcept()
   static uint64_t __valueGuard;
   alignas(foo) static char __value[sizeof(foo)];
   
-  if(!__valueGuard) {
+  if((__valueGuard & 255) == 0) {
     if(__cxa_guard_acquire(&__valueGuard)) {
       new (&__value)foo{std::move(__lambda_4_23.operator()())};
       __valueGuard = true;
       __cxa_guard_release(&__valueGuard);
+      /* __cxa_atexit(foo::~foo, &__value, &__dso_handle); */
     } 
     
   } 
@@ -78,7 +79,7 @@ const void withNoexceptFalse()
   static uint64_t __valueGuard;
   alignas(foo) static char __value[sizeof(foo)];
   
-  if(!__valueGuard) {
+  if((__valueGuard & 255) == 0) {
     if(__cxa_guard_acquire(&__valueGuard)) {
       try 
       {
@@ -89,6 +90,7 @@ const void withNoexceptFalse()
         throw ;
       }
       __cxa_guard_release(&__valueGuard);
+      /* __cxa_atexit(foo::~foo, &__value, &__dso_handle); */
     } 
     
   } 
@@ -124,11 +126,12 @@ const void withNoexceptTrue()
   static uint64_t __valueGuard;
   alignas(foo) static char __value[sizeof(foo)];
   
-  if(!__valueGuard) {
+  if((__valueGuard & 255) == 0) {
     if(__cxa_guard_acquire(&__valueGuard)) {
       new (&__value)foo{std::move(__lambda_12_23.operator()())};
       __valueGuard = true;
       __cxa_guard_release(&__valueGuard);
+      /* __cxa_atexit(foo::~foo, &__value, &__dso_handle); */
     } 
     
   } 
@@ -179,7 +182,7 @@ void viaFunction()
   static uint64_t __fGuard;
   alignas(foo) static char __f[sizeof(foo)];
   
-  if(!__fGuard) {
+  if((__fGuard & 255) == 0) {
     if(__cxa_guard_acquire(&__fGuard)) {
       try 
       {
@@ -190,6 +193,7 @@ void viaFunction()
         throw ;
       }
       __cxa_guard_release(&__fGuard);
+      /* __cxa_atexit(foo::~foo, &__f, &__dso_handle); */
     } 
     
   } 

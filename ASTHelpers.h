@@ -54,6 +54,7 @@ CXXBoolLiteralExpr* Bool(bool b);
 CallExpr*           CallDestructor(const VarDecl* fieldDecl);
 CXXNewExpr*         New(ArrayRef<Expr*> placementArgs, const Expr* expr, QualType t);
 BinaryOperator*     Mul(Expr* lhs, Expr* rhs);
+BinaryOperator*     And(VarDecl* lhs, Expr* rhs);
 QualType            Typedef(std::string_view name, QualType underlayingType);
 
 SmallVector<Expr*, 5> ArgsToExprVector(const Expr* expr);

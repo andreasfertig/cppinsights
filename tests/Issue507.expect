@@ -1,0 +1,40 @@
+#include <new> // for thread-safe static's placement new
+#include <stdint.h> // for uint64_t under Linux/GCC
+
+struct example_struct
+{
+  inline example_struct()
+  {
+    throw ;
+  }
+  
+  inline ~example_struct() noexcept
+  {
+  }
+  
+};
+
+
+example_struct & get_example()
+{
+  static uint64_t __tempGuard;
+  alignas(example_struct) static char __temp[sizeof(example_struct)];
+  
+  if((__tempGuard & 255) == 0) {
+    if(__cxa_guard_acquire(&__tempGuard)) {
+      try 
+      {
+        new (&__temp)example_struct();
+        __tempGuard = true;
+      } catch(...) {
+        __cxa_guard_abort(&__tempGuard);
+        throw ;
+      }
+      __cxa_guard_release(&__tempGuard);
+      /* __cxa_atexit(example_struct::~example_struct, &__temp, &__dso_handle); */
+    } 
+    
+  } 
+  
+  return *reinterpret_cast<example_struct*>(__temp);
+}

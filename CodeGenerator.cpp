@@ -4594,6 +4594,8 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
 
     if(threadSafe) {
         innerBodyStmts.AddBodyStmts(Call("__cxa_guard_release"sv, {Ref(compilerGuardVar)}));
+        innerBodyStmts.Add(Comment(
+            StrCat("__cxa_atexit("sv, typeName, "::~"sv, typeName, ", &"sv, internalVarName, ", &__dso_handle);"sv)));
 
         auto* aquireIf = If(Call("__cxa_guard_acquire"sv, {Ref(compilerGuardVar)}), innerBodyStmts);
         bodyStmts.AddBodyStmts(aquireIf);
@@ -4601,7 +4603,7 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
         bodyStmts.AddBodyStmts(allocAndFlagBodyCompound);
     }
 
-    InsertArg(If(Not(compilerGuardVar), bodyStmts));
+    InsertArg(If(Equal(And(compilerGuardVar, Int32(0xff)), Int32(0)), bodyStmts));
 }
 //-----------------------------------------------------------------------------
 

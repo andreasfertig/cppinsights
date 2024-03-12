@@ -23,7 +23,7 @@ Sing & Test()
   static bool __sGuard;
   alignas(Sing) static char __s[sizeof(Sing)];
   
-  if(!__sGuard) {
+  if((__sGuard & 255) == 0) {
     new (&__s)Sing();
     __sGuard = true;
   } 
