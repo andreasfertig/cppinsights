@@ -8,11 +8,12 @@ const std::vector<int, std::allocator<int> > & getTheData()
   static uint64_t __theDataGuard;
   alignas(std::vector<int, std::allocator<int> >) static char __theData[sizeof(std::vector<int, std::allocator<int> >)];
   
-  if(!__theDataGuard) {
+  if((__theDataGuard & 255) == 0) {
     if(__cxa_guard_acquire(&__theDataGuard)) {
       new (&__theData)std::vector<int, std::allocator<int> >();
       __theDataGuard = true;
       __cxa_guard_release(&__theDataGuard);
+      /* __cxa_atexit(std::vector<int, std::allocator<int> >::~std::vector<int, std::allocator<int> >, &__theData, &__dso_handle); */
     } 
     
   } 

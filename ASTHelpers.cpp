@@ -680,6 +680,12 @@ BinaryOperator* Mul(Expr* lhs, Expr* rhs)
 }
 //-----------------------------------------------------------------------------
 
+BinaryOperator* And(VarDecl* lhs, Expr* rhs)
+{
+    return mkBinaryOperator(mkDeclRefExpr(lhs), rhs, BinaryOperator::Opcode::BO_And, lhs->getType());
+}
+//-----------------------------------------------------------------------------
+
 void StmtsContainer::AddBodyStmts(Stmt* body)
 {
     if(auto* b = dyn_cast_or_null<CompoundStmt>(body)) {

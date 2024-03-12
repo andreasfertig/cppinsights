@@ -13,7 +13,7 @@ const foo & create()
   static uint64_t __valueGuard;
   alignas(const foo) static char __value[sizeof(const foo)];
   
-  if(!__valueGuard) {
+  if((__valueGuard & 255) == 0) {
     if(__cxa_guard_acquire(&__valueGuard)) {
       try 
       {
@@ -24,6 +24,7 @@ const foo & create()
         throw ;
       }
       __cxa_guard_release(&__valueGuard);
+      /* __cxa_atexit(const foo::~const foo, &__value, &__dso_handle); */
     } 
     
   } 
