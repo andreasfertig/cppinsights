@@ -1129,6 +1129,14 @@ void CodeGenerator::EndLifetimeScope()
 }
 //-----------------------------------------------------------------------------
 
+// In a primary template we can see a ParenListExpr with a PackExpansionExpr. With the equal sign we need a type.
+static bool IsPrimaryTemplatePackExpansionExpr(const ParenListExpr* stmt)
+{
+    return stmt and stmt->getNumExprs() and isa_and_nonnull<PackExpansionExpr>(stmt->getExpr(0)) and
+           stmt->getType().isNull();
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const LinkageSpecDecl* stmt)
 {
     mOutputFormatHelper.Append("extern \"",
@@ -1316,22 +1324,27 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                     if(not(ctorExpr and ctorExpr->getConstructor()->isDefaultConstructor() and
                            ctorExpr->getConstructor()->getParent()->hasTrivialDefaultConstructor())) {
 
-                        if(not isa<CXXParenListInitExpr>(init)) {
+                        const bool isPrimaryTemplatePackExpansionExpr{
+                            IsPrimaryTemplatePackExpansionExpr(dyn_cast_or_null<ParenListExpr>(init))};
+
+                        if(not isa<CXXParenListInitExpr>(init) and not isPrimaryTemplatePackExpansionExpr) {
                             mOutputFormatHelper.Append(hlpAssing);
                         }
 
-                        if(GetInsightsOptions().ShowLifetime and init->isXValue() and
-                           stmt->getType()->isRValueReferenceType()) {
+                        WrapInParensIfNeeded(isPrimaryTemplatePackExpansionExpr, [&] {
+                            if(GetInsightsOptions().ShowLifetime and init->isXValue() and
+                               stmt->getType()->isRValueReferenceType()) {
 
-                            if(GetInsightsOptions().UseShow2C) {
-                                mOutputFormatHelper.Append("&");
+                                if(GetInsightsOptions().UseShow2C) {
+                                    mOutputFormatHelper.Append("&");
+                                }
+
+                                InsertArg(StaticCast(stmt->getType(), init, false));
+
+                            } else {
+                                InsertArg(init);
                             }
-
-                            InsertArg(StaticCast(stmt->getType(), init, false));
-
-                        } else {
-                            InsertArg(init);
-                        }
+                        });
                     }
                 }
             }
@@ -2583,7 +2596,7 @@ void CodeGenerator::InsertArg(const MaterializeTemporaryExpr* stmt)
 {
     // At least in case of a ternary operator wrapped inside a MaterializeTemporaryExpr parens are necessary
     const auto* temporary = stmt->getSubExpr();
-    WrapInParensIfNeeded(isa<ConditionalOperator>(temporary), [&] { InsertArg(temporary); });
+    WrapInParensIfNeeded(isa_and_nonnull<ConditionalOperator>(temporary), [&] { InsertArg(temporary); });
 }
 //-----------------------------------------------------------------------------
 
