@@ -1386,13 +1386,24 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
                 //                if(not ctorExpr->getConstructor()->isTrivial()) {
                 if(stmt->hasGlobalStorage()) {
-                    // push to __cxx_global_var_init
-                    auto* callExpr = CallConstructor(
-                        stmt->getType(), stmt, ArgsToExprVector(ctorExpr), DoCast::No, AsReference::Yes);
+                    if(ctorExpr->getConstructor()->isDefaultConstructor() and
+                       ctorExpr->getConstructor()->getParent()->hasTrivialDefaultConstructor()) {
 
-                    PushGlobalVariable(callExpr);
+                        auto* callMemset = Call("memset"sv, {Ref(stmt), Int32(0), Sizeof(stmt->getType())});
 
-                    PushGlobalVariableDtor(CallDestructor(stmt));
+                        EnableGlobalInsert(GlobalInserts::FuncMemset);
+                        PushGlobalVariable(callMemset);
+
+                    } else {
+
+                        // push to __cxx_global_var_init
+                        auto* callExpr = CallConstructor(
+                            stmt->getType(), stmt, ArgsToExprVector(ctorExpr), DoCast::No, AsReference::Yes);
+
+                        PushGlobalVariable(callExpr);
+
+                        PushGlobalVariableDtor(CallDestructor(stmt));
+                    }
 
                 } else {
                     mOutputFormatHelper.AppendSemiNewLine();
@@ -1456,6 +1467,11 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                     }
                 }
             }
+        } else if(GetInsightsOptions().UseShow2C and stmt->hasGlobalStorage() and
+                  (stmt->getStorageDuration() == SD_Static) and
+                  (stmt->getDeclContext()->isNamespace() or
+                   (is{stmt->getStorageClass()}.any_of(SC_Static, SC_Extern)))) {
+            PushGlobalVariable(Assign(stmt, Int32(0)));
         }
 
         if(stmt->isNRVOVariable()) {

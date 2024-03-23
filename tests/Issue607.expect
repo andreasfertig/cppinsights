@@ -1,0 +1,65 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+extern "C" void* memset(void*, int, unsigned int);
+
+namespace X
+{
+  int initInNamespace;
+  
+}
+
+extern int initDueToExtern;
+
+int unInitGlobal;
+int initGlobalWitValue = 3;
+
+static int initGlobalStatic;
+
+typedef struct A
+{
+  char __dummy;
+} A;
+
+
+A initGlobalCtor;
+
+namespace
+{
+  int initInAnonNamespace;
+  A initCtorInAnonNamespace;
+  
+}
+
+int __main(void)
+{
+  ++X::initInNamespace;
+  return 0;
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+}
+
+void __cxa_start(void)
+{
+  X::initInNamespace = 0;
+  initDueToExtern = 0;
+  initGlobalStatic = 0;
+  memset(&initGlobalCtor, 0, sizeof(A));
+  ::initInAnonNamespace = 0;
+  memset(&::initCtorInAnonNamespace, 0, sizeof(A));
+}
+
+void __cxa_atexit(void)
+{
+}
+
