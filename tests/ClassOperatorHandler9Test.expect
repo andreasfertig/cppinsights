@@ -83,7 +83,7 @@ MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
   
-  return MyVector<int>(static_cast<MyVector<int> &&>(result));
+  return result;
 }
 
 template<typename T>
@@ -107,7 +107,7 @@ MyVector<int> operator*<int>(const MyVector<int> & a, const MyVector<int> & b)
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
   
-  return MyVector<int>(static_cast<MyVector<int> &&>(result));
+  return result;
 }
 #endif
 
@@ -119,7 +119,7 @@ MyVector<int> Foo(const MyVector<int> & a, const MyVector<int> & b)
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
   
-  return MyVector<int>(static_cast<MyVector<int> &&>(result));
+  return result;
 }
 
 int main()

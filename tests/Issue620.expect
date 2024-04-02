@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <utility>
+
+class C
+{
+  
+  public: 
+  inline C()
+  {
+    printf("default constructor\n");
+  }
+  
+  inline ~C() noexcept
+  {
+    printf("destructor\n");
+  }
+  
+  inline C(C &&)
+  {
+    printf("move constructor\n");
+  }
+  
+  inline C & operator=(C &&)
+  {
+    printf("move assignment\n");
+    return *this;
+  }
+  
+  
+  private: 
+  int x;
+  public: 
+  // inline constexpr C(const C &) /* noexcept */ = delete;
+  // inline C & operator=(const C &) /* noexcept */ = delete;
+};
+
+
+C f()
+{
+  C c = C() /* NRVO variable */;
+  return c;
+}

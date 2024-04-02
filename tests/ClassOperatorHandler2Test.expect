@@ -30,7 +30,7 @@ class Foo
     printf("  ======\n");
     ++this->mX;
     printf("  ++++++\n");
-    return Foo(static_cast<Foo &&>(old));
+    return old;
   }
   
   inline Foo & operator++()
@@ -45,7 +45,7 @@ class Foo
     printf("  ======\n");
     --this->mX;
     printf("  ++++++\n");
-    return Foo(static_cast<Foo &&>(old));
+    return old;
   }
   
   inline Foo & operator--()
