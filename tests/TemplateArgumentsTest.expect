@@ -44,6 +44,7 @@ inline const value_type * Normalize<std::basic_string<char, std::char_traits<cha
 {
   if constexpr(true) {
     return arg.c_str();
+  } else /* constexpr */ {
   } 
   
 }

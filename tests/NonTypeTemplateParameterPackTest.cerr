@@ -1,11 +1,11 @@
-.tmp.cpp:147:23: error: use of undeclared identifier 'my_array'; did you mean 'Test::my_array'?
-  147 |   Test::Map<int, int, my_array> a;
+.tmp.cpp:151:23: error: use of undeclared identifier 'my_array'; did you mean 'Test::my_array'?
+  151 |   Test::Map<int, int, my_array> a;
       |                       ^~~~~~~~
       |                       Test::my_array
-.tmp.cpp:106:9: note: 'Test::my_array' declared here
-  106 |   class my_array
+.tmp.cpp:110:9: note: 'Test::my_array' declared here
+  110 |   class my_array
       |         ^
-.tmp.cpp:147:23: error: use of undeclared identifier 'my_array'
-  147 |   Test::Map<int, int, my_array> a;
+.tmp.cpp:151:23: error: use of undeclared identifier 'my_array'
+  151 |   Test::Map<int, int, my_array> a;
       |                       ^
 2 errors generated.

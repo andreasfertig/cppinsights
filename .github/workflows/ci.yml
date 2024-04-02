@@ -12,9 +12,9 @@ on:
     types: [rebuild_trigger]
 
 env:
-  CMAKE_VERSION: 3.16.2
-  NINJA_VERSION: 1.10.0
-  LLVM_VERSION: 17.0.0
+  CMAKE_VERSION: 3.29.0
+  NINJA_VERSION: 1.11.1
+  LLVM_VERSION: 18.1.0
 
 jobs:
   checks:
@@ -29,7 +29,7 @@ jobs:
             name: "Linux Clang - Format check",
             os: ubuntu-20.04,
             build_type: Release,
-            cformat_name: 'clang-format-17'
+            cformat_name: 'clang-format-18'
           }
 
     steps:
@@ -42,7 +42,7 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 17
+        sudo ./llvm.sh 18
         sudo apt-get install ${{ matrix.config.cformat_name }}
 
     - name: clang-format check
@@ -64,11 +64,11 @@ jobs:
         config:
         # AppleClang
         - {
-            name: "Clang 17 / LLVM 17 @ macOS Release",
-            os: macos-11,
+            name: "Clang 18 / LLVM 18 @ macOS Release",
+            os: macos-14,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "17.0.0",
+            llvm_version: "18.1.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -78,15 +78,16 @@ jobs:
             bin_name: "insights",
             archive_name: "insights-macos",
             upload: "Yes",
+            cmake_args: "-DCMAKE_OSX_ARCHITECTURES=arm64",
           }
 
         # AppleClang
         - {
-            name: "Clang 17 / LLVM 17 @ macOS Debug",
-            os: macos-11,
+            name: "Clang 18 / LLVM 18 @ macOS Debug",
+            os: macos-14,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "17.0.0",
+            llvm_version: "18.1.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -96,15 +97,16 @@ jobs:
             bin_name: "insights",
             archive_name: "insights-macos",
             upload: "No",
+            cmake_args: "-DCMAKE_OSX_ARCHITECTURES=arm64",
           }
 
         # # AppleClang
         # - {
-        #     name: "Clang 17 / LLVM 17 @ macOS Coverage & Debug",
-        #     os: macos-11,
+        #     name: "Clang 18 / LLVM 18 @ macOS Coverage & Debug",
+        #     os: macos-14,
         #     build_type: Release,
         #     cxx: "clang++",
-        #     llvm_version: "17.0.0",
+        #     llvm_version: "18.1.0",
         #     llvm_config: "llvm-config",
         #     coverage: "Yes",
         #     static: "No",
@@ -118,11 +120,11 @@ jobs:
 
           # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 17 @ Windows Release",
+          #   name: "MSVC 2022 / LLVM 18 @ Windows Release",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "17.0.0",
+          #   llvm_version: "18.1.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "No",
@@ -137,11 +139,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 17 @ Windows Debug",
+          #   name: "MSVC 2022 / LLVM 18 @ Windows Debug",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "17.0.0",
+          #   llvm_version: "18.1.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "Yes",
@@ -155,11 +157,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-        #     name: "MSVC 2022 / LLVM 17 @ Windows Code Coverage & Debug",
+        #     name: "MSVC 2022 / LLVM 18 @ Windows Code Coverage & Debug",
         #     os: windows-2022,
         #     build_type: Release,
         #     cxx: "clang-cl.exe",
-        #     llvm_version: "17.0.0",
+        #     llvm_version: "18.1.0",
         #     llvm_config: "current/bin/llvm-config.exe",
         #     coverage: "Yes",
         #     static: "Yes",
@@ -199,8 +201,8 @@ jobs:
           cmake_dir="${cmake_base_dir}/bin"
         elif [ "$RUNNER_OS" == "macOS" ]; then
           ninja_suffix="mac.zip"
-          cmake_suffix="Darwin-x86_64.tar.gz"
-          cmake_base_dir="cmake-${cmake_version}-Darwin-x86_64"
+          cmake_suffix="macos-universal.tar.gz"
+          cmake_base_dir="cmake-${cmake_version}-macos-universal"
           cmake_dir="${cmake_base_dir}/CMake.app/Contents/bin"
         fi
 
@@ -261,12 +263,12 @@ jobs:
         key: ${{ runner.os }}-clang-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/current') }}
 
     - name: Install Clang
-      if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-clang-binary.outputs.cache-hit != 'true'"
+      if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window'))"
       shell: cmake -P {0}
       run: |
         set(llvm_version ${{ matrix.config.llvm_version }})
         set(path_separator ":")
-        set(archive_name "clang+llvm-${llvm_version}-x86_64-apple-darwin")
+        set(archive_name "clang+llvm-${llvm_version}-arm64-apple-darwin")
         if ("${{ runner.os }}" STREQUAL "Windows")
             set(archive_name "clang+llvm-${llvm_version}-win64-msvc")
             set(path_separator ";")
@@ -322,7 +324,7 @@ jobs:
         export HOMEBREW_NO_AUTO_UPDATE=1
         brew update > /dev/null
         brew install lcov || brew upgrade lcov
-        brew install gcc@10 || brew upgrade gcc@10 # for Clang 17 and newer gcov
+        brew install gcc@10 || brew upgrade gcc@10 # for Clang 18 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
@@ -465,13 +467,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # GCC 12 / LLVM 17
+        # GCC 13 / LLVM 18
         - {
-            name: "GCC 12 / LLVM 17 @ Ubuntu Release @docker",
+            name: "GCC 13 / LLVM 18 @ Ubuntu Release @docker",
             build_type: Release,
-            cxx: "g++-12",
-            llvm_version: "17.0.0",
-            llvm_config: "/usr/bin/llvm-config-17",
+            cxx: "g++-13",
+            llvm_version: "18.1.0",
+            llvm_config: "/usr/bin/llvm-config-18",
             coverage: "No",
             static: "Yes",
             debug: "No",
@@ -484,13 +486,13 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 12 / LLVM 17
+        # GCC 13 / LLVM 18
         - {
-            name: "GCC 12 / LLVM 17 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage & Debug @docker",
             build_type: Release,
-            cxx: "g++-12",
-            llvm_version: "17.0.0",
-            llvm_config: "/usr/bin/llvm-config-17",
+            cxx: "g++-13",
+            llvm_version: "18.1.0",
+            llvm_config: "/usr/bin/llvm-config-18",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -501,13 +503,13 @@ jobs:
             archive_name: "insights-ubuntu-14.04",
           }
 
-        # GCC 12 / LLVM 17
+        # GCC 13 / LLVM 18
         - {
-            name: "GCC 12 / LLVM 17 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage (libc++) @docker",
             build_type: Release,
-            cxx: "g++-12",
-            llvm_version: "17.0.0",
-            llvm_config: "/usr/bin/llvm-config-17",
+            cxx: "g++-13",
+            llvm_version: "18.1.0",
+            llvm_config: "/usr/bin/llvm-config-18",
             coverage: "Yes",
             static: "No",
             debug: "Yes",

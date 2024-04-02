@@ -4,7 +4,7 @@ using seconds_t = std::chrono::duration<long long>;
 
 inline constexpr std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long long s)
 {
-  return std::chrono::duration<long long, std::ratio<1, 1> >(s, nullptr);
+  return std::chrono::duration<long long, std::ratio<1, 1> >(s);
 }
 
 int main()

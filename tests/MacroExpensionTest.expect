@@ -14,9 +14,9 @@ enum eTest
 /* PASSED: static_assert(true); */
 
 template<class T>
-constexpr const T pi = T(3.14159265358979323851L);
+constexpr const T pi = T(3.1415926535897931L);
 
 template<>
-constexpr const int pi<int> = int(3.14159265358979323851L);
+constexpr const int pi<int> = int(3.1415926535897931L);
 
 int i = pi<int>;
