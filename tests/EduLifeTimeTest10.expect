@@ -31,7 +31,7 @@ Vector createStrings2()
   const char *const __temporary19_58[6] = {"This", "is", "a", "vector", "of", "strings"};
   Vector v = Vector{std::initializer_list<const char *>{__temporary19_58, 6}} /* NRVO variable */;
   /* __temporary19_58 // lifetime ends here */
-  return Vector(static_cast<Vector &&>(v));
+  return v;
   /* v // lifetime ends here */
 }
 

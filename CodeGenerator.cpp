@@ -4141,7 +4141,11 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
             mOutputFormatHelper.Append(' ');
 
             if(not temporaryFinder.Found()) {
-                InsertArg(retVal);
+                if(const auto* nrvoVD = stmt->getNRVOCandidate()) {
+                    mOutputFormatHelper.Append(GetName(*nrvoVD));
+                } else {
+                    InsertArg(retVal);
+                }
             } else {
                 mOutputFormatHelper.Append(temporaryFinder.Name());
             }
