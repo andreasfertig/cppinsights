@@ -1,3 +1,10 @@
+.tmp.cpp:3:15: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+    3 |   char buffer[n];
+      |               ^
+.tmp.cpp:3:15: note: function parameter 'n' with unknown value cannot be used in a constant expression
+.tmp.cpp:1:15: note: declared here
+    1 | void Test(int n)
+      |               ^
 .tmp.cpp:14:5: warning: declaration does not declare anything [-Wmissing-declarations]
    14 |     unsigned long;
       |     ^~~~~~~~~~~~~
@@ -7,6 +14,13 @@
 .tmp.cpp:1:15: note: 'n' declared here
     1 | void Test(int n)
       |               ^
+.tmp.cpp:15:20: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+   15 |     char (&buffer)[n];
+      |                    ^
+.tmp.cpp:15:20: note: function parameter 'n' with unknown value cannot be used in a constant expression
+.tmp.cpp:1:15: note: declared here
+    1 | void Test(int n)
+      |               ^
 .tmp.cpp:15:12: error: fields must have a constant size: 'variable length array in structure' extension will never be supported
    15 |     char (&buffer)[n];
       |            ^
@@ -14,6 +28,13 @@
    18 |     __lambda_6_5(char (&_buffer)[n])
       |                                  ^
 .tmp.cpp:1:15: note: 'n' declared here
+    1 | void Test(int n)
+      |               ^
+.tmp.cpp:18:34: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+   18 |     __lambda_6_5(char (&_buffer)[n])
+      |                                  ^
+.tmp.cpp:18:34: note: function parameter 'n' with unknown value cannot be used in a constant expression
+.tmp.cpp:1:15: note: declared here
     1 | void Test(int n)
       |               ^
 .tmp.cpp:22:5: error: no matching constructor for initialization of 'class __lambda_6_5'
@@ -28,4 +49,4 @@
 .tmp.cpp:18:5: note: candidate constructor not viable: no known conversion from 'char[n]' to 'char (&)[n]' for 1st argument
    18 |     __lambda_6_5(char (&_buffer)[n])
       |     ^            ~~~~~~~~~~~~~~~~~~
-1 warning and 4 errors generated.
+4 warnings and 4 errors generated.

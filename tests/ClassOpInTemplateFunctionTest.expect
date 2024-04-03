@@ -43,6 +43,7 @@ class Foo
   {
     if constexpr(true) {
       return this->mX;
+    } else /* constexpr */ {
     } 
     
   }

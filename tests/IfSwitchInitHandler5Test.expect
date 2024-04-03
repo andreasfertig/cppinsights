@@ -4,7 +4,7 @@
 int main()
 {
   std::shared_ptr<int> sharedPtr = std::make_shared<int>(2011);
-  std::weak_ptr<int> weakPtr = std::weak_ptr<int>(sharedPtr, 0);
+  std::weak_ptr<int> weakPtr = std::weak_ptr<int>(sharedPtr);
   {
     std::shared_ptr<int> sharedPtr1 = weakPtr.lock();
     if(sharedPtr1.operator bool()) {

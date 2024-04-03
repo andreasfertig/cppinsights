@@ -174,6 +174,14 @@ There are a couple of options that can be enabled with [cmake](https://cmake.org
 | INSIGHTS_USE_LIBCPP | Use libc++ for tests       | OFF     |
 | DEBUG               | Enable debug               | OFF     |
 
+### Building for ARM on macOS
+
+It seems best to supply the architecture during configuration:
+
+```
+cmake -DCMAKE_OSX_ARCHITECTURES=arm64 ../cppinsights
+```
+
 
 ### Use it with [Cevelop](https://www.cevelop.com)
 

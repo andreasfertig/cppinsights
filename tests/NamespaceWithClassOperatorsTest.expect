@@ -3,14 +3,14 @@
 std::chrono::duration<double, std::ratio<1, 1> > Bar()
 {
   std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long long, std::ratio<1, 1000000> > > begin = std::chrono::system_clock::now();
-  return std::chrono::duration<double, std::ratio<1, 1> >(std::chrono::operator-(std::chrono::system_clock::now(), begin), nullptr);
+  return std::chrono::duration<double, std::ratio<1, 1> >(std::chrono::operator-(std::chrono::system_clock::now(), begin));
 }
 
 
 void Foo()
 {
   std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long long, std::ratio<1, 1000000> > > start = std::chrono::system_clock::now();
-  std::chrono::duration<double, std::ratio<1, 1> > theDuration = std::chrono::duration<double, std::ratio<1, 1> >(std::chrono::operator-(std::chrono::system_clock::now(), start), nullptr);
+  std::chrono::duration<double, std::ratio<1, 1> > theDuration = std::chrono::duration<double, std::ratio<1, 1> >(std::chrono::operator-(std::chrono::system_clock::now(), start));
 }
 
 int main()

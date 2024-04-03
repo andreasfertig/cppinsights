@@ -90,6 +90,7 @@ class Point
   {
     if constexpr(true) {
       return this->GetX();
+    } else /* constexpr */ {
     } 
     
   }
@@ -131,6 +132,7 @@ class Point
   {
     if constexpr(true) {
       return this->GetX();
+    } else /* constexpr */ {
     } 
     
   }

@@ -5,7 +5,7 @@
 
 std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long long s)
 {
-  return std::chrono::duration<long long, std::ratio<1, 1> >(s, nullptr);
+  return std::chrono::duration<long long, std::ratio<1, 1> >(s);
 }
 
 std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator""_str(const char * s, std::size_t len)

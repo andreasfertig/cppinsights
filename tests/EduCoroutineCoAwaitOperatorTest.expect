@@ -148,7 +148,7 @@ awaiter operator co_await<long long, std::ratio<1, 1000> >(std::chrono::duration
     
   };
   
-  return awaiter{std::chrono::duration<long long, std::ratio<1, 1000000> >(d, nullptr)};
+  return awaiter{std::chrono::duration<long long, std::ratio<1, 1000000> >(d)};
 }
 #endif
 

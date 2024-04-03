@@ -1,7 +1,7 @@
 #ifndef INSIGHTS_VERSION_H
 #define INSIGHTS_VERSION_H
 
-#define INSIGHTS_VERSION "17.0"
+#define INSIGHTS_VERSION "18.1"
 #define GIT_REPO_URL "@GIT_REPO_URL@"
 #define GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
 
@@ -12,14 +12,8 @@
 
 // Build Clang's resource dir and include dir by hand. This is necessary, as we do not always have Clang installed. 
 // See: https://github.com/MaskRay/ccls/wiki/Install#clang-resource-directory
-#if CLANG_VERSION_MAJOR > 15
 #define INSIGHTS_CLANG_RESOURCE_DIR R"(-resource-dir=@LLVM_LIBDIR@/clang/@LLVM_PACKAGE_VERSION_MAJOR_PLAIN@)"
 #define INSIGHTS_CLANG_RESOURCE_INCLUDE_DIR R"(-I @LLVM_LIBDIR@/clang/@LLVM_PACKAGE_VERSION_MAJOR_PLAIN@/include)"
-#else
-#define INSIGHTS_CLANG_RESOURCE_DIR R"(-resource-dir=@LLVM_LIBDIR@/clang/@LLVM_PACKAGE_VERSION_PLAIN@)"
-#define INSIGHTS_CLANG_RESOURCE_INCLUDE_DIR R"(-I @LLVM_LIBDIR@/clang/@LLVM_PACKAGE_VERSION_PLAIN@/include)"
-#endif
-
 #define INSIGHTS_LLVM_INCLUDE_DIR R"(-isystem@LLVM_INCLUDE_DIR@/c++/v1)"
 
 #endif /* INSIGHTS_VERSION_H */

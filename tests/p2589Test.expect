@@ -11,5 +11,5 @@ struct Test
 int main()
 {
   Test t = {};
-  return Test::operator[](4);
+  return t.operator[](4);
 }
