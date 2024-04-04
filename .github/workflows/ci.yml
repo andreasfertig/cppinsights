@@ -15,6 +15,7 @@ env:
   CMAKE_VERSION: 3.29.0
   NINJA_VERSION: 1.11.1
   LLVM_VERSION: 18.1.0
+  NINJA_STATUS: "[%f/%t %o/sec] "
 
 jobs:
   checks:
@@ -648,8 +649,6 @@ jobs:
   docker_arm64:
     runs-on: ubuntu-22.04
     name: ${{ matrix.config.name }}
-    container:
-      image: andreasfertig/cppinsights-builder
     strategy:
       fail-fast: false
       matrix:
@@ -712,78 +711,75 @@ jobs:
       with:
         path: cppinsights
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: arm64
+
     - name: Configure
       id: cmake_configure
       run: |
-          export CXX=${{ matrix.config.cxx }}
           mkdir build
+
+          cat > build.sh << "EOF"
+          #! /bin/bash
           cd build
-          cmake -G Ninja -DINSIGHTS_STATIC=${{ matrix.config.static }} -DDEBUG=${{ matrix.config.debug }} -DINSIGHTS_COVERAGE=${{ matrix.config.coverage }} -DINSIGHTS_USE_LIBCPP=${{ matrix.config.libcxx }} ../cppinsights
+          CXX=${{ matrix.config.cxx }} cmake -G Ninja -DINSIGHTS_STATIC=${{ matrix.config.static }} -DDEBUG=${{ matrix.config.debug }} -DINSIGHTS_COVERAGE=${{ matrix.config.coverage }} -DINSIGHTS_USE_LIBCPP=${{ matrix.config.libcxx }} ../cppinsights
+          EOF
+
+          chmod 0755 build.sh
+
+          docker run \
+            --rm \
+            -v $(pwd):/${{ github.workspace }} \
+            -w ${{ github.workspace }} \
+            --user $(id -u):$(id -g) \
+            --platform linux/arm64 \
+            andreasfertig/cppinsights-builder \
+            ./build.sh
 
     - name: Build
-      shell: cmake -P {0}
+      shell: bash
       continue-on-error: false
       run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status")
-        endif()
+          docker run \
+            --rm \
+            -v $(pwd):/${{ github.workspace }} \
+            -w ${{ github.workspace }} \
+            --user $(id -u):$(id -g) \
+            --platform linux/arm64 \
+            andreasfertig/cppinsights-builder \
+            cmake --build build
 
     - name: Run tests
       if:  matrix.config.run_tests == 'Yes'
       id: run_tests
-      shell: cmake -P {0}
+      shell: bash
       continue-on-error: false
       run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build --target tests
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status during tests")
-        endif()
-
-    - name: Make docs
-      if:  matrix.config.docs == 'Yes'
-      shell: cmake -P {0}
-      continue-on-error: false
-      run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build --target doc
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status during doc")
-        endif()
-
-        file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive/")
-        file(COPY "$ENV{GITHUB_WORKSPACE}/build/html" DESTINATION "$ENV{GITHUB_WORKSPACE}/build/archive/")
-
+          docker run \
+            --rm \
+            -v $(pwd):/${{ github.workspace }} \
+            -w ${{ github.workspace }} \
+            --user $(id -u):$(id -g) \
+            --platform linux/arm64 \
+            andreasfertig/cppinsights-builder \
+            cmake --build build --target tests
 
     - name: Run coverage
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage
-      shell: cmake -P {0}
+      shell: bash
       continue-on-error: false
       run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build --target coverage
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status during coverage")
-        endif()
+          docker run \
+            --rm \
+            -v $(pwd):/${{ github.workspace }} \
+            -w ${{ github.workspace }} \
+            --user $(id -u):$(id -g) \
+            --platform linux/arm64 \
+            andreasfertig/cppinsights-builder \
+            cmake --build build --target coverage
 
     - name: Run coverage upload
       if:  matrix.config.coverage == 'Yes'
