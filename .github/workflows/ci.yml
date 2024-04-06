@@ -709,7 +709,7 @@ jobs:
         /usr/bin/git config user.email andy@cppinsights.io
 
         echo "Rsyncing files to gh-pages"
-        /usr/bin/rsync -q -av --checksum --progress ~/binaries/insights-artifact-ubuntu/html/. ${GITHUB_WORKSPACE}/gh-pages --delete --exclude CNAME --exclude .ssh --exclude .git --exclude .github
+        /usr/bin/rsync -q -av --checksum --progress ~/binaries/insights-artifact-ubuntu-amd64/html/. ${GITHUB_WORKSPACE}/gh-pages --delete --exclude CNAME --exclude .ssh --exclude .git --exclude .github
 
         /usr/bin/git status --porcelain
 
