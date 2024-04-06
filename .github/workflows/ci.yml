@@ -59,6 +59,7 @@ jobs:
     needs: checks
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
+    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
@@ -101,23 +102,23 @@ jobs:
             cmake_args: "-DCMAKE_OSX_ARCHITECTURES=arm64",
           }
 
-        # # AppleClang
-        # - {
-        #     name: "Clang 18 / LLVM 18 @ macOS Coverage & Debug",
-        #     os: macos-14,
-        #     build_type: Release,
-        #     cxx: "clang++",
-        #     llvm_version: "18.1.0",
-        #     llvm_config: "llvm-config",
-        #     coverage: "Yes",
-        #     static: "No",
-        #     debug: "Yes",
-        #     tidy: "No",
-        #     run_tests: "No",
-        #     bin_name: "insights",
-        #     archive_name: "insights-macos",
-        #     upload: "No",
-        #   }
+        # AppleClang
+        - {
+            name: "Clang 18 / LLVM 18 @ macOS Coverage & Debug",
+            os: macos-14,
+            build_type: Release,
+            cxx: "clang++",
+            llvm_version: "18.1.0",
+            llvm_config: "llvm-config",
+            coverage: "Yes",
+            static: "No",
+            debug: "Yes",
+            tidy: "No",
+            run_tests: "No",
+            bin_name: "insights",
+            archive_name: "insights-macos",
+            upload: "No",
+          }
 
           # # MSVC 2019
         # - {
@@ -264,7 +265,7 @@ jobs:
         key: ${{ runner.os }}-clang-${{ matrix.config.llvm_version }}-${{ hashFiles('${{ github.workspace }}/current') }}
 
     - name: Install Clang
-      if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window'))"
+      if: "(startsWith(matrix.config.os, 'macos') || startsWith(matrix.config.os, 'Window')) && steps.cache-clang-binary.outputs.cache-hit != 'true'"
       shell: cmake -P {0}
       run: |
         set(llvm_version ${{ matrix.config.llvm_version }})
@@ -304,6 +305,7 @@ jobs:
 
     - name: Cache grcov
       id: cache-grcov-binary
+      if: "(startsWith(matrix.config.os, 'Window') && (matrix.config.coverage == 'Yes'))"
       uses: actions/cache@v4
       with:
         path: |
@@ -318,14 +320,6 @@ jobs:
         file(DOWNLOAD "https://github.com/mozilla/grcov/releases/download/v0.5.15/grcov-win-x86_64.tar.bz2" ./grcov.tar.bz2)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ./grcov.tar.bz2)
         execute_process(COMMAND ${CMAKE_COMMAND} -E remove ./grcov.tar.bz2)
-
-    - name: Install lcov for macOS
-      if: "(startsWith(matrix.config.os, 'macos') && (matrix.config.coverage == 'Yes'))"
-      run: |
-        export HOMEBREW_NO_AUTO_UPDATE=1
-        brew update > /dev/null
-        brew install lcov || brew upgrade lcov
-        brew install gcc@10 || brew upgrade gcc@10 # for Clang 18 and newer gcov
 
     - name: Setup MSVC Dev
       if: "startsWith(matrix.config.os, 'Windows')"
@@ -375,7 +369,6 @@ jobs:
 
     - name: Build
       shell: cmake -P {0}
-      continue-on-error: false
       run: |
         execute_process(
           COMMAND ${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}/cmake --build build
@@ -389,7 +382,6 @@ jobs:
       id: run_tests
       if: matrix.config.run_tests == 'Yes'
       shell: cmake -P {0}
-      continue-on-error: false
       run: |
         if ("${{ runner.os }}" STREQUAL "macOS")
           set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk/usr/include")
@@ -407,7 +399,6 @@ jobs:
     - name: Run coverage
       if:  matrix.config.coverage == 'Yes'
       shell: cmake -P {0}
-      continue-on-error: false
       run: |
         if ("${{ runner.os }}" STREQUAL "macOS")
           set(ENV{CPLUS_INCLUDE_PATH} "$ENV{GITHUB_WORKSPACE}/current/include/c++/v1:/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk/usr/include")
@@ -427,15 +418,16 @@ jobs:
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+        files: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+        exclude: build
         flags: ${{ matrix.config.archive_name }}
+        disable_search: true
         fail_ci_if_error: true
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
       shell: cmake -P {0}
       working-directory: ${{ github.workspace }}/build
-      continue-on-error: false
       run: |
         file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive")
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "${{ matrix.config.bin_name }}")
@@ -457,6 +449,7 @@ jobs:
   docker:
     runs-on: ubuntu-22.04
     name: ${{ matrix.config.name }} @${{ matrix.arch }}
+    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
@@ -525,7 +518,6 @@ jobs:
 
     - name: Create docker shell
       shell: bash
-      continue-on-error: false
       run: |
           cat > docker-shell << "EOF"
           #! /bin/bash
@@ -565,14 +557,12 @@ jobs:
 
     - name: Build
       shell: docker-shell {0}
-      continue-on-error: false
       run: |
           cmake --build build
 
     - name: Simple test
       if:  "((matrix.config.coverage != 'Yes') && (matrix.config.run_tests != 'Yes'))"
       shell: docker-shell {0}
-      continue-on-error: false
       run: |
           ./build/insights cppinsights/tests/SimpleCICompileTest.cpp
           ./build/insights --use-libc++ cppinsights/tests/SimpleCICompileTest.cpp
@@ -581,7 +571,6 @@ jobs:
       if:  matrix.config.run_tests == 'Yes'
       id: run_tests
       shell: docker-shell {0}
-      continue-on-error: false
       run: |
           cmake --build build --target tests
 
@@ -608,7 +597,6 @@ jobs:
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage
       shell: docker-shell {0}
-      continue-on-error: false
       run: |
           cmake --build build --target coverage
           rm -f build/coverage.info
@@ -619,15 +607,16 @@ jobs:
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+        files: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+        exclude: build
         flags: ${{ matrix.config.archive_name }}-${{ matrix.arch }}-libcxx-${{ matrix.config.libcxx }}
+        disable_search: true
         fail_ci_if_error: true
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
       working-directory: ${{ github.workspace }}/build
       shell: bash
-      continue-on-error: false
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/build/archive
 
@@ -648,6 +637,7 @@ jobs:
     needs: [build, docker]
     if: github.ref == 'refs/heads/main'
     name: Final Deploy
+    continue-on-error: false
     runs-on: ubuntu-22.04
 
     steps:

@@ -122,6 +122,7 @@ def main():
     parser.add_argument('--update-tests',   help='Update failing tests', default=False, action='store_true')
     parser.add_argument('--std',            help='C++ Standard to used', default='c++17')
     parser.add_argument('--use-libcpp',     help='Use libst++',          default=False, action='store_true')
+    parser.add_argument('--llvm-prof-dir',  help='LLVM profiles data dir', default='')
     parser.add_argument('args', nargs=argparse.REMAINDER)
     args = vars(parser.parse_args())
 
@@ -130,6 +131,9 @@ def main():
     bFailureIsOk  = args['failure_is_ok']
     bUpdateTests  = args['update_tests']
     defaultCppStd = '-std=%s'% (args['std'])
+
+    if args['llvm_prof_dir'] != '':
+        os.environ['LLVM_PROFILE_FILE'] = os.path.join(args['llvm_prof_dir'], 'prof%p.profraw')
 
     if 0 == len(remainingArgs):
         cppFiles = [f for f in os.listdir(mypath) if (os.path.isfile(os.path.join(mypath, f)) and f.endswith('.cpp'))]
