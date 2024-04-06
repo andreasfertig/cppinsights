@@ -221,7 +221,7 @@ jobs:
 
     - name: Cache Ninja and CMake
       id: cache-ninja-and-cmake
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
             ${{ github.workspace }}/ninja*
@@ -257,7 +257,7 @@ jobs:
 
     - name: Cache Clang
       id: cache-clang-binary
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
             ${{ github.workspace }}/current
@@ -304,7 +304,7 @@ jobs:
 
     - name: Cache grcov
       id: cache-grcov-binary
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
             ${{ github.workspace }}/grcov.exe
@@ -377,8 +377,6 @@ jobs:
       shell: cmake -P {0}
       continue-on-error: false
       run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
         execute_process(
           COMMAND ${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}/cmake --build build
           RESULT_VARIABLE result
@@ -398,8 +396,6 @@ jobs:
           set(ENV{SDKROOT} "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
         endif()
 
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
         execute_process(
           COMMAND ${{ steps.cmake_and_ninja_setup.outputs.cmake_dir }}/cmake --build build --target tests
           RESULT_VARIABLE result
@@ -418,8 +414,6 @@ jobs:
           set(ENV{SDKROOT} "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
         endif()
 
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
         execute_process(
           COMMAND cmake --build build --target coverage
           RESULT_VARIABLE result
@@ -430,8 +424,9 @@ jobs:
 
     - name: Upload code coverage info
       if:  matrix.config.coverage == 'Yes'
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         file: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
         flags: ${{ matrix.config.archive_name }}
         fail_ci_if_error: true
@@ -459,18 +454,20 @@ jobs:
 #------------------------------------------------------------------------------
 # BUILD INSIDE DOCKER
 #------------------------------------------------------------------------------
-  docker_amd64:
+  docker:
     runs-on: ubuntu-22.04
-    name: ${{ matrix.config.name }}
-    container:
-      image: andreasfertig/cppinsights-builder
+    name: ${{ matrix.config.name }} @${{ matrix.arch }}
     strategy:
       fail-fast: false
       matrix:
+        arch:
+          - arm64
+          - amd64
+
         config:
         # GCC 13 / LLVM 18
         - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu Release @docker",
+            name: "GCC 13 / LLVM 18 @ Ubuntu Release",
             build_type: Release,
             cxx: "g++-13",
             llvm_version: "18.1.0",
@@ -482,14 +479,14 @@ jobs:
             run_tests: "No",
             libcxx: "No",
             bin_name: "insights",
-            archive_name: "insights-ubuntu-amd64",
+            archive_name: "insights-ubuntu",
             upload: "Yes",
             docs: "Yes",
           }
 
         # GCC 13 / LLVM 18
         - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage & Debug @docker",
+            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage & Debug",
             build_type: Release,
             cxx: "g++-13",
             llvm_version: "18.1.0",
@@ -501,12 +498,12 @@ jobs:
             run_tests: "No",
             libcxx: "No",
             bin_name: "insights",
-            archive_name: "insights-ubuntu-amd64",
+            archive_name: "insights-ubuntu",
           }
 
         # GCC 13 / LLVM 18
         - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage (libc++) @docker",
+            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage (libc++)",
             build_type: Release,
             cxx: "g++-13",
             llvm_version: "18.1.0",
@@ -518,7 +515,7 @@ jobs:
             run_tests: "No",
             libcxx: "Yes",
             bin_name: "insights",
-            archive_name: "insights-ubuntu-amd64",
+            archive_name: "insights-ubuntu",
           }
 
     steps:
@@ -526,301 +523,121 @@ jobs:
       with:
         path: cppinsights
 
-    - name: Configure
-      id: cmake_configure
-      run: |
-          export CXX=${{ matrix.config.cxx }}
-          mkdir build
-          cd build
-          cmake -G Ninja -DINSIGHTS_STATIC=${{ matrix.config.static }} -DDEBUG=${{ matrix.config.debug }} -DINSIGHTS_COVERAGE=${{ matrix.config.coverage }} -DINSIGHTS_USE_LIBCPP=${{ matrix.config.libcxx }} ../cppinsights
-
-    - name: Build
-      shell: cmake -P {0}
-      continue-on-error: false
-      run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status")
-        endif()
-
-    - name: Run tests
-      if:  matrix.config.run_tests == 'Yes'
-      id: run_tests
-      shell: cmake -P {0}
-      continue-on-error: false
-      run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build --target tests
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status during tests")
-        endif()
-
-    - name: Make docs
-      if:  matrix.config.docs == 'Yes'
-      shell: cmake -P {0}
-      continue-on-error: false
-      run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build --target doc
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status during doc")
-        endif()
-
-        file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive/")
-        file(COPY "$ENV{GITHUB_WORKSPACE}/build/html" DESTINATION "$ENV{GITHUB_WORKSPACE}/build/archive/")
-
-
-    - name: Run coverage
-      if:  matrix.config.coverage == 'Yes'
-      id: run_coverage
-      shell: cmake -P {0}
-      continue-on-error: false
-      run: |
-        set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
-
-        execute_process(
-          COMMAND cmake --build build --target coverage
-          RESULT_VARIABLE result
-        )
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status during coverage")
-        endif()
-
-    - name: Run coverage upload
-      if:  matrix.config.coverage == 'Yes'
-      id: run_coverage_upload
-      continue-on-error: false
-      env:
-        LIBCXX: ${{ matrix.config.libcxx }}
+    - name: Create docker shell
       shell: bash
-      run: |
-        if [ ! -f ${GITHUB_WORKSPACE}/build/filtered.info ]; then
-            echo -e "\033[1;31mlcov did not create filtered.info!\033[0m"
-            exit 1;
-        fi
-        if [ ! -s ${GITHUB_WORKSPACE}/build/filtered.info ]; then
-            echo -e "\033[1;31mlcov did create an empty filtered.info!\033[0m"
-            exit 1;
-        fi
-
-        flag="ubuntu"
-        if [ "Yes" == "${LIBCXX}" ]; then
-          flag="ubuntu-libcxx"
-        fi
-
-        # Uploading report to CodeCov
-        bash <(curl -s https://codecov.io/bash) -f ${GITHUB_WORKSPACE}/build/filtered.info -F ${flag} || echo "Codecov did not collect coverage reports"
-
-    - name: Create archive
-      if:  matrix.config.upload == 'Yes'
-      working-directory: ${{ github.workspace }}/build
-      shell: cmake -P {0}
       continue-on-error: false
       run: |
-        file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "${{ matrix.config.bin_name }}")
-        file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
-        file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
+          cat > docker-shell << "EOF"
+          #! /bin/bash
+          cp $1 ./__cmd.sh
 
-    - uses: actions/upload-artifact@v3
-      if:  matrix.config.upload == 'Yes'
-      with:
-        name: insights-artifact-ubuntu
-        if-no-files-found: error
-        path: |
-            ${{ github.workspace }}/build/archive/*
+          docker run \
+            --rm \
+            -v "/var/run/docker.sock":"/var/run/docker.sock" \
+            -v "/home/runner/work/_temp/_github_home":"/github/home" \
+            -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+            -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+            -v "/home/runner/work/cppinsights/cppinsights":"/github/workspace" \
+            --workdir /github/workspace \
+            --user $(id -u):$(id -g) \
+            --platform linux/${{ matrix.arch }} \
+            andreasfertig/cppinsights-builder \
+            /bin/bash -e ./__cmd.sh
+          EOF
 
-#------------------------------------------------------------------------------
-# BUILD INSIDE DOCKER for ARM
-#------------------------------------------------------------------------------
-  docker_arm64:
-    runs-on: ubuntu-22.04
-    name: ${{ matrix.config.name }}
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-        # GCC 13 / LLVM 18
-        - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu ARM Release @docker",
-            build_type: Release,
-            cxx: "g++-13",
-            llvm_version: "18.1.0",
-            llvm_config: "/usr/bin/llvm-config-18",
-            coverage: "No",
-            static: "Yes",
-            debug: "No",
-            tidy: "No",
-            run_tests: "No",
-            libcxx: "No",
-            bin_name: "insights",
-            archive_name: "insights-ubuntu-arm64",
-            upload: "Yes",
-            docs: "No",
-          }
-
-        # GCC 13 / LLVM 18
-        - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu ARM Code Coverage & Debug @docker",
-            build_type: Release,
-            cxx: "g++-13",
-            llvm_version: "18.1.0",
-            llvm_config: "/usr/bin/llvm-config-18",
-            coverage: "Yes",
-            static: "No",
-            debug: "Yes",
-            tidy: "No",
-            run_tests: "No",
-            libcxx: "No",
-            bin_name: "insights",
-            archive_name: "insights-ubuntu-arm64",
-          }
-
-        # GCC 13 / LLVM 18
-        - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu ARM Code Coverage (libc++) @docker",
-            build_type: Release,
-            cxx: "g++-13",
-            llvm_version: "18.1.0",
-            llvm_config: "/usr/bin/llvm-config-18",
-            coverage: "Yes",
-            static: "No",
-            debug: "Yes",
-            tidy: "No",
-            run_tests: "No",
-            libcxx: "Yes",
-            bin_name: "insights",
-            archive_name: "insights-ubuntu-arm64",
-          }
-
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        path: cppinsights
+          sudo mv docker-shell /usr/bin/docker-shell
+          sudo chmod 0755 /usr/bin/docker-shell
 
     - name: Set up QEMU
+      if:  matrix.arch == 'arm64'
       uses: docker/setup-qemu-action@v3
       with:
         platforms: arm64
 
     - name: Configure
       id: cmake_configure
+      shell: docker-shell {0}
       run: |
           mkdir build
-
-          cat > build.sh << "EOF"
-          #! /bin/bash
           cd build
+
           CXX=${{ matrix.config.cxx }} cmake -G Ninja -DINSIGHTS_STATIC=${{ matrix.config.static }} -DDEBUG=${{ matrix.config.debug }} -DINSIGHTS_COVERAGE=${{ matrix.config.coverage }} -DINSIGHTS_USE_LIBCPP=${{ matrix.config.libcxx }} ../cppinsights
-          EOF
-
-          chmod 0755 build.sh
-
-          docker run \
-            --rm \
-            -v $(pwd):/${{ github.workspace }} \
-            -w ${{ github.workspace }} \
-            --user $(id -u):$(id -g) \
-            --platform linux/arm64 \
-            andreasfertig/cppinsights-builder \
-            ./build.sh
 
     - name: Build
-      shell: bash
+      shell: docker-shell {0}
       continue-on-error: false
       run: |
-          docker run \
-            --rm \
-            -v $(pwd):/${{ github.workspace }} \
-            -w ${{ github.workspace }} \
-            --user $(id -u):$(id -g) \
-            --platform linux/arm64 \
-            andreasfertig/cppinsights-builder \
-            cmake --build build
+          cmake --build build
+
+    - name: Simple test
+      if:  "((matrix.config.coverage != 'Yes') && (matrix.config.run_tests != 'Yes'))"
+      shell: docker-shell {0}
+      continue-on-error: false
+      run: |
+          ./build/insights cppinsights/tests/SimpleCICompileTest.cpp
+          ./build/insights --use-libc++ cppinsights/tests/SimpleCICompileTest.cpp
 
     - name: Run tests
       if:  matrix.config.run_tests == 'Yes'
       id: run_tests
-      shell: bash
+      shell: docker-shell {0}
       continue-on-error: false
       run: |
-          docker run \
-            --rm \
-            -v $(pwd):/${{ github.workspace }} \
-            -w ${{ github.workspace }} \
-            --user $(id -u):$(id -g) \
-            --platform linux/arm64 \
-            andreasfertig/cppinsights-builder \
-            cmake --build build --target tests
+          cmake --build build --target tests
+
+    # docker-shell fails building doc with an unknown reason. Use the original container
+    - name: Make docs 1/2
+      if:  "((matrix.arch == 'amd64') && (matrix.config.docs == 'Yes'))"
+      uses: docker://andreasfertig/cppinsights-builder:latest
+      with:
+        args: |
+          /bin/bash -c "cmake --build build --target doc"
+
+    - name: Make docs 2/2
+      if:  "((matrix.arch == 'amd64') && (matrix.config.docs == 'Yes'))"
+      working-directory: ${{ github.workspace }}/build
+      shell: bash
+      run: |
+          sudo chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}/build/
+          ls -l ${GITHUB_WORKSPACE}/build/
+          ls -l ${GITHUB_WORKSPACE}/build/html
+          mkdir -p ${GITHUB_WORKSPACE}/build/archive
+          mv ${GITHUB_WORKSPACE}/build/html ${GITHUB_WORKSPACE}/build/archive/
 
     - name: Run coverage
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage
-      shell: bash
+      shell: docker-shell {0}
       continue-on-error: false
       run: |
-          docker run \
-            --rm \
-            -v $(pwd):/${{ github.workspace }} \
-            -w ${{ github.workspace }} \
-            --user $(id -u):$(id -g) \
-            --platform linux/arm64 \
-            andreasfertig/cppinsights-builder \
-            cmake --build build --target coverage
+          cmake --build build --target coverage
+          rm -f build/coverage.info
 
-    - name: Run coverage upload
+    - name: Upload code coverage info
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage_upload
-      continue-on-error: false
-      env:
-        LIBCXX: ${{ matrix.config.libcxx }}
-      shell: bash
-      run: |
-        if [ ! -f ${GITHUB_WORKSPACE}/build/filtered.info ]; then
-            echo -e "\033[1;31mlcov did not create filtered.info!\033[0m"
-            exit 1;
-        fi
-        if [ ! -s ${GITHUB_WORKSPACE}/build/filtered.info ]; then
-            echo -e "\033[1;31mlcov did create an empty filtered.info!\033[0m"
-            exit 1;
-        fi
-
-        flag="ubuntu-arm64"
-        if [ "Yes" == "${LIBCXX}" ]; then
-          flag="ubuntu-arm64-libcxx"
-        fi
-
-        # Uploading report to CodeCov
-        bash <(curl -s https://codecov.io/bash) -f ${GITHUB_WORKSPACE}/build/filtered.info -F ${flag} || echo "Codecov did not collect coverage reports"
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+        flags: ${{ matrix.config.archive_name }}-${{ matrix.arch }}-libcxx-${{ matrix.config.libcxx }}
+        fail_ci_if_error: true
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
       working-directory: ${{ github.workspace }}/build
-      shell: cmake -P {0}
+      shell: bash
       continue-on-error: false
       run: |
-        file(MAKE_DIRECTORY "$ENV{GITHUB_WORKSPACE}/build/archive")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar cvz "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.tar.gz" -- "${{ matrix.config.bin_name }}")
-        file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
-        file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
+        mkdir -p ${GITHUB_WORKSPACE}/build/archive
+
+        tar -cvzf ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-${{ matrix.arch }}.tar.gz ${{ matrix.config.bin_name }}
+        sha256sum ${GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }} > ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-${{ matrix.arch }}.sha256
 
     - uses: actions/upload-artifact@v3
       if:  matrix.config.upload == 'Yes'
       with:
-        name: insights-artifact-ubuntu-arm64
+        name: insights-artifact-ubuntu-${{ matrix.arch }}
         if-no-files-found: error
         path: |
             ${{ github.workspace }}/build/archive/*
@@ -828,7 +645,7 @@ jobs:
 # DEPLOY
 #------------------------------------------------------------------------------
   deploy:
-    needs: [build, docker_amd64, docker_arm64]
+    needs: [build, docker]
     if: github.ref == 'refs/heads/main'
     name: Final Deploy
     runs-on: ubuntu-22.04
