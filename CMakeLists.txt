@@ -347,18 +347,22 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
             set(COVERAGE_LINK_FLAGS    "-lgcov")
         endif()
 
-	if(WIN32)
+        if(WIN32)
             add_definitions(-fprofile-instr-generate)
             set(COVERAGE_LINK_FLAGS "${COVERAGE_LINK_FLAGS} ${LLVM_LIBDIR}/clang/${LLVM_PACKAGE_VERSION_PLAIN}/lib/windows/clang_rt.profile-x86_64.lib /FORCE:MULTIPLE")
-	else()
+    	else()
             add_definitions(-g)
             add_definitions(-O0)
-#	    add_definitions(-fprofile-arcs)
+#	         add_definitions(-fprofile-arcs)
             add_definitions(-ftest-coverage)
             set(COVERAGE_LINK_FLAGS "${COVERAGE_LINK_FLAGS} --coverage")
-	endif()
+    	endif()
 
-        add_definitions(--coverage)
+        if(IS_CLANG)
+            add_definitions(-fprofile-instr-generate -fcoverage-mapping)
+        else()
+            add_definitions(--coverage)
+        endif()
 
         set( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${COVERAGE_LINK_FLAGS}")
     endif()
@@ -425,12 +429,12 @@ if(WIN32)
     set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
     set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
     # Second, for multi-config builds (e.g. msvc)
-        foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
-                string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-                set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
-                set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
-                set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
-            endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
+    foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
+        string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
+        set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
+        set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
+        set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR} )
+    endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 endif()
 
 
@@ -608,6 +612,11 @@ if(INSIGHTS_COVERAGE OR WIN32)
     set(TEST_FAILURE_IS_OK "--failure-is-ok")
 endif()
 
+set(LLVM_PROF_DIR "")
+if(INSIGHTS_COVERAGE AND IS_CLANG)
+    set(LLVM_PROF_DIR "--llvm-prof-dir=${CMAKE_CURRENT_BINARY_DIR}/llvmprof")
+endif()
+
 set(TEST_USE_LIBCPP "")
 if(INSIGHTS_USE_LIBCPP)
     set(TEST_USE_LIBCPP "--use-libcpp")
@@ -628,7 +637,9 @@ else()
 
     # add a target to generate run tests
     add_custom_target(tests
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK} ${TEST_USE_LIBCPP}
+        COMMAND cmake -E rm -rf ${CMAKE_CURRENT_BINARY_DIR}/llvmprof/
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights
+        ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK} ${TEST_USE_LIBCPP} ${LLVM_PROF_DIR}
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights>
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testInvalidOption.sh ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights>
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
@@ -718,13 +729,12 @@ if(INSIGHTS_COVERAGE)
                 COMMENT "Generating code coverage HTML" VERBATIM
             )
         endif()
-    else()
+    elseif(IS_GNU)
         find_program(LCOV_BIN lcov)
         find_program(GENHTML_BIN genhtml)
         find_package_handle_standard_args(lcov
             REQUIRED_VARS LCOV_BIN GENHTML_BIN
         )
-
 
         if (NOT LCOV_FOUND)
             message(FATAL_ERROR "Lcov not found")
@@ -764,8 +774,38 @@ if(INSIGHTS_COVERAGE)
                 COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.info --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out
                 COMMENT "Generating code coverage HTML" VERBATIM
             )
-
         endif()
+
+    else() # Clang
+        find_program(LCOV_BIN llvm-cov)
+        find_program(PROFDATA_BIN llvm-profdata)
+        #        find_package_handle_standard_args(llvm-lcov
+        #            REQUIRED_VARS LCOV_BIN PROFDATA_BIN
+        #        )
+
+
+        #        if (NOT LCOV_FOUND)
+        #            message(FATAL_ERROR "llvm-cov not found")
+        #        elseif (NOT PROFDATA_FOUND)
+        #            message(FATAL_ERROR "llvm-profdata not found")
+        #        else()
+            message(STATUS "Target coverage available")
+            message(STATUS "lcov                     : ${LCOV_BIN}")
+            message(STATUS "llvm-profdata            : ${PROFDATA_BIN}")
+
+            # https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
+            add_custom_target(coverage
+                COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-coverage.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --llvm-prof-dir=${CMAKE_CURRENT_BINARY_DIR}/llvmprof/ --format=text  --output=${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+                COMMENT "Running code coverage analysis" VERBATIM
+            )
+
+            add_custom_target(coverage-html
+                COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-coverage.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --llvm-prof-dir=${CMAKE_CURRENT_BINARY_DIR}/llvmprof/ --format=html --output=${CMAKE_CURRENT_BINARY_DIR}/filtered.html
+                COMMENT "Generating code coverage HTML" VERBATIM
+            )
+
+        #        endif()
     endif()
 
     add_dependencies(coverage tests)

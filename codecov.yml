@@ -1,3 +1,6 @@
 fixes:
   - "cppinsights/::"
+  - "/home/runner/work/cppinsights/cppinsights/::"
+  - "/Users/runner/work/cppinsights/cppinsights/::"
+  - "github/workspace/::"
 
