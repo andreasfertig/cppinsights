@@ -2549,6 +2549,10 @@ void CodeGenerator::InsertArg(const CStyleCastExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
 {
+    const auto  noEmptyInitList = mNoEmptyInitList;
+    FinalAction _{[&] { mNoEmptyInitList = noEmptyInitList; }};
+    mNoEmptyInitList = GetInsightsOptions().UseShow2C ? NoEmptyInitList::Yes : NoEmptyInitList::No;
+
     mOutputFormatHelper.Append("new "sv);
 
     if(stmt->getNumPlacementArgs()) {
