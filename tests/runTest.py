@@ -164,7 +164,7 @@ def main():
 
         m = regExInsights.search(fileHeader)
         if m is not None:
-            insightsOpts = m.group(1)
+            insightsOpts = m.group(1).split(' ')
 
         if not os.path.isfile(expectFile) and not os.path.isfile(ignoreFile):
             print('Missing expect/ignore for: %s' %(f))
@@ -182,8 +182,8 @@ def main():
             cmd.append('-use-libc++')
 
 
-        if '' != insightsOpts:
-            cmd.append(insightsOpts)
+        if len(insightsOpts):
+            cmd.extend(insightsOpts)
 
         cmd.extend(['--', cppStd, '-m64'])
 

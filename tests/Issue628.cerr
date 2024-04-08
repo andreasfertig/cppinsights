@@ -1,0 +1,99 @@
+In file included from .tmp.cpp:9:
+In file included from ... iostream:43:
+In file included from ... ios:223:
+In file included from ... __locale:15:
+In file included from ... shared_ptr.h:33:
+In file included from ... unique_ptr.h:17:
+In file included from ... hash.h:28:
+In file included from ... cstring:63:
+In file included from ... string.h:61:
+... string.h:74:7: error: conflicting types for 'memset'
+   74 | void    *memset(void *__b, int __c, size_t __len);
+      |          ^
+.tmp.cpp:7:18: note: previous declaration is here
+    7 | extern "C" void* memset(void*, int, unsigned int);
+      |                  ^
+.tmp.cpp:24:3: error: use of undeclared identifier 'Constructor_std'
+   24 |   Constructor_std::chrono::duration<long long, std::ratio<1, 1000> >(&__this->delay, n);
+      |   ^
+.tmp.cpp:24:42: error: expected '(' for function-style cast or type construction
+   24 |   Constructor_std::chrono::duration<long long, std::ratio<1, 1000> >(&__this->delay, n);
+      |                                     ~~~~ ^
+.tmp.cpp:37:102: error: no member named 'operatorMinus' in namespace 'std::chrono'
+   37 |   const std::chrono::duration<long long, std::ratio<1, 1000000000> > __temporary20_49 = std::chrono::operatorMinus(&__temporary20_45, &start);
+      |                                                                                         ~~~~~~~~~~~~~^
+.tmp.cpp:38:44: error: use of undeclared identifier 'push'
+   38 |   std::function<bool ()> __temporary26_9 = push(&task_queue, __temporary26_9);
+      |                                            ^
+.tmp.cpp:39:3: error: use of undeclared identifier 'Destructor_std'
+   39 |   Destructor_std::function<bool ()>(&__temporary26_9);
+      |   ^
+.tmp.cpp:59:31: error: no type named 'promise_type' in 'Task'; did you mean simply 'promise_type'?
+   59 | inline Task get_return_object(Task::promise_type * __this)
+      |                               ^~~~~~~~~~~~~~~~~~
+      |                               promise_type
+.tmp.cpp:57:3: note: 'promise_type' declared here
+   57 | } promise_type;
+      |   ^
+.tmp.cpp:66:43: error: no type named 'promise_type' in 'Task'; did you mean simply 'promise_type'?
+   66 | inline std::suspend_never initial_suspend(Task::promise_type * __this)
+      |                                           ^~~~~~~~~~~~~~~~~~
+      |                                           promise_type
+.tmp.cpp:57:3: note: 'promise_type' declared here
+   57 | } promise_type;
+      |   ^
+.tmp.cpp:73:42: error: no type named 'promise_type' in 'Task'; did you mean simply 'promise_type'?
+   73 | inline std::suspend_always final_suspend(Task::promise_type * __this)
+      |                                          ^~~~~~~~~~~~~~~~~~
+      |                                          promise_type
+.tmp.cpp:57:3: note: 'promise_type' declared here
+   57 | } promise_type;
+      |   ^
+.tmp.cpp:80:33: error: no type named 'promise_type' in 'Task'; did you mean simply 'promise_type'?
+   80 | inline void unhandled_exception(Task::promise_type * __this)
+      |                                 ^~~~~~~~~~~~~~~~~~
+      |                                 promise_type
+.tmp.cpp:57:3: note: 'promise_type' declared here
+   57 | } promise_type;
+      |   ^
+.tmp.cpp:89:3: error: no type named 'promise_type' in 'std::__coroutine_traits_sfinae<Task>'; did you mean simply 'promise_type'?
+   89 |   std::__coroutine_traits_sfinae<Task>::promise_type __promise;
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |   promise_type
+.tmp.cpp:57:3: note: 'promise_type' declared here
+   57 | } promise_type;
+      |   ^
+.tmp.cpp:102:53: error: use of undeclared identifier 'operatorNew_std'
+  102 |   __fooFrame * __f = reinterpret_cast<__fooFrame *>(operatorNew_std::size_t(sizeof(__fooFrame)));
+      |                                                     ^
+.tmp.cpp:107:24: error: no type named 'promise_type' in 'std::__coroutine_traits_sfinae<Task>'; did you mean simply 'promise_type'?
+  107 |   new (&__f->__promise)std::__coroutine_traits_sfinae<Task>::promise_type;
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                        promise_type
+.tmp.cpp:57:3: note: 'promise_type' declared here
+   57 | } promise_type;
+      |   ^
+.tmp.cpp:137:5: error: use of undeclared identifier '__temporary45_6'
+  137 |     __temporary45_6 = __f->__promise.initial_suspend();
+      |     ^
+.tmp.cpp:138:5: error: use of undeclared identifier '__temporary45_6'
+  138 |     __temporary45_6 = from_address(static_cast<void *>(__f));
+      |     ^
+.tmp.cpp:138:23: error: use of undeclared identifier 'from_address'; did you mean 'std::to_address'?
+  138 |     __temporary45_6 = from_address(static_cast<void *>(__f));
+      |                       ^~~~~~~~~~~~
+      |                       std::to_address
+... pointer_traits.h:232:45: note: 'std::to_address' declared here
+  232 | inline _LIBCPP_HIDE_FROM_ABI constexpr auto to_address(_Tp* __p) noexcept {
+      |                                             ^
+.tmp.cpp:143:5: error: expected expression
+  143 |     ) {
+      |     ^
+.tmp.cpp:144:41: error: use of undeclared identifier '__temporary45_6'
+  144 |       __f->__suspend_45_6.await_suspend(__temporary45_6.operator std::coroutine_handle<void>());
+      |                                         ^
+.tmp.cpp:157:10: error: no member named 'operatorLessLess' in namespace 'std'
+  157 |     std::operatorLessLess(std::cout, "1. hello from foo1").operator<<(std::endl);
+      |     ~~~~~^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
