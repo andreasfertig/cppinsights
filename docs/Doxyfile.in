@@ -74,6 +74,7 @@ STRIP_FROM_PATH        = @CMAKE_CURRENT_SOURCE_DIR@
 
 STRIP_FROM_INC_PATH    = @CMAKE_CURRENT_SOURCE_DIR@/include
 STRIP_FROM_INC_PATH   += @CMAKE_CURRENT_SOURCE_DIR@/lib
+STRIP_FROM_INC_PATH   += @CMAKE_CURRENT_SOURCE_DIR@
 
 # The TAB_SIZE tag can be used to set the number of spaces in a tab. Doxygen
 # uses this value to replace tabs by spaces in code fragments.
