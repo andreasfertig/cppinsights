@@ -14,9 +14,9 @@ import subprocess
 def main():
     versionH = open('version.h.in', 'r').read()
 
-    oldClangStable = '17'
-    newClangStable = '18'
-    newInsightsVersion = '18.0'
+    oldClangStable = '18'
+    newClangStable = '19'
+    newInsightsVersion = f'{newClangStable}.0'
     oldInsightsVersion = re.search(r'INSIGHTS_VERSION\s+"(.*?)"', versionH, re.DOTALL | re.MULTILINE).group(1)
 
 
@@ -40,7 +40,6 @@ def main():
     travis = re.sub(r"(llvm-toolchain-xenial)-(%s)" %(oldClangStable), r"\1-%s" %(newClangStable) , travis)
     travis = re.sub(r"(./llvm.sh) (%s)" %(oldClangStable), r"\1 %s" %(newClangStable) , travis)
 
-#    print(travis)
     open('.github/workflows/ci.yml', 'w').write(travis)
 
 
@@ -50,32 +49,23 @@ def main():
     open('CMakeLists.txt', 'w').write(cmake)
 
 
-    print('  - Updating version.h %s -> %s' %(oldInsightsVersion, newInsightsVersion))
+    print(f'  - Updating version.h {oldInsightsVersion} -> {newInsightsVersion}')
     version = open('version.h.in', 'r').read()
     version = re.sub('(INSIGHTS_VERSION )"(.*)"', '\\1"%s"' %(newInsightsVersion) , version)
     open('version.h.in', 'w').write(version)
 
+    cppInsightsDockerBaseFile = '../cppinsights-docker-base/Dockerfile'
 
-    print('  - Generating CHANGELOG.md')
-    os.system('gren changelog --override --username=andreasfertig --repo=cppinsights %s...continous' %(oldInsightsVersion))
+    print(f'  - Updating cppinsights-docker-base ({cppInsightsDockerBaseFile})')
 
-    cmd = ['gren', 'changelog', '--override', '--username=andreasfertig', '--repo=cppinsights', '%s...continous' %(oldInsightsVersion)]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = p.communicate()
+    dockerFile = open(cppInsightsDockerBaseFile, 'r').read()
+    dockerFile = re.sub(r'(ENV\s+CLANG_VERSION=)([0-9]+)', r'\g<1>%s' %(newClangStable), dockerFile)
+    open(cppInsightsDockerBaseFile, 'w').write(dockerFile)
 
-    if 0 != p.returncode:
-        print('ERR: gren failed')
-        print(stderr)
-        return 1
 
-    changeLog = open('CHANGELOG.md', 'r').read()
-    changeLog = re.sub('(## Continuous build.*?---)\n', '', changeLog, flags=re.DOTALL)
-    open('CHANGELOG.md', 'w').write(changeLog)
+    gitTag = f'v_{oldInsightsVersion}'
+    print(f'  - Tagging {gitTag}')
 
-    gitTag = 'v_%s' %(oldInsightsVersion)
-    print('  - Tagging %s' %(gitTag))
-
-    #cmd = ['git', 'tag', '-a', '-m', gitTag, gitTag, 'main']
     cmd = ['git', 'tag', gitTag, 'main']
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
@@ -85,13 +75,8 @@ def main():
         print(stderr)
         return 1
 
-    cppInsightsDockerBaseFile = '../cppinsights-docker-base/Dockerfile'
-
-    print('  - Updating cppinsights-docker-base (%s)' %(cppInsightsDockerBaseFile))
-
-    dockerFile = open(cppInsightsDockerBaseFile, 'r').read()
-    dockerFile = re.sub(r'(ENV\s+CLANG_VERSION=)([0-9]+)', r'\g<1>%s' %(newClangStable), dockerFile)
-    open(cppInsightsDockerBaseFile, 'w').write(dockerFile)
+    print('  - Push tag:')
+    print(f'             git push origin {gitTag}')
 #------------------------------------------------------------------------------
 
 main()
