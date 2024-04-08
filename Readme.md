@@ -78,7 +78,7 @@ int main()
 }
 ```
 
-You can see all the compiler-provided special member functions and the downcast from `Derived` to `Base`.
+You can see all the compiler-provided special member functions and the upcast from `Derived` to `Base`.
 
 ## Why
 
