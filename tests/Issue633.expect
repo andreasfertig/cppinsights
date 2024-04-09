@@ -1,0 +1,39 @@
+#include <iostream>
+#include <map>
+
+int main()
+{
+  std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > a = std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > >{std::initializer_list<std::pair<const int, int> >{std::pair<const int, int>{1, 3}, std::pair<const int, int>{4, 5}}, std::less<int>()};
+  {
+    std::map<int, int, std::less<int>, std::allocator<std::pair<const int, int> > > & __range1 = a;
+    std::__map_iterator<std::__tree_iterator<std::__value_type<int, int>, std::__tree_node<std::__value_type<int, int>, void *> *, long> > __begin1 = __range1.begin();
+    std::__map_iterator<std::__tree_iterator<std::__value_type<int, int>, std::__tree_node<std::__value_type<int, int>, void *> *, long> > __end1 = __range1.end();
+    for(; operator!=(__begin1, __end1); __begin1.operator++()) {
+      std::pair<const int, int> & __operator8 = __begin1.operator*();
+      const int & k = std::get<0UL>(__operator8);
+      int & v = std::get<1UL>(__operator8);
+            
+      class __lambda_9_8
+      {
+        public: 
+        inline /*constexpr */ int operator()() const
+        {
+          return k;
+        }
+        
+        private: 
+        std::tuple_element<0, std::pair<const int, int> >::type k;
+        
+        public:
+        __lambda_9_8(const int & _k)
+        : k{_k}
+        {}
+        
+      } __lambda_9_8{k};
+      
+      __lambda_9_8.operator()();
+    }
+    
+  }
+  return 0;
+}
