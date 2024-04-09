@@ -4038,6 +4038,11 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
             const auto* capturedVar = c.getCapturedVar();
             if(const auto* value = captures[capturedVar]) {
+                // Since C++20 lambdas can capture structured bindings
+                if(const auto* bindingDecl = dyn_cast_or_null<BindingDecl>(capturedVar)) {
+                    capturedVar = bindingDecl->getHoldingVar();
+                }
+
                 addToInits(GetName(*capturedVar),
                            value,
                            false,
