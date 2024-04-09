@@ -35,8 +35,18 @@ set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to u
 set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 18)
 set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
 
-if(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(BUILD_INSIGHTS_OUTSIDE_LLVM On)
+else()
+  # used when build inside the clang tool/extra folder
+  set(BUILD_INSIGHTS_OUTSIDE_LLVM Off)
+  include_directories(BEFORE
+    ${LLVM_SOURCE_DIR}/include
+    ${LLVM_EXTERNAL_CLANG_SOURCE_DIR}/include
+    ${LLVM_BINARY_DIR}/include
+    ${LLVM_BINARY_DIR}/tools/clang/include
+  )
+
 endif()
 
 if(INSIGHTS_COVERAGE OR DEBUG)
@@ -367,11 +377,6 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         set( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${COVERAGE_LINK_FLAGS}")
     endif()
 
-    # copied from: llvm/tools/clang/cmake/modules/AddClang.cmake
-    macro(add_clang_tool name)
-      add_executable( ${name} ${ARGN} )
-    endmacro(add_clang_tool)
-
     # additional libs required when building insights outside llvm
     set(ADDITIONAL_LIBS
         ${LLVM_LDFLAGS}
@@ -421,6 +426,12 @@ endif()
 if (${LLVM_PACKAGE_VERSION} VERSION_LESS ${INSIGHTS_MIN_LLVM_VERSION})
     message(FATAL_ERROR "LLVM version ${INSIGHTS_MIN_LLVM_VERSION} or higher required. Current version is: ${LLVM_PACKAGE_VERSION}.")
 endif()
+
+# copied from: llvm/tools/clang/cmake/modules/AddClang.cmake
+macro(add_clang_tool name)
+  add_executable( ${name} ${ARGN} )
+endmacro(add_clang_tool)
+
 
 
 if(WIN32)
@@ -815,6 +826,7 @@ endif()
 
 message(STATUS "")
 message(STATUS "[ Build summary ]")
+message(STATUS "BUILD_INSIGHTS_OUTSIDE_LLVM : ${BUILD_INSIGHTS_OUTSIDE_LLVM}")
 message(STATUS "CMAKE_GENERATOR       : ${CMAKE_GENERATOR}")
 message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
 message(STATUS "CMAKE_LINKER          : ${CMAKE_LINKER}")
