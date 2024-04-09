@@ -630,11 +630,65 @@ jobs:
         if-no-files-found: error
         path: |
             ${{ github.workspace }}/build/archive/*
+
+#------------------------------------------------------------------------------
+# BUILD INSIDE DOCKER INSIDE LLVM-SOURCE-TREE
+#------------------------------------------------------------------------------
+  in-source-tree:
+    runs-on: ubuntu-22.04
+    name: ${{ matrix.config.name }} LLVM source tree
+    container:
+      image: andreasfertig/cppinsights-builder
+    continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - amd64
+
+        config:
+        # GCC 13 / LLVM 18
+        - {
+            name: "GCC 13 / LLVM 18 @ Ubuntu Release",
+            build_type: Release,
+            cxx: "g++-13",
+            llvm_version: "18.1.0",
+            llvm_config: "/usr/bin/llvm-config-18",
+            coverage: "No",
+            static: "Yes",
+            debug: "No",
+            libcxx: "No",
+          }
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: cppinsights
+
+    - uses: actions/checkout@v4
+      name: Checkout Clang
+      with:
+        repository: llvm/llvm-project
+        ref: llvmorg-${{ env.LLVM_VERSION }}
+        path: llvm-project
+        fetch-tags: true
+
+    - name: Configure
+      id: cmake_configure
+      shell: bash
+      run: |
+          mkdir build
+          cd build
+
+          CXX=${{ matrix.config.cxx }}
+          cmake -G Ninja -D=CMAKE_BUILD_TYPE=Release -DLLVM_EXTERNAL_PROJECTS=cppinsights -DLLVM_EXTERNAL_CPPINSIGHTS_SOURCE_DIR=${GITHUB_WORKSPACE}/cppinsights  -DINSIGHTS_STATIC=${{ matrix.config.static }} -DDEBUG=${{ matrix.config.debug }} -DINSIGHTS_COVERAGE=${{ matrix.config.coverage }} -DINSIGHTS_USE_LIBCPP=${{ matrix.config.libcxx }} ${GITHUB_WORKSPACE}/llvm-project/llvm
+          # For now a successful configure is enough
+
 #------------------------------------------------------------------------------
 # DEPLOY
 #------------------------------------------------------------------------------
   deploy:
-    needs: [build, docker]
+    needs: [build, docker, in-source-tree]
     if: github.ref == 'refs/heads/main'
     name: Final Deploy
     continue-on-error: false

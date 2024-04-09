@@ -130,6 +130,7 @@ See https://github.com/andreasfertig/cppinsights/issues/186 for an explanation o
 
 `extra/clang` and `extra/llvm` provide `/usr/lib/{libclangAST.so,libLLVM*.a,libLLVM.so}`. `libclangAST.so` needs `libLLVM.so` and there would be a conflict if `libLLVM*.a` (instead of `libLLVM.so`) are linked. See https://bugs.archlinux.org/task/60512
 
+
 ### Building outside Clang
 
 You need to have a Clang installation in the search path.
@@ -144,23 +145,20 @@ The resulting binary (insights) can be found in the `build` folder.
 
 ### Building inside Clang
 
-For building it inside the Clang source tree, assuming you have your source tree already prepared under `llvm-project`:
+The easiest way to build C++ Insights inside the Clang source tree is using the `LLVM_EXTERNAL_PROJECTS` option.
 
 ```
-cd llvm-project/clang-tools-extra/
+git clone https://github.com/llvm/llvm-project.git
 git clone https://github.com/andreasfertig/cppinsights.git
 
-echo "add_subdirectory(cppinsights)" >> CMakeLists.txt
+mkdir build
+cd build
+cmake -G Ninja -D=CMAKE_BUILD_TYPE=Release -DLLVM_EXTERNAL_PROJECTS=cppinsights -DLLVM_EXTERNAL_CPPINSIGHTS_SOURCE_DIR=<PATH/TO/cppinsights>  [INSIGHTS CMAKE OPTIONS] ../llvm-project/llvm
+
+ninja
 ```
 
-To activate the C++ Insights build you have to set `-DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"` for `cmake`:
 
-```
-cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -G "Unix Makefiles" ../llvm-project
-```
-
-
-Then, build Clang as you normally do.
 
 ### cmake options
 
