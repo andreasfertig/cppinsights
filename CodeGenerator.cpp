@@ -1316,7 +1316,9 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                     if(not(ctorExpr and ctorExpr->getConstructor()->isDefaultConstructor() and
                            ctorExpr->getConstructor()->getParent()->hasTrivialDefaultConstructor())) {
 
-                        mOutputFormatHelper.Append(hlpAssing);
+                        if(not isa<CXXParenListInitExpr>(init)) {
+                            mOutputFormatHelper.Append(hlpAssing);
+                        }
 
                         if(GetInsightsOptions().ShowLifetime and init->isXValue() and
                            stmt->getType()->isRValueReferenceType()) {
@@ -2002,6 +2004,12 @@ void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 void CodeGenerator::InsertArg(const ParenExpr* stmt)
 {
     WrapInParens([&]() { InsertArg(stmt->getSubExpr()); });
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CXXParenListInitExpr* stmt)
+{
+    WrapInParens([&]() { ForEachArg(stmt->getInitExprs(), [&](const auto& init) { InsertArg(init); }); });
 }
 //-----------------------------------------------------------------------------
 

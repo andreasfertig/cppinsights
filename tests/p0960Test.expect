@@ -1,0 +1,13 @@
+struct Point
+{
+  int y;
+  int x = 2;
+  int z;
+};
+
+
+int main()
+{
+  Point p(2, 3, 4);
+  return 0;
+}
