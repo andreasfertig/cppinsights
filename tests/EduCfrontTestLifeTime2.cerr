@@ -1,22 +1,22 @@
-.tmp.cpp:83:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
-   83 |   Data * d = &get(Constructor_Test((Test *)&__temporary43_22, 4));
+.tmp.cpp:84:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
+   84 |   Data * d = &get(Constructor_Test((Test *)&__temporary43_22, 4));
       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:90:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
-   90 |   Data * d = &get(Constructor_Test((Test *)&__temporary48_22, 4));
+.tmp.cpp:91:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
+   91 |   Data * d = &get(Constructor_Test((Test *)&__temporary48_22, 4));
       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:102:20: error: use of undeclared identifier 'tt'
-  102 |   Destructor_Test(&tt);
+.tmp.cpp:103:20: error: use of undeclared identifier 'tt'
+  103 |   Destructor_Test(&tt);
       |                    ^
-.tmp.cpp:103:20: error: use of undeclared identifier 't'
-  103 |   Destructor_Test(&t);
+.tmp.cpp:104:20: error: use of undeclared identifier 't'
+  104 |   Destructor_Test(&t);
       |                    ^
-.tmp.cpp:104:20: error: use of undeclared identifier 'tt'
-  104 |   Destructor_Test(&tt);
-      |                    ^
-.tmp.cpp:105:20: error: use of undeclared identifier 't'
-  105 |   Destructor_Test(&t);
+.tmp.cpp:105:20: error: use of undeclared identifier 'tt'
+  105 |   Destructor_Test(&tt);
       |                    ^
 .tmp.cpp:106:20: error: use of undeclared identifier 't'
   106 |   Destructor_Test(&t);
+      |                    ^
+.tmp.cpp:107:20: error: use of undeclared identifier 't'
+  107 |   Destructor_Test(&t);
       |                    ^
 7 errors generated.

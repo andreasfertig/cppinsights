@@ -36,6 +36,7 @@ inline void Destructor_Alloc(Alloc * __this)
 int __main(void)
 {
   Alloc a;
+  Constructor_Alloc((Alloc *)&a);
   return 0;
   Destructor_Alloc(&a);
 }

@@ -837,7 +837,8 @@ void CfrontCodeGenerator::InsertArg(const CXXConstructExpr* stmt)
         }
     }
 
-    auto  ctorName = GetSpecialMemberName(stmt->getConstructor());
+    auto  ctor     = stmt->getConstructor();
+    auto  ctorName = GetSpecialMemberName(ctor);
     auto* vd       = dyn_cast_or_null<VarDecl>(mLastDecl);
 
 #if 0   
@@ -854,6 +855,23 @@ void CfrontCodeGenerator::InsertArg(const CXXConstructExpr* stmt)
     }
 #endif
 
+    auto InsertCallCtor = [&](Expr* varNameRef) {
+        SmallVector<Expr*, 16> args{Cast(varNameRef, Ptr(stmt->getType()))};
+
+        for(int i = 0; auto* arg : stmt->arguments()) {
+            if(IsCopyOrMoveCtor(ctor) or ctor->getParamDecl(i)->getType()->isReferenceType()) {
+                args.push_back(Ref(arg));
+
+            } else {
+                args.push_back(const_cast<Expr*>(arg));
+            }
+
+            ++i;
+        }
+
+        InsertArg(Call(ctorName, args));
+    };
+
     // For an array we need to call __vec_new
     if(const auto* ar = dyn_cast_or_null<ConstantArrayType>(stmt->getType())) {
         if(not HasCtor(ar->getElementType())) {
@@ -865,38 +883,26 @@ void CfrontCodeGenerator::InsertArg(const CXXConstructExpr* stmt)
 
     } else if(const auto* tmpObjectExpr = dyn_cast_or_null<CXXTemporaryObjectExpr>(stmt); vd and not tmpObjectExpr) {
         if(not HasCtor(vd->getType())) {
-            // InsertArg(Ref(vd));
-        }
+            mInsertSemi = false;
+        } else {
+            auto* varNameRef = Ref(mkDeclRefExpr(vd));
 
-        mInsertSemi = false;
+            InsertCallCtor(varNameRef);
+        }
 
     } else if(tmpObjectExpr) {
         auto* varNameRef = Ref(mkVarDeclRefExpr(GetName(*tmpObjectExpr), stmt->getType()));
-
-        SmallVector<Expr*, 16> args{Cast(varNameRef, Ptr(stmt->getType()))};
 
         if(not HasCtor(stmt->getType())) {
             InsertArg(varNameRef);
             return;
         }
 
-        for(auto* arg : stmt->arguments()) {
-            if(IsCopyOrMoveCtor(stmt->getConstructor())) {
-                args.push_back(Ref(arg));
-
-            } else {
-                args.push_back(const_cast<Expr*>(arg));
-            }
-        }
-
-        InsertArg(Call(ctorName, args));
+        InsertCallCtor(varNameRef);
 
     } else {
-        InsertArg(CallConstructor(stmt->getType(),
-                                  Ptr(GetRecordDeclType(stmt->getConstructor())),
-                                  nullptr,
-                                  ArgsToExprVector(stmt),
-                                  DoCast::Yes));
+        InsertArg(CallConstructor(
+            stmt->getType(), Ptr(GetRecordDeclType(ctor)), nullptr, ArgsToExprVector(stmt), DoCast::Yes));
     }
 }
 //-----------------------------------------------------------------------------
