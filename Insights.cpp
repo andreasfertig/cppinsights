@@ -179,7 +179,12 @@ public:
     , mIncludes{includes}
     {
         if(GetInsightsOptions().UseShow2C) {
-            gInsightsOptions.ShowLifetime = true;
+            if(GetInsightsOptions().ShowCoroutineTransformation) {
+                DPrint("disabling cfront\n");
+                gInsightsOptions.UseShow2C = false;
+            } else {
+                gInsightsOptions.ShowLifetime = true;
+            }
         }
 
         if(GetInsightsOptions().ShowLifetime) {

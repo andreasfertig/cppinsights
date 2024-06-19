@@ -23,6 +23,7 @@ inline Test * Constructor_Test(Test * __this)
 void Basic(void)
 {
   Test t;
+  Constructor_Test((Test *)&t);
   int x = 2;
   ++x;
   /* x // lifetime ends here */
@@ -32,6 +33,7 @@ void Basic(void)
 void Simple(void)
 {
   Test t;
+  Constructor_Test((Test *)&t);
   int x = 2;
   if((bool)x) {
   } else {
@@ -44,13 +46,16 @@ void Simple(void)
 void Next(void)
 {
   Test t;
+  Constructor_Test((Test *)&t);
   int x = 2;
   if((bool)x) {
     Test t2;
+    Constructor_Test((Test *)&t2);
     ++x;
     Destructor_Test(&t2);
   } else {
     Test t3;
+    Constructor_Test((Test *)&t3);
     ++x;
     Destructor_Test(&t3);
   } 
@@ -62,6 +67,7 @@ void Next(void)
 void Fun(void)
 {
   Test t;
+  Constructor_Test((Test *)&t);
   Test * t2;
   int x = 2;
   ++x;
@@ -89,6 +95,7 @@ void Fun(void)
 int Fun2(void)
 {
   Test t;
+  Constructor_Test((Test *)&t);
   Test * t2;
   int x = 2;
   ++x;

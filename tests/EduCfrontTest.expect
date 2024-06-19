@@ -76,11 +76,14 @@ inline void Destructor_Other(Other * __this);
 int __main(void)
 {
   Apple a;
+  Constructor_Apple((Apple *)&a);
   Set(&a, 4);
   Apple * paaa = nullptr;
   Set(paaa, 5);
   Apple b;
+  Constructor_Apple((Apple *)&b, 6);
   Apple c;
+  CopyConstructor_Apple((Apple *)&c, &b);
   operatorEqual(&b, &a);
   return 0;
   Destructor_Apple(&c);

@@ -48,6 +48,7 @@ void FunFun(Test t, Test tt)
 int FunFunInt(Test t, Test tt)
 {
   Test t3;
+  Constructor_Test((Test *)&t3, 5);
   return 3;
   Destructor_Test(&t3);
 }
