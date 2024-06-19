@@ -3626,6 +3626,8 @@ void CodeGenerator::InsertArg(const AttributedStmt* stmt)
     for(const auto& attr : stmt->getAttrs()) {
         InsertAttribute(*attr);
     }
+
+    InsertArg(stmt->getSubStmt());
 }
 //-----------------------------------------------------------------------------
 
@@ -5003,7 +5005,7 @@ void CodeGenerator::WrapInParensOrCurlys(const BraceKind        braceKind,
 
 void CodeGenerator::WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAfter addNewLineAfter)
 {
-    const bool hasNoCompoundStmt = not isa<CompoundStmt>(stmt);
+    const bool hasNoCompoundStmt = not(isa<CompoundStmt>(stmt) or isa<AttributedStmt>(stmt));
 
     if(hasNoCompoundStmt) {
         mOutputFormatHelper.OpenScope();
@@ -5012,8 +5014,13 @@ void CodeGenerator::WrapInCompoundIfNeeded(const Stmt* stmt, const AddNewLineAft
     if(not isa<NullStmt>(stmt)) {
         InsertArg(stmt);
 
+        const bool isAttrWithCompound{[&] {
+            auto* attrStmt = dyn_cast_or_null<AttributedStmt>(stmt);
+            return attrStmt and isa<CompoundStmt>(attrStmt->getSubStmt());
+        }()};
+
         // Add semi-colon if necessary. A do{} while does already add one.
-        if(IsStmtRequiringSemi<IfStmt, CompoundStmt, NullStmt, WhileStmt, DoStmt>(stmt)) {
+        if(IsStmtRequiringSemi<IfStmt, CompoundStmt, NullStmt, WhileStmt, DoStmt>(stmt) and not isAttrWithCompound) {
             mOutputFormatHelper.AppendSemiNewLine();
         }
     }
