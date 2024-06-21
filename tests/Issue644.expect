@@ -1,0 +1,19 @@
+int main(int argc, char ** argv)
+{
+  if(static_cast<bool>(argc)) [[likely]] return 5;
+   else {
+    return 8;
+  } 
+  
+  if(static_cast<bool>(argc)) [[likely]] {
+    return 5;
+  } else {
+    return 8;
+  } 
+  
+  switch(argc) {
+    case 1: return 6;
+    [[likely]] case 2: return 9;
+  }
+  return 0;
+}
