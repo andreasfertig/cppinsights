@@ -20,8 +20,8 @@ inline X * Constructor_X(X * __this, std::initializer_list<int> x)
 
 void fun(void)
 {
-  X __temporary13_14;
   const int __list13_6[3]{1, 2, 3};
+  X __temporary13_14;
   Constructor_X((X *)&__temporary13_14, std::initializer_list<int>{__list13_6, 3});
   /* __temporary13_14 // lifetime ends here */
 }

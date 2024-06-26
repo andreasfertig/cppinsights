@@ -1173,7 +1173,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
     }
 
     LAMBDA_SCOPE_HELPER(VarDecl);
-    UpdateCurrentPos();
+    UpdateCurrentPos(mCurrentVarDeclPos);
 
     TemporaryDeclFinder temporaryFinder{*this, stmt->getInit()};
 
@@ -2093,7 +2093,7 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
         mLambdaStack.back().setInsertName(true);
     }
 
-    UpdateCurrentPos();
+    UpdateCurrentPos(mCurrentCallExprPos);
 
     InsertArg(stmt->getCallee());
 
@@ -2141,6 +2141,8 @@ void CodeGenerator::InsertArg(const CallExpr* stmt)
     if(insideDecltype) {
         mLambdaStack.back().setInsertName(false);
     }
+
+    mCurrentCallExprPos.reset();
 }
 //-----------------------------------------------------------------------------
 
@@ -3054,8 +3056,9 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
     // name and the type. The CXXMethodDecl above knows only the type.
     if(const auto* ctor = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
         CodeGeneratorVariant codeGenerator{initOutputFormatHelper, mLambdaStack, mProcessingPrimaryTemplate};
-        codeGenerator->mCurrentPos                = mCurrentPos;
+        codeGenerator->mCurrentVarDeclPos         = mCurrentVarDeclPos;
         codeGenerator->mCurrentFieldPos           = mCurrentFieldPos;
+        codeGenerator->mCurrentCallExprPos        = mCurrentCallExprPos;
         codeGenerator->mOutputFormatHelperOutside = &mOutputFormatHelper;
 
         OnceTrue first{};
@@ -3815,7 +3818,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
         }
     }
 
-    mCurrentFieldPos = mOutputFormatHelper.CurrentPos();
+    UpdateCurrentPos(mCurrentFieldPos);
 
     OnceTrue        firstRecordDecl{};
     OnceTrue        firstDecl{};
@@ -4149,10 +4152,10 @@ void CodeGenerator::InsertArg(const ReturnStmt* stmt)
 {
     LAMBDA_SCOPE_HELPER(ReturnStmt);
 
+    UpdateCurrentPos(mCurrentReturnPos);
+
     {  // dedicated scope to first clear everything found in the return statement. Then clear all others.
         TemporaryDeclFinder temporaryFinder{*this, stmt->getRetValue(), true};
-
-        mCurrentReturnPos = mOutputFormatHelper.CurrentPos();
 
         mOutputFormatHelper.Append(kwReturn);
 
@@ -4295,8 +4298,8 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
     const auto typeName{GetName(stmt->getType(), Unqualified::Yes)};
 
     if(GetInsightsOptions().UseShowInitializerList) {
-        RETURN_IF(not mCurrentPos.has_value() and not mCurrentFieldPos.has_value() and
-                  not mCurrentReturnPos.has_value());
+        RETURN_IF(not mCurrentVarDeclPos.has_value() and not mCurrentFieldPos.has_value() and
+                  not mCurrentReturnPos.has_value() and not mCurrentCallExprPos.has_value());
 
         const auto* subExpr = stmt->getSubExpr();
 
@@ -4308,13 +4311,15 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
         }
 
         std::string modifiers{};
-        size_t      variableInsertPos = mCurrentReturnPos.value_or(mCurrentPos.value_or(0));
+        size_t      variableInsertPos = mCurrentReturnPos.value_or(
+            mCurrentVarDeclPos.value_or(mCurrentCallExprPos.value_or(0)));  // order is important!
 
         auto& ofmToInsert = [&]() -> decltype(auto) {
-            if(not mCurrentPos.has_value() and not mCurrentReturnPos.has_value()) {
-                variableInsertPos = mCurrentFieldPos.value_or(0);
-                mCurrentPos       = variableInsertPos;
-                modifiers         = StrCat(kwStaticSpace, kwInlineSpace);
+            if(not mCurrentVarDeclPos.has_value() and not mCurrentReturnPos.has_value() and
+               not mCurrentCallExprPos.has_value()) {
+                variableInsertPos  = mCurrentFieldPos.value_or(0);
+                mCurrentVarDeclPos = variableInsertPos;
+                modifiers          = StrCat(kwStaticSpace, kwInlineSpace);
                 return (*mOutputFormatHelperOutside);
             }
 
@@ -4348,8 +4353,10 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 
         if(mCurrentReturnPos.has_value()) {
             mCurrentReturnPos = mCurrentReturnPos.value() + ofm.size();
+        } else if(mCurrentVarDeclPos.has_value()) {
+            mCurrentVarDeclPos = mCurrentVarDeclPos.value() + ofm.size();
         } else {
-            mCurrentPos = mCurrentPos.value() + ofm.size();
+            mCurrentCallExprPos = mCurrentCallExprPos.value() + ofm.size();
         }
 
     } else {
