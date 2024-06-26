@@ -1,0 +1,7 @@
+#include <algorithm>
+
+void f()
+{
+  const int __list6_20[3]{1, 2, 3};
+  int v = std::max(std::initializer_list<int>{__list6_20, 3});
+}

@@ -119,7 +119,7 @@ protected:
     public:
         LambdaHelper(const LambdaCallerType lambdaCallerType, OutputFormatHelper& outputFormatHelper)
         : mLambdaCallerType{lambdaCallerType}
-        , mCurrentPos{outputFormatHelper.CurrentPos()}
+        , mCurrentVarDeclPos{outputFormatHelper.CurrentPos()}
         , mOutputFormatHelper{outputFormatHelper}
         {
             mLambdaOutputFormatHelper.SetIndent(mOutputFormatHelper);
@@ -128,7 +128,7 @@ protected:
         void finish()
         {
             if(not mLambdaOutputFormatHelper.empty()) {
-                mOutputFormatHelper.InsertAt(mCurrentPos, mLambdaOutputFormatHelper);
+                mOutputFormatHelper.InsertAt(mCurrentVarDeclPos, mLambdaOutputFormatHelper);
             }
         }
 
@@ -151,7 +151,7 @@ protected:
 
     private:
         const LambdaCallerType mLambdaCallerType;
-        const size_t           mCurrentPos;
+        const size_t           mCurrentVarDeclPos;
         OutputFormatHelper&    mOutputFormatHelper;
         OutputFormatHelper     mLambdaOutputFormatHelper{};
         std::string            mInits{};
@@ -394,7 +394,7 @@ protected:
                               void_func_ref          lambda,
                               const AddSpaceAtTheEnd addSpaceAtTheEnd = AddSpaceAtTheEnd::No);
 
-    void UpdateCurrentPos() { mCurrentPos = mOutputFormatHelper.CurrentPos(); }
+    void UpdateCurrentPos(std::optional<size_t>& pos) { pos = mOutputFormatHelper.CurrentPos(); }
 
     static std::string_view GetBuiltinTypeSuffix(const BuiltinType::Kind& kind);
 
@@ -438,12 +438,14 @@ protected:
     static constexpr auto MAX_FILL_VALUES_FOR_ARRAYS{
         uint64_t{100}};  //!< This is the upper limit of elements which will be shown for an array when filled by \c
                          //!< FillConstantArray.
-    std::optional<size_t> mCurrentPos{};        //!< The position in mOutputFormatHelper where a potential
-                                                //!< std::initializer_list expansion must be inserted.
-    std::optional<size_t> mCurrentReturnPos{};  //!< The position in mOutputFormatHelper from a return where a
-                                                //!< potential std::initializer_list expansion must be inserted.
-    std::optional<size_t> mCurrentFieldPos{};   //!< The position in mOutputFormatHelper in a class where where a
-                                                //!< potential std::initializer_list expansion must be inserted.
+    std::optional<size_t> mCurrentVarDeclPos{};   //!< The position in mOutputFormatHelper where a potential
+                                                  //!< std::initializer_list expansion must be inserted.
+    std::optional<size_t> mCurrentCallExprPos{};  //!< The position in mOutputFormatHelper where a potential
+                                                  //!< std::initializer_list expansion must be inserted.
+    std::optional<size_t> mCurrentReturnPos{};    //!< The position in mOutputFormatHelper from a return where a
+                                                  //!< potential std::initializer_list expansion must be inserted.
+    std::optional<size_t> mCurrentFieldPos{};     //!< The position in mOutputFormatHelper in a class where where a
+                                                  //!< potential std::initializer_list expansion must be inserted.
     OutputFormatHelper* mOutputFormatHelperOutside{
         nullptr};                        //!< Helper output buffer for std::initializer_list expansion.
     bool mRequiresImplicitReturnZero{};  //!< Track whether this is a function with an imlpicit return 0.
