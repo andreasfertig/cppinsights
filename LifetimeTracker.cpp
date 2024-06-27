@@ -31,6 +31,19 @@ void LifetimeTracker::StartScope(bool funcStart)
 }
 //-----------------------------------------------------------------------------
 
+void LifetimeTracker::AddExtended(const VarDecl* decl, const ValueDecl* extending)
+{
+    // Search for the extending VarlDecl which is already in `objects`. Insert this decl _after_
+    for(auto it = objects.begin(); it != objects.end(); ++it) {
+        if(auto& e = *it; e.item == extending) {
+            // This _could_ invalidate all iterators. We don't care since we don't touch them after this operation.
+            objects.insert(std::next(it), {decl, LifetimeEntry::FuncStart::No, e.scope});
+            return;
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
 void LifetimeTracker::Add(const VarDecl* decl)
 {
     RETURN_IF(not GetInsightsOptions().ShowLifetime)
@@ -38,6 +51,10 @@ void LifetimeTracker::Add(const VarDecl* decl)
     QualType type{decl->getType()};
 
     RETURN_IF(type->isPointerType() or type->isRValueReferenceType());
+
+    // For life-time extended objects
+    // XXX contains in C++23
+    RETURN_IF(std::ranges::find_if(objects, [&](const auto& e) { return e.item == decl; }) != objects.end());
 
     objects.push_back({decl, LifetimeEntry::FuncStart::No, scopeCounter});
 }

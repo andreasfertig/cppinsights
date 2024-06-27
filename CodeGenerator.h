@@ -70,6 +70,7 @@ class LifetimeTracker
 
 public:
     void Add(const VarDecl* decl);
+    void AddExtended(const VarDecl* decl, const ValueDecl* extending);
 
     LifetimeEntry& top() { return objects.back(); }
 
@@ -275,6 +276,7 @@ public:
     void InsertPrimaryTemplate(const FunctionTemplateDecl*);
 
     void StartLifetimeScope();
+    void LifetimeAddExtended(const VarDecl*, const ValueDecl*);
     void EndLifetimeScope();
 
 protected:
