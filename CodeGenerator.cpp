@@ -1042,6 +1042,8 @@ public:
         if(SD_FullExpression == stmt->getStorageDuration()) {
             codeGenerator.StartLifetimeScope();
             mHaveTemporary = true;
+        } else if(const auto* extending = stmt->getExtendingDecl()) {
+            codeGenerator.LifetimeAddExtended(vd, extending);
         }
 
         codeGenerator.InsertArg(vd);
@@ -1114,6 +1116,12 @@ std::string EmitGlobalVariableCtors()
     cg->InsertArg(cxaAtExitFun);
 
     return ofm.GetString();
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::LifetimeAddExtended(const VarDecl* vd, const ValueDecl* extending)
+{
+    mLifeTimeTracker.AddExtended(vd, extending);
 }
 //-----------------------------------------------------------------------------
 
