@@ -34,12 +34,10 @@ void LifetimeTracker::StartScope(bool funcStart)
 void LifetimeTracker::AddExtended(const VarDecl* decl, const ValueDecl* extending)
 {
     // Search for the extending VarlDecl which is already in `objects`. Insert this decl _after_
-    for(auto it = objects.begin(); it != objects.end(); ++it) {
-        if(auto& e = *it; e.item == extending) {
-            // This _could_ invalidate all iterators. We don't care since we don't touch them after this operation.
-            objects.insert(std::next(it), {decl, LifetimeEntry::FuncStart::No, e.scope});
-            return;
-        }
+    if(auto it = std::ranges::find_if(objects, [&](const auto& e) { return e.item == extending; });
+       it != objects.end()) {
+        const auto scope = (*it).scope;
+        objects.insert(std::next(it), {decl, LifetimeEntry::FuncStart::No, scope});
     }
 }
 //-----------------------------------------------------------------------------
