@@ -338,14 +338,6 @@ static const VarDecl* GetVarDeclFromDeclRefExpr(const DeclRefExpr& declRefExpr)
 }
 //-----------------------------------------------------------------------------
 
-std::string GetNameAsWritten(const QualType& t)
-{
-    SplitQualType splitted = t.split();
-
-    return ScopeHandler::RemoveCurrentScope(QualType::getAsString(splitted, CppInsightsPrintingPolicy{}));
-}
-//-----------------------------------------------------------------------------
-
 // own implementation due to lambdas
 std::string GetDeclContext(const DeclContext* ctx, WithTemplateParameters withTemplateParameters)
 {
@@ -668,10 +660,9 @@ private:
     void HandleTypeAfter(const FunctionProtoType* type)
     {
         mData.Append('(');
-        OnceFalse needsComma{};
 
         mSkipSpace = true;
-        for(const auto& t : type->getParamTypes()) {
+        for(OnceFalse needsComma{}; const auto& t : type->getParamTypes()) {
             if(needsComma) {
                 mData.Append(", "sv);
             }
@@ -758,7 +749,7 @@ private:
     {
         // A DecltypeType in a template definition is unevaluated and refers ti itself. This check ensures, that in such
         // a situation no expansion is performed.
-        if(const auto* subType = type->desugar().getTypePtrOrNull(); not isa<DecltypeType>(subType)) {
+        if(not isa_and_nonnull<DecltypeType>(type->desugar().getTypePtrOrNull())) {
             const bool skipSpace{mSkipSpace};
             mSkipSpace = true;
 
@@ -771,7 +762,7 @@ private:
             return true;
         }
 
-        if(const Expr * underlyingExpr{type->getUnderlyingExpr()}; not isa<DeclRefExpr>(underlyingExpr)) {
+        if(not isa_and_nonnull<DeclRefExpr>(type->getUnderlyingExpr())) {
             P0315Visitor visitor{mData};
 
             return not visitor.TraverseStmt(type->getUnderlyingExpr());
@@ -1354,8 +1345,8 @@ void AppendTemplateTypeParamName(OutputFormatHelper&         ofm,
         }
     }
 
-    const auto depth = [&] { return decl ? decl->getDepth() : type->getDepth(); }();
-    const auto index = [&] { return decl ? decl->getIndex() : type->getIndex(); }();
+    const auto depth = decl ? decl->getDepth() : type->getDepth();
+    const auto index = decl ? decl->getIndex() : type->getIndex();
 
     ofm.Append("type_parameter_"sv, depth, "_"sv, index);
 }
@@ -1373,26 +1364,9 @@ static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 
 APValue* GetEvaluatedValue(const VarDecl& varDecl)
 {
-    if((nullptr != varDecl.ensureEvaluatedStmt()) and
-#if IS_CLANG_NEWER_THAN(16)
-       varDecl.ensureEvaluatedStmt()->Value.isValid()
-#else
-       (nullptr != varDecl.ensureEvaluatedStmt()->Value)
-#endif
-    ) {
-
-#if IS_CLANG_NEWER_THAN(16)
-        if(not varDecl.getInit()->isValueDependent()) {
-
-            return varDecl.evaluateValue();
-        }
-#else
-        const auto* init = cast<Expr>(varDecl.ensureEvaluatedStmt()->Value);
-        if(not init->isValueDependent()) {
-
-            return varDecl.evaluateValue();
-        }
-#endif
+    if((nullptr != varDecl.ensureEvaluatedStmt()) and varDecl.ensureEvaluatedStmt()->Value.isValid() and
+       not varDecl.getInit()->isValueDependent()) {
+        return varDecl.evaluateValue();
     }
 
     return nullptr;
@@ -1512,7 +1486,7 @@ std::string GetName(const VarDecl& VD)
             return std::string{};
         }()};
 
-        return {BuildInternalVarName(baseVarName, decompositionDeclStmt->getBeginLoc(), GetSM(*decompositionDeclStmt))};
+        return BuildInternalVarName(baseVarName, decompositionDeclStmt->getBeginLoc(), GetSM(*decompositionDeclStmt));
     }
 
     std::string name{VD.getNameAsString()};
@@ -1525,7 +1499,8 @@ static bool EvaluateAsBoolenCondition(const Expr& expr, const Decl& decl)
 {
     bool r{false};
 
-    expr.EvaluateAsBooleanCondition(r, decl.getASTContext());
+    const bool res = expr.EvaluateAsBooleanCondition(r, decl.getASTContext());
+    assert(res);
 
     return r;
 }
@@ -1539,26 +1514,13 @@ const std::string GetNoExcept(const FunctionDecl& decl)
         std::string ret{kwSpaceNoexcept};
 
         if(const auto* expr = func->getNoexceptExpr()) {
-            const auto value = [&] {
-                if(const auto* boolExpr = dyn_cast_or_null<CXXBoolLiteralExpr>(expr)) {
-                    return boolExpr->getValue();
-
-                } else if(const auto* bExpr = dyn_cast_or_null<BinaryOperator>(expr)) {
-                    return EvaluateAsBoolenCondition(*bExpr, decl);
-
-                } else if(const auto* cExpr = dyn_cast_or_null<ConstantExpr>(expr)) {
-                    return EvaluateAsBoolenCondition(*cExpr, decl);
-                }
-
-                Error(expr, "INSIGHTS: Unexpected noexcept expr\n");
-
-                return false;
-            }();
+            const auto value = EvaluateAsBoolenCondition(*expr, decl);
 
             ret += StrCat("("sv, details::ConvertToBoolString(value), ")"sv);
         }
 
         return ret;
+
     } else if(func and isUnresolvedExceptionSpec(func->getExceptionSpecType())) {
         // For special members the exception specification is unevaluated as long as the special member is unused.
         return StrCat(" "sv, kwCommentStart, kwSpaceNoexcept, kwSpaceCCommentEnd);
@@ -1619,6 +1581,12 @@ void StringStream::Print(const TypeConstraint& arg)
 void StringStream::Print(const StringLiteral& arg)
 {
     arg.outputString(*this);
+}
+//-----------------------------------------------------------------------------
+
+void StringStream::Print(const CharacterLiteral& arg)
+{
+    CharacterLiteral::print(arg.getValue(), arg.getKind(), *this);
 }
 //-----------------------------------------------------------------------------
 

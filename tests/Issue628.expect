@@ -13,9 +13,9 @@ void __cxa_atexit(void);
 
 std::queue<std::function<bool ()>, std::deque<std::function<bool ()>, std::allocator<std::function<bool ()> > > > task_queue = std::queue<std::function<bool ()>, std::deque<std::function<bool ()>, std::allocator<std::function<bool ()> > > >();
 
-struct sleep
+struct mysleep
 {
-  inline sleep(int n)
+  inline mysleep(int n)
   : delay{std::chrono::duration<long long, std::ratio<1, 1000> >{n}}
   {
   }
@@ -29,7 +29,7 @@ struct sleep
   {
     std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long long, std::ratio<1, 1000000000> > > start = std::chrono::steady_clock::now();
         
-    class __lambda_19_25
+    class __lambda_20_25
     {
       public: 
       inline /*constexpr */ bool operator()() const
@@ -48,10 +48,10 @@ struct sleep
       std::coroutine_handle<void> h;
       std::chrono::duration<long long, std::ratio<1, 1000> > d;
       public: 
-      // inline /*constexpr */ __lambda_19_25 & operator=(const __lambda_19_25 &) /* noexcept */ = delete;
-      // inline /*constexpr */ __lambda_19_25(const __lambda_19_25 &) noexcept = default;
-      // inline /*constexpr */ __lambda_19_25(__lambda_19_25 &&) noexcept = default;
-      __lambda_19_25(const std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long long, std::ratio<1, 1000000000> > > & _start, const std::coroutine_handle<void> & _h, const std::chrono::duration<long long, std::ratio<1, 1000> > & _d)
+      // inline /*constexpr */ __lambda_20_25 & operator=(const __lambda_20_25 &) /* noexcept */ = delete;
+      // inline /*constexpr */ __lambda_20_25(const __lambda_20_25 &) noexcept = default;
+      // inline /*constexpr */ __lambda_20_25(__lambda_20_25 &&) noexcept = default;
+      __lambda_20_25(const std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long long, std::ratio<1, 1000000000> > > & _start, const std::coroutine_handle<void> & _h, const std::chrono::duration<long long, std::ratio<1, 1000> > & _d)
       : start{_start}
       , h{_h}
       , d{_d}
@@ -59,7 +59,7 @@ struct sleep
       
     };
     
-    task_queue.push(std::function<bool ()>(__lambda_19_25{start, h, this->delay}));
+    task_queue.push(std::function<bool ()>(__lambda_20_25{start, h, this->delay}));
   }
   
   inline void await_resume() const noexcept
@@ -107,9 +107,9 @@ struct __fooFrame
   int __suspend_index;
   bool __initial_await_suspend_called;
   int i;
-  std::suspend_never __suspend_45_6;
-  sleep __suspend_48_18;
-  std::suspend_always __suspend_45_6_1;
+  std::suspend_never __suspend_46_6;
+  mysleep __suspend_49_18;
+  std::suspend_always __suspend_46_6_1;
 };
 
 Task foo() noexcept
@@ -152,30 +152,30 @@ void __fooResume(__fooFrame * __f)
       case 2: goto __resume_foo_2;
     }
     
-    /* co_await Issue628.cpp:45 */
-    __f->__suspend_45_6 = __f->__promise.initial_suspend();
-    if(!__f->__suspend_45_6.await_ready()) {
-      __f->__suspend_45_6.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    /* co_await Issue628.cpp:46 */
+    __f->__suspend_46_6 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_46_6.await_ready()) {
+      __f->__suspend_46_6.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__suspend_index = 1;
       __f->__initial_await_suspend_called = true;
       return;
     } 
     
     __resume_foo_1:
-    __f->__suspend_45_6.await_resume();
+    __f->__suspend_46_6.await_resume();
     std::operator<<(std::cout, "1. hello from foo1").operator<<(std::endl);
     for(__f->i = 0; __f->i < 10; ++__f->i) {
       
-      /* co_await Issue628.cpp:48 */
-      __f->__suspend_48_18 = sleep{10};
-      if(!__f->__suspend_48_18.await_ready()) {
-        __f->__suspend_48_18.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      /* co_await Issue628.cpp:49 */
+      __f->__suspend_49_18 = mysleep{10};
+      if(!__f->__suspend_49_18.await_ready()) {
+        __f->__suspend_49_18.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
         __f->__suspend_index = 2;
         return;
       } 
       
       __resume_foo_2:
-      __f->__suspend_48_18.await_resume();
+      __f->__suspend_49_18.await_resume();
       std::operator<<(std::cout, "2. hello from foo1").operator<<(std::endl);
     }
     
@@ -190,10 +190,10 @@ void __fooResume(__fooFrame * __f)
   
   __final_suspend:
   
-  /* co_await Issue628.cpp:45 */
-  __f->__suspend_45_6_1 = __f->__promise.final_suspend();
-  if(!__f->__suspend_45_6_1.await_ready()) {
-    __f->__suspend_45_6_1.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+  /* co_await Issue628.cpp:46 */
+  __f->__suspend_46_6_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_46_6_1.await_ready()) {
+    __f->__suspend_46_6_1.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
   } 
   
   ;

@@ -23,6 +23,8 @@ def main():
     parser = argparse.ArgumentParser(description='llvm-coverage')
     parser.add_argument('--insights',       help='C++ Insights binary',      required=True)
     parser.add_argument('--llvm-prof-dir',  help='LLVM profiles data dir',   default='')
+    parser.add_argument('--llvm-prof',      help='llvm-profdata binary',     default='llvm-profdata')
+    parser.add_argument('--llvm-cov',       help='llvm-cov binary',          default='llvm-cov')
     parser.add_argument('--format',         help='Output format: html/text', default='text')
     parser.add_argument('--output',         help='Output filename',          required=True)
     parser.add_argument('args', nargs=argparse.REMAINDER)
@@ -36,11 +38,14 @@ def main():
     with open(profilesManifest, "w") as manifest:
         manifest.write("\n".join(rawProfiles))
 
-    cmd = ['llvm-profdata', 'merge', '-sparse', '-f', profilesManifest, '-o', profilesData]
+    cmd = [args['llvm_prof'], 'merge', '-sparse', '-f', profilesManifest, '-o', profilesData]
     stdout, stderr, returncode = runCmd(cmd)
     print(stderr)
 
-    cmd = ['llvm-cov', 'show', insightsPath, f'-instr-profile={profilesData}', f'--format={args["format"]}', '-ignore-filename-regex=build/']
+    action = 'show' if args['format'] != 'lcov' else 'export'
+
+    cmd = [args['llvm_cov'], action, insightsPath, f'-instr-profile={profilesData}', f'--format={args["format"]}', '-ignore-filename-regex=build/']
+
     stdout, stderr, returncode = runCmd(cmd)
     print(stderr)
 

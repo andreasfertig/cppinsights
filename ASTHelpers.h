@@ -131,7 +131,6 @@ BreakStmt*                Break();
 LabelStmt*                Label(std::string_view name);
 GotoStmt*                 Goto(std::string_view labelName);
 UnaryOperator*            Not(const Expr* stmt);
-UnaryOperator*            Not(const VarDecl* stmt);
 UnaryOperator*            Ref(const Expr* e);
 UnaryOperator*            Ref(const ValueDecl* d);
 UnaryOperator*            Dref(const Expr* stmt);

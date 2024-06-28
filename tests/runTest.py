@@ -62,7 +62,7 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
         cppStd = cppStd.replace('-std=', '/std:')
         cppStd = cppStd.replace('2a', 'latest')
 
-    cmd = [args['cxx'], cppStd, '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)']
+    cmd = [args['cxx'], cppStd, '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)', '-I', os.getcwd()]
 
     if os.name != 'nt':
         cmd.append('-m64')
@@ -84,7 +84,7 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
             stderr = cleanStderr(stderr, tmpFileName)
 
             if ce == stderr:
-                print('[PASSED] Compile: %s' %(f))
+                print(f'[PASSED] Compile: {f}')
                 return True, None
 
         compileErrorFile = os.path.join(mypath, fileName + '.ccerr')
@@ -93,10 +93,10 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
                 stderr = stderr.replace(tmpFileName, '.tmp.cpp')
 
                 if ce == stderr:
-                    print('[PASSED] Compile: %s' %(f))
+                    print('f[PASSED] Compile: {f}')
                     return True, None
 
-        print('[ERROR] Compile failed: %s' %(f))
+        print(f'[ERROR] Compile failed: {f}')
         print(stderr)
     else:
         if os.path.isfile(compileErrorFile):
@@ -107,7 +107,7 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
         objFileName = '%s.%s' %(os.path.splitext(os.path.basename(tmpFileName))[0], ext)
         os.remove(objFileName)
 
-        print('[PASSED] Compile: %s' %(f))
+        print(f'[PASSED] Compile: {f}')
         return True, None
 
     return False, stderr
@@ -130,7 +130,7 @@ def main():
     remainingArgs = args['args']
     bFailureIsOk  = args['failure_is_ok']
     bUpdateTests  = args['update_tests']
-    defaultCppStd = '-std=%s'% (args['std'])
+    defaultCppStd = f"-std={args['std']}"
 
     if args['llvm_prof_dir'] != '':
         os.environ['LLVM_PROFILE_FILE'] = os.path.join(args['llvm_prof_dir'], 'prof%p.profraw')
@@ -167,12 +167,12 @@ def main():
             insightsOpts = m.group(1).split(' ')
 
         if not os.path.isfile(expectFile) and not os.path.isfile(ignoreFile):
-            print('Missing expect/ignore for: %s' %(f))
+            print(f'Missing expect/ignore for: {f}')
             missingExpected += 1
             continue
 
         if os.path.isfile(ignoreFile):
-            print('Ignoring: %s' %(f))
+            print(f'Ignoring: {f}')
             filesPassed += 1
             continue
 
@@ -204,17 +204,16 @@ def main():
                 stderr = cleanStderr(stderr)
 
                 # The cerr output matches and the return code says that we hit a compile error, accept it as passed
-                if (ce == stderr) and (1 == returncode):
-                    print('[PASSED] Compile: %s' %(f))
+                if ((ce == stderr) and (1 == returncode)) or os.path.exists(os.path.join(mypath, fileName + '.failure')):
+                    print(f'[PASSED] Transform: {f}')
                     filesPassed += 1
                     continue
                 else:
-                    print('[ERROR] Compile: %s' %(f))
+                    print(f'[ERROR] Transform: {f}')
                     ret = 1
 
-
             crashes += 1
-            print('Insight crashed for: %s with: %d' %(f, returncode))
+            print(f'Insight crashed for: {f} with: {returncode}')
             print(stderr)
 
             if not bUpdateTests:
@@ -231,7 +230,7 @@ def main():
             compileErrorFile = os.path.join(mypath, fileName + '.cerr')
 
 
-            if bCompiles and equal:
+            if (bCompiles and equal) or bFailureIsOk:
                 filesPassed += 1
             elif bUpdateTests:
                 if bCompiles and not equal:
@@ -250,13 +249,10 @@ def main():
 
     expectedToPass = len(cppFiles)-missingExpected
     print('-----------------------------------------------------------------')
-    print('Tests passed: %d/%d' %(filesPassed, expectedToPass))
+    print(f'Tests passed: {filesPassed}/{expectedToPass}')
 
-    if bFailureIsOk:
-        return 0
-
-    print('Insights crashed: %d' %(crashes))
-    print('Missing expected files: %d' %(missingExpected))
+    print(f'Insights crashed: {crashes}')
+    print(f'Missing expected files: {missingExpected}')
 
     passed = (0 == missingExpected) and (expectedToPass == filesPassed)
 

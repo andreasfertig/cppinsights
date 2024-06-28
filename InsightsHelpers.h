@@ -31,42 +31,6 @@ std::string BuildInternalVarName(const std::string_view& varName);
 std::string MakeLineColumnName(const SourceManager& sm, const SourceLocation& loc, const std::string_view& prefix);
 //-----------------------------------------------------------------------------
 
-inline bool IsMacroLocation(const SourceLocation& loc)
-{
-    return loc.isMacroID();
-}
-//-----------------------------------------------------------------------------
-
-inline bool IsMacroLocation(const SourceRange& range)
-{
-    return IsMacroLocation(range.getBegin()) or IsMacroLocation(range.getEnd());
-}
-//-----------------------------------------------------------------------------
-
-inline bool IsMacroLocation(const auto& t, auto... args)
-{
-    return (IsMacroLocation(t) or IsMacroLocation(args...));
-}
-//-----------------------------------------------------------------------------
-
-inline bool IsInvalidLocation(const SourceLocation& loc)
-{
-    return loc.isInvalid();
-}
-//-----------------------------------------------------------------------------
-
-inline bool IsInvalidLocation(const SourceRange& range)
-{
-    return IsInvalidLocation(range.getBegin()) or IsInvalidLocation(range.getEnd());
-}
-//-----------------------------------------------------------------------------
-
-inline bool IsInvalidLocation(const auto& t, auto... args)
-{
-    return (IsInvalidLocation(t) or IsInvalidLocation(args...));
-}
-//-----------------------------------------------------------------------------
-
 inline bool IsStaticStorageClass(const CXXMethodDecl* md)
 {
     return SC_Static == md->getStorageClass();
@@ -86,16 +50,6 @@ inline bool IsReferenceType(const DeclRefExpr* decl)
 //-----------------------------------------------------------------------------
 
 std::string BuildRetTypeName(const Decl& decl);
-//-----------------------------------------------------------------------------
-
-#define SKIP_MACRO_LOCATION(...)                                                                                       \
-    {                                                                                                                  \
-        const bool isMacro{IsMacroLocation(__VA_ARGS__) or IsInvalidLocation(__VA_ARGS__)};                            \
-        if(isMacro) {                                                                                                  \
-            return;                                                                                                    \
-        } else {                                                                                                       \
-        }                                                                                                              \
-    }
 //-----------------------------------------------------------------------------
 
 inline bool Contains(const std::string_view source, const std::string_view search)
@@ -128,8 +82,6 @@ inline const LangOptions& GetLangOpts(const Decl& decl)
     return decl.getASTContext().getLangOpts();
 }
 //-----------------------------------------------------------------------------
-
-std::string GetNameAsWritten(const QualType& t);
 
 /// \brief Get the evaluated APValue from a `VarDecl`
 ///
@@ -354,6 +306,7 @@ public:
     void Print(const TemplateSpecializationType&);
     void Print(const TypeConstraint&);
     void Print(const StringLiteral&);
+    void Print(const CharacterLiteral&);
 };
 //-----------------------------------------------------------------------------
 
