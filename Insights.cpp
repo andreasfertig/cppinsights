@@ -43,17 +43,14 @@ const InsightsOptions& GetInsightsOptions()
 static llvm::cl::OptionCategory gInsightCategory("Insights"sv);
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
 static llvm::cl::OptionCategory gInsightEduCategory(
     "Insights-Educational"sv,
     "This transformations are only for education purposes. The resulting code most likely does not compile."sv);
 //-----------------------------------------------------------------------------
 
 static llvm::cl::opt<bool> gStdinMode("stdin",
-                                      llvm::cl::desc("Override source file's content (in the overlaying\n"
-                                                     "virtual file system) with input from <stdin> and run\n"
-                                                     "the tool on the new content with the compilation\n"
-                                                     "options of the source file. This mode is currently\n"
-                                                     "used for editor integration."sv),
+                                      llvm::cl::desc("Read the input from <stdin>."sv),
                                       llvm::cl::init(false),
                                       llvm::cl::cat(gInsightCategory));
 //-----------------------------------------------------------------------------
@@ -375,7 +372,6 @@ int main(int argc, const char** argv)
         R"(extern "C" void __cxa_vec_dtor(void *, unsigned int, unsigned int, void* (*destructor)(void *) );)"sv);
 
     llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
-    llvm::cl::HideUnrelatedOptions(gInsightCategory);
     llvm::cl::SetVersionPrinter(&PrintVersion);
 
     auto opExpected = CommonOptionsParser::create(argc, argv, gInsightCategory);
