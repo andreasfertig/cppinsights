@@ -1,0 +1,23 @@
+#include <tuple>
+
+template<typename ... C>
+void test(C... c)
+{
+  std::tuple<C...> tpl(c... );
+}
+
+/* First instantiated from: Issue595.cpp:12 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void test<int, double, char>(int __c0, double __c1, char __c2)
+{
+  std::tuple<int, double, char> tpl = std::tuple<int, double, char>(__c0, __c1, __c2);
+}
+#endif
+
+
+int main()
+{
+  test(3, 5.5, 'a');
+  return 0;
+}
