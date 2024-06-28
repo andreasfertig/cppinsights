@@ -84,12 +84,6 @@ UnaryOperator* Not(const Expr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-UnaryOperator* Not(const VarDecl* stmt)
-{
-    return mkUnaryOperator(mkDeclRefExpr(stmt), UO_LNot, stmt->getType());
-}
-//-----------------------------------------------------------------------------
-
 static UnaryOperator* mkReference(Expr* e, QualType t)
 {
     return mkUnaryOperator(e, UO_AddrOf, t);

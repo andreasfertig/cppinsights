@@ -727,8 +727,7 @@ void CfrontCodeGenerator::InsertArg(const CXXRecordDecl* stmt)
     //    CodeGenerator::InsertArg(typedefDecl);
 
     // insert member functions except for the special member functions and classes defined inside this class
-    OnceTrue firstRecordDecl{};
-    for(const auto* d : stmt->decls()) {
+    for(OnceTrue firstRecordDecl{}; const auto* d : stmt->decls()) {
         if((isa<CXXRecordDecl>(d) and firstRecordDecl)          // skip the first record decl which are ourselves
            or (stmt->isLambda() and isa<CXXDestructorDecl>(d))  // skip dtor for lambdas
            or isa<FieldDecl>(d)                                 // skip fields

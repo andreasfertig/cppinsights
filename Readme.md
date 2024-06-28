@@ -2,7 +2,7 @@
 # C++ Insights - See your source code with the eyes of a compiler.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://github.com/andreasfertig/cppinsights/releases) [![Build Status](https://github.com/andreasfertig/cppinsights/workflows/ci/badge.svg)](https://github.com/andreasfertig/cppinsights/actions/)
-[![codecov](https://codecov.io/gh/andreasfertig/cppinsights/branch/master/graph/badge.svg)](https://codecov.io/gh/andreasfertig/cppinsights)
+[![codecov](https://codecov.io/gh/andreasfertig/cppinsights/branch/main/graph/badge.svg)](https://codecov.io/gh/andreasfertig/cppinsights)
 [![Try online](https://img.shields.io/badge/try-online-blue.svg)](https://cppinsights.io)
 [![Documentation](https://img.shields.io/badge/view-documentation-blue)](https://docs.cppinsights.io)
 [![patreon](https://img.shields.io/badge/patreon-support-orange.svg)](https://www.patreon.com/cppinsights)
@@ -25,7 +25,7 @@
 transformation. The goal of C++ Insights is to make things visible that normally and intentionally happen behind the scenes.
 It's about the magic the compiler does for us to make things work.
 
-Take this piece of code for example:
+Take this piece of code, for example:
 
 ```.cpp
 class Base {
@@ -116,7 +116,7 @@ I did a couple of talks about C++ Insights since I released C++ Insights. For ex
 
 ## Building
 
-C++ Insights can be built inside the Clang source tree or outside.
+C++ Insights can be built inside or outside the Clang source tree.
 
 ### Building on Windows
 
@@ -236,6 +236,9 @@ Here "`${GCC_11_2_0_INSTALL_PATH}`" is the installation directory of your custom
 There is also another GitHub project that sets up a docker container with the latest C++ Insights version in it: [C++
 Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 
+
+## Plugins / Extensions / Packages
+
 ### C++ Insights @ Vim
 
 A plugin for Vim is available at
@@ -249,7 +252,7 @@ Insights - VSCode Extension](https://marketplace.visualstudio.com/items?itemName
 
 ### C++ Insights @ brew
 
-At least for macOS, you can install C++ Insights via Homebrew thanks to [this formulae](https://formulae.brew.sh/formula/cppinsights):
+At least for macOS, you can install C++ Insights via Homebrew thanks to [this formular](https://formulae.brew.sh/formula/cppinsights):
 
 ```
 brew install cppinsights
@@ -281,4 +284,5 @@ See [TODO](TODO.md).
 ## Support
 
 If you like to support the project, consider [submitting](CONTRIBUTING.md) a patch. Another alternative is to become a [GitHub Sponsor](https://github.com/sponsors/andreasfertig) or a [Patreon](https://www.patreon.com/cppinsights) supporter.
+
 

@@ -229,9 +229,7 @@ public:
     void VisitDeclRefExpr(DeclRefExpr* stmt)
     {
         if(auto* vd = dyn_cast_or_null<VarDecl>(stmt->getDecl())) {
-            if(not vd->isLocalVarDeclOrParm() or not Contains(mVarNamePrefix, vd)) {
-                return;
-            }
+            RETURN_IF(not vd->isLocalVarDeclOrParm() or not Contains(mVarNamePrefix, vd));
 
             auto* memberExpr = mVarNamePrefix[vd];
 
@@ -426,9 +424,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         // XXX: This will fail with NTTP's like 3.14
         if(const auto* args = fd.getTemplateSpecializationArgs()) {
             ofm.Append('_');
-            OnceFalse needsUnderscore{};
 
-            for(const auto& arg : args->asArray()) {
+            for(OnceFalse needsUnderscore{}; const auto& arg : args->asArray()) {
                 if(needsUnderscore) {
                     ofm.Append('_');
                 }
@@ -539,8 +536,6 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         }
     }
 
-    SmallVector<Expr*, 16> exprs{};
-
     // According to https://eel.is/c++draft/dcl.fct.def.coroutine#5.7 the promise_type constructor can have
     // parameters. If so, they must be equal to the coroutines function parameters.
     // The code here performs a _simple_ lookup for a matching ctor without using Clang's overload resolution.
@@ -575,6 +570,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
             return QualType(var->getType().getNonReferenceType().getTypePtrOrNull(), 0);
         }
     };
+
+    SmallVector<Expr*, 16> exprs{};
 
     for(auto* promiseTypeRecordDecl = mASTData.mPromiseField->getType()->getAsCXXRecordDecl();
         auto* ctor : promiseTypeRecordDecl->ctors()) {
@@ -639,10 +636,6 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     // Add parameters from the original function to the list
 
     // P0057R8: [dcl.fct.def.coroutine] p5: before initial_suspend and at tops 1
-#if not IS_CLANG_NEWER_THAN(14)
-    mOutputFormatHelper.AppendNewLine();
-    InsertArg(stmt->getResultDecl());
-#endif
 
     // Make a call to the made up state machine function for the initial suspend
     mOutputFormatHelper.AppendNewLine();
@@ -739,8 +732,6 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
 
 void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
 {
-    auto& ctx = GetGlobalAST();
-
     // insert a made up switch for continuing a resume
     SwitchStmt* sstmt = Switch(mASTData.mSuspendIndexAccess);
 
@@ -910,10 +901,8 @@ std::string CoroutinesCodeGenerator::BuildResumeLabelName(int index) const
 
 void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 {
-    auto& ctx = GetGlobalAST();
-
     mOutputFormatHelper.AppendNewLine();
-    InsertInstantiationPoint(ctx.getSourceManager(), stmt->getKeywordLoc(), [&] {
+    InsertInstantiationPoint(GetGlobalAST().getSourceManager(), stmt->getKeywordLoc(), [&] {
         if(isa<CoawaitExpr>(stmt)) {
             return kwCoAwaitSpace;
         } else {

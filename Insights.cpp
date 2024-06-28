@@ -180,7 +180,6 @@ public:
     {
         if(GetInsightsOptions().UseShow2C) {
             if(GetInsightsOptions().ShowCoroutineTransformation) {
-                DPrint("disabling cfront\n");
                 gInsightsOptions.UseShow2C = false;
             } else {
                 gInsightsOptions.ShowLifetime = true;
@@ -432,10 +431,7 @@ int main(int argc, const char** argv)
     if(gUseLibCpp) {
         prependArgument(INSIGHTS_LLVM_INCLUDE_DIR);
         prependArgument("-stdlib=libc++");
-
-#if IS_CLANG_NEWER_THAN(15)
         prependArgument("-fexperimental-library");
-#endif
 
 #ifdef __APPLE__
         prependArgument("-nostdinc++");  // macos Monterey

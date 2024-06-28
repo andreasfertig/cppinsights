@@ -788,8 +788,9 @@ if(INSIGHTS_COVERAGE)
         endif()
 
     else() # Clang
-        find_program(LCOV_BIN llvm-cov)
-        find_program(PROFDATA_BIN llvm-profdata)
+        llvm_config(LLVM_BINDIR "--bindir")
+        find_program(LCOV_BIN llvm-cov PATHS ${LLVM_BINDIR})
+        find_program(PROFDATA_BIN llvm-profdata PATHS ${LLVM_BINDIR})
         #        find_package_handle_standard_args(llvm-lcov
         #            REQUIRED_VARS LCOV_BIN PROFDATA_BIN
         #        )
@@ -806,13 +807,15 @@ if(INSIGHTS_COVERAGE)
 
             # https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
             add_custom_target(coverage
-                COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-coverage.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --llvm-prof-dir=${CMAKE_CURRENT_BINARY_DIR}/llvmprof/ --format=text  --output=${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-coverage.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --llvm-prof-dir=${CMAKE_CURRENT_BINARY_DIR}/llvmprof/ --format=text  --output=${CMAKE_CURRENT_BINARY_DIR}/filtered.info --llvm-cov ${LCOV_BIN} --llvm-prof ${PROFDATA_BIN}
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
                 COMMENT "Running code coverage analysis" VERBATIM
             )
 
             add_custom_target(coverage-html
-                COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-coverage.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --llvm-prof-dir=${CMAKE_CURRENT_BINARY_DIR}/llvmprof/ --format=html --output=${CMAKE_CURRENT_BINARY_DIR}/filtered.html
+                COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-coverage.py --insights
+                ${CMAKE_CURRENT_BINARY_DIR}/insights --llvm-prof-dir=${CMAKE_CURRENT_BINARY_DIR}/llvmprof/ --format=lcov --output=${CMAKE_CURRENT_BINARY_DIR}/filtered.lcov --llvm-cov ${LCOV_BIN} --llvm-prof ${PROFDATA_BIN}
+                COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/filtered.lcov --demangle-cpp --output-directory ${CMAKE_CURRENT_BINARY_DIR}/out --keep-going
                 COMMENT "Generating code coverage HTML" VERBATIM
             )
 

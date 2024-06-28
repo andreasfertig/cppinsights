@@ -273,8 +273,6 @@ public:
     void InsertTemplateParameters(const TemplateParameterList& list,
                                   const TemplateParamsOnly     templateParamsOnly = TemplateParamsOnly::No);
 
-    void InsertPrimaryTemplate(const FunctionTemplateDecl*);
-
     void StartLifetimeScope();
     void LifetimeAddExtended(const VarDecl*, const ValueDecl*);
     void EndLifetimeScope();

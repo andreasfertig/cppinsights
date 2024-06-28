@@ -284,6 +284,28 @@ static std::string_view ArrowOrDot(bool isArrow)
 }
 //-----------------------------------------------------------------------------
 
+template<typename T>
+static T ValueOrDefault(bool b, T v)
+{
+    if(b) {
+        return v;
+    }
+
+    return {};
+}
+//-----------------------------------------------------------------------------
+
+template<typename T>
+static T ValueOr(bool b, T val, T el)
+{
+    if(b) {
+        return val;
+    }
+
+    return el;
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
 {
     if(not stmt->isImplicitAccess()) {
@@ -292,13 +314,7 @@ void CodeGenerator::InsertArg(const CXXDependentScopeMemberExpr* stmt)
         InsertNamespace(stmt->getQualifier());
     }
 
-    auto op{[&]() -> std::string_view {
-        if(stmt->isImplicitAccess()) {
-            return {};
-        }
-
-        return ArrowOrDot(stmt->isArrow());
-    }()};
+    std::string_view op{ValueOrDefault(not stmt->isImplicitAccess(), ArrowOrDot(stmt->isArrow()))};
 
     mOutputFormatHelper.Append(op, stmt->getMemberNameInfo().getAsString());
 }
@@ -366,17 +382,6 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 }
 //-----------------------------------------------------------------------------
 
-template<typename T>
-static T ValueOrDefault(bool b, T v)
-{
-    if(b) {
-        return v;
-    }
-
-    return {};
-}
-//-----------------------------------------------------------------------------
-
 void CodeGenerator::InsertQualifierAndName(const DeclarationName&     declName,
                                            const NestedNameSpecifier* qualifier,
                                            const bool                 hasTemplateKeyword)
@@ -427,8 +432,7 @@ void CodeGenerator::InsertArg(const VarTemplateDecl* stmt)
 
     InsertArg(templatedDecl);
 
-    OnceTrue first{};
-    for(const auto* spec : stmt->specializations()) {
+    for(OnceTrue first{}; const auto* spec : stmt->specializations()) {
         if(TSK_ExplicitSpecialization == spec->getSpecializationKind()) {
             continue;
         }
@@ -571,15 +575,7 @@ static std::optional<std::string> GetFieldDeclNameForLambda(const FieldDecl&    
                                                             const CXXRecordDecl& cxxRecordDecl)
 {
     if(cxxRecordDecl.isLambda()) {
-        llvm::DenseMap<const
-#if IS_CLANG_NEWER_THAN(15)
-                       ValueDecl*
-#else
-                       VarDecl*
-#endif
-                       ,
-                       FieldDecl*>
-            captures{};
+        llvm::DenseMap<const ValueDecl*, FieldDecl*> captures{};
 
         FieldDecl* thisCapture{};
 
@@ -613,9 +609,7 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
         if(const auto* implicitCast = dyn_cast_or_null<ImplicitCastExpr>(base)) {
             if(CastKind::CK_UncheckedDerivedToBase == implicitCast->getCastKind()) {
                 // if this calls a protected function we cannot cast it to the base, this would not compile
-                if(isa<CXXThisExpr>(implicitCast->IgnoreImpCasts())) {
-                    return true;
-                }
+                return isa<CXXThisExpr>(implicitCast->IgnoreImpCasts());
             }
         }
 
@@ -676,10 +670,8 @@ void CodeGenerator::InsertArg(const MemberExpr* stmt)
 
             ofm.Append('<');
 
-            bool      haveArg{false};
-            OnceFalse needsComma{};
-            for(const auto& arg : tmplArgs->asArray()) {
-
+            bool haveArg{false};
+            for(OnceFalse needsComma{}; const auto& arg : tmplArgs->asArray()) {
                 if(arg.getKind() == TemplateArgument::Integral) {
                     ofm.AppendComma(needsComma);
 
@@ -1480,7 +1472,7 @@ void CodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 
     // peal of __promise.yield_value
     if(const auto* matTemp = dyn_cast_or_null<MaterializeTemporaryExpr>(stmt->getCommonExpr())) {
-        const auto* temporary = GetTemporary(matTemp);
+        const auto* temporary = matTemp->getSubExpr();
 
         if(const auto* memExpr = dyn_cast_or_null<CXXMemberCallExpr>(temporary)) {
             ForEachArg(memExpr->arguments(), [&](const auto& arg) { InsertArg(arg); });
@@ -1623,21 +1615,13 @@ static std::string GetTypeConstraintAsString(const TypeConstraint* typeConstrain
 
 static std::string_view Ellipsis(bool b)
 {
-    if(b) {
-        return kwElipsis;
-    }
-
-    return {};
+    return ValueOrDefault(b, kwElipsis);
 }
 //-----------------------------------------------------------------------------
 
 static std::string_view EllipsisSpace(bool b)
 {
-    if(b) {
-        return kwElipsisSpace;
-    }
-
-    return {};
+    return ValueOrDefault(b, kwElipsisSpace);
 }
 //-----------------------------------------------------------------------------
 
@@ -1652,8 +1636,7 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
 
     mOutputFormatHelper.Append("<"sv);
 
-    OnceFalse needsComma{};
-    for(const auto* param : list) {
+    for(OnceFalse needsComma{}; const auto* param : list) {
         mOutputFormatHelper.AppendComma(needsComma);
 
         const auto& typeName = GetName(*param);
@@ -1715,13 +1698,7 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
                 mOutputFormatHelper.Append(typeName, EllipsisSpace(nonTmplParam->isParameterPack()));
             }
         } else if(const auto* tmplTmplParam = dyn_cast_or_null<TemplateTemplateParmDecl>(param)) {
-            const std::string pack{[&]() {
-                if(tmplTmplParam->isParameterPack()) {
-                    return kwElipsisSpace;
-                }
-
-                return " "sv;
-            }()};
+            auto pack{ValueOr(tmplTmplParam->isParameterPack(), kwElipsisSpace, " "sv)};
 
             mOutputFormatHelper.Append(kwTemplateSpace, "<typename> typename"sv, pack, typeName);
 
@@ -1754,6 +1731,7 @@ void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
 
     SmallVector<const ClassTemplateSpecializationDecl*, 10> specializations{};
 
+    // XXX C++23: replace with filter and ranges::to<>
     for(const auto* spec : stmt->specializations()) {
         // Explicit specializations and instantiations will appear later in the AST as dedicated node. Don't
         // generate code for them now, otherwise they are there twice.
@@ -1776,9 +1754,7 @@ void CodeGenerator::InsertArg(const ClassTemplateDecl* stmt)
 
 void CodeGenerator::InsertArg(const ParenListExpr* stmt)
 {
-    OnceFalse needsComma{};
-
-    for(const auto& expr : stmt->children()) {
+    for(OnceFalse needsComma{}; const auto& expr : stmt->children()) {
         mOutputFormatHelper.AppendComma(needsComma);
 
         InsertArg(expr);
@@ -1892,13 +1868,7 @@ void CodeGenerator::InsertConstructorExpr(const auto* stmt)
 
     mOutputFormatHelper.Append(GetName(stmt->getType(), Unqualified::Yes));
 
-    const BraceKind braceKind = [&]() {
-        if(stmt->isListInitialization()) {
-            return BraceKind::Curlys;
-        }
-
-        return BraceKind::Parens;
-    }();
+    const BraceKind braceKind = ValueOr(stmt->isListInitialization(), BraceKind::Curlys, BraceKind::Parens);
 
     WrapInParensOrCurlys(braceKind, [&]() {
         if(const auto& arguments = stmt->arguments(); not arguments.empty()) {
@@ -1916,9 +1886,7 @@ void CodeGenerator::InsertArg(const CXXConstructExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXUnresolvedConstructExpr* stmt)
 {
-    const auto  noEmptyInitList = mNoEmptyInitList;
-    FinalAction _{[&] { mNoEmptyInitList = noEmptyInitList; }};
-    mNoEmptyInitList = NoEmptyInitList::Yes;
+    BackupAndRestore _{mNoEmptyInitList, NoEmptyInitList::Yes};
 
     InsertConstructorExpr(stmt);
 }
@@ -1991,11 +1959,7 @@ void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
 
 bool CodeGenerator::InsideDecltype() const
 {
-    if(not mLambdaStack.empty()) {
-        return LambdaCallerType::Decltype == mLambdaStack.back().callerType();
-    }
-
-    return false;
+    return (not mLambdaStack.empty()) and (LambdaCallerType::Decltype == mLambdaStack.back().callerType());
 }
 //-----------------------------------------------------------------------------
 
@@ -2298,7 +2262,7 @@ void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
 void CodeGenerator::InsertArg(const CompoundStmt* stmt)
 {
     mOutputFormatHelper.OpenScope();
-    mLifeTimeTracker.StartScope(mLastDecl and isa<FunctionDecl>(mLastDecl));
+    mLifeTimeTracker.StartScope(isa_and_nonnull<FunctionDecl>(mLastDecl));
 
     // prevent nested CompoundStmt's to insert a return on each leave. Only insert it before closing the most outer
     // one.
@@ -2314,7 +2278,7 @@ void CodeGenerator::InsertArg(const CompoundStmt* stmt)
         }
     }
 
-    mSkipSemi = mLifeTimeTracker.EndScope(mOutputFormatHelper, mLastStmt and isa<ReturnStmt>(mLastStmt));
+    mSkipSemi = mLifeTimeTracker.EndScope(mOutputFormatHelper, isa_and_nonnull<ReturnStmt>(mLastStmt));
 
     mOutputFormatHelper.CloseScope(OutputFormatHelper::NoNewLineBefore::Yes);
 }
@@ -2618,7 +2582,7 @@ void CodeGenerator::InsertArg(const CXXNewExpr* stmt)
 void CodeGenerator::InsertArg(const MaterializeTemporaryExpr* stmt)
 {
     // At least in case of a ternary operator wrapped inside a MaterializeTemporaryExpr parens are necessary
-    const auto* temporary = GetTemporary(stmt);
+    const auto* temporary = stmt->getSubExpr();
     WrapInParensIfNeeded(isa<ConditionalOperator>(temporary), [&] { InsertArg(temporary); });
 }
 //-----------------------------------------------------------------------------
@@ -2713,13 +2677,7 @@ void CodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
     if(isCXXMethod) {
         const OverloadedOperatorKind opKind = stmt->getOperator();
 
-        const std::string_view operatorKw{[&] {
-            if(OO_Coawait == opKind) {
-                return kwOperatorSpace;
-            }
-
-            return kwOperator;
-        }()};
+        const std::string_view operatorKw{ValueOr((OO_Coawait == opKind), kwOperatorSpace, kwOperator)};
 
         mOutputFormatHelper.Append("."sv, operatorKw, getOperatorSpelling(opKind), "("sv);
     }
@@ -2810,46 +2768,18 @@ void CodeGenerator::InsertArg(const GNUNullExpr* /*stmt*/)
 
 void CodeGenerator::InsertArg(const CharacterLiteral* stmt)
 {
-#if IS_CLANG_NEWER_THAN(17)
-#else
-#define CharacterLiteralKind CharacterLiteral
-#endif
-    switch(stmt->getKind()) {
-        case CharacterLiteralKind::Ascii: break;
-        case CharacterLiteralKind::Wide: mOutputFormatHelper.Append('L'); break;
-        case CharacterLiteralKind::UTF8: mOutputFormatHelper.Append("u8"sv); break;
-        case CharacterLiteralKind::UTF16: mOutputFormatHelper.Append('u'); break;
-        case CharacterLiteralKind::UTF32: mOutputFormatHelper.Append('U'); break;
+    StringStream stream{};
+    stream.Print(*stmt);
+
+    auto str = std::move(stream.str());
+
+    if(str == "'\\x00'"sv) {
+        str = "'\\0'"sv;
+    } else if(str == "'\\xff'"sv) {
+        str = "255"sv;
     }
 
-    switch(unsigned value = stmt->getValue()) {
-        case '\\': mOutputFormatHelper.Append("'\\\\'"sv); break;
-        case '\0': mOutputFormatHelper.Append("'\\0'"sv); break;
-        case '\'': mOutputFormatHelper.Append("'\\''"sv); break;
-        case '\a': mOutputFormatHelper.Append("'\\a'"sv); break;
-        case '\b': mOutputFormatHelper.Append("'\\b'"sv); break;
-        // FIXME: causes clang to report a non-standard escape sequence error
-        // case '\e': mOutputFormatHelper.Append("'\\e'"); break;
-        case '\f': mOutputFormatHelper.Append("'\\f'"sv); break;
-        case '\n': mOutputFormatHelper.Append("'\\n'"sv); break;
-        case '\r': mOutputFormatHelper.Append("'\\r'"sv); break;
-        case '\t': mOutputFormatHelper.Append("'\\t'"sv); break;
-        case '\v': mOutputFormatHelper.Append("'\\v'"sv); break;
-        default:
-            if(((value & ~0xFFu) == ~0xFFu) and (stmt->getKind() == CharacterLiteralKind::Ascii)) {
-                value &= 0xFFu;
-            }
-
-            if(value < 256) {
-                if(isPrintable(static_cast<unsigned char>(value))) {
-                    const std::string v{static_cast<char>(value)};
-                    mOutputFormatHelper.Append("'"sv, v, "'"sv);
-                } else {
-                    const std::string v{std::to_string(static_cast<unsigned char>(value))};
-                    mOutputFormatHelper.Append(v);
-                }
-            }
-    }
+    mOutputFormatHelper.Append(str);
 }
 //-----------------------------------------------------------------------------
 
@@ -3069,9 +2999,7 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
         codeGenerator->mCurrentCallExprPos        = mCurrentCallExprPos;
         codeGenerator->mOutputFormatHelperOutside = &mOutputFormatHelper;
 
-        OnceTrue first{};
-
-        for(const auto* init : ctor->inits()) {
+        for(OnceTrue first{}; const auto* init : ctor->inits()) {
             initOutputFormatHelper.AppendNewLine();
             if(first) {
                 initOutputFormatHelper.Append(": "sv);
@@ -3265,8 +3193,7 @@ void CodeGenerator::InsertArg(const EnumConstantDecl* stmt)
 
 static auto& GetRecordLayout(const RecordDecl* recordDecl)
 {
-    auto& astContext = GetGlobalAST();
-    return astContext.getASTRecordLayout(recordDecl);
+    return GetGlobalAST().getASTRecordLayout(recordDecl);
 }
 //-----------------------------------------------------------------------------
 
@@ -3313,16 +3240,14 @@ void CodeGenerator::InsertArg(const FieldDecl* stmt)
         }
 
         // Keep the inline init for aggregates, as we do not see it somewhere else.
-        if(cxxRecordDecl->isAggregate()) {
-            const auto* initializer = stmt->getInClassInitializer();
-            if(stmt->hasInClassInitializer() and initializer) {
-                const bool isConstructorExpr{isa<CXXConstructExpr>(initializer) or isa<ExprWithCleanups>(initializer)};
-                if((ICIS_ListInit != stmt->getInClassInitStyle()) or isConstructorExpr) {
-                    mOutputFormatHelper.Append(hlpAssing);
-                }
-
-                InsertArg(initializer);
+        if(const auto* initializer = stmt->getInClassInitializer();
+           stmt->hasInClassInitializer() and initializer and cxxRecordDecl->isAggregate()) {
+            const bool isConstructorExpr{isa<CXXConstructExpr>(initializer) or isa<ExprWithCleanups>(initializer)};
+            if((ICIS_ListInit != stmt->getInClassInitStyle()) or isConstructorExpr) {
+                mOutputFormatHelper.Append(hlpAssing);
             }
+
+            InsertArg(initializer);
         }
     }
 
@@ -3508,21 +3433,21 @@ void CodeGenerator::InsertArg(const FriendDecl* stmt)
     if(const auto* typeInfo = stmt->getFriendType()) {
         mOutputFormatHelper.AppendSemiNewLine(kwFriendSpace, GetName(typeInfo->getType()));
 
+    } else if(const auto* fd = dyn_cast_or_null<FunctionDecl>(stmt->getFriendDecl())) {
+        InsertArg(fd);
+
+    } else if(const auto* fdt = dyn_cast_or_null<FunctionTemplateDecl>(stmt->getFriendDecl())) {
+        InsertArg(fdt);
+
     } else {
-        if(const auto* fd = dyn_cast_or_null<FunctionDecl>(stmt->getFriendDecl())) {
-            InsertArg(fd);
-        } else if(const auto* fdt = dyn_cast_or_null<FunctionTemplateDecl>(stmt->getFriendDecl())) {
-            InsertArg(fdt);
-        } else {
-            std::string cls{};
-            if(const auto* ctd = dyn_cast_or_null<ClassTemplateDecl>(stmt->getFriendDecl())) {
-                InsertTemplateParameters(*ctd->getTemplateParameters());
+        std::string cls{};
+        if(const auto* ctd = dyn_cast_or_null<ClassTemplateDecl>(stmt->getFriendDecl())) {
+            InsertTemplateParameters(*ctd->getTemplateParameters());
 
-                cls = GetTagDeclTypeName(*ctd->getTemplatedDecl());
-            }
-
-            mOutputFormatHelper.AppendSemiNewLine(kwFriendSpace, cls, GetName(*stmt->getFriendDecl()));
+            cls = GetTagDeclTypeName(*ctd->getTemplatedDecl());
         }
+
+        mOutputFormatHelper.AppendSemiNewLine(kwFriendSpace, cls, GetName(*stmt->getFriendDecl()));
     }
 }
 //-----------------------------------------------------------------------------
@@ -3537,11 +3462,7 @@ void CodeGenerator::InsertArg(const CXXNoexceptExpr* stmt)
 
 void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
 {
-#if IS_CLANG_NEWER_THAN(16)
     RETURN_IF(DeductionCandidate::Copy == stmt->getDeductionCandidateKind());
-#else
-    RETURN_IF(stmt->isCopyDeductionCandidate());
-#endif
 
     const bool isImplicit{stmt->isImplicit()};
     const bool noSpecializations = [&] {
@@ -3583,12 +3504,6 @@ void CodeGenerator::InsertArg(const CXXDeductionGuideDecl* stmt)
     if(needsTemplateGuard) {
         InsertTemplateGuardEnd(stmt);
     }
-}
-//-----------------------------------------------------------------------------
-
-void CodeGenerator::InsertPrimaryTemplate(const FunctionTemplateDecl* stmt)
-{
-    InsertTemplate(stmt, false);
 }
 //-----------------------------------------------------------------------------
 
@@ -3970,14 +3885,8 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                     }
                 }
 
-                const std::string_view elips{Ellipsis([&] {
-                    if(const auto* type = fieldDeclType->getPointeeType().getTypePtrOrNull();
-                       type and isa<PackExpansionType>(type)) {
-                        return true;
-                    }
-
-                    return false;
-                }())};
+                const std::string_view elips{
+                    Ellipsis(isa_and_nonnull<PackExpansionType>(fieldDeclType->getPointeeType().getTypePtrOrNull()))};
 
                 // To avoid seeing the templates stuff from std::move (typename...) the canonical type is used here.
                 fieldDeclType = fieldDeclType.getCanonicalType();
@@ -4029,16 +3938,8 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                 mOutputFormatHelper.Append(GetTypeNameAsParameter(fieldDeclType, StrCat("_"sv, name)));
             };
 
-        llvm::DenseMap<const
-#if IS_CLANG_NEWER_THAN(15)
-                       ValueDecl*
-#else
-                       VarDecl*
-#endif
-                       ,
-                       FieldDecl*>
-                   captures{};
-        FieldDecl* thisCapture{};
+        llvm::DenseMap<const ValueDecl*, FieldDecl*> captures{};
+        FieldDecl*                                   thisCapture{};
 
         stmt->getCaptureFields(captures, thisCapture);
 
@@ -4068,11 +3969,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
                            value,
                            false,
                            cinit,
-#if IS_CLANG_NEWER_THAN(15)
                            VarDecl::ListInit == dyn_cast_or_null<VarDecl>(capturedVar)->getInitStyle());
-#else
-                           VarDecl::ListInit == capturedVar->getInitStyle());
-#endif
             }
         }
 
@@ -4089,8 +3986,7 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             } else {
                 mOutputFormatHelper.AppendNewLine();
 
-                OnceTrue firstCtorInitializer{};
-                for(const auto& initializer : ctorInitializerList) {
+                for(OnceTrue firstCtorInitializer{}; const auto& initializer : ctorInitializerList) {
                     if(firstCtorInitializer) {
                         mOutputFormatHelper.Append(": "sv);
                     } else {
@@ -4273,11 +4169,7 @@ void CodeGenerator::InsertArg(const RequiresExpr* stmt)
         } else if(const auto* nestedRequirement = dyn_cast_or_null<concepts::NestedRequirement>(requirement)) {
             mOutputFormatHelper.Append(kwRequiresSpace);
 
-#if IS_CLANG_NEWER_THAN(15)
             if(nestedRequirement->hasInvalidConstraint()) {
-#else
-            if(nestedRequirement->isSubstitutionFailure()) {
-#endif
                 // The requirement failed. We need some way to express that. Using a nested
                 // requirement with false seems to be the simplest solution.
                 mOutputFormatHelper.Append(kwFalse);
@@ -4339,7 +4231,7 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
 
         const auto size = [&]() -> size_t {
             if(const auto* mat = dyn_cast<MaterializeTemporaryExpr>(subExpr)) {
-                if(const auto* list = dyn_cast_or_null<InitListExpr>(GetTemporary(mat))) {
+                if(const auto* list = dyn_cast_or_null<InitListExpr>(mat->getSubExpr())) {
                     return list->getNumInits();
                 }
             }
@@ -4446,12 +4338,11 @@ void CodeGenerator::FormatCast(const std::string_view castName,
 void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
 {
     const bool needsParens = [&]() {
-        if(const auto* expr = dyn_cast_or_null<Expr>(stmt))
+        if(const auto* expr = dyn_cast_or_null<Expr>(stmt)) {
             if(const auto* dest = dyn_cast_or_null<UnaryOperator>(expr->IgnoreImplicit())) {
-                if(dest->getOpcode() == clang::UO_Deref) {
-                    return true;
-                }
+                return (dest->getOpcode() == clang::UO_Deref);
             }
+        }
 
         return false;
     }();
@@ -4462,13 +4353,11 @@ void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
 
 void CodeGenerator::InsertSuffix(const QualType& type)
 {
-    if(const auto* typePtr = type.getTypePtrOrNull()) {
-        if(typePtr->isBuiltinType()) {
-            if(const auto* bt = dyn_cast_or_null<BuiltinType>(typePtr)) {
-                const auto kind = bt->getKind();
+    if(const auto* typePtr = type.getTypePtrOrNull(); typePtr and typePtr->isBuiltinType()) {
+        if(const auto* bt = dyn_cast_or_null<BuiltinType>(typePtr)) {
+            const auto kind = bt->getKind();
 
-                mOutputFormatHelper.Append(GetBuiltinTypeSuffix(kind));
-            }
+            mOutputFormatHelper.Append(GetBuiltinTypeSuffix(kind));
         }
     }
 }
@@ -4681,8 +4570,7 @@ void CodeGenerator::HandleLambdaExpr(const LambdaExpr* lambda, LambdaHelper& lam
 void CodeGenerator::InsertConceptConstraint(const llvm::SmallVectorImpl<const Expr*>& constraints,
                                             const InsertInline                        insertInline)
 {
-    OnceTrue first{};
-    for(const auto* c : constraints) {
+    for(OnceTrue first{}; const auto* c : constraints) {
         if(first and (InsertInline::Yes == insertInline)) {
             mOutputFormatHelper.Append(' ');
         }
@@ -4700,10 +4588,8 @@ void CodeGenerator::InsertConceptConstraint(const llvm::SmallVectorImpl<const Ex
 // This inserts the requires clause after template<...>
 void CodeGenerator::InsertConceptConstraint(const TemplateParameterList& tmplDecl)
 {
-    SmallVector<const Expr*, 1> constraints{};
-
     if(const auto* reqClause = tmplDecl.getRequiresClause()) {
-        constraints.push_back(reqClause);
+        SmallVector<const Expr*, 1> constraints{reqClause};
 
         InsertConceptConstraint(constraints, InsertInline::No);
     }
@@ -4875,9 +4761,7 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
             // This comes from a using Base::SomeFunc
         } else if(not isFirstCxxMethodDecl or InsertNamespace() and not decl.getQualifier()) {
             const auto* parent = methodDecl->getParent();
-            outputFormatHelper.Append(parent->getName());
-
-            outputFormatHelper.Append("::"sv);
+            outputFormatHelper.Append(parent->getName(), "::"sv);
         }
     }
 

@@ -9,8 +9,9 @@
 
 std::queue<std::function<bool()>> task_queue;
 
-struct sleep {
-    sleep(int n) : delay{n} {}
+// Changed sleep -> mysleep avoiding clashes under POSIX
+struct mysleep {
+    mysleep(int n) : delay{n} {}
 
     constexpr bool await_ready() const noexcept { return false; }
 
@@ -45,7 +46,7 @@ struct Task {
 Task foo() noexcept {
     std::cout << "1. hello from foo1" << std::endl;
     for (int i = 0; i < 10; ++i) {
-        co_await sleep{10};
+        co_await mysleep{10};
         std::cout << "2. hello from foo1" << std::endl;
     }
 }

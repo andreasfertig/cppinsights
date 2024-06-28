@@ -35,7 +35,6 @@ public:
     }
 
     operator std::string_view() const& { return {mOutput}; }
-    operator StringRef() const& { return {mOutput}; }
 
     auto size() const { return mOutput.size(); }
 
@@ -219,8 +218,7 @@ public:
     /// \endcode
     inline void ForEachArg(const auto& arguments, /*XXX: invocable*/ auto&& lambda)
     {
-        OnceFalse needsComma{};
-        for(const auto& arg : arguments) {
+        for(OnceFalse needsComma{}; const auto& arg : arguments) {
             if constexpr(std::is_same_v<const TemplateArgument&, decltype(arg)>) {
                 if((TemplateArgument::Pack == arg.getKind()) and (0 == arg.pack_size())) {
                     break;

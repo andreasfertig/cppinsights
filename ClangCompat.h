@@ -16,9 +16,6 @@
 #define IS_CLANG_NEWER_THAN(major) (CLANG_VERSION_MAJOR > (major))
 //-----------------------------------------------------------------------------
 
-#include "clang/AST/ExprCXX.h"
-//-----------------------------------------------------------------------------
-
 namespace clang::insights {
 
 template<unsigned int MAJOR>
@@ -30,12 +27,6 @@ struct IsClangNewerThan
 //-----------------------------------------------------------------------------
 
 // inline constexpr bool IsClangNewerThan8 = IsClangNewerThan<8>::value;
-//-----------------------------------------------------------------------------
-
-inline auto* GetTemporary(const MaterializeTemporaryExpr* stmt)
-{
-    return stmt->getSubExpr();
-}
 //-----------------------------------------------------------------------------
 
 }  // namespace clang::insights

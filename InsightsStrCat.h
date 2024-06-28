@@ -35,11 +35,7 @@ inline std::string ToString(const llvm::APSInt& val)
         return details::ConvertToBoolString(0 != val.getExtValue());
     }
 
-#if IS_CLANG_NEWER_THAN(12)
     return llvm::toString(val, 10);
-#else
-    return val.toString(10);
-#endif
 }
 //-----------------------------------------------------------------------------
 
