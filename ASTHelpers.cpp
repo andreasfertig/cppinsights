@@ -193,6 +193,22 @@ CanQualType VoidTy()
 }
 //-----------------------------------------------------------------------------
 
+ParenExpr* Paren(Expr* expr)
+{
+    return new(GetGlobalAST()) ParenExpr({}, {}, expr);
+}
+//-----------------------------------------------------------------------------
+
+QualType ContantArrayTy(QualType t, int size)
+{
+    return GetGlobalAST().getConstantArrayType(t,
+                                               llvm::APInt(32, size, false),
+                                               /*const Expr* SizeExpr*/ nullptr,
+                                               ArraySizeModifier::Normal,
+                                               0u);
+}
+//-----------------------------------------------------------------------------
+
 static QualType mkAnonVoidFunctionPointer()
 {
     auto voidPtr = Ptr(VoidTy());
@@ -212,6 +228,25 @@ static FunctionDecl* CreateFunctionDecl(std::string_view funcName, params_vector
 CXXStaticCastExpr* CastToVoidFunPtr(std::string_view name)
 {
     return Cast(mkDeclRefExpr(CreateFunctionDecl(name, {})), mkAnonVoidFunctionPointer());
+}
+//-----------------------------------------------------------------------------
+
+CXXReinterpretCastExpr* ReinterpretCast(QualType toType, const Expr* toExpr, bool makePointer)
+{
+    auto& ctx = GetGlobalAST();
+
+    QualType sourceInfoToType = makePointer ? Ptr(toType) : toType;
+
+    return CXXReinterpretCastExpr::Create(ctx,
+                                          toType,
+                                          VK_LValue,
+                                          CK_BitCast,
+                                          const_cast<Expr*>(toExpr),
+                                          nullptr,
+                                          ctx.getTrivialTypeSourceInfo(sourceInfoToType),
+                                          {},
+                                          {},
+                                          {});
 }
 //-----------------------------------------------------------------------------
 
@@ -295,6 +330,12 @@ MemberExpr* AccessMember(const Expr* expr, const ValueDecl* vd, bool isArrow)
 BinaryOperator* Equal(Expr* var, Expr* assignExpr)
 {
     return mkBinaryOperator(var, assignExpr, BO_EQ, GetGlobalAST().BoolTy);
+}
+//-----------------------------------------------------------------------------
+
+BinaryOperator* Plus(Expr* var, Expr* assignExpr)
+{
+    return mkBinaryOperator(var, assignExpr, BO_Add, var->getType());
 }
 //-----------------------------------------------------------------------------
 
@@ -508,6 +549,15 @@ FieldDecl* mkFieldDecl(DeclContext* dc, std::string_view name, QualType type)
     fieldDecl->setAccess(AS_public);
 
     return fieldDecl;
+}
+//-----------------------------------------------------------------------------
+
+InitListExpr* InitList(ArrayRef<Expr*> initExprs, QualType t)
+{
+    auto* initList = new(GetGlobalAST()) InitListExpr(GetGlobalAST(), SourceLocation{}, initExprs, SourceLocation{});
+    initList->setType(t);
+
+    return initList;
 }
 //-----------------------------------------------------------------------------
 

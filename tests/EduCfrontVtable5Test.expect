@@ -1,0 +1,132 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+
+
+#include <cstdio>
+
+typedef struct Base
+{
+  __mptr * __vptrBase;
+} Base;
+
+inline void Destructor_Base(Base * __this)
+{
+  puts("~Base");
+}
+
+inline Base * operatorEqual(Base * __this, const Base * __rhs)
+{
+  return __this;
+}
+
+inline Base * Constructor_Base(Base * __this)
+{
+  __this->__vptrBase = __vtbl_array[0];
+  return __this;
+}
+
+
+typedef struct Derived
+{
+  __mptr * __vptrBase;
+} Derived;
+
+inline void Destructor_Derived(Derived * __this)
+{
+  puts("~Derived");
+  Destructor_Base((Base *)__this);
+}
+
+inline Derived * operatorEqual(Derived * __this, const Derived * __rhs)
+{
+  operatorEqual((Base *)__this, (Base *)__rhs);
+  return __this;
+}
+
+inline Derived * Constructor_Derived(Derived * __this)
+{
+  Constructor_Base((Base *)__this);
+  __this->__vptrBase = __vtbl_array[1];
+  return __this;
+}
+
+
+typedef struct BaseNonVirtual
+{
+  char __dummy;
+} BaseNonVirtual;
+
+inline void Destructor_BaseNonVirtual(BaseNonVirtual * __this)
+{
+  puts("~BaseNonVirtual");
+}
+
+inline BaseNonVirtual * Constructor_BaseNonVirtual(BaseNonVirtual * __this)
+{
+  return __this;
+}
+
+
+typedef struct DerivedNonVirtual
+{
+  char __dummy;
+} DerivedNonVirtual;
+
+inline void Destructor_DerivedNonVirtual(DerivedNonVirtual * __this)
+{
+  puts("~DerivedNonVirtual");
+}
+
+inline DerivedNonVirtual * Constructor_DerivedNonVirtual(DerivedNonVirtual * __this)
+{
+  return __this;
+}
+
+
+int __main(void)
+{
+  Derived d;
+  Constructor_Derived((Derived *)&d);
+  DerivedNonVirtual nvd;
+  Constructor_DerivedNonVirtual((DerivedNonVirtual *)&nvd);
+  return 0;
+  Destructor_DerivedNonVirtual(&nvd);
+  (*((void (*)(Derived *))((&d)->__vptrBase[0]).f))((((Derived *)(char *)(&d)) + ((&d)->__vptrBase[0]).d));
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+}
+
+__mptr __vtbl_Base[1] = {0, 0, (__vptp)Destructor_Base};
+__mptr __vtbl_Derived[1] = {0, 0, (__vptp)Destructor_Derived};
+
+__mptr * __vtbl_array[2] = {__vtbl_Base, __vtbl_Derived};
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

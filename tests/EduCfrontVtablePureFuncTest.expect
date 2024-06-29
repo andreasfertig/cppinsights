@@ -1,0 +1,124 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+#include <stdlib.h> // abort
+void __cxa_start(void);
+void __cxa_atexit(void);
+typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+
+extern "C" void __cxa_pure_virtual() { abort(); }
+
+#include <cstdio>
+
+typedef struct A
+{
+  __mptr * __vptrA;
+  double md;
+} A;
+
+void FunA(A * __this);
+
+inline A * Constructor_A(A * __this)
+{
+  __this->__vptrA = __vtbl_array[0];
+  (*((void (*)(A *))((__this)->__vptrA[0]).f))((((A *)(char *)(__this)) + ((__this)->__vptrA[0]).d));
+  return __this;
+}
+
+inline A * operatorEqual(A * __this, const A * __rhs)
+{
+  __this->md = __rhs->md;
+  return __this;
+}
+
+inline A * operatorEqual(A * __this, A * __rhs)
+{
+  __this->md = __rhs->md;
+  return __this;
+}
+
+
+typedef struct B
+{
+  __mptr * __vptrA;
+  double md;
+  int mX;
+} B;
+
+inline void FunB(B * __this)
+{
+  printf("fun b: %d\n", __this->mX);
+}
+
+inline void OtherB(B * __this)
+{
+}
+
+inline B * operatorEqual(B * __this, const B * __rhs)
+{
+  __this->md = __rhs->md;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->mX = __rhs->mX;
+  return __this;
+}
+
+inline B * operatorEqual(B * __this, B * __rhs)
+{
+  __this->md = __rhs->md;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->mX = __rhs->mX;
+  return __this;
+}
+
+inline B * Constructor_B(B * __this)
+{
+  Constructor_A((A *)__this);
+  __this->__vptrA = __vtbl_array[1];
+  __this->mX = 5;
+  return __this;
+}
+
+
+int __main(void)
+{
+  B b;
+  Constructor_B((B *)&b);
+  (*((void (*)(B *))((&b)->__vptrA[0]).f))((((B *)(char *)(&b)) + ((&b)->__vptrA[0]).d));
+  A * a = (A *)&b;
+  (*((void (*)(A *))((a)->__vptrA[0]).f))((((A *)(char *)(a)) + ((a)->__vptrA[0]).d));
+  return 0;
+  /* b // lifetime ends here */
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+}
+
+__mptr __vtbl_A[1] = {0, 0, (__vptp)__cxa_pure_virtual};
+__mptr __vtbl_B[2] = {{0, 0, (__vptp)FunB}, {0, 0, (__vptp)OtherB}};
+
+__mptr * __vtbl_array[2] = {__vtbl_A, __vtbl_B};
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

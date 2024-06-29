@@ -17,9 +17,9 @@ typedef struct Apple
 
 inline Apple * Constructor_Apple(Apple * __this, int x, int y)
 {
-  printf("Apple\n");
   __this->mX = (char)x;
   __this->mY = y;
+  printf("Apple\n");
   return __this;
 }
 

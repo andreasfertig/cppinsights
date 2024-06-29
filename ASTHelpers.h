@@ -107,6 +107,9 @@ DeclRefExpr*  mkDeclRefExpr(const ValueDecl* vd);
 NullStmt*     mkNullStmt();
 FieldDecl*    mkFieldDecl(DeclContext* dc, std::string_view name, QualType type);
 
+ParenExpr*                Paren(Expr*);
+QualType                  ContantArrayTy(QualType t, int size);
+InitListExpr*             InitList(ArrayRef<Expr*> initExprs, QualType t);
 ArraySubscriptExpr*       ArraySubscript(const Expr* lhs, uint64_t index, QualType type);
 MemberExpr*               AccessMember(const Expr* expr, const ValueDecl* vd, bool isArrow = true);
 CXXMemberCallExpr*        CallMemberFun(Expr* memExpr, QualType retType);
@@ -120,6 +123,8 @@ BinaryOperator*           Assign(const VarDecl* var, Expr* assignExpr);
 BinaryOperator*           Assign(UnaryOperator* var, Expr* assignExpr);
 BinaryOperator*           Assign(Expr* var, Expr* assignExpr);
 BinaryOperator*           Equal(Expr* var, Expr* assignExpr);
+BinaryOperator*           Plus(Expr* var, Expr* assignExpr);
+CXXReinterpretCastExpr*   ReinterpretCast(QualType toType, const Expr* toExpr, bool makePointer = false);
 CXXStaticCastExpr*        StaticCast(QualType toType, const Expr* toExpr, bool makePointer = false);
 CXXStaticCastExpr*        CastToVoidFunPtr(std::string_view name);
 CXXStaticCastExpr*        Cast(const Expr* toExpr, QualType toType);

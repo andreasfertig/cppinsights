@@ -350,6 +350,7 @@ int main(int argc, const char** argv)
     AddGLobalInsertMapEntry(HeaderUtility, "#include <utility> // std::move"sv);
     AddGLobalInsertMapEntry(HeaderStddef, "#include <stddef.h> // NULL and more"sv);
     AddGLobalInsertMapEntry(HeaderAssert, "#include <assert.h> // _Static_assert"sv);
+    AddGLobalInsertMapEntry(HeaderStdlib, "#include <stdlib.h> // abort"sv);
 
     // Now all the forward declared functions
     AddGLobalInsertMapEntry(FuncCxaStart, "void __cxa_start(void);"sv);
@@ -370,6 +371,18 @@ int main(int argc, const char** argv)
     AddGLobalInsertMapEntry(
         FuncCxaVecDtor,
         R"(extern "C" void __cxa_vec_dtor(void *, unsigned int, unsigned int, void* (*destructor)(void *) );)"sv);
+    AddGLobalInsertMapEntry(FuncVtableStruct, R"(typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+)"sv);
+    AddGLobalInsertMapEntry(FuncCxaPureVirtual, R"(extern "C" void __cxa_pure_virtual() { abort(); })");
 
     llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
     llvm::cl::SetVersionPrinter(&PrintVersion);

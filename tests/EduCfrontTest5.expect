@@ -4,6 +4,17 @@
  *************************************************************************************/
 void __cxa_start(void);
 void __cxa_atexit(void);
+typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+
 
 typedef struct WithDefaultCtor
 {
@@ -48,6 +59,7 @@ inline Type * operatorEqual(Type * __this, const Type * __rhs)
 
 typedef struct Base
 {
+  __mptr * __vptrBase;
   Type mY;
 } Base;
 
@@ -63,6 +75,7 @@ inline Base * operatorEqual(Base * __this, const Base * __rhs)
 
 inline Base * Constructor_Base(Base * __this)
 {
+  __this->__vptrBase = __vtbl_array[0];
   Constructor_Type(&__this->mY, 5);
   return __this;
 }
@@ -70,6 +83,7 @@ inline Base * Constructor_Base(Base * __this)
 
 typedef struct BaseSecond
 {
+  __mptr * __vptrBaseSecond;
   Type mX;
 } BaseSecond;
 
@@ -85,6 +99,7 @@ inline BaseSecond * operatorEqual(BaseSecond * __this, const BaseSecond * __rhs)
 
 inline BaseSecond * Constructor_BaseSecond(BaseSecond * __this)
 {
+  __this->__vptrBaseSecond = __vtbl_array[1];
   Constructor_Type(&__this->mX, 5);
   return __this;
 }
@@ -92,7 +107,9 @@ inline BaseSecond * Constructor_BaseSecond(BaseSecond * __this)
 
 typedef struct Derived
 {
+  __mptr * __vptrBase;
   Type mY;
+  __mptr * __vptrBaseSecond;
   Type mX;
   double mD;
   WithDefaultCtor mWd;
@@ -110,7 +127,7 @@ inline Derived * operatorEqual(Derived * __this, const Derived * __rhs)
   operatorEqual(&__this->mY, &__rhs->mY);
   operatorEqual((Base *)__this, (Base *)__rhs);
   operatorEqual(&__this->mX, &__rhs->mX);
-  operatorEqual((BaseSecond *)__this, (BaseSecond *)__rhs);
+  operatorEqual((BaseSecond *)((char*)__this+16), (BaseSecond *)((char*)__rhs+16));
   __this->mD = __rhs->mD;
   operatorEqual(&__this->mWd, &__rhs->mWd);
   return __this;
@@ -122,6 +139,8 @@ inline Derived * Constructor_Derived(Derived * __this)
   Constructor_Type(&__this->mY, 5);
   Constructor_BaseSecond((BaseSecond *)__this);
   Constructor_Type(&__this->mX, 5);
+  __this->__vptrBase = __vtbl_array[2];
+  __this->__vptrBaseSecond = __vtbl_array[3];
   Constructor_WithDefaultCtor(&__this->mWd);
   return __this;
 }
@@ -144,8 +163,15 @@ int main(int argc, const char ** argv)
   __cxa_atexit();
   return ret;
   /* ret // lifetime ends here */
-  Destructor_Derived(&d);
+  (*((void (*)(Derived *))((&d)->__vptrBase[0]).f))((((Derived *)(char *)(&d)) + ((&d)->__vptrBase[0]).d));
 }
+
+__mptr __vtbl_Base[1] = {0, 0, (__vptp)Destructor_Base};
+__mptr __vtbl_BaseSecond[1] = {0, 0, (__vptp)Destructor_BaseSecond};
+__mptr __vtbl_DerivedBase[1] = {0, 0, (__vptp)Destructor_Derived};
+__mptr __vtbl_DerivedBaseSecond[1] = {-16, 0, (__vptp)Destructor_Derived};
+
+__mptr * __vtbl_array[4] = {__vtbl_Base, __vtbl_BaseSecond, __vtbl_DerivedBase, __vtbl_DerivedBaseSecond};
 
 void __cxa_start(void)
 {
