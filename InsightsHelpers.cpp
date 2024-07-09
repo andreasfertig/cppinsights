@@ -1495,14 +1495,15 @@ std::string GetName(const VarDecl& VD)
 }
 //-----------------------------------------------------------------------------
 
-static bool EvaluateAsBoolenCondition(const Expr& expr, const Decl& decl)
+static std::optional<bool> EvaluateAsBoolenCondition(const Expr& expr, const Decl& decl)
 {
     bool r{false};
 
-    const bool res = expr.EvaluateAsBooleanCondition(r, decl.getASTContext());
-    assert(res);
+    if(expr.EvaluateAsBooleanCondition(r, decl.getASTContext())) {
+        return {r};
+    }
 
-    return r;
+    return std::nullopt;
 }
 //-----------------------------------------------------------------------------
 
@@ -1510,13 +1511,23 @@ const std::string GetNoExcept(const FunctionDecl& decl)
 {
     const auto* func = decl.getType()->castAs<FunctionProtoType>();
 
-    if(func and func->hasNoexceptExceptionSpec()) {
+    if(func and func->hasNoexceptExceptionSpec() and not isUnresolvedExceptionSpec(func->getExceptionSpecType())) {
         std::string ret{kwSpaceNoexcept};
 
         if(const auto* expr = func->getNoexceptExpr()) {
-            const auto value = EvaluateAsBoolenCondition(*expr, decl);
+            ret += "("sv;
 
-            ret += StrCat("("sv, details::ConvertToBoolString(value), ")"sv);
+            if(const auto value = EvaluateAsBoolenCondition(*expr, decl); value) {
+                ret += details::ConvertToBoolString(*value);
+            } else {
+                OutputFormatHelper ofm{};
+                CodeGenerator      cg{ofm};
+                cg.InsertArg(expr);
+
+                ret += ofm.GetString();
+            }
+
+            ret += ")"sv;
         }
 
         return ret;
