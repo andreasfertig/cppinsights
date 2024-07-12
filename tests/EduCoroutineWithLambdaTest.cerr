@@ -4,8 +4,8 @@
 .tmp.cpp:79:9: note: in instantiation of member function 'SyncAwait(std::suspend_always &&)::__lambda_45_24::operator()' requested here
    79 |   class __lambda_45_24
       |         ^
-.tmp.cpp:226:3: note: in instantiation of function template specialization 'SyncAwait<std::suspend_always>' requested here
-  226 |   SyncAwait(std::suspend_always{});
+.tmp.cpp:227:3: note: in instantiation of function template specialization 'SyncAwait<std::suspend_always>' requested here
+  227 |   SyncAwait(std::suspend_always{});
       |   ^
 .tmp.cpp:76:25: note: 'a' declared here
    76 | void SyncAwait(_AwrT && a)

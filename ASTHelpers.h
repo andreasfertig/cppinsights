@@ -136,6 +136,7 @@ UnaryOperator*            Ref(const ValueDecl* d);
 UnaryOperator*            Dref(const Expr* stmt);
 UnaryOperator*            AddrOf(const Expr* stmt);
 CallExpr*                 Call(const FunctionDecl* fd, ArrayRef<Expr*> params);
+CallExpr*                 Call(MemberExpr* fd, ArrayRef<Expr*> params);
 CallExpr*                 Call(std::string_view name, ArrayRef<Expr*> args);
 CXXTryStmt*               Try(const Stmt* tryBody, CXXCatchStmt* catchAllBody);
 CXXCatchStmt*             Catch(Stmt* body);
