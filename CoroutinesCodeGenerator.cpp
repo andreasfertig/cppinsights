@@ -962,19 +962,13 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
     if(returnsVoid) {
         bodyStmts.Add(stmt->getSuspendExpr());
         addInitialAwaitSuspendCalled();
-
-        if(eState::FinalSuspend != mState) {
-            bodyStmts.Add(Return());
-        }
+        bodyStmts.Add(Return());
 
         InsertArg(If(Not(stmt->getReadyExpr()), bodyStmts));
 
     } else {
         addInitialAwaitSuspendCalled();
-
-        if(eState::FinalSuspend != mState) {
-            bodyStmts.Add(Return());
-        }
+        bodyStmts.Add(Return());
 
         auto* ifSuspend = If(stmt->getSuspendExpr(), bodyStmts);
 
@@ -987,7 +981,12 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
         mOutputFormatHelper.AppendNewLine();
     }
 
-    RETURN_IF(eState::FinalSuspend == mState);
+    if(eState::FinalSuspend == mState) {
+        auto* memExpr     = AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mDestroyFnField, true);
+        auto* callCoroFSM = Call(memExpr, {mASTData.mFrameAccessDeclRef});
+        InsertArg(callCoroFSM);
+        return;
+    }
 
     auto* suspendLabel = Label(BuildResumeLabelName(mSuspendsCount));
     InsertArg(suspendLabel);

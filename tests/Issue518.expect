@@ -316,9 +316,10 @@ void __get_randomResume(__get_randomFrame * __f)
   __f->__suspend_77_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_77_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_77_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    return;
   } 
   
-  ;
+  __f->destroy_fn(__f);
 }
 
 /* This function invoked by coroutine_handle<>::destroy() */
@@ -445,9 +446,10 @@ void __testResume(__testFrame * __f)
   __f->__suspend_83_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_83_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_83_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    return;
   } 
   
-  ;
+  __f->destroy_fn(__f);
 }
 
 /* This function invoked by coroutine_handle<>::destroy() */

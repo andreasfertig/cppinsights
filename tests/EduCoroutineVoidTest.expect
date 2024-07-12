@@ -239,9 +239,10 @@ void __seq_intResume(__seq_intFrame * __f)
   __f->__suspend_34_14_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_34_14_1.await_ready()) {
     __f->__suspend_34_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    return;
   } 
   
-  ;
+  __f->destroy_fn(__f);
 }
 
 /* This function invoked by coroutine_handle<>::destroy() */

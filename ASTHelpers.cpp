@@ -120,6 +120,12 @@ CallExpr* Call(const FunctionDecl* fd, ArrayRef<Expr*> params)
 }
 //-----------------------------------------------------------------------------
 
+CallExpr* Call(MemberExpr* fd, ArrayRef<Expr*> params)
+{
+    return CallExpr::Create(GetGlobalAST(), fd, params, fd->getType(), VK_LValue, {}, {});
+}
+//-----------------------------------------------------------------------------
+
 CallExpr* Call(std::string_view name, ArrayRef<Expr*> args)
 {
     params_vector params{};

@@ -148,9 +148,10 @@ inline my_resumable coro(int x) const
     __f->__suspend_29_16_1 = __f->__promise.final_suspend();
     if(!__f->__suspend_29_16_1.await_ready()) {
       __f->__suspend_29_16_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      return;
     } 
     
-    ;
+    __f->destroy_fn(__f);
   }
   
   /* This function invoked by coroutine_handle<>::destroy() */
