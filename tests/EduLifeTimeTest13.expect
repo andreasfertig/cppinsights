@@ -1,0 +1,61 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+template<class T, class U>
+struct pair
+{
+  T first;
+  U second;
+  inline pair(T && t, U && u)
+  : first{t}
+  , second{u}
+  {
+  }
+  
+  inline pair(const T & t, const U & u)
+  : first{t}
+  , second{u}
+  {
+  }
+  
+};
+
+/* First instantiated from: EduLifeTimeTest13.cpp:27 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct pair<int, int>
+{
+  int first;
+  int second;
+  inline pair(int && t, int && u)
+  : first{t}
+  , second{u}
+  {
+  }
+  
+  inline pair(const int & t, const int & u);
+  
+};
+
+#endif
+
+struct S
+{
+  int mi;
+  const pair<int, int> & failingp;
+};
+
+
+int main()
+{
+  int __temporary27_18 = 2;
+  int __temporary27_21 = 3;
+  const pair<int, int> __temporary27_22 = pair<int, int>{__temporary27_18, __temporary27_21};
+  S invalids = {1, __temporary27_22};
+  /* __temporary27_21 // lifetime ends here */
+  /* __temporary27_18 // lifetime ends here */
+  return 0;
+  /* __temporary27_22 // lifetime ends here */
+  /* invalids // lifetime ends here */
+}
