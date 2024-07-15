@@ -1,0 +1,209 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+
+
+#include <cstdio>
+
+typedef struct A
+{
+  __mptr * __vptrA;
+  int a;
+} A;
+
+inline void vA(A * __this)
+{
+  puts("A->v");
+}
+
+inline A * operatorEqual(A * __this, const A * __rhs)
+{
+  __this->a = __rhs->a;
+  return __this;
+}
+
+inline A * operatorEqual(A * __this, A * __rhs)
+{
+  __this->a = __rhs->a;
+  return __this;
+}
+
+inline A * Constructor_A(A * __this)
+{
+  __this->__vptrA = __vtbl_array[0];
+  return __this;
+}
+
+
+typedef struct B
+{
+  __mptr * __vptrB;
+  int b;
+} B;
+
+inline void wB(B * __this)
+{
+  puts("B->w");
+}
+
+inline B * operatorEqual(B * __this, const B * __rhs)
+{
+  __this->b = __rhs->b;
+  return __this;
+}
+
+inline B * operatorEqual(B * __this, B * __rhs)
+{
+  __this->b = __rhs->b;
+  return __this;
+}
+
+inline B * Constructor_B(B * __this)
+{
+  __this->__vptrB = __vtbl_array[1];
+  return __this;
+}
+
+
+typedef struct C
+{
+  __mptr * __vptrA;
+  int a;
+  __mptr * __vptrB;
+  int b;
+  int c;
+} C;
+
+inline void wC(C * __this)
+{
+  puts("C->w");
+}
+
+inline C * operatorEqual(C * __this, const C * __rhs)
+{
+  __this->a = __rhs->a;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->b = __rhs->b;
+  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
+  __this->c = __rhs->c;
+  return __this;
+}
+
+inline C * operatorEqual(C * __this, C * __rhs)
+{
+  __this->a = __rhs->a;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->b = __rhs->b;
+  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
+  __this->c = __rhs->c;
+  return __this;
+}
+
+inline C * Constructor_C(C * __this)
+{
+  Constructor_A((A *)__this);
+  Constructor_B((B *)__this);
+  __this->__vptrA = __vtbl_array[2];
+  __this->__vptrB = __vtbl_array[3];
+  return __this;
+}
+
+
+typedef struct D
+{
+  __mptr * __vptrA;
+  int a;
+  __mptr * __vptrB;
+  int b;
+  int d;
+} D;
+
+inline D * operatorEqual(D * __this, const D * __rhs)
+{
+  __this->a = __rhs->a;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->b = __rhs->b;
+  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
+  __this->d = __rhs->d;
+  return __this;
+}
+
+inline D * operatorEqual(D * __this, D * __rhs)
+{
+  __this->a = __rhs->a;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->b = __rhs->b;
+  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
+  __this->d = __rhs->d;
+  return __this;
+}
+
+inline D * Constructor_D(D * __this)
+{
+  Constructor_A((A *)__this);
+  Constructor_B((B *)__this);
+  __this->__vptrA = __vtbl_array[4];
+  __this->__vptrB = __vtbl_array[5];
+  return __this;
+}
+
+
+int __main(void)
+{
+  C c;
+  Constructor_C((C *)&c);
+  (*((void (*)(C *))((&c)->__vptrA[0]).f))((((C *)(char *)(&c)) + ((&c)->__vptrA[0]).d));
+  (*((void (*)(A *))((&c)->__vptrA[0]).f))((((A *)(char *)(&c)) + ((&c)->__vptrA[0]).d));
+  B * b = (B *)((char*)&c+16);
+  (*((void (*)(B *))((b)->__vptrB[0]).f))((((B *)(char *)(b)) + ((b)->__vptrB[0]).d));
+  C * cb = (C *)((char*)(b)-16);
+  (*((void (*)(A *))((cb)->__vptrA[0]).f))((((A *)(char *)(cb)) + ((cb)->__vptrA[0]).d));
+  D d;
+  Constructor_D((D *)&d);
+  B * bd = (B *)((char*)&d+16);
+  D * db = (D *)((char*)bd-16);
+  (*((void (*)(B *))((db)->__vptrB[0]).f))((((B *)(char *)(db)) + ((db)->__vptrB[0]).d));
+  return 0;
+  /* d // lifetime ends here */
+  /* c // lifetime ends here */
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+}
+
+__mptr __vtbl_A[1] = {0, 0, (__vptp)vA};
+__mptr __vtbl_B[1] = {0, 0, (__vptp)wB};
+__mptr __vtbl_CA[2] = {{0, 0, (__vptp)vA}, {0, 0, (__vptp)wC}};
+__mptr __vtbl_CB[1] = {-16, 0, (__vptp)wC};
+__mptr __vtbl_DA[1] = {0, 0, (__vptp)vA};
+__mptr __vtbl_DB[1] = {0, 0, (__vptp)wB};
+
+__mptr * __vtbl_array[6] = {__vtbl_A, __vtbl_B, __vtbl_CA, __vtbl_CB, __vtbl_DA, __vtbl_DB};
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

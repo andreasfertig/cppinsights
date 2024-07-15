@@ -5,8 +5,11 @@
  *
  ****************************************************************************/
 
+#include <clang/AST/VTableBuilder.h>
+
 #include <algorithm>
 #include <vector>
+
 #include "CodeGenerator.h"
 #include "DPrint.h"
 #include "Insights.h"
@@ -23,12 +26,55 @@ namespace clang::insights {
 using namespace asthelpers;
 //-----------------------------------------------------------------------------
 
+//! Store the `this` pointer offset from derived to base class.
+static llvm::DenseMap<std::pair<const CXXRecordDecl*, const CXXRecordDecl*>, int> mThisPointerOffset{};
+//-----------------------------------------------------------------------------
+
 static MemberExpr* AccessMember(std::string_view name, const ValueDecl* vd, QualType type)
 {
     auto* rhsDeclRef    = mkVarDeclRefExpr(name, type);
     auto* rhsMemberExpr = AccessMember(rhsDeclRef, vd);
 
     return rhsMemberExpr;
+}
+//-----------------------------------------------------------------------------
+
+CfrontCodeGenerator::CfrontVtableData::CfrontVtableData()
+: vptpTypedef{Typedef("__vptp"sv, Function("vptp"sv, GetGlobalAST().IntTy, {})->getType())}
+, vtableRecorDecl{}
+{
+    vtableRecorDecl = Struct("__mptr"sv);
+    auto AddField   = [&](FieldDecl* field) { vtableRecorDecl->addDecl(field); };
+
+    d = mkFieldDecl(vtableRecorDecl, "d"sv, GetGlobalAST().ShortTy);
+    AddField(d);
+    AddField(mkFieldDecl(vtableRecorDecl, "i"sv, GetGlobalAST().ShortTy));
+    f = mkFieldDecl(vtableRecorDecl, "f"sv, vptpTypedef);
+    AddField(f);
+
+    vtableRecorDecl->completeDefinition();
+
+    vtableRecordType = QualType{vtableRecorDecl->getTypeForDecl(), 0u};
+}
+//-----------------------------------------------------------------------------
+
+VarDecl* CfrontCodeGenerator::CfrontVtableData::VtblArrayVar(int size)
+{
+    return Variable("__vtbl_array"sv, ContantArrayTy(Ptr(vtableRecordType), size));
+}
+//-----------------------------------------------------------------------------
+
+FieldDecl* CfrontCodeGenerator::CfrontVtableData::VtblPtrField(const CXXRecordDecl* parent)
+{
+    return mkFieldDecl(const_cast<CXXRecordDecl*>(parent), StrCat("__vptr"sv, GetName(*parent)), Ptr(vtableRecordType));
+}
+//-----------------------------------------------------------------------------
+
+CfrontCodeGenerator::CfrontVtableData& CfrontCodeGenerator::VtableData()
+{
+    static CfrontVtableData data{};
+
+    return data;
 }
 //-----------------------------------------------------------------------------
 
@@ -406,10 +452,6 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
     auto*          body       = stmt->getBody();
     StmtsContainer bodyStmts{};
 
-    if(body) {
-        bodyStmts.AddBodyStmts(body);
-    }
-
     auto retType = stmt->getReturnType();
 
     auto processBaseClassesAndFields = [&](const CXXRecordDecl* parent) {
@@ -514,9 +556,35 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
 
             for(const auto& base : parent->bases()) {
                 auto baseType = base.getType();
-                bodyStmts.AddBodyStmts(CallConstructor(baseType, Ptr(baseType), nullptr, {}, DoCast::Yes));
+
+                if(const auto* baseRd = baseType->getAsCXXRecordDecl();
+                   baseRd and baseRd->hasNonTrivialDefaultConstructor()) {
+                    bodyStmts.AddBodyStmts(CallConstructor(baseType, Ptr(baseType), nullptr, {}, DoCast::Yes));
+                }
 
                 insertFields(baseType->getAsRecordDecl());
+            }
+
+            auto insertVtblPtr = [&](const CXXRecordDecl* cur) {
+                if(cur->isPolymorphic() and (0 == cur->getNumBases())) {
+                    auto* fieldDecl     = VtableData().VtblPtrField(cur);
+                    auto* lhsMemberExpr = AccessMember(kwInternalThis, fieldDecl, Ptr(GetRecordDeclType(cur)));
+
+                    // struct __mptr *__ptbl_vec__c___src_C_[]
+                    auto* vtablAr      = VtableData().VtblArrayVar(1);
+                    auto* vtblArrayPos = ArraySubscript(
+                        mkDeclRefExpr(vtablAr), GetGlobalVtablePos(stmt->getParent(), cur), fieldDecl->getType());
+
+                    bodyStmts.AddBodyStmts(Assign(lhsMemberExpr, fieldDecl, vtblArrayPos));
+                }
+            };
+
+            // insert our vtable pointer
+            insertVtblPtr(stmt->getParent());
+
+            // in case of multi inheritance insert additional vtable pointers
+            for(const auto& base : parent->bases()) {
+                insertVtblPtr(base.getType()->getAsCXXRecordDecl());
             }
 
             // insert own fields
@@ -554,9 +622,11 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
             }
         }
 
-        auto* lhsDeclRef = mkVarDeclRefExpr(kwInternalThis, Ptr(ctorDecl->getType()));
+        if(body) {
+            bodyStmts.AddBodyStmts(body);
+        }
 
-        bodyStmts.AddBodyStmts(Return(lhsDeclRef));
+        bodyStmts.AddBodyStmts(Return(mkVarDeclRefExpr(kwInternalThis, Ptr(ctorDecl->getType()))));
 
         body    = mkCompoundStmt({bodyStmts});
         retType = parentType;
@@ -569,17 +639,21 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
             bodyStmts.clear();
 
             processBaseClassesAndFields(stmt->getParent());
+        } else if(body) {
+            bodyStmts.AddBodyStmts(body);
         }
 
-        auto* lhsDeclRef = mkVarDeclRefExpr(kwInternalThis, Ptr(stmt->getType()));
-
-        bodyStmts.AddBodyStmts(Return(lhsDeclRef));
+        bodyStmts.AddBodyStmts(Return(mkVarDeclRefExpr(kwInternalThis, Ptr(stmt->getType()))));
 
         body    = mkCompoundStmt({bodyStmts});
         retType = parentType;
 
     } else if(const auto* dtor = dyn_cast_or_null<CXXDestructorDecl>(stmt)) {
         // Based on: https://www.dre.vanderbilt.edu/~schmidt/PDF/C++-translation.pdf
+
+        if(body) {
+            bodyStmts.AddBodyStmts(body);
+        }
 
         if(not HasDtor(GetRecordDeclType(dtor->getParent()))) {
             return;
@@ -635,11 +709,46 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
 void CfrontCodeGenerator::FormatCast(const std::string_view,
                                      const QualType& castDestType,
                                      const Expr*     subExpr,
-                                     const CastKind&)
+                                     const CastKind& kind)
 {
     // C does not have a rvalue notation and we already transformed the temporary into an object. Skip the cast to &&.
-    if(not castDestType->isRValueReferenceType()) {
+    // Ignore CK_UncheckedDerivedToBase which would lead to (A)c where neither A nor c is a pointer.
+    if(not castDestType->isRValueReferenceType() and not(CastKind::CK_UncheckedDerivedToBase == kind)) {
         mOutputFormatHelper.Append("(", GetName(castDestType), ")");
+
+        // ARM p 221:
+        // C* pc = new C;
+        // B* pb = pc -> pc = (B*) ((char*)pc+delta(B))
+        if(is{kind}.any_of(CastKind::CK_DerivedToBase, CastKind::CK_BaseToDerived)) {
+            // We have to switch in case of a base to derived cast
+            auto [key,
+                  sign] = [&]() -> std::pair<std::pair<const CXXRecordDecl*, const CXXRecordDecl*>, std::string_view> {
+                auto plainType = [](QualType t) {
+                    if(const auto* pt = dyn_cast_or_null<PointerType>(t.getTypePtrOrNull())) {
+                        return pt->getPointeeType()->getAsCXXRecordDecl();
+                    }
+
+                    return t->getAsCXXRecordDecl();
+                };
+
+                auto base    = plainType(castDestType);
+                auto derived = plainType(subExpr->getType());
+
+                if((CastKind::CK_BaseToDerived == kind)) {
+                    return {{base, derived}, "-"sv};
+                }
+
+                return {{derived, base}, "+"sv};
+            }();
+
+            if(auto off = mThisPointerOffset[key]) {
+                mOutputFormatHelper.Append("((char*)"sv);
+                InsertArg(subExpr);
+                mOutputFormatHelper.Append(sign, off, ")"sv);
+
+                return;
+            }
+        }
     }
 
     InsertArg(subExpr);
@@ -680,51 +789,195 @@ void CfrontCodeGenerator::InsertArg(const TypedefDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+static void ProcessFields(CXXRecordDecl* recordDecl, const CXXRecordDecl* rd)
+{
+    RETURN_IF(not rd->hasDefinition())
+
+    auto AddField = [&](const FieldDecl* field) {
+        recordDecl->addDecl(mkFieldDecl(recordDecl, GetName(*field), field->getType()));
+    };
+
+    // Insert field from base classes
+    for(const auto& base : rd->bases()) {
+        // XXX: ignoring TemplateSpecializationType
+        if(const auto* rdBase = dyn_cast_or_null<CXXRecordDecl>(base.getType().getCanonicalType()->getAsRecordDecl())) {
+            ProcessFields(recordDecl, rdBase);
+        }
+    }
+
+    // insert vtable pointer if required
+    if(rd->isPolymorphic() and (rd->getNumBases() == 0)) {
+        recordDecl->addDecl(CfrontCodeGenerator::VtableData().VtblPtrField(rd));
+    }
+
+    // insert own fields
+    for(const auto* d : rd->fields()) {
+        AddField(d);
+    }
+
+    if(recordDecl->field_empty()) {
+        AddField(mkFieldDecl(recordDecl, "__dummy"sv, GetGlobalAST().CharTy));
+    }
+}
+//-----------------------------------------------------------------------------
+
+static std::string GetFirstPolymorphicBaseName(const RecordDecl* decl, const RecordDecl* to)
+{
+    std::string ret{GetName(*decl)};
+
+    if(const auto* rdecl = dyn_cast_or_null<CXXRecordDecl>(decl); rdecl->getNumBases() > 1) {
+        for(const auto& base : rdecl->bases()) {
+            if(const auto* rd = base.getType()->getAsRecordDecl(); rd == to) {
+                ret += GetFirstPolymorphicBaseName(rd, to);
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
+//-----------------------------------------------------------------------------
+
 void CfrontCodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
     auto* recordDecl = Struct(GetName(*stmt));
 
-    if(stmt->hasDefinition()) {
-        auto AddField = [&](const FieldDecl* field) {
-            auto* fieldDecl = mkFieldDecl(recordDecl, GetName(*field), field->getType());
-
-            recordDecl->addDecl(fieldDecl);
-        };
-
-        // Insert field from base classes
-        for(const auto& base : stmt->bases()) {
-            // XXX: ignoring TemplateSpecializationType
-            if(const auto* rd = base.getType().getCanonicalType()->getAsRecordDecl()) {
-                for(const auto* d : rd->fields()) {
-                    AddField(d);
-                }
-            }
-        }
-
-        // insert own fields
-        for(const auto* d : stmt->fields()) {
-            AddField(d);
-        }
-
-        if(recordDecl->field_empty()) {
-            AddField(mkFieldDecl(recordDecl, "__dummy"sv, GetGlobalAST().CharTy));
-        }
-
-        recordDecl->completeDefinition();
-
+    if(stmt->hasDefinition() and stmt->isPolymorphic()) {
+        if(auto* itctx =
+               static_cast<ItaniumVTableContext*>(const_cast<ASTContext&>(GetGlobalAST()).getVTableContext())) {
 #if 0
-    // TypedefDecl above is not called
-    auto& ctx = GetGlobalAST();
-    auto et = ctx.getElaboratedType(ElaboratedTypeKeyword::ETK_Struct, nullptr, GetRecordDeclType(recordDecl), nullptr);
-    auto* typedefDecl = Typedef(GetName(*stmt),et);
+            // Get mangled RTTI name
+            auto*                     mc = const_cast<ASTContext&>(GetGlobalAST()).createMangleContext(nullptr);
+            SmallString<256>          rttiName{};
+            llvm::raw_svector_ostream out(rttiName);
+            mc->mangleCXXRTTI(QualType(stmt->getTypeForDecl(), 0), out);
+            DPrint("name: %s\n", rttiName.c_str());
 #endif
+
+            SmallVector<Expr*, 16>   mInitExprs{};
+            SmallVector<QualType, 5> baseList{};
+
+            if(stmt->getNumBases() == 0) {
+                baseList.push_back(GetRecordDeclType(stmt));
+            }
+
+            for(const auto& base : stmt->bases()) {
+                baseList.push_back(base.getType());
+            }
+
+            llvm::DenseMap<uint64_t, ThunkInfo> thunkMap{};
+            const VTableLayout&                 layout{itctx->getVTableLayout(stmt)};
+
+            for(const auto& [idx, thunk] : layout.vtable_thunks()) {
+                thunkMap[idx] = thunk;
+            }
+
+            unsigned clsIdx{};
+            unsigned funIdx{};
+            auto&    vtblData = VtableData();
+
+            auto pushVtable = [&] {
+                if(funIdx) {
+                    EnableGlobalInsert(GlobalInserts::FuncVtableStruct);
+
+                    //    struct __mptr __vtbl__A[] = {0, 0, 0, 0, 0, (__vptp)FunA, 0, 0, 0};
+                    auto* thisRd = baseList[clsIdx - 1]->getAsCXXRecordDecl();
+                    auto  vtableName{StrCat("__vtbl_"sv, GetFirstPolymorphicBaseName(stmt, thisRd))};
+                    auto* vtabl = Variable(vtableName, ContantArrayTy(vtblData.vtableRecordType, funIdx));
+                    vtabl->setInit(InitList(mInitExprs, vtblData.vtableRecordType));
+
+                    PushVtableEntry(stmt, thisRd, vtabl);
+
+                    funIdx = 0;
+                }
+
+                mInitExprs.clear();
+            };
+
+            for(unsigned i = 0; const auto& vc : layout.vtable_components()) {
+                switch(vc.getKind()) {
+                    case VTableComponent::CK_OffsetToTop: {
+                        auto off = layout.getVTableOffset(clsIdx);
+                        if(auto rem = (off % 4)) {
+                            off += 4 - rem;  // sometimes the value is misaligned. Align to 4 bytes
+                        }
+
+                        mThisPointerOffset[{stmt, baseList[clsIdx]->getAsCXXRecordDecl()}] = off * 4;  // we need bytes
+
+                        if(clsIdx >= 1) {
+                            pushVtable();
+                        }
+                        ++clsIdx;
+                    } break;
+
+                    case VTableComponent::CK_RTTI:
+                        break;
+
+                        // Source: https://itanium-cxx-abi.github.io/cxx-abi/abi.html#vtable-components
+                        // The entries for virtual destructors are actually pairs of entries. The first destructor,
+                        // called the complete object destructor, performs the destruction without calling delete() on
+                        // the object. The second destructor, called the deleting destructor, calls delete() after
+                        // destroying the object.
+                    case VTableComponent::CK_CompleteDtorPointer:
+                        break;  // vc.getKind() == VTableComponent::CK_CompleteDtorPointer
+                    case VTableComponent::CK_DeletingDtorPointer:
+                    case VTableComponent::CK_FunctionPointer: {
+                        auto* thunkOffset = [&] {
+                            if(ThunkInfo thunk = thunkMap.lookup(i); not thunk.isEmpty() and not thunk.This.isEmpty()) {
+                                return Int32(thunk.This.NonVirtual);
+                            }
+
+                            return Int32(0);
+                        }();
+
+                        const auto* md = dyn_cast_or_null<FunctionDecl>(vc.getFunctionDecl());
+
+                        std::string name{};
+                        if(md->isPureVirtual()) {
+                            EnableGlobalInsert(GlobalInserts::HeaderStdlib);
+                            EnableGlobalInsert(GlobalInserts::FuncCxaPureVirtual);
+
+                            md = Function("__cxa_pure_virtual"sv, VoidTy(), params_vector{{kwInternalThis, VoidTy()}});
+
+                            name = GetName(*md);
+                        } else {
+                            name = GetSpecialMemberName(md);
+                        }
+
+                        auto* reicast = ReinterpretCast(vtblData.vptpTypedef, mkVarDeclRefExpr(name, md->getType()));
+
+                        mInitExprs.push_back(InitList({thunkOffset, Int32(0), reicast}, vtblData.vtableRecordType));
+
+                        ++funIdx;
+                        break;
+                    }
+                    default: break;
+                }
+
+                ++i;
+            }
+
+            pushVtable();
+        }
+    }
+
+    if(stmt->hasDefinition()) {
+        ProcessFields(recordDecl, stmt);
+        recordDecl->completeDefinition();
 
         mOutputFormatHelper.Append(kwTypedefSpace);
     }
 
     // use our freshly created recordDecl
     CodeGenerator::InsertArg(recordDecl);
-    //    CodeGenerator::InsertArg(typedefDecl);
+
+#if 0
+    // TypedefDecl above is not called
+    auto& ctx = GetGlobalAST();
+    auto et = ctx.getElaboratedType(ElaboratedTypeKeyword::ETK_Struct, nullptr, GetRecordDeclType(recordDecl), nullptr);
+    auto* typedefDecl = Typedef(GetName(*stmt),et);
+    CodeGenerator::InsertArg(typedefDecl);
+#endif
 
     // insert member functions except for the special member functions and classes defined inside this class
     for(OnceTrue firstRecordDecl{}; const auto* d : stmt->decls()) {
@@ -747,14 +1000,35 @@ void CfrontCodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 }
 //-----------------------------------------------------------------------------
 
+///! Find the first polymorphic base class.
+static const CXXRecordDecl* GetFirstPolymorphicBase(const RecordDecl* decl)
+{
+    if(const auto* rdecl = dyn_cast_or_null<CXXRecordDecl>(decl); rdecl->getNumBases() >= 1) {
+        for(const auto& base : rdecl->bases()) {
+            const auto* rd = base.getType()->getAsRecordDecl();
+
+            if(const auto* cxxRd = dyn_cast_or_null<CXXRecordDecl>(rd); not cxxRd or not cxxRd->isPolymorphic()) {
+                continue;
+            } else if(const CXXRecordDecl* ret = GetFirstPolymorphicBase(rd)) {
+                return ret;
+            }
+
+            break;
+        }
+    }
+
+    return dyn_cast_or_null<CXXRecordDecl>(decl);
+}
+//-----------------------------------------------------------------------------
+
 void CfrontCodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 {
     if(const auto* me = dyn_cast_or_null<MemberExpr>(stmt->getCallee())) {
-        auto* obj = me->getBase();
+        auto*      obj = me->getBase();
+        const bool isPointer{obj->getType()->isPointerType()};
 
-        const bool isReference = IsReferenceType(dyn_cast_or_null<VarDecl>(obj->getReferencedDeclOfCallee()));
-
-        if(not obj->getType()->isPointerType() and not isReference) {
+        if(const bool isReference = IsReferenceType(dyn_cast_or_null<VarDecl>(obj->getReferencedDeclOfCallee()));
+           not isPointer and not isReference) {
             obj = Ref(obj);
         }
 
@@ -766,8 +1040,10 @@ void CfrontCodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
             }
         }
 
+        auto* memDecl = me->getMemberDecl();
+
         if(const auto* ar = dyn_cast_or_null<ConstantArrayType>(obj->getType())) {
-            if(const auto* dtor = dyn_cast_or_null<CXXDestructorDecl>(me->getMemberDecl())) {
+            if(const auto* dtor = dyn_cast_or_null<CXXDestructorDecl>(memDecl)) {
                 // ignore the reference
                 InsertArg(CallVecDtor(dyn_cast_or_null<UnaryOperator>(obj)->getSubExpr(), ar));
                 return;
@@ -778,7 +1054,52 @@ void CfrontCodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
         auto*                  ncStmt = const_cast<CXXMemberCallExpr*>(stmt);
         params.append(ncStmt->arg_begin(), ncStmt->arg_end());
 
-        InsertArg(Call(GetSpecialMemberName(me->getMemberDecl()), params));
+        if(auto* md = dyn_cast_or_null<CXXMethodDecl>(memDecl); md and md->isVirtual()) {
+            auto& vtblData    = VtableData();
+            auto* cls         = md->getParent();
+            auto  vRecordDecl = GetFirstPolymorphicBase(cls);
+            auto* vtblField   = VtableData().VtblPtrField(vRecordDecl);
+
+            // -- cast to function signature: void Fun(struct X*)
+
+            auto destType = not isPointer ? Ptr(obj->getType()) : obj->getType();
+            auto atype    = isPointer ? obj->getType()->getPointeeType() : obj->getType();
+            auto idx      = mVirtualFunctions[{md, {atype->getAsCXXRecordDecl(), vRecordDecl}}];
+
+            // a->__vptr[1];  #1
+            auto* accessVptr   = AccessMember(Paren(obj), vtblField, true);
+            auto* vtblArrayPos = ArraySubscript(accessVptr, idx, vtblField->getType());
+
+            auto* p             = Paren(vtblArrayPos);                 // ( #1 ) #2
+            auto* accessMemberF = AccessMember(p, vtblData.f, false);  // #2.f  #3
+
+            // (void (*)(struct X*) (#3)
+            params_vector ps{{kwInternalThis, destType}};
+            auto*         funcPtrFuncDecl = Function("__dummy"sv, VoidTy(), ps);
+            auto*         reicast         = ReinterpretCast(funcPtrFuncDecl->getType(), accessMemberF, true);
+
+            auto* p4 = Paren(reicast);  // (#4)
+            auto  p5 = Dref(p4);        // *#5
+            auto* p6 = Paren(p5);       // (#5)  #6
+
+            // -- call with possible this pointer adjustment
+
+            auto* p7 = AccessMember(p, vtblData.d, false);                        // a->__vptr[1];  #7
+            auto* p8 = ReinterpretCast(GetGlobalAST().CharTy, Paren(obj), true);  // (#7) #8
+
+            auto* p9 = ReinterpretCast(destType, p8);
+
+            auto* p10 = Paren(p9);
+            auto* p11 = Plus(p10, p7);  // #7 + #8    #9
+            auto* p12 = Paren(p11);
+
+            // Use the modified object parameter
+            params[0] = p12;
+            InsertArg(CallExpr::Create(GetGlobalAST(), p6, params, p6->getType(), VK_LValue, {}, {}));
+
+        } else {
+            InsertArg(Call(GetSpecialMemberName(memDecl), params));
+        }
 
     } else {
         CodeGenerator::InsertArg(stmt);

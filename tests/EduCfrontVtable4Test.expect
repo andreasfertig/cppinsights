@@ -1,0 +1,176 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+
+
+#include <cstdio>
+
+typedef struct A
+{
+  __mptr * __vptrA;
+  double md;
+} A;
+
+inline void Destructor_A(A * __this)
+{
+  puts("dtor");
+}
+
+inline void FunA(A * __this)
+{
+  puts("fun a");
+}
+
+inline A * operatorEqual(A * __this, const A * __rhs)
+{
+  __this->md = __rhs->md;
+  return __this;
+}
+
+inline A * Constructor_A(A * __this)
+{
+  __this->__vptrA = __vtbl_array[0];
+  return __this;
+}
+
+
+typedef struct B
+{
+  __mptr * __vptrA;
+  double md;
+  int mX;
+} B;
+
+inline void FunB(B * __this)
+{
+  printf("fun b: %d\n", __this->mX);
+}
+
+inline void OtherB(B * __this)
+{
+}
+
+inline B * operatorEqual(B * __this, const B * __rhs)
+{
+  __this->md = __rhs->md;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->mX = __rhs->mX;
+  return __this;
+}
+
+inline B * operatorEqual(B * __this, B * __rhs)
+{
+  __this->md = __rhs->md;
+  operatorEqual((A *)__this, (A *)__rhs);
+  __this->mX = __rhs->mX;
+  return __this;
+}
+
+inline void Destructor_B(B * __this)
+{
+  Destructor_A((A *)__this);
+}
+
+inline B * Constructor_B(B * __this)
+{
+  Constructor_A((A *)__this);
+  __this->__vptrA = __vtbl_array[1];
+  __this->mX = 5;
+  return __this;
+}
+
+
+typedef struct C
+{
+  __mptr * __vptrA;
+  double md;
+  int mX;
+  int mB;
+} C;
+
+inline void FunC(C * __this)
+{
+  printf("fun c: %d\n", __this->mB);
+}
+
+inline void OtherC(C * __this)
+{
+}
+
+inline C * operatorEqual(C * __this, const C * __rhs)
+{
+  __this->mX = __rhs->mX;
+  operatorEqual((B *)__this, (B *)__rhs);
+  __this->mB = __rhs->mB;
+  return __this;
+}
+
+inline C * operatorEqual(C * __this, C * __rhs)
+{
+  __this->mX = __rhs->mX;
+  operatorEqual((B *)__this, (B *)__rhs);
+  __this->mB = __rhs->mB;
+  return __this;
+}
+
+inline void Destructor_C(C * __this)
+{
+  Destructor_B((B *)__this);
+}
+
+inline C * Constructor_C(C * __this)
+{
+  Constructor_B((B *)__this);
+  __this->mX = 5;
+  __this->mB = 8;
+  return __this;
+}
+
+
+int __main(void)
+{
+  C b;
+  Constructor_C((C *)&b);
+  (*((void (*)(C *))((&b)->__vptrA[0]).f))((((C *)(char *)(&b)) + ((&b)->__vptrA[0]).d));
+  A * a = (A *)&b;
+  (*((void (*)(A *))((a)->__vptrA[0]).f))((((A *)(char *)(a)) + ((a)->__vptrA[0]).d));
+  return 0;
+  (*((void (*)(C *))((&b)->__vptrA[0]).f))((((C *)(char *)(&b)) + ((&b)->__vptrA[0]).d));
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+}
+
+__mptr __vtbl_A[2] = {{0, 0, (__vptp)Destructor_A}, {0, 0, (__vptp)FunA}};
+__mptr __vtbl_B[3] = {{0, 0, (__vptp)Destructor_B}, {0, 0, (__vptp)FunB}, {0, 0, (__vptp)OtherB}};
+__mptr __vtbl_C[3] = {{0, 0, (__vptp)Destructor_C}, {0, 0, (__vptp)FunC}, {0, 0, (__vptp)OtherC}};
+
+__mptr * __vtbl_array[3] = {__vtbl_A, __vtbl_B, __vtbl_C};
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

@@ -476,18 +476,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mOutputFormatHelper.AppendCommentNewLine("Note: The actual parameter new is __builtin_coro_size"sv);
 
     auto* coroFrameVar = Variable(CORO_FRAME_NAME, GetFramePointerType());
-
-    CXXReinterpretCastExpr* reicast =
-        CXXReinterpretCastExpr::Create(ctx,
-                                       GetFramePointerType(),
-                                       VK_LValue,
-                                       CK_BitCast,
-                                       stmt->getAllocate(),
-                                       nullptr,
-                                       ctx.getTrivialTypeSourceInfo(GetFramePointerType()),
-                                       {},
-                                       {},
-                                       {});
+    auto* reicast      = ReinterpretCast(GetFramePointerType(), stmt->getAllocate());
 
     coroFrameVar->setInit(reicast);
 

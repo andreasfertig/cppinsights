@@ -24,6 +24,9 @@
 
 namespace clang::insights {
 
+void PushVtableEntry(const CXXRecordDecl*, const CXXRecordDecl*, VarDecl* decl);
+int  GetGlobalVtablePos(const CXXRecordDecl*, const CXXRecordDecl*);
+
 class CppInsightsCommentStmt : public Stmt
 {
     std::string mComment{};
@@ -602,6 +605,9 @@ private:
 /// command line option.
 class CfrontCodeGenerator final : public CodeGenerator
 {
+    ///! A mapping for the pair method decl - derived-to-base-class to index in the vtable.
+    static inline llvm::DenseMap<std::pair<const Decl*, std::pair<const CXXRecordDecl*, const CXXRecordDecl*>>, int>
+         mVirtualFunctions{};
     bool mInsertSemi{true};  // We need to for int* p = new{5};
 
 public:
@@ -624,6 +630,32 @@ public:
     void InsertCXXMethodDecl(const CXXMethodDecl*, CodeGenerator::SkipBody) override;
 
     void FormatCast(const std::string_view, const QualType&, const Expr*, const CastKind&) override;
+
+    struct CfrontVtableData
+    {
+        CfrontVtableData();
+
+        // struct __mptr *__ptbl_vec__c___src_C_[]
+        VarDecl*   VtblArrayVar(int size);
+        FieldDecl* VtblPtrField(const CXXRecordDecl* parent);
+
+        QualType vptpTypedef;  // typedef int (*__vptp)();
+
+        /*
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+*/
+        CXXRecordDecl* vtableRecorDecl;
+        QualType       vtableRecordType;
+        FieldDecl*     d;
+        FieldDecl*     f;
+    };
+
+    static CfrontVtableData& VtableData();
 
 protected:
     bool InsertSemi() override { return std::exchange(mInsertSemi, true); }

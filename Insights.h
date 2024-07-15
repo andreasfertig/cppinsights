@@ -44,6 +44,7 @@ enum class GlobalInserts
     HeaderUtility,    //!< Track whether there was a std::move inserted.
     HeaderStddef,     //!< Track whether we need to insert <stddef.h> in Cfront mode
     HeaderAssert,     //!< Track whether we need to insert <assert.h> in Cfront mode
+    HeaderStdlib,     //!< Track whether we need to insert <stdlib.h> in Cfront mode
 
     // Now all the forward declared functions
     FuncCxaStart,
@@ -56,6 +57,8 @@ enum class GlobalInserts
     FuncCxaVecCtor,
     FuncCxaVecDel,
     FuncCxaVecDtor,
+    FuncVtableStruct,
+    FuncCxaPureVirtual,
 
     // The traditional enum element count
     MAX

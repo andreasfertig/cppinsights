@@ -1062,17 +1062,38 @@ public:
 };
 //-----------------------------------------------------------------------------
 
+/*constinit*/ static SmallVector<std::pair<std::pair<const CXXRecordDecl*, const CXXRecordDecl*>, VarDecl*>, 10>
+                                            gVtables{};
 /*constinit*/ static SmallVector<Expr*, 10> globalVarCtors{};
 /*constinit*/ static SmallVector<Expr*, 10> globalVarDtors{};
 //-----------------------------------------------------------------------------
 
-void PushGlobalVariable(const Expr* callExpr)
+int GetGlobalVtablePos(const CXXRecordDecl* record, const CXXRecordDecl* recordB)
+{
+    auto iter = std::ranges::find_if(
+        gVtables, [&](const auto& e) { return (e.first.first == record) and (e.first.second == recordB); });
+
+    if(iter == gVtables.end()) {
+        iter = std::ranges::find_if(gVtables, [&](const auto& e) { return e.first.first == record; });
+    }
+
+    return std::distance(gVtables.begin(), iter);
+}
+//-----------------------------------------------------------------------------
+
+void PushVtableEntry(const CXXRecordDecl* record, const CXXRecordDecl* recordB, VarDecl* decl)
+{
+    gVtables.push_back({{record, recordB}, decl});
+}
+//-----------------------------------------------------------------------------
+
+static void PushGlobalVariable(const Expr* callExpr)
 {
     globalVarCtors.push_back(const_cast<Expr*>(callExpr));
 }
 //-----------------------------------------------------------------------------
 
-void PushGlobalVariableDtor(const Expr* callExpr)
+static void PushGlobalVariableDtor(const Expr* callExpr)
 {
     globalVarDtors.push_back(const_cast<Expr*>(callExpr));
 }
@@ -1093,6 +1114,26 @@ std::string EmitGlobalVariableCtors()
     ofm.AppendNewLine();
     ofm.AppendNewLine();
     CodeGeneratorVariant cg{ofm};
+
+    if(gVtables.size()) {
+        SmallVector<Expr*, 16> mInitExprs{};
+
+        for(auto& e : gVtables) {
+            cg->InsertArg(e.second);
+            mInitExprs.push_back(mkDeclRefExpr(e.second));
+        }
+
+        ofm.AppendNewLine();
+
+        // struct __mptr *__ptbl_vec__c___src_C_[]
+        auto* vtable = CfrontCodeGenerator::VtableData().VtblArrayVar(mInitExprs.size());
+        vtable->setInit(InitList(mInitExprs, vtable->getType()));
+
+        cg->InsertArg(vtable);
+
+        ofm.AppendNewLine();
+    }
+
     cg->InsertArg(cxaStartFun);
 
     StmtsContainer bodyStmtsDtors{};
@@ -1299,7 +1340,8 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
 
                 if(MyOptional<const InitListExpr*> initList{dyn_cast_or_null<InitListExpr>(init)};
                    GetInsightsOptions().UseShow2C and
-                   initList.and_then(CanonicalType).and_then(Isa<RecordType>).and_not(IsPointer).and_then(IsPOD)) {
+                   initList.and_then(CanonicalType).and_then(Isa<RecordType>).and_not(IsPointer).and_then(IsPOD) and
+                   not isa<ArrayType>(stmt->getType())) {
                     auto* callMemset = Call("memset"sv, {Ref(stmt), Int32(0), Sizeof(stmt->getType())});
 
                     EnableGlobalInsert(GlobalInserts::FuncMemset);

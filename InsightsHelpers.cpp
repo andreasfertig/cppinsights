@@ -984,6 +984,9 @@ std::string GetCfrontOverloadedFunctionName(const FunctionDecl* fd)
                 }
             }
         }
+    } else if(const auto* md = dyn_cast_or_null<CXXMethodDecl>(fd);
+              md and GetInsightsOptions().UseShow2C and md->isVirtual()) {
+        name = GetName(*md->getParent());
     }
 
     return name;
