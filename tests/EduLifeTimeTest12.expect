@@ -18,15 +18,15 @@ int main()
   const std::pair<int, int> __temporary10_16 = std::pair<int, int>{__temporary10_13, __temporary10_15};
   S a = {1, __temporary10_16};
   /* __temporary10_15 // lifetime ends here */
+  /* __temporary10_13 // lifetime ends here */
   int __temporary11_21 = 2;
   int __temporary11_23 = 3;
   const std::pair<int, int> __temporary11_24 = std::pair<int, int>{__temporary11_21, __temporary11_23};
   S * p = new S{1, __temporary11_24};
   /* __temporary11_24 // lifetime ends here */
-  return 0;
   /* __temporary11_23 // lifetime ends here */
   /* __temporary11_21 // lifetime ends here */
-  /* __temporary10_13 // lifetime ends here */
+  return 0;
   /* __temporary10_16 // lifetime ends here */
   /* a // lifetime ends here */
 }

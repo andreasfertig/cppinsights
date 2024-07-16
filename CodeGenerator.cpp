@@ -905,11 +905,12 @@ public:
 /// \brief Find a \c DeclRefExpr belonging to a \c DecompositionDecl
 class TemporaryDeclFinder : public StmtVisitor<TemporaryDeclFinder>
 {
-    CodeGenerator& codeGenerator;
-    bool           mFound{};
-    bool           mHaveTemporary{};
-    Stmt*          mPrevStmt{};
-    std::string    mTempName{};
+    CodeGenerator&        codeGenerator;
+    bool                  mFound{};
+    bool                  mHaveTemporary{};
+    Stmt*                 mPrevStmt{};
+    std::string           mTempName{};
+    std::vector<VarDecl*> mDecls{};
 
 public:
     TemporaryDeclFinder(CodeGenerator& _codeGenerator, const Stmt* stmt, bool inspectReturn = false)
@@ -919,6 +920,10 @@ public:
         RETURN_IF(not GetInsightsOptions().ShowLifetime);
 
         Visit(mPrevStmt);
+
+        for(auto d : mDecls) {
+            codeGenerator.InsertArg(d);
+        }
 
         RETURN_IF(not GetInsightsOptions().UseShow2C or mFound or not inspectReturn);
 
@@ -1001,7 +1006,7 @@ public:
             ReplaceNode(mPrevStmt, expr, newValue);
         }
 
-        codeGenerator.InsertArg(vd);
+        mDecls.push_back(vd);
     }
 
 #if 0
@@ -1031,14 +1036,14 @@ public:
         auto* newValue = mkDeclRefExpr(vd);
         ReplaceNode(mPrevStmt, stmt, newValue);
 
-        if(SD_FullExpression == stmt->getStorageDuration()) {
+        if(SD_FullExpression == stmt->getStorageDuration() and not mHaveTemporary) {
             codeGenerator.StartLifetimeScope();
             mHaveTemporary = true;
         } else if(const auto* extending = stmt->getExtendingDecl()) {
             codeGenerator.LifetimeAddExtended(vd, extending);
         }
 
-        codeGenerator.InsertArg(vd);
+        mDecls.push_back(vd);
     }
 
     void VisitStmt(Stmt* stmt)
