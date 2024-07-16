@@ -9,6 +9,7 @@ import argparse
 import tempfile
 import datetime
 import difflib
+import platform
 #------------------------------------------------------------------------------
 
 mypath = '.'
@@ -65,7 +66,9 @@ def testCompile(tmpFileName, f, args, fileName, cppStd):
     cmd = [args['cxx'], cppStd, '-D__cxa_guard_acquire(x)=true', '-D__cxa_guard_release(x)', '-D__cxa_guard_abort(x)', '-I', os.getcwd()]
 
     if os.name != 'nt':
-        cmd.append('-m64')
+        arch = platform.architecture()[0]
+        if (arch != '64bit') or ((arch == '64bit') and (sys.platform == 'darwin')):
+            cmd.append('-m64')
     else:
         cmd.extend(['/nologo', '/EHsc', '/IGNORE:C4335']) # C4335: mac file format detected. EHsc assume only C++ functions throw exceptions.
 
