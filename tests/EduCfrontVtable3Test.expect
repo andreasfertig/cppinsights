@@ -126,6 +126,7 @@ inline C * Constructor_C(C * __this)
 {
   Constructor_B((B *)__this);
   __this->mX = 5;
+  __this->__vptrA = __vtbl_array[2];
   __this->mB = 8;
   return __this;
 }
