@@ -172,6 +172,7 @@ inline Derived * Constructor_Derived(Derived * __this)
   Constructor_Type(&__this->mY, 5);
   Constructor_BaseThird((BaseThird *)__this);
   Constructor_Type(&__this->mZ, 5);
+  __this->__vptrBase = __vtbl_array[3];
   __this->__vptrBaseThird = __vtbl_array[4];
   /* dt // trivial type, maybe uninitialized */
   __this->g = 4;

@@ -1,0 +1,169 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+
+
+#include <cstdio>
+
+typedef struct Fruit
+{
+  __mptr * __vptrFruit;
+  double md;
+} Fruit;
+
+inline void Destructor_Fruit(Fruit * __this)
+{
+  puts("~Fruit");
+}
+
+inline void FunFruit(Fruit * __this)
+{
+  puts("Fruit's Fun");
+}
+
+inline Fruit * operatorEqual(Fruit * __this, const Fruit * __rhs)
+{
+  __this->md = __rhs->md;
+  return __this;
+}
+
+inline Fruit * Constructor_Fruit(Fruit * __this)
+{
+  __this->__vptrFruit = __vtbl_array[0];
+  return __this;
+}
+
+
+typedef struct Apple
+{
+  __mptr * __vptrFruit;
+  double md;
+  int mX;
+} Apple;
+
+inline void FunApple(Apple * __this)
+{
+  printf("Apple's Fun: %d\n", __this->mX);
+}
+
+inline Apple * operatorEqual(Apple * __this, const Apple * __rhs)
+{
+  __this->md = __rhs->md;
+  operatorEqual((Fruit *)__this, (Fruit *)__rhs);
+  __this->mX = __rhs->mX;
+  return __this;
+}
+
+inline Apple * operatorEqual(Apple * __this, Apple * __rhs)
+{
+  __this->md = __rhs->md;
+  operatorEqual((Fruit *)__this, (Fruit *)__rhs);
+  __this->mX = __rhs->mX;
+  return __this;
+}
+
+inline void Destructor_Apple(Apple * __this)
+{
+  Destructor_Fruit((Fruit *)__this);
+}
+
+inline Apple * Constructor_Apple(Apple * __this)
+{
+  Constructor_Fruit((Fruit *)__this);
+  __this->__vptrFruit = __vtbl_array[1];
+  __this->mX = 5;
+  return __this;
+}
+
+
+typedef struct PinkLady
+{
+  __mptr * __vptrFruit;
+  double md;
+  int mX;
+  int mApple;
+} PinkLady;
+
+inline void FunPinkLady(PinkLady * __this)
+{
+  printf("Pink Ladies Fun: %d\n", __this->mApple);
+}
+
+inline PinkLady * operatorEqual(PinkLady * __this, const PinkLady * __rhs)
+{
+  __this->mX = __rhs->mX;
+  operatorEqual((Apple *)__this, (Apple *)__rhs);
+  __this->mApple = __rhs->mApple;
+  return __this;
+}
+
+inline PinkLady * operatorEqual(PinkLady * __this, PinkLady * __rhs)
+{
+  __this->mX = __rhs->mX;
+  operatorEqual((Apple *)__this, (Apple *)__rhs);
+  __this->mApple = __rhs->mApple;
+  return __this;
+}
+
+inline void Destructor_PinkLady(PinkLady * __this)
+{
+  Destructor_Apple((Apple *)__this);
+}
+
+inline PinkLady * Constructor_PinkLady(PinkLady * __this)
+{
+  Constructor_Apple((Apple *)__this);
+  __this->mX = 5;
+  __this->__vptrFruit = __vtbl_array[2];
+  __this->mApple = 8;
+  return __this;
+}
+
+
+int __main(void)
+{
+  PinkLady delicious;
+  Constructor_PinkLady((PinkLady *)&delicious);
+  (*((void (*)(PinkLady *))((&delicious)->__vptrFruit[0]).f))((((PinkLady *)(char *)(&delicious)) + ((&delicious)->__vptrFruit[0]).d));
+  Fruit * f = (Fruit *)&delicious;
+  (*((void (*)(Fruit *))((f)->__vptrFruit[0]).f))((((Fruit *)(char *)(f)) + ((f)->__vptrFruit[0]).d));
+  return 0;
+  (*((void (*)(PinkLady *))((&delicious)->__vptrFruit[0]).f))((((PinkLady *)(char *)(&delicious)) + ((&delicious)->__vptrFruit[0]).d));
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+}
+
+__mptr __vtbl_Fruit[2] = {{0, 0, (__vptp)Destructor_Fruit}, {0, 0, (__vptp)FunFruit}};
+__mptr __vtbl_Apple[2] = {{0, 0, (__vptp)Destructor_Apple}, {0, 0, (__vptp)FunApple}};
+__mptr __vtbl_PinkLady[2] = {{0, 0, (__vptp)Destructor_PinkLady}, {0, 0, (__vptp)FunPinkLady}};
+
+__mptr * __vtbl_array[3] = {__vtbl_Fruit, __vtbl_Apple, __vtbl_PinkLady};
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+

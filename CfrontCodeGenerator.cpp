@@ -438,6 +438,27 @@ void CfrontCodeGenerator::InsertArg(const CXXOperatorCallExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+static void InsertVtblPtr(const CXXMethodDecl* stmt, const CXXRecordDecl* cur, StmtsContainer& bodyStmts)
+{
+    if(cur->isPolymorphic() and (0 == cur->getNumBases())) {
+        auto* fieldDecl     = CfrontCodeGenerator::VtableData().VtblPtrField(cur);
+        auto* lhsMemberExpr = AccessMember(kwInternalThis, fieldDecl, Ptr(GetRecordDeclType(cur)));
+
+        // struct __mptr *__ptbl_vec__c___src_C_[]
+        auto* vtablAr = CfrontCodeGenerator::VtableData().VtblArrayVar(1);
+        auto* vtblArrayPos =
+            ArraySubscript(mkDeclRefExpr(vtablAr), GetGlobalVtablePos(stmt->getParent(), cur), fieldDecl->getType());
+
+        bodyStmts.AddBodyStmts(Assign(lhsMemberExpr, fieldDecl, vtblArrayPos));
+
+    } else if(cur->isPolymorphic() and (0 < cur->getNumBases()) and (cur != stmt->getParent())) {
+        for(const auto& base : cur->bases()) {
+            InsertVtblPtr(stmt, base.getType()->getAsCXXRecordDecl(), bodyStmts);
+        }
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody)
 {
     OutputFormatHelper initOutputFormatHelper{};
@@ -565,26 +586,12 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
                 insertFields(baseType->getAsRecordDecl());
             }
 
-            auto insertVtblPtr = [&](const CXXRecordDecl* cur) {
-                if(cur->isPolymorphic() and (0 == cur->getNumBases())) {
-                    auto* fieldDecl     = VtableData().VtblPtrField(cur);
-                    auto* lhsMemberExpr = AccessMember(kwInternalThis, fieldDecl, Ptr(GetRecordDeclType(cur)));
-
-                    // struct __mptr *__ptbl_vec__c___src_C_[]
-                    auto* vtablAr      = VtableData().VtblArrayVar(1);
-                    auto* vtblArrayPos = ArraySubscript(
-                        mkDeclRefExpr(vtablAr), GetGlobalVtablePos(stmt->getParent(), cur), fieldDecl->getType());
-
-                    bodyStmts.AddBodyStmts(Assign(lhsMemberExpr, fieldDecl, vtblArrayPos));
-                }
-            };
-
             // insert our vtable pointer
-            insertVtblPtr(stmt->getParent());
+            InsertVtblPtr(stmt, stmt->getParent(), bodyStmts);
 
             // in case of multi inheritance insert additional vtable pointers
             for(const auto& base : parent->bases()) {
-                insertVtblPtr(base.getType()->getAsCXXRecordDecl());
+                InsertVtblPtr(stmt, base.getType()->getAsCXXRecordDecl(), bodyStmts);
             }
 
             // insert own fields
