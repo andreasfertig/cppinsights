@@ -1262,7 +1262,7 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
         HandleLocalStaticNonTrivialClass(stmt);
 
     } else {
-        if(InsertVarDecl()) {
+        if(InsertVarDecl(stmt)) {
             const auto desugaredType = GetType(GetDesugarType(stmt->getType()));
 
             const bool isMemberPointer{isa<MemberPointerType>(desugaredType.getTypePtrOrNull())};
@@ -2542,7 +2542,8 @@ void CodeGenerator::InsertArg(const ForStmt* stmt)
             WrapInParens(
                 [&]() {
                     if(const auto* init = stmt->getInit()) {
-                        MultiStmtDeclCodeGenerator codeGenerator{mOutputFormatHelper, mLambdaStack, InsertVarDecl()};
+                        MultiStmtDeclCodeGenerator codeGenerator{
+                            mOutputFormatHelper, mLambdaStack, InsertVarDecl(nullptr)};
                         codeGenerator.InsertArg(init);
 
                     } else {

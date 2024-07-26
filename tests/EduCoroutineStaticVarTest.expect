@@ -1,0 +1,214 @@
+/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+#include <coroutine>
+#include <cstdio>
+#include <exception>
+#include <iostream>
+#include <list>
+#include <new>
+#include <string_view>
+#include <utility>
+
+using namespace std::string_literals;
+using namespace std::string_view_literals;
+
+struct Task
+{
+  struct promise_type
+  {
+    inline Task get_return_object() noexcept
+    {
+      return {};
+    }
+    
+    inline std::suspend_never initial_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline std::suspend_never final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline void return_void() noexcept
+    {
+    }
+    
+    inline void unhandled_exception() noexcept
+    {
+    }
+    
+    // inline constexpr promise_type() noexcept = default;
+  };
+  
+};
+
+
+struct Scheduler;
+
+struct awaiter : public std::suspend_always
+{
+  Scheduler * _sched;
+  inline explicit awaiter(Scheduler & sched)
+  : std::suspend_always()
+  , _sched{&sched}
+  {
+  }
+  
+  void await_suspend(std::coroutine_handle<void> coro) const noexcept;
+  
+};
+
+
+struct Scheduler
+{
+  std::list<std::coroutine_handle<void>, std::allocator<std::coroutine_handle<void> > > _tasks = std::list<std::coroutine_handle<void>, std::allocator<std::coroutine_handle<void> > >{};
+  inline bool schedule()
+  {
+    std::coroutine_handle<void> task = std::coroutine_handle<void>(this->_tasks.front());
+    this->_tasks.pop_front();
+    if(!task.done()) {
+      task.resume();
+    } 
+    
+    return !this->_tasks.empty();
+  }
+  
+  inline awaiter suspend()
+  {
+    return awaiter{*this};
+  }
+  
+  // inline ~Scheduler() noexcept = default;
+};
+
+
+void awaiter::await_suspend(std::coroutine_handle<void> coro) const noexcept
+{
+  this->_sched->_tasks.push_back(coro);
+}
+
+
+struct __taskAFrame
+{
+  void (*resume_fn)(__taskAFrame *);
+  void (*destroy_fn)(__taskAFrame *);
+  std::__coroutine_traits_sfinae<Task>::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  Scheduler & sched;
+  std::suspend_never __suspend_58_6;
+  awaiter __suspend_62_18;
+  std::suspend_never __suspend_58_6_1;
+};
+
+Task taskA(Scheduler & sched)
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __taskAFrame * __f = reinterpret_cast<__taskAFrame *>(operator new(sizeof(__taskAFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  __f->sched = std::forward<Scheduler &>(sched);
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<Task>::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __taskAResume(__taskAFrame * __f);
+  void __taskADestroy(__taskAFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__taskAResume;
+  __f->destroy_fn = &__taskADestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __taskAResume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __taskAResume(__taskAFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_taskA_1;
+      case 2: goto __resume_taskA_2;
+    }
+    
+    /* co_await EduCoroutineStaticVarTest.cpp:58 */
+    __f->__suspend_58_6 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_58_6.await_ready()) {
+      __f->__suspend_58_6.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_taskA_1:
+    __f->__suspend_58_6.await_resume();
+    std::operator<<(std::cout, std::operator""sv("Hello, from task A\n", 19UL));
+    
+    /* co_await EduCoroutineStaticVarTest.cpp:62 */
+    __f->__suspend_62_18 = __f->sched.suspend();
+    if(!__f->__suspend_62_18.await_ready()) {
+      __f->__suspend_62_18.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_taskA_2:
+    __f->__suspend_62_18.await_resume();
+    static std::basic_string<char, std::char_traits<char>, std::allocator<char> > res = {std::operator""s("a is back doing work\n", 21UL)};
+    std::operator<<(std::cout, res);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineStaticVarTest.cpp:58 */
+  __f->__suspend_58_6_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_58_6_1.await_ready()) {
+    __f->__suspend_58_6_1.await_suspend(std::coroutine_handle<Task::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    return;
+  } 
+  
+  __f->destroy_fn(__f);
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __taskADestroy(__taskAFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__taskAFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f));
+}
+
+
+int main()
+{
+  Scheduler scheduler = {{std::list<std::coroutine_handle<void>, std::allocator<std::coroutine_handle<void> > >{}}};
+  taskA(scheduler);
+  while(scheduler.schedule()) {
+  }
+  
+  return 0;
+}

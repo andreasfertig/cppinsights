@@ -281,7 +281,7 @@ public:
     void EndLifetimeScope();
 
 protected:
-    virtual bool InsertVarDecl() { return true; }
+    virtual bool InsertVarDecl(const VarDecl*) { return true; }
     virtual bool SkipSpaceAfterVarDecl() { return false; }
     virtual bool InsertComma() { return false; }
     virtual bool InsertSemi() { return true; }
@@ -500,7 +500,7 @@ protected:
     OnceFalse mInsertComma{};    //! Insert the comma after we have generated the first \c VarDecl and we are about to
                                  //! insert another one.
 
-    bool InsertVarDecl() override { return mInsertVarDecl; }
+    bool InsertVarDecl(const VarDecl*) override { return mInsertVarDecl; }
     bool InsertComma() override { return mInsertComma; }
     bool InsertSemi() override { return false; }
 };
@@ -563,7 +563,7 @@ public:
     std::string GetFrameName() const { return mFrameName; }
 
 protected:
-    bool InsertVarDecl() override { return mInsertVarDecl; }
+    bool InsertVarDecl(const VarDecl* vd) override { return mInsertVarDecl or (vd and vd->isStaticLocal()); }
     bool SkipSpaceAfterVarDecl() override { return not mInsertVarDecl; }
 
 private:

@@ -229,7 +229,7 @@ public:
     void VisitDeclRefExpr(DeclRefExpr* stmt)
     {
         if(auto* vd = dyn_cast_or_null<VarDecl>(stmt->getDecl())) {
-            RETURN_IF(not vd->isLocalVarDeclOrParm() or not Contains(mVarNamePrefix, vd));
+            RETURN_IF(not vd->isLocalVarDeclOrParm() or vd->isStaticLocal() or not Contains(mVarNamePrefix, vd));
 
             auto* memberExpr = mVarNamePrefix[vd];
 
@@ -241,6 +241,10 @@ public:
     {
         for(auto* decl : stmt->decls()) {
             if(auto* varDecl = dyn_cast_or_null<VarDecl>(decl)) {
+                if(varDecl->isStaticLocal()) {
+                    continue;
+                }
+
                 // add this point a placement-new would be appropriate for at least some cases.
 
                 auto* field  = AddField(mASTData, GetName(*varDecl), varDecl->getType());
