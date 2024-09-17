@@ -291,7 +291,9 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         # To many warnings/errors from Clang's internals
         add_definitions(-Wextra)
         add_definitions(-Wold-style-cast)
-        add_definitions(-Werror)
+        if(NOT DEBUG)
+            add_definitions(-Werror)
+        endif ()
     endif ()
 
     if(IS_GNU AND NOT INSIGHTS_TIDY)
@@ -308,6 +310,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     if(DEBUG)
         add_definitions(-D INSIGHTS_DEBUG)
         add_definitions(-O0)
+        add_definitions(-g)
     endif()
 
     if(WIN32)
