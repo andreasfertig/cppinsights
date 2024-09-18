@@ -34,12 +34,6 @@ inline void FunA(A * __this)
   puts("fun a");
 }
 
-inline A * operatorEqual(A * __this, const A * __rhs)
-{
-  __this->md = __rhs->md;
-  return __this;
-}
-
 inline A * Constructor_A(A * __this)
 {
   __this->__vptrA = __vtbl_array[0];
@@ -61,22 +55,6 @@ inline void FunB(B * __this)
 
 inline void OtherB(B * __this)
 {
-}
-
-inline B * operatorEqual(B * __this, const B * __rhs)
-{
-  __this->md = __rhs->md;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->mX = __rhs->mX;
-  return __this;
-}
-
-inline B * operatorEqual(B * __this, B * __rhs)
-{
-  __this->md = __rhs->md;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->mX = __rhs->mX;
-  return __this;
 }
 
 inline void Destructor_B(B * __this)
@@ -110,22 +88,6 @@ inline void OtherC(C * __this)
 {
 }
 
-inline C * operatorEqual(C * __this, const C * __rhs)
-{
-  __this->mX = __rhs->mX;
-  operatorEqual((B *)__this, (B *)__rhs);
-  __this->mB = __rhs->mB;
-  return __this;
-}
-
-inline C * operatorEqual(C * __this, C * __rhs)
-{
-  __this->mX = __rhs->mX;
-  operatorEqual((B *)__this, (B *)__rhs);
-  __this->mB = __rhs->mB;
-  return __this;
-}
-
 inline void Destructor_C(C * __this)
 {
   Destructor_B((B *)__this);
@@ -134,7 +96,6 @@ inline void Destructor_C(C * __this)
 inline C * Constructor_C(C * __this)
 {
   Constructor_B((B *)__this);
-  __this->mX = 5;
   __this->__vptrA = __vtbl_array[2];
   __this->mB = 8;
   return __this;

@@ -26,16 +26,6 @@ inline WithDefaultCtor * Constructor_WithDefaultCtor(WithDefaultCtor * __this)
   return __this;
 }
 
-inline WithDefaultCtor * operatorEqual(WithDefaultCtor * __this, const WithDefaultCtor * __rhs)
-{
-  return __this;
-}
-
-inline WithDefaultCtor * operatorEqual(WithDefaultCtor * __this, WithDefaultCtor * __rhs)
-{
-  return __this;
-}
-
 
 typedef struct Type
 {
@@ -51,11 +41,6 @@ inline void Destructor_Type(Type * __this)
 {
 }
 
-inline Type * operatorEqual(Type * __this, const Type * __rhs)
-{
-  return __this;
-}
-
 
 typedef struct Base
 {
@@ -65,12 +50,6 @@ typedef struct Base
 
 inline void Destructor_Base(Base * __this)
 {
-}
-
-inline Base * operatorEqual(Base * __this, const Base * __rhs)
-{
-  operatorEqual(&__this->mY, &__rhs->mY);
-  return __this;
 }
 
 inline Base * Constructor_Base(Base * __this)
@@ -89,12 +68,6 @@ typedef struct BaseSecond
 
 inline void Destructor_BaseSecond(BaseSecond * __this)
 {
-}
-
-inline BaseSecond * operatorEqual(BaseSecond * __this, const BaseSecond * __rhs)
-{
-  operatorEqual(&__this->mX, &__rhs->mX);
-  return __this;
 }
 
 inline BaseSecond * Constructor_BaseSecond(BaseSecond * __this)
@@ -122,23 +95,10 @@ inline void Destructor_Derived(Derived * __this)
   Destructor_Base((Base *)__this);
 }
 
-inline Derived * operatorEqual(Derived * __this, const Derived * __rhs)
-{
-  operatorEqual(&__this->mY, &__rhs->mY);
-  operatorEqual((Base *)__this, (Base *)__rhs);
-  operatorEqual(&__this->mX, &__rhs->mX);
-  operatorEqual((BaseSecond *)((char*)__this+16), (BaseSecond *)((char*)__rhs+16));
-  __this->mD = __rhs->mD;
-  operatorEqual(&__this->mWd, &__rhs->mWd);
-  return __this;
-}
-
 inline Derived * Constructor_Derived(Derived * __this)
 {
   Constructor_Base((Base *)__this);
-  Constructor_Type(&__this->mY, 5);
   Constructor_BaseSecond((BaseSecond *)__this);
-  Constructor_Type(&__this->mX, 5);
   __this->__vptrBase = __vtbl_array[2];
   __this->__vptrBaseSecond = __vtbl_array[3];
   Constructor_WithDefaultCtor(&__this->mWd);

@@ -461,6 +461,10 @@ static void InsertVtblPtr(const CXXMethodDecl* stmt, const CXXRecordDecl* cur, S
 
 void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBody)
 {
+    // Skip if he method is unused like assignment operators by default.
+    RETURN_IF(not stmt->isUsed() and
+              (IsCopyOrMoveAssign(stmt) or (not stmt->hasBody() and not isa<CXXConstructorDecl>(stmt))));
+
     OutputFormatHelper initOutputFormatHelper{};
     initOutputFormatHelper.SetIndent(mOutputFormatHelper, OutputFormatHelper::SkipIndenting::Yes);
 
@@ -503,8 +507,6 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
         for(const auto& base : parent->bases()) {
             const auto rd = base.getType()->getAsRecordDecl();
 
-            insertFields(rd);
-
             auto* lhsCast    = StaticCast(GetRecordDeclType(rd), thisOfParent, true);
             auto* rhsDeclRef = mkVarDeclRefExpr("__rhs"sv, parentType);
             auto* rhsCast    = StaticCast(GetRecordDeclType(rd), rhsDeclRef, true);
@@ -520,7 +522,6 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
 
     // Skip ctor for trivial types
     if(const auto* ctorDecl = dyn_cast_or_null<CXXConstructorDecl>(stmt)) {
-
         const auto* parent = stmt->getParent();
 
         if(not stmt->doesThisDeclarationHaveABody()) {
@@ -582,8 +583,6 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
                    baseRd and baseRd->hasNonTrivialDefaultConstructor()) {
                     bodyStmts.AddBodyStmts(CallConstructor(baseType, Ptr(baseType), nullptr, {}, DoCast::Yes));
                 }
-
-                insertFields(baseType->getAsRecordDecl());
             }
 
             // insert our vtable pointer

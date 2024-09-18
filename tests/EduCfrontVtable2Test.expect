@@ -29,18 +29,6 @@ inline void vA(A * __this)
   puts("A->v");
 }
 
-inline A * operatorEqual(A * __this, const A * __rhs)
-{
-  __this->a = __rhs->a;
-  return __this;
-}
-
-inline A * operatorEqual(A * __this, A * __rhs)
-{
-  __this->a = __rhs->a;
-  return __this;
-}
-
 inline A * Constructor_A(A * __this)
 {
   __this->__vptrA = __vtbl_array[0];
@@ -57,18 +45,6 @@ typedef struct B
 inline void wB(B * __this)
 {
   puts("B->w");
-}
-
-inline B * operatorEqual(B * __this, const B * __rhs)
-{
-  __this->b = __rhs->b;
-  return __this;
-}
-
-inline B * operatorEqual(B * __this, B * __rhs)
-{
-  __this->b = __rhs->b;
-  return __this;
 }
 
 inline B * Constructor_B(B * __this)
@@ -92,26 +68,6 @@ inline void wC(C * __this)
   puts("C->w");
 }
 
-inline C * operatorEqual(C * __this, const C * __rhs)
-{
-  __this->a = __rhs->a;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->b = __rhs->b;
-  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
-  __this->c = __rhs->c;
-  return __this;
-}
-
-inline C * operatorEqual(C * __this, C * __rhs)
-{
-  __this->a = __rhs->a;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->b = __rhs->b;
-  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
-  __this->c = __rhs->c;
-  return __this;
-}
-
 inline C * Constructor_C(C * __this)
 {
   Constructor_A((A *)__this);
@@ -130,26 +86,6 @@ typedef struct D
   int b;
   int d;
 } D;
-
-inline D * operatorEqual(D * __this, const D * __rhs)
-{
-  __this->a = __rhs->a;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->b = __rhs->b;
-  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
-  __this->d = __rhs->d;
-  return __this;
-}
-
-inline D * operatorEqual(D * __this, D * __rhs)
-{
-  __this->a = __rhs->a;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->b = __rhs->b;
-  operatorEqual((B *)((char*)__this+16), (B *)((char*)__rhs+16));
-  __this->d = __rhs->d;
-  return __this;
-}
 
 inline D * Constructor_D(D * __this)
 {

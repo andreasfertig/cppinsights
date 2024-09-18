@@ -33,28 +33,11 @@ inline void Destructor_Type(Type * __this)
 {
 }
 
-inline Type * operatorEqual(Type * __this, const Type * __rhs)
-{
-  __this->tint = __rhs->tint;
-  __this->oint = __rhs->oint;
-  return __this;
-}
-
 
 typedef struct DefaultCtorType
 {
   char __dummy;
 } DefaultCtorType;
-
-inline DefaultCtorType * operatorEqual(DefaultCtorType * __this, const DefaultCtorType * __rhs)
-{
-  return __this;
-}
-
-inline DefaultCtorType * operatorEqual(DefaultCtorType * __this, DefaultCtorType * __rhs)
-{
-  return __this;
-}
 
 
 typedef struct Base
@@ -65,12 +48,6 @@ typedef struct Base
 
 inline void Destructor_Base(Base * __this)
 {
-}
-
-inline Base * operatorEqual(Base * __this, const Base * __rhs)
-{
-  operatorEqual(&__this->mX, &__rhs->mX);
-  return __this;
 }
 
 inline Base * Constructor_Base(Base * __this)
@@ -93,18 +70,9 @@ inline void Destructor_BaseSecond(BaseSecond * __this)
   Destructor_Base((Base *)__this);
 }
 
-inline BaseSecond * operatorEqual(BaseSecond * __this, const BaseSecond * __rhs)
-{
-  operatorEqual(&__this->mX, &__rhs->mX);
-  operatorEqual((Base *)__this, (Base *)__rhs);
-  operatorEqual(&__this->mY, &__rhs->mY);
-  return __this;
-}
-
 inline BaseSecond * Constructor_BaseSecond(BaseSecond * __this)
 {
   Constructor_Base((Base *)__this);
-  Constructor_Type(&__this->mX, 5);
   __this->__vptrBase = __vtbl_array[1];
   Constructor_Type(&__this->mY, 5);
   return __this;
@@ -119,12 +87,6 @@ typedef struct BaseThird
 
 inline void Destructor_BaseThird(BaseThird * __this)
 {
-}
-
-inline BaseThird * operatorEqual(BaseThird * __this, const BaseThird * __rhs)
-{
-  operatorEqual(&__this->mZ, &__rhs->mZ);
-  return __this;
 }
 
 inline BaseThird * Constructor_BaseThird(BaseThird * __this)
@@ -154,24 +116,10 @@ inline void Destructor_Derived(Derived * __this)
   Destructor_BaseSecond((BaseSecond *)__this);
 }
 
-inline Derived * operatorEqual(Derived * __this, const Derived * __rhs)
-{
-  operatorEqual(&__this->mY, &__rhs->mY);
-  operatorEqual((BaseSecond *)__this, (BaseSecond *)__rhs);
-  operatorEqual(&__this->mZ, &__rhs->mZ);
-  operatorEqual((BaseThird *)((char*)__this+16), (BaseThird *)((char*)__rhs+16));
-  __this->mD = __rhs->mD;
-  operatorEqual(&__this->dt, &__rhs->dt);
-  __this->g = __rhs->g;
-  return __this;
-}
-
 inline Derived * Constructor_Derived(Derived * __this)
 {
   Constructor_BaseSecond((BaseSecond *)__this);
-  Constructor_Type(&__this->mY, 5);
   Constructor_BaseThird((BaseThird *)__this);
-  Constructor_Type(&__this->mZ, 5);
   __this->__vptrBase = __vtbl_array[3];
   __this->__vptrBaseThird = __vtbl_array[4];
   /* dt // trivial type, maybe uninitialized */

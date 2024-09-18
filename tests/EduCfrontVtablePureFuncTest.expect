@@ -26,24 +26,10 @@ typedef struct A
   double md;
 } A;
 
-void FunA(A * __this);
-
 inline A * Constructor_A(A * __this)
 {
   __this->__vptrA = __vtbl_array[0];
   (*((void (*)(A *))((__this)->__vptrA[0]).f))((((A *)(char *)(__this)) + ((__this)->__vptrA[0]).d));
-  return __this;
-}
-
-inline A * operatorEqual(A * __this, const A * __rhs)
-{
-  __this->md = __rhs->md;
-  return __this;
-}
-
-inline A * operatorEqual(A * __this, A * __rhs)
-{
-  __this->md = __rhs->md;
   return __this;
 }
 
@@ -62,22 +48,6 @@ inline void FunB(B * __this)
 
 inline void OtherB(B * __this)
 {
-}
-
-inline B * operatorEqual(B * __this, const B * __rhs)
-{
-  __this->md = __rhs->md;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->mX = __rhs->mX;
-  return __this;
-}
-
-inline B * operatorEqual(B * __this, B * __rhs)
-{
-  __this->md = __rhs->md;
-  operatorEqual((A *)__this, (A *)__rhs);
-  __this->mX = __rhs->mX;
-  return __this;
 }
 
 inline B * Constructor_B(B * __this)
