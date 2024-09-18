@@ -63,15 +63,6 @@ inline Other * Constructor_Other(Other * __this, int xy)
   return __this;
 }
 
-inline Other * operatorEqual(Other * __this, Other * __rhs)
-{
-  operatorEqual(&__this->mA, &__rhs->mA);
-  __this->y = __rhs->y;
-  return __this;
-}
-
-inline void Destructor_Other(Other * __this);
-
 
 int __main(void)
 {

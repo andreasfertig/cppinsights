@@ -28,11 +28,6 @@ inline void Destructor_Base(Base * __this)
   puts("~Base");
 }
 
-inline Base * operatorEqual(Base * __this, const Base * __rhs)
-{
-  return __this;
-}
-
 inline Base * Constructor_Base(Base * __this)
 {
   __this->__vptrBase = __vtbl_array[0];
@@ -49,12 +44,6 @@ inline void Destructor_Derived(Derived * __this)
 {
   puts("~Derived");
   Destructor_Base((Base *)__this);
-}
-
-inline Derived * operatorEqual(Derived * __this, const Derived * __rhs)
-{
-  operatorEqual((Base *)__this, (Base *)__rhs);
-  return __this;
 }
 
 inline Derived * Constructor_Derived(Derived * __this)

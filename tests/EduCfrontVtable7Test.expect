@@ -34,12 +34,6 @@ inline void FunFruit(Fruit * __this)
   puts("Fruit's Fun");
 }
 
-inline Fruit * operatorEqual(Fruit * __this, const Fruit * __rhs)
-{
-  __this->md = __rhs->md;
-  return __this;
-}
-
 inline Fruit * Constructor_Fruit(Fruit * __this)
 {
   __this->__vptrFruit = __vtbl_array[0];
@@ -57,22 +51,6 @@ typedef struct Apple
 inline void FunApple(Apple * __this)
 {
   printf("Apple's Fun: %d\n", __this->mX);
-}
-
-inline Apple * operatorEqual(Apple * __this, const Apple * __rhs)
-{
-  __this->md = __rhs->md;
-  operatorEqual((Fruit *)__this, (Fruit *)__rhs);
-  __this->mX = __rhs->mX;
-  return __this;
-}
-
-inline Apple * operatorEqual(Apple * __this, Apple * __rhs)
-{
-  __this->md = __rhs->md;
-  operatorEqual((Fruit *)__this, (Fruit *)__rhs);
-  __this->mX = __rhs->mX;
-  return __this;
 }
 
 inline void Destructor_Apple(Apple * __this)
@@ -102,22 +80,6 @@ inline void FunPinkLady(PinkLady * __this)
   printf("Pink Ladies Fun: %d\n", __this->mApple);
 }
 
-inline PinkLady * operatorEqual(PinkLady * __this, const PinkLady * __rhs)
-{
-  __this->mX = __rhs->mX;
-  operatorEqual((Apple *)__this, (Apple *)__rhs);
-  __this->mApple = __rhs->mApple;
-  return __this;
-}
-
-inline PinkLady * operatorEqual(PinkLady * __this, PinkLady * __rhs)
-{
-  __this->mX = __rhs->mX;
-  operatorEqual((Apple *)__this, (Apple *)__rhs);
-  __this->mApple = __rhs->mApple;
-  return __this;
-}
-
 inline void Destructor_PinkLady(PinkLady * __this)
 {
   Destructor_Apple((Apple *)__this);
@@ -126,7 +88,6 @@ inline void Destructor_PinkLady(PinkLady * __this)
 inline PinkLady * Constructor_PinkLady(PinkLady * __this)
 {
   Constructor_Apple((Apple *)__this);
-  __this->mX = 5;
   __this->__vptrFruit = __vtbl_array[2];
   __this->mApple = 8;
   return __this;

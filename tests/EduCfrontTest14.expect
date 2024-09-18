@@ -35,11 +35,6 @@ inline B * MoveConstructor_B(B * __this, B * __rhs)
   return __this;
 }
 
-inline B * operatorEqual(B * __this, const B * __rhs)
-{
-  return __this;
-}
-
 
 int __main(void)
 {
