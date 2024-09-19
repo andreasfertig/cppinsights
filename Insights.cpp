@@ -18,6 +18,8 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 #include "CodeGenerator.h"
 #include "DPrint.h"
@@ -57,6 +59,9 @@ static llvm::cl::opt<bool> gStdinMode("stdin",
 
 static llvm::cl::opt<bool>
     gUseLibCpp("use-libc++", llvm::cl::desc("Use libc++."sv), llvm::cl::init(false), llvm::cl::cat(gInsightCategory));
+
+static llvm::cl::opt<std::string>
+    gOutput("output", llvm::cl::desc("Redirect output into a file."sv), llvm::cl::init(""), llvm::cl::cat(gInsightCategory));
 //-----------------------------------------------------------------------------
 
 #define INSIGHTS_OPT(option, name, deflt, description, category)                                                       \
@@ -298,6 +303,32 @@ public:
 };
 //-----------------------------------------------------------------------------
 
+// https://stackoverflow.com/a/76507816
+class hijack_raw_fd_ostream : public llvm::raw_fd_ostream {
+public:
+  std::stringstream mSs;
+  explicit hijack_raw_fd_ostream()
+    : llvm::raw_fd_ostream(-1, false, false) {
+  }
+
+protected:
+
+  void write_impl(const char *Ptr, size_t Size) override {
+    std::string_view sv(Ptr, Ptr + Size);
+    mSs << sv;
+  }
+
+  uint64_t current_pos() const override {
+    llvm::report_fatal_error("current_pos not implemented!");
+  }
+
+  size_t preferred_buffer_size() const override {
+    return 0;
+  }
+} hijack_stream;
+
+static std::stringstream ss;
+
 class CppInsightFrontendAction final : public ASTFrontendAction
 {
     Rewriter                 mRewriter{};
@@ -307,7 +338,9 @@ public:
     CppInsightFrontendAction() = default;
     void EndSourceFileAction() override
     {
-        mRewriter.getEditBuffer(mRewriter.getSourceMgr().getMainFileID()).write(llvm::outs());
+        mRewriter.getEditBuffer(mRewriter.getSourceMgr().getMainFileID()).write(hijack_stream);
+        ss << hijack_stream.mSs.str();
+        hijack_stream.mSs = {};
     }
 
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& CI, StringRef /*file*/) override
@@ -455,6 +488,20 @@ extern struct __mptr* __vtbl_array[];
         EnableGlobalInsert(FuncCxaAtExit);
     }
 
-    return tool.run(newFrontendActionFactory<CppInsightFrontendAction>().get());
+    int status = tool.run(newFrontendActionFactory<CppInsightFrontendAction>().get());
+    if (status)
+        return status;
+    std::string fname = gOutput.getValue();
+    if (fname == "") {
+        std::cout << ss.str();
+    } else {
+        std::fstream f;
+        f.open(fname, std::ios::out);
+        if (f.fail())
+            return 1;
+        f << ss.str();
+    }
+    ss = {};
+    return status;
 }
 //-----------------------------------------------------------------------------
