@@ -10,6 +10,16 @@
 #define INSIGHTS_OPT(opt, name, deflt, description, category)
 #endif
 
+INSIGHTS_OPT("stdin",
+             StdinMode,
+             false,
+             "Read the input from <stdin>.",
+             gInsightCategory)
+INSIGHTS_OPT("use-libc++",
+             UseLibCpp,
+             false,
+             "Use libc++.",
+             gInsightCategory)
 INSIGHTS_OPT("alt-syntax-for",
              UseAltForSyntax,
              false,
