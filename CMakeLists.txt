@@ -694,7 +694,7 @@ if (NOT WIN32)
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh ${CMAKE_CURRENT_BINARY_DIR}/docker_build compile "-DINSIGHTS_STATIC=${INSIGHTS_STATIC} -DINSIGHTS_COVERAGE=${INSIGHTS_COVERAGE} -DDEBUG=${DEBUG} -DINSIGHTS_TIDY=${INSIGHTS_TIDY} -DINSIGHTS_USE_LIBCPP=${INSIGHTS_USE_LIBCPP}"
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/scripts/docker-shell.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMENT "Bulding insights in docker" VERBATIM
+        COMMENT "Building insights in docker" VERBATIM
     )
 
     # open a shell in the docker container
