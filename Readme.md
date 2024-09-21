@@ -244,6 +244,11 @@ Insights - Docker](https://github.com/andreasfertig/cppinsights-docker)
 A plugin for Vim is available at
 [here](https://github.com/Freed-Wu/cppinsights.vim).
 
+### C++ Insights @ Neovim
+
+A plugin for Neovim is available at
+[here](https://github.com/Freed-Wu/cppinsights.nvim).
+
 ### C++ Insights @ VSCode
 
 An extension for Visual Studio Code is available at the VS Code marketplace: [C++
