@@ -312,9 +312,11 @@ void __get_randomResume(__get_randomFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:77 */
   __f->__suspend_77_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_77_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_77_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 2;
-    return;
+    if(__f->__suspend_77_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
   } 
   
   __resume_get_random_2:
@@ -328,7 +330,7 @@ void __get_randomDestroy(__get_randomFrame * __f)
   __f->~__get_randomFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__get_randomFrame));
 }
 
 
@@ -424,9 +426,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:90 */
     __f->__suspend_90_17 = __f->v.operator co_await();
     if(!__f->__suspend_90_17.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_90_17.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 2;
-      return;
+      if(__f->__suspend_90_17.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
     } 
     
     __resume_testVarDeclAndConditional_2:
@@ -435,9 +439,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:90 */
     __f->__suspend_90_30 = __f->u.operator co_await();
     if(!__f->__suspend_90_30.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_90_30.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 3;
-      return;
+      if(__f->__suspend_90_30.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 3;
+        return;
+      } 
+      
     } 
     
     __resume_testVarDeclAndConditional_3:
@@ -447,9 +453,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:92 */
     __f->__suspend_92_14 = __f->v.operator co_await();
     if(!__f->__suspend_92_14.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_92_14.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 4;
-      return;
+      if(__f->__suspend_92_14.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 4;
+        return;
+      } 
+      
     } 
     
     __resume_testVarDeclAndConditional_4:
@@ -458,9 +466,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:92 */
     __f->__suspend_92_27 = __f->v.operator co_await();
     if(!__f->__suspend_92_27.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_92_27.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 5;
-      return;
+      if(__f->__suspend_92_27.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 5;
+        return;
+      } 
+      
     } 
     
     __resume_testVarDeclAndConditional_5:
@@ -469,9 +479,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:92 */
     __f->__suspend_92_42 = __f->v.operator co_await();
     if(!__f->__suspend_92_42.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_92_42.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 6;
-      return;
+      if(__f->__suspend_92_42.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 6;
+        return;
+      } 
+      
     } 
     
     __resume_testVarDeclAndConditional_6:
@@ -481,9 +493,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:94 */
     __f->__suspend_94_22 = __f->v.operator co_await();
     if(!__f->__suspend_94_22.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_94_22.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 7;
-      return;
+      if(__f->__suspend_94_22.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 7;
+        return;
+      } 
+      
     } 
     
     __resume_testVarDeclAndConditional_7:
@@ -504,9 +518,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:85 */
   __f->__suspend_85_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_85_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_85_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 8;
-    return;
+    if(__f->__suspend_85_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 8;
+      return;
+    } 
+    
   } 
   
   __resume_testVarDeclAndConditional_8:
@@ -520,7 +536,7 @@ void __testVarDeclAndConditionalDestroy(__testVarDeclAndConditionalFrame * __f)
   __f->~__testVarDeclAndConditionalFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__testVarDeclAndConditionalFrame));
 }
 
 
@@ -607,9 +623,11 @@ void __testIfStmtResume(__testIfStmtFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:101 */
     __f->__suspend_101_8 = __f->v.operator co_await();
     if(!__f->__suspend_101_8.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_101_8.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 2;
-      return;
+      if(__f->__suspend_101_8.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
     } 
     
     __resume_testIfStmt_2:
@@ -618,9 +636,11 @@ void __testIfStmtResume(__testIfStmtFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:101 */
     __f->__suspend_101_21 = __f->u.operator co_await();
     if(!__f->__suspend_101_21.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_101_21.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 3;
-      return;
+      if(__f->__suspend_101_21.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 3;
+        return;
+      } 
+      
     } 
     
     __resume_testIfStmt_3:
@@ -630,9 +650,11 @@ void __testIfStmtResume(__testIfStmtFrame * __f)
       /* co_await EduCoroutineExprTest.cpp:103 */
       __f->__suspend_103_19 = __f->v.operator co_await();
       if(!__f->__suspend_103_19.await_ready()) {
-        __builtin_coro_resume(__f->__suspend_103_19.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-        __f->__suspend_index = 4;
-        return;
+        if(__f->__suspend_103_19.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+          __f->__suspend_index = 4;
+          return;
+        } 
+        
       } 
       
       __resume_testIfStmt_4:
@@ -643,9 +665,11 @@ void __testIfStmtResume(__testIfStmtFrame * __f)
       /* co_await EduCoroutineExprTest.cpp:105 */
       __f->__suspend_105_18 = __f->v.operator co_await();
       if(!__f->__suspend_105_18.await_ready()) {
-        __builtin_coro_resume(__f->__suspend_105_18.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-        __f->__suspend_index = 5;
-        return;
+        if(__f->__suspend_105_18.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+          __f->__suspend_index = 5;
+          return;
+        } 
+        
       } 
       
       __resume_testIfStmt_5:
@@ -669,9 +693,11 @@ void __testIfStmtResume(__testIfStmtFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:96 */
   __f->__suspend_96_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_96_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_96_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 6;
-    return;
+    if(__f->__suspend_96_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 6;
+      return;
+    } 
+    
   } 
   
   __resume_testIfStmt_6:
@@ -685,7 +711,7 @@ void __testIfStmtDestroy(__testIfStmtFrame * __f)
   __f->~__testIfStmtFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__testIfStmtFrame));
 }
 
 
@@ -760,9 +786,11 @@ void __testCallExprResume(__testCallExprFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:115 */
     __f->__suspend_115_10 = __f->v.operator co_await();
     if(!__f->__suspend_115_10.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_115_10.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 2;
-      return;
+      if(__f->__suspend_115_10.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
     } 
     
     __resume_testCallExpr_2:
@@ -784,9 +812,11 @@ void __testCallExprResume(__testCallExprFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:111 */
   __f->__suspend_111_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_111_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_111_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 3;
-    return;
+    if(__f->__suspend_111_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 3;
+      return;
+    } 
+    
   } 
   
   __resume_testCallExpr_3:
@@ -800,7 +830,7 @@ void __testCallExprDestroy(__testCallExprFrame * __f)
   __f->~__testCallExprFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__testCallExprFrame));
 }
 
 
@@ -875,9 +905,11 @@ void __testSwitchResume(__testSwitchFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:124 */
     __f->__suspend_124_12 = __f->v.operator co_await();
     if(!__f->__suspend_124_12.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_124_12.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 2;
-      return;
+      if(__f->__suspend_124_12.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
     } 
     
     __resume_testSwitch_2:
@@ -901,9 +933,11 @@ void __testSwitchResume(__testSwitchFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:120 */
   __f->__suspend_120_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_120_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_120_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 3;
-    return;
+    if(__f->__suspend_120_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 3;
+      return;
+    } 
+    
   } 
   
   __resume_testSwitch_3:
@@ -917,7 +951,7 @@ void __testSwitchDestroy(__testSwitchFrame * __f)
   __f->~__testSwitchFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__testSwitchFrame));
 }
 
 
@@ -993,9 +1027,11 @@ void __testWhileResume(__testWhileFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:135 */
     __f->__suspend_135_11 = __f->v.operator co_await();
     if(!__f->__suspend_135_11.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_135_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 2;
-      return;
+      if(__f->__suspend_135_11.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
     } 
     
     __resume_testWhile_2:
@@ -1020,9 +1056,11 @@ void __testWhileResume(__testWhileFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:131 */
   __f->__suspend_131_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_131_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_131_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 3;
-    return;
+    if(__f->__suspend_131_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 3;
+      return;
+    } 
+    
   } 
   
   __resume_testWhile_3:
@@ -1036,7 +1074,7 @@ void __testWhileDestroy(__testWhileFrame * __f)
   __f->~__testWhileFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__testWhileFrame));
 }
 
 
@@ -1112,9 +1150,11 @@ void __testDoWhileResume(__testDoWhileFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:148 */
     __f->__suspend_148_13 = __f->v.operator co_await();
     if(!__f->__suspend_148_13.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_148_13.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 2;
-      return;
+      if(__f->__suspend_148_13.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
     } 
     
     __resume_testDoWhile_2:
@@ -1139,9 +1179,11 @@ void __testDoWhileResume(__testDoWhileFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:142 */
   __f->__suspend_142_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_142_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_142_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 3;
-    return;
+    if(__f->__suspend_142_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 3;
+      return;
+    } 
+    
   } 
   
   __resume_testDoWhile_3:
@@ -1155,7 +1197,7 @@ void __testDoWhileDestroy(__testDoWhileFrame * __f)
   __f->~__testDoWhileFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__testDoWhileFrame));
 }
 
 
@@ -1239,9 +1281,11 @@ void __testForLoopResume(__testForLoopFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:159 */
     __f->__suspend_159_9 = __f->v.operator co_await();
     if(!__f->__suspend_159_9.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_159_9.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 2;
-      return;
+      if(__f->__suspend_159_9.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 2;
+        return;
+      } 
+      
     } 
     
     __resume_testForLoop_2:
@@ -1250,9 +1294,11 @@ void __testForLoopResume(__testForLoopFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:159 */
     __f->__suspend_159_26 = __f->v.operator co_await();
     if(!__f->__suspend_159_26.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_159_26.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 3;
-      return;
+      if(__f->__suspend_159_26.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 3;
+        return;
+      } 
+      
     } 
     
     __resume_testForLoop_3:
@@ -1261,9 +1307,11 @@ void __testForLoopResume(__testForLoopFrame * __f)
     /* co_await EduCoroutineExprTest.cpp:159 */
     __f->__suspend_159_38 = __f->v.operator co_await();
     if(!__f->__suspend_159_38.await_ready()) {
-      __builtin_coro_resume(__f->__suspend_159_38.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-      __f->__suspend_index = 4;
-      return;
+      if(__f->__suspend_159_38.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+        __f->__suspend_index = 4;
+        return;
+      } 
+      
     } 
     
     __resume_testForLoop_4:
@@ -1273,9 +1321,11 @@ void __testForLoopResume(__testForLoopFrame * __f)
       /* co_await EduCoroutineExprTest.cpp:161 */
       __f->__suspend_161_9 = __f->v.operator co_await();
       if(!__f->__suspend_161_9.await_ready()) {
-        __builtin_coro_resume(__f->__suspend_161_9.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address());
-        __f->__suspend_index = 5;
-        return;
+        if(__f->__suspend_161_9.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>()).address()) {
+          __f->__suspend_index = 5;
+          return;
+        } 
+        
       } 
       
       __resume_testForLoop_5:
@@ -1299,9 +1349,11 @@ void __testForLoopResume(__testForLoopFrame * __f)
   /* co_await EduCoroutineExprTest.cpp:154 */
   __f->__suspend_154_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_154_11_1.await_ready()) {
-    __builtin_coro_resume(__f->__suspend_154_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
-    __f->__suspend_index = 6;
-    return;
+    if(__f->__suspend_154_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address()) {
+      __f->__suspend_index = 6;
+      return;
+    } 
+    
   } 
   
   __resume_testForLoop_6:
@@ -1315,6 +1367,6 @@ void __testForLoopDestroy(__testForLoopFrame * __f)
   __f->~__testForLoopFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__testForLoopFrame));
 }
 

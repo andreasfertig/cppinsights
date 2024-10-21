@@ -4,7 +4,7 @@
       |  ;
 .tmp.cpp:11:1: warning: typedef requires a name [-Wmissing-declarations]
    11 | typedef struct Foo
-      | ^~~~~~~
+      | ^~~~~~~~~~~~~~~~~~
 .tmp.cpp:15:3: warning: declaration does not declare anything [-Wmissing-declarations]
    15 | } Foo;
       |   ^~~

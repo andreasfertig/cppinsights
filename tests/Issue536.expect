@@ -146,7 +146,7 @@ void __coroResume(__coroFrame * __f)
     /* co_return Issue536.cpp:38 */
     __f->__promise.return_void();
     /* co_return Issue536.cpp:37 */
-    __f->__promise.return_void();
+    __f->__promise.return_void()/* implicit */;
     goto __final_suspend;
   } catch(...) {
     if(!__f->__initial_await_suspend_called) {
@@ -177,6 +177,6 @@ void __coroDestroy(__coroFrame * __f)
   __f->~__coroFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__coroFrame));
 }
 

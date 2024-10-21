@@ -16,7 +16,7 @@ def main():
 
     oldClangStable = '18'
     newClangStable = '19'
-    newInsightsVersion = f'{newClangStable}.0'
+    newInsightsVersion = f'{newClangStable}.1'
     oldInsightsVersion = re.search(r'INSIGHTS_VERSION\s+"(.*?)"', versionH, re.DOTALL | re.MULTILINE).group(1)
 
 

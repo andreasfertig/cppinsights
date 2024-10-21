@@ -9,7 +9,7 @@ int demonstrate() {
   demonstrator D;
   D.template templated_function<bool>();
   D.template templated_function<float>();
-  D.template templated_function();
+  D.template templated_function<>(); // Invalid without <> since Clang 19
   return 42;
 }
   
