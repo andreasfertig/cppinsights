@@ -180,14 +180,8 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
         case NestedNameSpecifier::NamespaceAlias: fullNamespace.append(stmt->getAsNamespaceAlias()->getName()); break;
 
         case NestedNameSpecifier::TypeSpecWithTemplate:
-            if(
-#if IS_CLANG_NEWER_THAN(17)
-                ElaboratedTypeKeyword::Typename
-#else
-                ElaboratedTypeKeyword::ETK_Typename
-#endif
-                == stmt->getAsType()->getAs<DependentTemplateSpecializationType>()->getKeyword()) {
-                fullNamespace.append(kwTemplateSpace);
+            if(auto* dependentSpecType = stmt->getAsType()->getAs<DependentTemplateSpecializationType>()) {
+                fullNamespace.append(GetElaboratedTypeKeyword(dependentSpecType->getKeyword()));
             }
 
             [[fallthrough]];

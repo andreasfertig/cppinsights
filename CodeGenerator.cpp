@@ -1729,13 +1729,26 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
             if(tt->hasDefaultArgument() and not tt->defaultArgumentWasInherited()) {
                 const auto& defaultArg = tt->getDefaultArgument();
 
-                if(const auto decltypeType = dyn_cast_or_null<DecltypeType>(defaultArg.getTypePtrOrNull())) {
+                if(const auto decltypeType = dyn_cast_or_null<DecltypeType>(defaultArg
+                                                                                .
+#if IS_CLANG_NEWER_THAN(18)
+                                                                            getArgument()
+                                                                                .getAsType()
+#else
+                                                                            getTypePtrOrNull()
+#endif
+                                                                                )) {
                     mOutputFormatHelper.Append(hlpAssing);
 
                     InsertArg(decltypeType->getUnderlyingExpr());
 
                 } else {
-                    mOutputFormatHelper.Append(hlpAssing, GetName(defaultArg));
+                    mOutputFormatHelper.Append(hlpAssing);
+                    InsertTemplateArg(defaultArg
+#if IS_CLANG_NEWER_THAN(18)
+                                          .getArgument()
+#endif
+                    );
                 }
             }
 
@@ -1752,7 +1765,11 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
 
                 if(nonTmplParam->hasDefaultArgument()) {
                     mOutputFormatHelper.Append(hlpAssing);
+#if IS_CLANG_NEWER_THAN(18)
+                    InsertTemplateArg(nonTmplParam->getDefaultArgument().getArgument());
+#else
                     InsertArg(nonTmplParam->getDefaultArgument());
+#endif
                 }
             } else {
                 mOutputFormatHelper.Append(typeName, EllipsisSpace(nonTmplParam->isParameterPack()));
@@ -3008,9 +3025,29 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
     mOutputFormatHelper.Append(kwUsingSpace, GetName(*stmt), hlpAssing);
 
     if(auto* templateSpecializationType = underlyingType->getAs<TemplateSpecializationType>()) {
+#if IS_CLANG_NEWER_THAN(18)
+        const bool carriesNamespace{[&] {
+            if(const auto tn = templateSpecializationType->getTemplateName();
+               (TemplateName::QualifiedTemplate == tn.getKind()) or (TemplateName::DependentTemplate == tn.getKind())) {
+                const auto* qtn = tn.getAsQualifiedTemplateName();
+
+                return qtn->getQualifier() != nullptr;
+            }
+
+            return false;
+        }()};
+
+        if(const auto* elaboratedType = underlyingType->getAs<ElaboratedType>()) {
+            if(templateSpecializationType->isSugared() and not carriesNamespace) {
+                // do this only if the templateSpecializationType does not carry a nestedns
+                InsertNamespace(elaboratedType->getQualifier());
+            }
+        }
+#else
         if(const auto* elaboratedType = underlyingType->getAs<ElaboratedType>()) {
             InsertNamespace(elaboratedType->getQualifier());
         }
+#endif
 
         StringStream stream{};
         stream.Print(*templateSpecializationType);
@@ -3686,7 +3723,10 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
 
     // attributes start with a space, skip it as it is not required for the first attribute
     std::string_view start{stream.str()};
+#if IS_CLANG_NEWER_THAN(18)
+#else
     start.remove_prefix(1);
+#endif
 
     mOutputFormatHelper.Append(start, " "sv);
 }
@@ -4426,12 +4466,20 @@ void CodeGenerator::InsertSuffix(const QualType& type)
 
 void CodeGenerator::InsertTemplateArgs(const ClassTemplateSpecializationDecl& clsTemplateSpe)
 {
+#if IS_CLANG_NEWER_THAN(18)
+    if(const auto* ar = clsTemplateSpe.getTemplateArgsAsWritten()) {
+        InsertTemplateArgs(ar->arguments());
+    } else {
+        InsertTemplateArgs(clsTemplateSpe.getTemplateArgs());
+    }
+#else
     if(const TypeSourceInfo* typeAsWritten = clsTemplateSpe.getTypeAsWritten()) {
         const TemplateSpecializationType* tmplSpecType = cast<TemplateSpecializationType>(typeAsWritten->getType());
         InsertTemplateArgs(*tmplSpecType);
     } else {
         InsertTemplateArgs(clsTemplateSpe.getTemplateArgs());
     }
+#endif
 }
 //-----------------------------------------------------------------------------
 
