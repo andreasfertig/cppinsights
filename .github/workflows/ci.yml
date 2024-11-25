@@ -710,7 +710,7 @@ jobs:
         npm install github-release-notes -g
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
           path: ~/binaries
 
