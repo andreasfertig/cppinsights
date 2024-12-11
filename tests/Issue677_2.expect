@@ -1,0 +1,23 @@
+template<class T>
+concept ConceptInNoExcept = true;
+
+
+template<class T>
+void FunWithConceptInNoExcept() noexcept(ConceptInNoExcept<T>)
+{
+}
+
+/* First instantiated from: Issue677_2.cpp:12 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void FunWithConceptInNoExcept<int>() noexcept(true)
+{
+}
+#endif
+
+
+int main()
+{
+  FunWithConceptInNoExcept<int>();
+  return 0;
+}
