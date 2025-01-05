@@ -3725,7 +3725,9 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
     std::string_view start{stream.str()};
 #if IS_CLANG_NEWER_THAN(18)
 #else
-    start.remove_prefix(1);
+    if(!start.empty()) {
+        start.remove_prefix(1);
+    }
 #endif
 
     mOutputFormatHelper.Append(start, " "sv);
