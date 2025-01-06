@@ -1,0 +1,21 @@
+#include <inttypes.h>
+
+static inline int clz32(unsigned int a)
+{
+  return __builtin_clz(a);
+}
+
+static inline int clz64(uint64_t a)
+{
+  return __builtin_clzll(a);
+}
+
+static inline int ctz32(unsigned int a)
+{
+  return __builtin_ctz(a);
+}
+
+static inline int ctz64(uint64_t a)
+{
+  return __builtin_ctzll(a);
+}
