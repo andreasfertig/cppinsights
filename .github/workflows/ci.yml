@@ -434,7 +434,7 @@ jobs:
         file(SHA256 "$ENV{GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }}" CHKSM)
         file(WRITE "$ENV{GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}.sha256" ${CHKSM})
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if:  matrix.config.upload == 'Yes'
       with:
         name: insights-artifact-${{ matrix.config.os }}
@@ -623,7 +623,7 @@ jobs:
         tar -cvzf ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-${{ matrix.arch }}.tar.gz ${{ matrix.config.bin_name }}
         sha256sum ${GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }} > ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-${{ matrix.arch }}.sha256
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if:  matrix.config.upload == 'Yes'
       with:
         name: insights-artifact-ubuntu-${{ matrix.arch }}
