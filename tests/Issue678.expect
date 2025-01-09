@@ -1,0 +1,23 @@
+#include <cstdio>
+
+int next()
+{
+  static int i = 1;
+  return i++;
+}
+
+int main()
+{
+  {
+    int i = next();
+    while(static_cast<bool>(i)) {
+      printf("i=%d\n", i);
+      if(i >= 10) {
+        break;
+      } 
+      
+    }
+    
+  }
+  return 0;
+}

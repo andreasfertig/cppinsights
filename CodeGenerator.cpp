@@ -555,15 +555,27 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 
 void CodeGenerator::InsertArg(const WhileStmt* stmt)
 {
+    const auto* conditionVar{stmt->getConditionVariable()};
+
     {
         // We need to handle the case that a lambda is used in the init-statement of the for-loop.
         LAMBDA_SCOPE_HELPER(VarDecl);
+
+        if(conditionVar) {
+            mOutputFormatHelper.OpenScope();
+
+            InsertArg(conditionVar);
+        }
 
         mOutputFormatHelper.Append(kwWhile);
         WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
     }
 
     WrapInCompoundIfNeeded(stmt->getBody(), AddNewLineAfter::Yes);
+
+    if(conditionVar) {
+        mOutputFormatHelper.CloseScope();
+    }
 
     mOutputFormatHelper.AppendNewLine();
 }
