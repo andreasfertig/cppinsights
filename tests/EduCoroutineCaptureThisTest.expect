@@ -119,6 +119,7 @@ inline my_resumable coro(int x)
       switch(__f->__suspend_index) {
         case 0: break;
         case 1: goto __resume_coro_1;
+        case 2: goto __resume_coro_2;
       }
       
       /* co_await EduCoroutineCaptureThisTest.cpp:31 */
@@ -150,9 +151,11 @@ inline my_resumable coro(int x)
     __f->__suspend_31_16_1 = __f->__promise.final_suspend();
     if(!__f->__suspend_31_16_1.await_ready()) {
       __f->__suspend_31_16_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 2;
       return;
     } 
     
+    __resume_coro_2:
     __f->destroy_fn(__f);
   }
   

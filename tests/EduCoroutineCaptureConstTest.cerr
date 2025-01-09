@@ -4,8 +4,8 @@
 .tmp.cpp:82:15: note: non-static data member 'start' declared const here
    82 |   const int & start;
       |   ~~~~~~~~~~~~^~~~~
-.tmp.cpp:147:12: error: no viable overloaded '='
-  147 |     __f->s = {0, '\0'};
+.tmp.cpp:148:12: error: no viable overloaded '='
+  148 |     __f->s = {0, '\0'};
       |     ~~~~~~ ^ ~~~~~~~~~
 .tmp.cpp:84:10: note: candidate function (the implicit copy assignment operator) not viable: 'this' argument has type 'const S', but method is not marked const
    84 |   struct S
