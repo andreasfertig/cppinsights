@@ -25,6 +25,7 @@ struct InsightsOptions
 
 /// \brief Get the global C++ Insights options.
 extern const InsightsOptions& GetInsightsOptions();
+extern InsightsOptions&       GetInsightsOptionsRW();
 //-----------------------------------------------------------------------------
 
 /// \brief Get access to the ASTContext

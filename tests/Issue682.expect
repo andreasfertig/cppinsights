@@ -1,0 +1,39 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void Fun()
+{
+}
+
+
+class __lambda_5_17
+{
+  public: 
+  inline /*constexpr */ bool operator()() const
+  {
+    return true;
+  }
+  
+  using retType_5_17 = auto (*)() -> bool;
+  inline constexpr operator retType_5_17 () const noexcept
+  {
+    return __invoke;
+  };
+  
+  private: 
+  static inline /*constexpr */ bool __invoke()
+  {
+    return __lambda_5_17{}.operator()();
+  }
+  
+  
+} __lambda_5_17{};
+
+/* PASSED: static_assert(__lambda_5_17.operator()()); */
+
+int main()
+{
+  Fun();
+  return 0;
+}

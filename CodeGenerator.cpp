@@ -3442,6 +3442,7 @@ void CodeGenerator::InsertArg(const StaticAssertDecl* stmt)
     mOutputFormatHelper.Append(kwStaticAssert);
 
     WrapInParens([&] {
+        BackupAndRestore _{GetInsightsOptionsRW().ShowLifetime, false};
         InsertArg(stmt->getAssertExpr());
 
         if(stmt->getMessage()) {
