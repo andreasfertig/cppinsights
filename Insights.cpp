@@ -40,6 +40,12 @@ const InsightsOptions& GetInsightsOptions()
 }
 //-----------------------------------------------------------------------------
 
+InsightsOptions& GetInsightsOptionsRW()
+{
+    return gInsightsOptions;
+}
+//-----------------------------------------------------------------------------
+
 static llvm::cl::OptionCategory gInsightCategory("Insights"sv);
 //-----------------------------------------------------------------------------
 
