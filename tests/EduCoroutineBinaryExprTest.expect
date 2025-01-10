@@ -140,6 +140,7 @@ void __seqResume(__seqFrame * __f)
       case 3: goto __resume_seq_3;
       case 4: goto __resume_seq_4;
       case 5: goto __resume_seq_5;
+      case 6: goto __resume_seq_6;
     }
     
     /* co_await EduCoroutineBinaryExprTest.cpp:35 */
@@ -216,9 +217,11 @@ void __seqResume(__seqFrame * __f)
   __f->__suspend_35_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_35_11_1.await_ready()) {
     __f->__suspend_35_11_1.await_suspend(std::coroutine_handle<generator::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    __f->__suspend_index = 6;
     return;
   } 
   
+  __resume_seq_6:
   __f->destroy_fn(__f);
 }
 

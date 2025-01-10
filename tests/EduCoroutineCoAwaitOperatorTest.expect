@@ -209,6 +209,7 @@ void __gResume(__gFrame * __f)
       case 1: goto __resume_g_1;
       case 2: goto __resume_g_2;
       case 3: goto __resume_g_3;
+      case 4: goto __resume_g_4;
     }
     
     /* co_await EduCoroutineCoAwaitOperatorTest.cpp:51 */
@@ -247,6 +248,8 @@ void __gResume(__gFrame * __f)
     __resume_g_3:
     __f->__suspend_56_14_res = __f->__suspend_56_14.await_resume();
     __f->__suspend_56_14_res;
+    /* co_return EduCoroutineCoAwaitOperatorTest.cpp:51 */
+    __f->__promise.return_void();
     goto __final_suspend;
   } catch(...) {
     if(!__f->__initial_await_suspend_called) {
@@ -262,9 +265,11 @@ void __gResume(__gFrame * __f)
   __f->__suspend_51_16_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_51_16_1.await_ready()) {
     __f->__suspend_51_16_1.await_suspend(std::coroutine_handle<my_future<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    __f->__suspend_index = 4;
     return;
   } 
   
+  __resume_g_4:
   __f->destroy_fn(__f);
 }
 

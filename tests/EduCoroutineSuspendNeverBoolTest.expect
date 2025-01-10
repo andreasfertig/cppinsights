@@ -211,6 +211,7 @@ void __fun_intResume(__fun_intFrame * __f)
       case 0: break;
       case 1: goto __resume_fun_int_1;
       case 2: goto __resume_fun_int_2;
+      case 3: goto __resume_fun_int_3;
     }
     
     /* co_await EduCoroutineSuspendNeverBoolTest.cpp:41 */
@@ -259,11 +260,13 @@ void __fun_intResume(__fun_intFrame * __f)
   __f->__suspend_41_14_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_41_14_1.await_ready()) {
     if(__f->__suspend_41_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>())) {
+      __f->__suspend_index = 3;
       return;
     } 
     
   } 
   
+  __resume_fun_int_3:
   __f->destroy_fn(__f);
 }
 

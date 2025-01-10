@@ -112,7 +112,6 @@ class CoroutineASTTransformer : public StmtVisitor<CoroutineASTTransformer>
     CoroutineASTData&                     mASTData;
     Stmt*                                 mStaged{};
     bool                                  mSkip{};
-    bool                                  mFinalSuspend{};
     size_t&                               mSuspendsCount;
     llvm::DenseMap<VarDecl*, MemberExpr*> mVarNamePrefix{};
 
@@ -320,9 +319,7 @@ public:
 
     void VisitCoawaitExpr(CoawaitExpr* stmt)
     {
-        if(not mFinalSuspend) {
-            ++mSuspendsCount;
-        }
+        ++mSuspendsCount;
 
         if(const bool returnsVoid{stmt->getResumeExpr()->getType()->isVoidType()}; returnsVoid) {
             Visit(stmt->getOperand());
@@ -391,13 +388,9 @@ public:
         Visit(stmt->getReturnValueInit());
         Visit(stmt->getExceptionHandler());
         Visit(stmt->getReturnStmtOnAllocFailure());
-
+        Visit(stmt->getFallthroughHandler());
         Visit(stmt->getInitSuspendStmt());
-
-        // final suspend point doesn't need a label
-        mFinalSuspend = true;
         Visit(stmt->getFinalSuspendStmt());
-        mFinalSuspend = false;
     }
 
     void VisitStmt(Stmt* stmt)
@@ -756,7 +749,10 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
         funcBodyStmts.Add(c);
     }
 
-    // InsertArg(stmt->getFallthroughHandler());
+    if(const auto* coReturnVoid = dyn_cast_or_null<CoreturnStmt>(stmt->getFallthroughHandler())) {
+        coReturnVoid->dump();
+        funcBodyStmts.Add(coReturnVoid);
+    }
 
     auto* gotoFinalSuspend = Goto(FINAL_SUSPEND_NAME);
     funcBodyStmts.Add(gotoFinalSuspend);
@@ -939,16 +935,14 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
     Expr*          initializeInitialAwaitResume = nullptr;
 
     auto addInitialAwaitSuspendCalled = [&] {
-        if(eState::FinalSuspend != mState) {
-            bodyStmts.Add(bop);
+        bodyStmts.Add(bop);
 
-            if(eState::InitialSuspend == mState) {
-                mState = eState::Body;
-                // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
-                initializeInitialAwaitResume =
-                    Assign(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField, Bool(true));
-                bodyStmts.Add(initializeInitialAwaitResume);
-            }
+        if(eState::InitialSuspend == mState) {
+            mState = eState::Body;
+            // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
+            initializeInitialAwaitResume =
+                Assign(mASTData.mFrameAccessDeclRef, mASTData.mInitialAwaitResumeCalledField, Bool(true));
+            bodyStmts.Add(initializeInitialAwaitResume);
         }
     };
 
@@ -974,15 +968,15 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
         mOutputFormatHelper.AppendNewLine();
     }
 
+    auto* suspendLabel = Label(BuildResumeLabelName(mSuspendsCount));
+    InsertArg(suspendLabel);
+
     if(eState::FinalSuspend == mState) {
         auto* memExpr     = AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mDestroyFnField, true);
         auto* callCoroFSM = Call(memExpr, {mASTData.mFrameAccessDeclRef});
         InsertArg(callCoroFSM);
         return;
     }
-
-    auto* suspendLabel = Label(BuildResumeLabelName(mSuspendsCount));
-    InsertArg(suspendLabel);
 
     const auto* resumeExpr = stmt->getResumeExpr();
 

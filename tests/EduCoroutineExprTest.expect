@@ -281,6 +281,7 @@ void __get_randomResume(__get_randomFrame * __f)
     switch(__f->__suspend_index) {
       case 0: break;
       case 1: goto __resume_get_random_1;
+      case 2: goto __resume_get_random_2;
     }
     
     /* co_await EduCoroutineExprTest.cpp:77 */
@@ -312,9 +313,11 @@ void __get_randomResume(__get_randomFrame * __f)
   __f->__suspend_77_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_77_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_77_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 2;
     return;
   } 
   
+  __resume_get_random_2:
   __f->destroy_fn(__f);
 }
 
@@ -401,6 +404,7 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
       case 5: goto __resume_testVarDeclAndConditional_5;
       case 6: goto __resume_testVarDeclAndConditional_6;
       case 7: goto __resume_testVarDeclAndConditional_7;
+      case 8: goto __resume_testVarDeclAndConditional_8;
     }
     
     /* co_await EduCoroutineExprTest.cpp:85 */
@@ -501,9 +505,11 @@ void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f)
   __f->__suspend_85_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_85_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_85_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 8;
     return;
   } 
   
+  __resume_testVarDeclAndConditional_8:
   __f->destroy_fn(__f);
 }
 
@@ -581,6 +587,7 @@ void __testIfStmtResume(__testIfStmtFrame * __f)
       case 3: goto __resume_testIfStmt_3;
       case 4: goto __resume_testIfStmt_4;
       case 5: goto __resume_testIfStmt_5;
+      case 6: goto __resume_testIfStmt_6;
     }
     
     /* co_await EduCoroutineExprTest.cpp:96 */
@@ -663,9 +670,11 @@ void __testIfStmtResume(__testIfStmtFrame * __f)
   __f->__suspend_96_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_96_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_96_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 6;
     return;
   } 
   
+  __resume_testIfStmt_6:
   __f->destroy_fn(__f);
 }
 
@@ -732,6 +741,7 @@ void __testCallExprResume(__testCallExprFrame * __f)
       case 0: break;
       case 1: goto __resume_testCallExpr_1;
       case 2: goto __resume_testCallExpr_2;
+      case 3: goto __resume_testCallExpr_3;
     }
     
     /* co_await EduCoroutineExprTest.cpp:111 */
@@ -775,9 +785,11 @@ void __testCallExprResume(__testCallExprFrame * __f)
   __f->__suspend_111_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_111_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_111_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 3;
     return;
   } 
   
+  __resume_testCallExpr_3:
   __f->destroy_fn(__f);
 }
 
@@ -844,6 +856,7 @@ void __testSwitchResume(__testSwitchFrame * __f)
       case 0: break;
       case 1: goto __resume_testSwitch_1;
       case 2: goto __resume_testSwitch_2;
+      case 3: goto __resume_testSwitch_3;
     }
     
     /* co_await EduCoroutineExprTest.cpp:120 */
@@ -889,9 +902,11 @@ void __testSwitchResume(__testSwitchFrame * __f)
   __f->__suspend_120_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_120_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_120_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 3;
     return;
   } 
   
+  __resume_testSwitch_3:
   __f->destroy_fn(__f);
 }
 
@@ -959,6 +974,7 @@ void __testWhileResume(__testWhileFrame * __f)
       case 0: break;
       case 1: goto __resume_testWhile_1;
       case 2: goto __resume_testWhile_2;
+      case 3: goto __resume_testWhile_3;
     }
     
     /* co_await EduCoroutineExprTest.cpp:131 */
@@ -1005,9 +1021,11 @@ void __testWhileResume(__testWhileFrame * __f)
   __f->__suspend_131_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_131_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_131_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 3;
     return;
   } 
   
+  __resume_testWhile_3:
   __f->destroy_fn(__f);
 }
 
@@ -1075,6 +1093,7 @@ void __testDoWhileResume(__testDoWhileFrame * __f)
       case 0: break;
       case 1: goto __resume_testDoWhile_1;
       case 2: goto __resume_testDoWhile_2;
+      case 3: goto __resume_testDoWhile_3;
     }
     
     /* co_await EduCoroutineExprTest.cpp:142 */
@@ -1121,9 +1140,11 @@ void __testDoWhileResume(__testDoWhileFrame * __f)
   __f->__suspend_142_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_142_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_142_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 3;
     return;
   } 
   
+  __resume_testDoWhile_3:
   __f->destroy_fn(__f);
 }
 
@@ -1199,6 +1220,7 @@ void __testForLoopResume(__testForLoopFrame * __f)
       case 3: goto __resume_testForLoop_3;
       case 4: goto __resume_testForLoop_4;
       case 5: goto __resume_testForLoop_5;
+      case 6: goto __resume_testForLoop_6;
     }
     
     /* co_await EduCoroutineExprTest.cpp:154 */
@@ -1278,9 +1300,11 @@ void __testForLoopResume(__testForLoopFrame * __f)
   __f->__suspend_154_11_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_154_11_1.await_ready()) {
     __builtin_coro_resume(__f->__suspend_154_11_1.await_suspend(std::coroutine_handle<task<int>::promise_type>::from_address(static_cast<void *>(__f))).address());
+    __f->__suspend_index = 6;
     return;
   } 
   
+  __resume_testForLoop_6:
   __f->destroy_fn(__f);
 }
 

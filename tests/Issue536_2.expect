@@ -118,6 +118,7 @@ inline my_resumable coro(int x) const
       switch(__f->__suspend_index) {
         case 0: break;
         case 1: goto __resume_coro_1;
+        case 2: goto __resume_coro_2;
       }
       
       /* co_await Issue536_2.cpp:29 */
@@ -132,6 +133,8 @@ inline my_resumable coro(int x) const
       __resume_coro_1:
       __f->__suspend_29_16.await_resume();
       /* co_return Issue536_2.cpp:30 */
+      __f->__promise.return_void();
+      /* co_return Issue536_2.cpp:29 */
       __f->__promise.return_void();
       goto __final_suspend;
     } catch(...) {
@@ -148,9 +151,11 @@ inline my_resumable coro(int x) const
     __f->__suspend_29_16_1 = __f->__promise.final_suspend();
     if(!__f->__suspend_29_16_1.await_ready()) {
       __f->__suspend_29_16_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 2;
       return;
     } 
     
+    __resume_coro_2:
     __f->destroy_fn(__f);
   }
   

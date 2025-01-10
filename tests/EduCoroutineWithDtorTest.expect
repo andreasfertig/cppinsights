@@ -207,6 +207,7 @@ void __fun_TestResume(__fun_TestFrame * __f)
     switch(__f->__suspend_index) {
       case 0: break;
       case 1: goto __resume_fun_Test_1;
+      case 2: goto __resume_fun_Test_2;
     }
     
     /* co_await EduCoroutineWithDtorTest.cpp:43 */
@@ -237,9 +238,11 @@ void __fun_TestResume(__fun_TestFrame * __f)
   __f->__suspend_43_14_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_43_14_1.await_ready()) {
     __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<Test>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    __f->__suspend_index = 2;
     return;
   } 
   
+  __resume_fun_Test_2:
   __f->destroy_fn(__f);
 }
 
