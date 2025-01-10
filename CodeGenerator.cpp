@@ -555,7 +555,8 @@ void CodeGenerator::InsertArg(const SwitchStmt* stmt)
 
 void CodeGenerator::InsertArg(const WhileStmt* stmt)
 {
-    const auto* conditionVar{stmt->getConditionVariable()};
+    auto* rwStmt = const_cast<WhileStmt*>(stmt);
+    auto* conditionVar{rwStmt->getConditionVariable()};
 
     {
         // We need to handle the case that a lambda is used in the init-statement of the for-loop.
@@ -571,7 +572,17 @@ void CodeGenerator::InsertArg(const WhileStmt* stmt)
         WrapInParens([&]() { InsertArg(stmt->getCond()); }, AddSpaceAtTheEnd::Yes);
     }
 
-    WrapInCompoundIfNeeded(stmt->getBody(), AddNewLineAfter::Yes);
+    if(not conditionVar) {
+        WrapInCompoundIfNeeded(stmt->getBody(), AddNewLineAfter::Yes);
+    } else {
+        const auto&    ctx = GetGlobalAST();
+        StmtsContainer bodyStmts{};
+
+        bodyStmts.AddBodyStmts(rwStmt->getBody());
+        bodyStmts.AddBodyStmts(Assign(conditionVar, conditionVar->getInit()));
+
+        InsertArg(mkCompoundStmt(bodyStmts, stmt->getBeginLoc(), stmt->getEndLoc()));
+    }
 
     if(conditionVar) {
         mOutputFormatHelper.CloseScope();

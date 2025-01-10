@@ -16,8 +16,8 @@ int main()
         break;
       } 
       
+      i = next();
     }
-    
   }
   return 0;
 }
