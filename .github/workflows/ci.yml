@@ -3,6 +3,8 @@ on:
   push:
     branches-ignore:
       - 'continuous'
+    tags:
+      - 'v_*'
 
   pull_request:
     branches-ignore:
@@ -689,12 +691,27 @@ jobs:
 #------------------------------------------------------------------------------
   deploy:
     needs: [build, docker, in-source-tree]
-    if: github.ref == 'refs/heads/main'
+    if: ${{ (github.ref == 'refs/heads/main') || contains(github.ref, 'refs/tags/v_') }}
     name: Final Deploy
     continue-on-error: false
     runs-on: ubuntu-22.04
 
     steps:
+    - name: Get release info
+      id: release_info
+      shell: bash
+      run: |
+        tag_name=""
+
+        if [[ "${{ github.ref }}" == *"refs/tags/v_"* ]]; then
+          tag_name="${{ github.ref_name }}"
+        else
+          tag_name="continuous"
+        fi
+
+        echo "Tag: ${tag_name}"
+        echo "tag_name=${tag_name}" >> $GITHUB_OUTPUT
+
     - uses: actions/checkout@v4
       with:
         path: cppinsights
@@ -720,10 +737,10 @@ jobs:
       shell: bash
       run: |
         cd ${GITHUB_WORKSPACE}/cppinsights
-        gren changelog --generate --override --username=andreasfertig --repo=cppinsights -t continuous..`git tag --sort=-creatordate | grep -v continuous | head -n 1 ` -c .github/grenrc.json
+        gren changelog --generate --override --username=andreasfertig --repo=cppinsights -t ${{ steps.release_info.outputs.tag_name }} --limit 1 -c .github/grenrc.json
         sed -in '1,4d' CHANGELOG.md
 
-    - name: Create Release
+    - name: Create release
       uses: ncipollo/release-action@v1
       with:
         artifacts: "/home/runner/binaries/insights-artifact-*/insights-*"
@@ -731,10 +748,10 @@ jobs:
         bodyFile: "${{ github.workspace }}/cppinsights/CHANGELOG.md"
         allowUpdates: true
         artifactErrorsFailBuild: true
-        name: continuous
-        prerelease: true
+        name: ${{ steps.release_info.outputs.tag_name }}
+        prerelease: ${{ steps.release_info.outputs.tag_name }} == 'continuous'
         removeArtifacts: true
-        tag: continuous
+        tag: ${{ steps.release_info.outputs.tag_name }}
         generateReleaseNotes: false
 
     - name: Upload docs to gh-pages

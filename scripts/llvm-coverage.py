@@ -1,4 +1,9 @@
 #! /usr/bin/env python3
+#
+#
+# C++ Insights, copyright (C) by Andreas Fertig
+# Distributed under an MIT license. See LICENSE for details
+#
 #------------------------------------------------------------------------------
 
 import os
