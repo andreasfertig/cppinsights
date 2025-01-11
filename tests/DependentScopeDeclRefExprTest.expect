@@ -116,7 +116,6 @@ namespace DependentScopeDeclRefExpr
   void test()
   {
     A<T>::foo;
-    A<T>::template foo;
     A<T>::template foo<>;
     A<T>::template foo<T>;
   }

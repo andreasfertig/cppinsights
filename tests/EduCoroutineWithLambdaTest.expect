@@ -176,7 +176,7 @@ inline generator operator()() const
         __resume_operator_45_43_2:
         __f->__suspend_45_54.await_resume();
         /* co_return EduCoroutineWithLambdaTest.cpp:45 */
-        __f->__promise.return_void();
+        __f->__promise.return_void()/* implicit */;
         goto __final_suspend;
       } catch(...) {
         if(!__f->__initial_await_suspend_called) {
@@ -207,7 +207,7 @@ inline generator operator()() const
       __f->~__operator_45_43Frame();
       /* Deallocating the coroutine frame */
       /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-      operator delete(static_cast<void *>(__f));
+      operator delete(static_cast<void *>(__f), sizeof(__operator_45_43Frame));
     }
     
     

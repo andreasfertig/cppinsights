@@ -50,7 +50,7 @@ struct A;
 template <typename T>
 void test() {
   A<T>::foo;
-  A<T>::template foo;
+  //A<T>::template foo; // Invalid since Clang 19
   A<T>::template foo<>;
   A<T>::template foo<T>;
 }

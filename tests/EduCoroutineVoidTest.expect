@@ -226,7 +226,7 @@ void __seq_intResume(__seq_intFrame * __f)
     }
     
     /* co_return EduCoroutineVoidTest.cpp:34 */
-    __f->__promise.return_void();
+    __f->__promise.return_void()/* implicit */;
     goto __final_suspend;
   } catch(...) {
     if(!__f->__initial_await_suspend_called) {
@@ -257,7 +257,7 @@ void __seq_intDestroy(__seq_intFrame * __f)
   __f->~__seq_intFrame();
   /* Deallocating the coroutine frame */
   /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
-  operator delete(static_cast<void *>(__f));
+  operator delete(static_cast<void *>(__f), sizeof(__seq_intFrame));
 }
 
 #endif

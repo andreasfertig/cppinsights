@@ -16,7 +16,7 @@ on:
 env:
   CMAKE_VERSION: 3.29.0
   NINJA_VERSION: 1.11.1
-  LLVM_VERSION: 18.1.0
+  LLVM_VERSION: 19.1.0
   NINJA_STATUS: "[%f/%t %o/sec] "
 
 jobs:
@@ -32,7 +32,7 @@ jobs:
             name: "Linux Clang - Format check",
             os: ubuntu-20.04,
             build_type: Release,
-            cformat_name: 'clang-format-18'
+            cformat_name: 'clang-format-19'
           }
 
     steps:
@@ -45,7 +45,7 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 18
+        sudo ./llvm.sh 19
         sudo apt-get install ${{ matrix.config.cformat_name }}
 
     - name: clang-format check
@@ -68,11 +68,11 @@ jobs:
         config:
         # AppleClang
         - {
-            name: "Clang 18 / LLVM 18 @ macOS Release",
+            name: "Clang 19 / LLVM 19 @ macOS Release",
             os: macos-14,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "18.1.0",
+            llvm_version: "19.1.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -87,11 +87,11 @@ jobs:
 
         # AppleClang
         - {
-            name: "Clang 18 / LLVM 18 @ macOS Debug",
+            name: "Clang 19 / LLVM 19 @ macOS Debug",
             os: macos-14,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "18.1.0",
+            llvm_version: "19.1.0",
             llvm_config: "llvm-config",
             coverage: "No",
             static: "No",
@@ -106,11 +106,11 @@ jobs:
 
         # AppleClang
         - {
-            name: "Clang 18 / LLVM 18 @ macOS Coverage & Debug",
+            name: "Clang 19 / LLVM 19 @ macOS Coverage & Debug",
             os: macos-14,
             build_type: Release,
             cxx: "clang++",
-            llvm_version: "18.1.0",
+            llvm_version: "19.1.0",
             llvm_config: "llvm-config",
             coverage: "Yes",
             static: "No",
@@ -124,11 +124,11 @@ jobs:
 
           # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 18 @ Windows Release",
+          #   name: "MSVC 2022 / LLVM 19 @ Windows Release",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "18.1.0",
+          #   llvm_version: "19.1.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "No",
@@ -143,11 +143,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-          #   name: "MSVC 2022 / LLVM 18 @ Windows Debug",
+          #   name: "MSVC 2022 / LLVM 19 @ Windows Debug",
           #   os: windows-2022,
           #   build_type: Release,
           #   cxx: "cl",
-          #   llvm_version: "18.1.0",
+          #   llvm_version: "19.1.0",
           #   llvm_config: "current/bin/llvm-config.exe",
           #   static: "Yes",
           #   debug: "Yes",
@@ -161,11 +161,11 @@ jobs:
 
         # # MSVC 2019
         # - {
-        #     name: "MSVC 2022 / LLVM 18 @ Windows Code Coverage & Debug",
+        #     name: "MSVC 2022 / LLVM 19 @ Windows Code Coverage & Debug",
         #     os: windows-2022,
         #     build_type: Release,
         #     cxx: "clang-cl.exe",
-        #     llvm_version: "18.1.0",
+        #     llvm_version: "19.1.0",
         #     llvm_config: "current/bin/llvm-config.exe",
         #     coverage: "Yes",
         #     static: "Yes",
@@ -460,13 +460,13 @@ jobs:
           - amd64
 
         config:
-        # GCC 13 / LLVM 18
+        # GCC 13 / LLVM 19
         - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu Release",
+            name: "GCC 13 / LLVM 19 @ Ubuntu Release",
             build_type: Release,
             cxx: "g++-13",
-            llvm_version: "18.1.0",
-            llvm_config: "/usr/bin/llvm-config-18",
+            llvm_version: "19.1.0",
+            llvm_config: "/usr/bin/llvm-config-19",
             coverage: "No",
             static: "Yes",
             debug: "No",
@@ -479,13 +479,13 @@ jobs:
             docs: "Yes",
           }
 
-        # GCC 13 / LLVM 18
+        # GCC 13 / LLVM 19
         - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage & Debug",
+            name: "GCC 13 / LLVM 19 @ Ubuntu Code Coverage & Debug",
             build_type: Release,
             cxx: "g++-13",
-            llvm_version: "18.1.0",
-            llvm_config: "/usr/bin/llvm-config-18",
+            llvm_version: "19.1.0",
+            llvm_config: "/usr/bin/llvm-config-19",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -496,13 +496,13 @@ jobs:
             archive_name: "insights-ubuntu",
           }
 
-        # GCC 13 / LLVM 18
+        # GCC 13 / LLVM 19
         - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu Code Coverage (libc++)",
+            name: "GCC 13 / LLVM 19 @ Ubuntu Code Coverage (libc++)",
             build_type: Release,
             cxx: "g++-13",
-            llvm_version: "18.1.0",
-            llvm_config: "/usr/bin/llvm-config-18",
+            llvm_version: "19.1.0",
+            llvm_config: "/usr/bin/llvm-config-19",
             coverage: "Yes",
             static: "No",
             debug: "Yes",
@@ -649,13 +649,13 @@ jobs:
           - amd64
 
         config:
-        # GCC 13 / LLVM 18
+        # GCC 13 / LLVM 19
         - {
-            name: "GCC 13 / LLVM 18 @ Ubuntu Release",
+            name: "GCC 13 / LLVM 19 @ Ubuntu Release",
             build_type: Release,
             cxx: "g++-13",
-            llvm_version: "18.1.0",
-            llvm_config: "/usr/bin/llvm-config-18",
+            llvm_version: "19.1.0",
+            llvm_config: "/usr/bin/llvm-config-19",
             coverage: "No",
             static: "Yes",
             debug: "No",

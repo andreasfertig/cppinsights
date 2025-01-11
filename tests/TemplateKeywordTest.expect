@@ -54,7 +54,7 @@ struct compose<>
   {
     using T = detail::to<int>;
     template<typename ... Ts>
-    using result = detail::to<int>::result<Ts...>;
+    using result = T::template result<Ts...>;
   };
   
   #endif

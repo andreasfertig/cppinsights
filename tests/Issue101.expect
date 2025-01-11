@@ -339,7 +339,7 @@ struct compose<add_const>
   struct to<add_pointer::to<identity> >
   {
     template<typename ... Ts>
-    using result = compose<>::to<add_const::to<add_pointer::to<identity> > >::result<Ts...>;
+    using result = compose<>::template template to<typename add_const::template to<to<identity> > >::template result<Ts...>;
   };
   
   #endif
@@ -349,7 +349,7 @@ struct compose<add_const>
   struct to<add_pointer::to<wrap> >
   {
     template<typename ... Ts>
-    using result = compose<>::to<add_const::to<add_pointer::to<wrap> > >::result<Ts...>;
+    using result = compose<>::template template to<typename add_const::template to<to<wrap> > >::template result<Ts...>;
   };
   
   #endif
@@ -370,7 +370,7 @@ struct compose<add_pointer>
   struct to<add_const::to<identity> >
   {
     template<typename ... Ts>
-    using result = compose<>::to<add_pointer::to<add_const::to<identity> > >::result<Ts...>;
+    using result = compose<>::template template to<typename add_pointer::template to<to<identity> > >::template result<Ts...>;
   };
   
   #endif
@@ -380,7 +380,7 @@ struct compose<add_pointer>
   struct to<identity>
   {
     template<typename ... Ts>
-    using result = compose<>::to<add_pointer::to<identity> >::result<Ts...>;
+    using result = compose<>::template template to<typename add_pointer::template to<identity> >::template result<Ts...>;
   };
   
   #endif
@@ -390,7 +390,7 @@ struct compose<add_pointer>
   struct to<wrap>
   {
     template<typename ... Ts>
-    using result = compose<>::to<add_pointer::to<wrap> >::result<Ts...>;
+    using result = compose<>::template template to<typename add_pointer::template to<wrap> >::template result<Ts...>;
   };
   
   #endif
@@ -411,7 +411,7 @@ struct compose<add_pointer, add_const>
   struct to<identity>
   {
     template<typename ... Ts>
-    using result = compose<add_const>::to<add_pointer::to<identity> >::result<Ts...>;
+    using result = compose<add_const>::template template to<typename add_pointer::template to<identity> >::template result<Ts...>;
   };
   
   #endif
@@ -421,7 +421,7 @@ struct compose<add_pointer, add_const>
   struct to<wrap>
   {
     template<typename ... Ts>
-    using result = compose<add_const>::to<add_pointer::to<wrap> >::result<Ts...>;
+    using result = compose<add_const>::template template to<typename add_pointer::template to<wrap> >::template result<Ts...>;
   };
   
   #endif
@@ -442,7 +442,7 @@ struct compose<add_const, add_pointer>
   struct to<identity>
   {
     template<typename ... Ts>
-    using result = compose<add_pointer>::to<add_const::to<identity> >::result<Ts...>;
+    using result = compose<add_pointer>::template template to<typename add_const::template to<identity> >::template result<Ts...>;
   };
   
   #endif
@@ -469,7 +469,7 @@ struct compose<>
   {
     using T = detail::to<add_pointer::to<identity> >;
     template<typename ... Ts>
-    using result = detail::to<identity>::result<Ts...>;
+    using result = T::template result<Ts...>;
   };
   
   #endif
@@ -480,7 +480,7 @@ struct compose<>
   {
     using T = detail::to<add_const::to<add_pointer::to<identity> > >;
     template<typename ... Ts>
-    using result = detail::to<add_pointer::to<identity> >::result<Ts...>;
+    using result = T::template result<Ts...>;
   };
   
   #endif
@@ -491,7 +491,7 @@ struct compose<>
   {
     using T = detail::to<add_pointer::to<add_const::to<identity> > >;
     template<typename ... Ts>
-    using result = detail::to<add_const::to<identity> >::result<Ts...>;
+    using result = T::template result<Ts...>;
   };
   
   #endif
@@ -502,7 +502,7 @@ struct compose<>
   {
     using T = detail::to<add_pointer::to<wrap> >;
     template<typename ... Ts>
-    using result = detail::to<wrap>::result<Ts...>;
+    using result = T::template result<Ts...>;
   };
   
   #endif
@@ -513,7 +513,7 @@ struct compose<>
   {
     using T = detail::to<add_const::to<add_pointer::to<wrap> > >;
     template<typename ... Ts>
-    using result = detail::to<add_pointer::to<wrap> >::result<Ts...>;
+    using result = T::template result<Ts...>;
   };
   
   #endif
