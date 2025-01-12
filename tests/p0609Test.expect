@@ -1,0 +1,9 @@
+int g()
+{
+  int ar[3] = {2, 3, 4};
+  int __ar5[3] = {ar[0], ar[1], ar[2]};
+  int & a = __ar5[0];
+  [[maybe_unused]] int & b = __ar5[1];
+  int & c = __ar5[2];
+  return a + c;
+}

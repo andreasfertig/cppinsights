@@ -5149,6 +5149,8 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
         type = stmt->getASTContext().getLValueReferenceType(type);
     }
 
+    InsertAttributes(stmt->attrs());
+
     mOutputFormatHelper.Append(GetQualifiers(*dyn_cast_or_null<VarDecl>(stmt->getDecomposedDecl())),
                                GetTypeNameAsParameter(type, GetName(*stmt)),
                                hlpAssing);
