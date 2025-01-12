@@ -3184,13 +3184,6 @@ void CodeGenerator::InsertCXXMethodHeader(const CXXMethodDecl* stmt, OutputForma
 
     InsertTemplateGuardBegin(stmt);
     InsertFunctionNameWithReturnType(*stmt, cxxInheritedCtorDecl);
-
-    if(stmt->isDeleted()) {
-        mOutputFormatHelper.AppendNewLine(kwSpaceEqualsDelete);
-
-    } else if(stmt->isDefaulted()) {
-        mOutputFormatHelper.AppendNewLine(kwSpaceEqualsDefault);
-    }
 }
 //-----------------------------------------------------------------------------
 
@@ -4992,6 +4985,18 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     if(decl.isPure()) {
 #endif
         mOutputFormatHelper.Append(" = 0"sv);
+    }
+
+    if(decl.isDeleted()) {
+        mOutputFormatHelper.Append(kwSpaceEqualsDelete);
+        if(auto* delInfo = decl.getDefalutedOrDeletedInfo()) {
+            WrapInParens([&]() { InsertArg(delInfo->getDeletedMessage()); }, AddSpaceAtTheEnd::No);
+        } else {
+            mOutputFormatHelper.AppendSemiNewLine();
+        }
+
+    } else if(decl.isDefaulted()) {
+        mOutputFormatHelper.AppendNewLine(kwSpaceEqualsDefault);
     }
 }
 //-----------------------------------------------------------------------------

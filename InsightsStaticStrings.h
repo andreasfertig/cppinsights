@@ -62,7 +62,7 @@ using namespace std::literals;
 #define KW_CO_AWAIT "co_await"
 #define KW_TYPENAME "typename"
 #define KW_EQUALS_DEFAULT "= default;"
-#define KW_EQUALS_DELETE "= delete;"
+#define KW_EQUALS_DELETE "= delete"
 #define KW_INTERNAL_THIS "__this"
 #define KW_ELIPSIS "..."
 #define KW_FALSE "false"
