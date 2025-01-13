@@ -136,9 +136,7 @@ public:
                             StringRef /*SearchPath*/,
                             StringRef /*RelativePath*/,
                             const Module* /*Imported*/,
-#if IS_CLANG_NEWER_THAN(18)
                             bool /*ModuleImported*/,
-#endif
                             SrcMgr::CharacteristicKind /*FileType*/) override
     {
         auto expansionLoc = mSm.getExpansionLoc(hashLoc);

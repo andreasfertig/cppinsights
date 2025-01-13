@@ -532,13 +532,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     if(const auto* cxxMethodDecl = dyn_cast_or_null<CXXMethodDecl>(&fd)) {
         funParamStorage.reserve(funParams.size() + 1);
 
-        cxxMethodType = cxxMethodDecl->
-#if IS_CLANG_NEWER_THAN(17)
-                        getFunctionObjectParameterType()
-#else
-                        getThisObjectType()
-#endif
-            ;
+        cxxMethodType = cxxMethodDecl->getFunctionObjectParameterType();
 
         // In case we have a member function the first parameter is a reference to this. The following code injects
         // this parameter.
@@ -574,14 +568,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         if(not ctor->param_empty() and
            (getNonRefType(ctor->getParamDecl(0)) == QualType(cxxMethodType.getTypePtrOrNull(), 0))) {
             if(0 == mASTData.mThisExprs.size()) {
-                mASTData.mThisExprs.push_back(
-#if IS_CLANG_NEWER_THAN(17)
-                    CXXThisExpr::Create(ctx, {}, Ptr(cxxMethodType), false)
-#else
-                    new(ctx) CXXThisExpr{{}, Ptr(cxxMethodType), false}
-#endif
-
-                );
+                mASTData.mThisExprs.push_back(CXXThisExpr::Create(ctx, {}, Ptr(cxxMethodType), false));
             }
         } else {
             (void)static_cast<bool>(derefFirstParam);  // set it to false
