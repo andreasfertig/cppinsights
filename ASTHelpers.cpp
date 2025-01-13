@@ -514,19 +514,8 @@ CXXRecordDecl* Struct(std::string_view name)
     auto getRecord = [&] {
         auto& ctx = GetGlobalAST();
 
-        return CXXRecordDecl::Create(ctx,
-#if IS_CLANG_NEWER_THAN(17)
-                                     TagTypeKind::Struct
-#else
-                                     TTK_Struct
-#endif
-                                     ,
-                                     ctx.getTranslationUnitDecl(),
-                                     {},
-                                     {},
-                                     &ctx.Idents.get(name),
-                                     nullptr,
-                                     false);
+        return CXXRecordDecl::Create(
+            ctx, TagTypeKind::Struct, ctx.getTranslationUnitDecl(), {}, {}, &ctx.Idents.get(name), nullptr, false);
     };
 
     auto* rd = getRecord();
@@ -710,12 +699,7 @@ CXXNewExpr* New(ArrayRef<Expr*> placementArgs, const Expr* expr, QualType t)
                               placementArgs,
                               SourceRange{},
                               std::optional<Expr*>{},
-#if IS_CLANG_NEWER_THAN(17)
-                              CXXNewInitializationStyle::Parens
-#else
-                              CXXNewExpr::CallInit
-#endif
-                              ,
+                              CXXNewInitializationStyle::Parens,
                               const_cast<Expr*>(expr),
                               Ptr(t),
                               ctx.getTrivialTypeSourceInfo(t),

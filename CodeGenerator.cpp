@@ -967,12 +967,7 @@ public:
                                                   {},
                                                  &ctx.Idents.get(mTempName),
                                                  expr->getType(),
-#if IS_CLANG_NEWER_THAN(17)
-                                                 ImplicitParamKind::Other
-#else
-                                                 ImplicitParamDecl::Other
-#endif
-            );
+                                                 ImplicitParamKind::Other);
 
 #endif
 
@@ -1208,17 +1203,7 @@ static bool IsPrimaryTemplatePackExpansionExpr(const ParenListExpr* stmt)
 
 void CodeGenerator::InsertArg(const LinkageSpecDecl* stmt)
 {
-    mOutputFormatHelper.Append("extern \"",
-                               (
-#if IS_CLANG_NEWER_THAN(17)
-                                   LinkageSpecLanguageIDs::C
-#else
-                                   LinkageSpecDecl::lang_c
-#endif
-                                   == stmt->getLanguage())
-                                   ? "C"sv
-                                   : "C++"sv,
-                               "\"");
+    mOutputFormatHelper.Append("extern \"", (LinkageSpecLanguageIDs::C == stmt->getLanguage()) ? "C"sv : "C++"sv, "\"");
     mOutputFormatHelper.OpenScope();
 
     for(const auto* decl : stmt->decls()) {
@@ -1752,26 +1737,14 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
             if(tt->hasDefaultArgument() and not tt->defaultArgumentWasInherited()) {
                 const auto& defaultArg = tt->getDefaultArgument();
 
-                if(const auto decltypeType = dyn_cast_or_null<DecltypeType>(defaultArg
-                                                                                .
-#if IS_CLANG_NEWER_THAN(18)
-                                                                            getArgument()
-                                                                                .getAsType()
-#else
-                                                                            getTypePtrOrNull()
-#endif
-                                                                                )) {
+                if(const auto decltypeType = dyn_cast_or_null<DecltypeType>(defaultArg.getArgument().getAsType())) {
                     mOutputFormatHelper.Append(hlpAssing);
 
                     InsertArg(decltypeType->getUnderlyingExpr());
 
                 } else {
                     mOutputFormatHelper.Append(hlpAssing);
-                    InsertTemplateArg(defaultArg
-#if IS_CLANG_NEWER_THAN(18)
-                                          .getArgument()
-#endif
-                    );
+                    InsertTemplateArg(defaultArg.getArgument());
                 }
             }
 
@@ -1788,11 +1761,7 @@ void CodeGenerator::InsertTemplateParameters(const TemplateParameterList& list,
 
                 if(nonTmplParam->hasDefaultArgument()) {
                     mOutputFormatHelper.Append(hlpAssing);
-#if IS_CLANG_NEWER_THAN(18)
                     InsertTemplateArg(nonTmplParam->getDefaultArgument().getArgument());
-#else
-                    InsertArg(nonTmplParam->getDefaultArgument());
-#endif
                 }
             } else {
                 mOutputFormatHelper.Append(typeName, EllipsisSpace(nonTmplParam->isParameterPack()));
@@ -3048,7 +3017,6 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
     mOutputFormatHelper.Append(kwUsingSpace, GetName(*stmt), hlpAssing);
 
     if(auto* templateSpecializationType = underlyingType->getAs<TemplateSpecializationType>()) {
-#if IS_CLANG_NEWER_THAN(18)
         const bool carriesNamespace{[&] {
             if(const auto tn = templateSpecializationType->getTemplateName();
                (TemplateName::QualifiedTemplate == tn.getKind()) or (TemplateName::DependentTemplate == tn.getKind())) {
@@ -3066,11 +3034,6 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
                 InsertNamespace(elaboratedType->getQualifier());
             }
         }
-#else
-        if(const auto* elaboratedType = underlyingType->getAs<ElaboratedType>()) {
-            InsertNamespace(elaboratedType->getQualifier());
-        }
-#endif
 
         StringStream stream{};
         stream.Print(*templateSpecializationType);
@@ -3699,10 +3662,8 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
     // skip this attribute. Clang seems to tag final methods or classes with final
     RETURN_IF(attr::Final == attr.getKind());
 
-#if IS_CLANG_NEWER_THAN(17)
     // skip this custom clang attribute
     RETURN_IF(attr::NoInline == attr.getKind());
-#endif
 
     // Clang's printPretty misses the parameter pack ellipsis. Hence treat this special case here.
     if(const auto* alignedAttr = dyn_cast_or_null<AlignedAttr>(&attr)) {
@@ -3740,12 +3701,6 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
 
     // attributes start with a space, skip it as it is not required for the first attribute
     std::string_view start{stream.str()};
-#if IS_CLANG_NEWER_THAN(18)
-#else
-    if(!start.empty()) {
-        start.remove_prefix(1);
-    }
-#endif
 
     mOutputFormatHelper.Append(start, " "sv);
 }
@@ -4485,20 +4440,11 @@ void CodeGenerator::InsertSuffix(const QualType& type)
 
 void CodeGenerator::InsertTemplateArgs(const ClassTemplateSpecializationDecl& clsTemplateSpe)
 {
-#if IS_CLANG_NEWER_THAN(18)
     if(const auto* ar = clsTemplateSpe.getTemplateArgsAsWritten()) {
         InsertTemplateArgs(ar->arguments());
     } else {
         InsertTemplateArgs(clsTemplateSpe.getTemplateArgs());
     }
-#else
-    if(const TypeSourceInfo* typeAsWritten = clsTemplateSpe.getTypeAsWritten()) {
-        const TemplateSpecializationType* tmplSpecType = cast<TemplateSpecializationType>(typeAsWritten->getType());
-        InsertTemplateArgs(*tmplSpecType);
-    } else {
-        InsertTemplateArgs(clsTemplateSpe.getTemplateArgs());
-    }
-#endif
 }
 //-----------------------------------------------------------------------------
 
@@ -4536,9 +4482,7 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             mOutputFormatHelper.Append(GetName(*arg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()));
             break;
         case TemplateArgument::Null: mOutputFormatHelper.Append("null"sv); break;
-#if IS_CLANG_NEWER_THAN(17)
         case TemplateArgument::StructuralValue: ToDo(arg, mOutputFormatHelper); break;
-#endif
     }
 }
 //-----------------------------------------------------------------------------
@@ -4567,10 +4511,6 @@ void CodeGenerator::HandleLocalStaticNonTrivialClass(const VarDecl* stmt)
                                         ctx.getConstantArrayType(ctx.CharTy,
                                                                  llvm::APInt(ctx.getTypeSize(ctx.getSizeType()), 0),
                                                                  Sizeof(stmt->getType()),
-#if IS_CLANG_NEWER_THAN(17)
-#else
-                                                                 ArrayType::
-#endif
                                                                  ArraySizeModifier::Normal,
                                                                  0));
 
@@ -4979,11 +4919,7 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     // template requires-clause during creation of the template head.
     InsertConceptConstraint(&decl);
 
-#if IS_CLANG_NEWER_THAN(17)
     if(decl.isPureVirtual()) {
-#else
-    if(decl.isPure()) {
-#endif
         mOutputFormatHelper.Append(" = 0"sv);
     }
 
