@@ -1,0 +1,29 @@
+class mdspan
+{
+  int field;
+  
+  public: 
+  template<class ... IndexType>
+  inline constexpr auto & operator[](IndexType...)
+  {
+    return this->field;
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline constexpr int & operator[]<int, int, int>(int __0, int __1, int __2)
+  {
+    return this->field;
+  }
+  #endif
+  
+  // inline constexpr mdspan() noexcept = default;
+};
+
+
+int main()
+{
+  mdspan s = mdspan{};
+  s.operator[](1, 1, 1) = 42;
+  return 0;
+}
