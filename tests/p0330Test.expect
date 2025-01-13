@@ -1,0 +1,10 @@
+#include <vector>
+
+int main()
+{
+  std::vector<int, std::allocator<int> > v = std::vector<int, std::allocator<int> >{std::initializer_list<int>{0, 1, 2, 3}};
+  for(unsigned long i = 0UL, s = v.size(); i < s; ++i) {
+  }
+  
+  return 0;
+}

@@ -1,0 +1,5 @@
+int main()
+{
+  double hexFloat = 0.0035848617553710938;
+  return 0;
+}

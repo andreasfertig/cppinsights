@@ -1,0 +1,2 @@
+constexpr const int N = {1};
+/* PASSED: static_assert(static_cast<bool>(N)); */
