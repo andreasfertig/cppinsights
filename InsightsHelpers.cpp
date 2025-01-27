@@ -311,6 +311,8 @@ const QualType GetDesugarType(const QualType& QT)
 
 const std::string EvaluateAsFloat(const FloatingLiteral& expr)
 {
+    // return std::to_string(expr.getValueAsApproximateDouble());
+
     SmallString<16> str{};
     expr.getValue().toString(str);
 
@@ -1129,6 +1131,28 @@ std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName)
 }
 //-----------------------------------------------------------------------------
 
+std::string BuildTemplateParamObjectName(std::string name)
+{
+    ReplaceAll(name, "{"sv, "_"sv);
+    ReplaceAll(name, "}"sv, "_"sv);
+    ReplaceAll(name, " "sv, ""sv);
+    ReplaceAll(name, ","sv, "_"sv);
+    ReplaceAll(name, "."sv, "_"sv);
+    ReplaceAll(name, "+"sv, "_"sv);
+
+    return name;
+}
+//-----------------------------------------------------------------------------
+
+std::string GetName(const TemplateParamObjectDecl& decl)
+{
+    StringStream stream{};
+    stream.Print(decl);
+
+    return ScopeHandler::RemoveCurrentScope(BuildTemplateParamObjectName(std::move(stream.str())));
+}
+//-----------------------------------------------------------------------------
+
 std::string GetName(const CXXRecordDecl& RD)
 {
     if(RD.isLambda()) {
@@ -1577,6 +1601,12 @@ void StringStream::Print(const TemplateArgument& arg)
 void StringStream::Print(const TemplateSpecializationType& arg)
 {
     arg.getTemplateName().print(*this, CppInsightsPrintingPolicy{}, TemplateName::Qualified::AsWritten);
+}
+//-----------------------------------------------------------------------------
+
+void StringStream::Print(const TemplateParamObjectDecl& arg)
+{
+    arg.printAsExpr(*this);
 }
 //-----------------------------------------------------------------------------
 

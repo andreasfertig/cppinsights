@@ -1,0 +1,64 @@
+#define INSIGHTS_USE_TEMPLATE
+
+struct A
+{
+  int i;
+};
+
+
+template<A a>
+class Foo
+{
+  
+  public: 
+  void Func();
+  
+};
+
+/* First instantiated from: Cpp20ClassAsNTTP4Test.cpp:16 */
+#ifdef INSIGHTS_USE_TEMPLATE
+static constexpr A A_2_{2};
+template<>
+class Foo<A_2_>
+{
+  
+  public: 
+  void Func();
+  
+  // inline constexpr Foo() noexcept = default;
+};
+
+#endif
+/* First instantiated from: Cpp20ClassAsNTTP4Test.cpp:21 */
+#ifdef INSIGHTS_USE_TEMPLATE
+static constexpr A A_3_{3};
+template<>
+class Foo<A_3_>
+{
+  
+  public: 
+  void Func();
+  
+  // inline constexpr Foo() noexcept = default;
+};
+
+#endif
+
+template<>
+void Foo<A_2_>::Func()
+{
+}
+
+
+template<>
+void Foo<A_3_>::Func()
+{
+}
+
+
+int main()
+{
+  Foo<A_2_> f;
+  Foo<A_3_> fc;
+  return 0;
+}

@@ -1,0 +1,78 @@
+#include <cstdio>
+
+#define INSIGHTS_USE_TEMPLATE
+
+struct A
+{
+  int x;
+  inline constexpr A(int _x)
+  : x{_x}
+  {
+  }
+  
+};
+
+
+template<A a>
+void Fun()
+{
+  printf("prim\n");
+}
+
+/* First instantiated from: Cpp20ClassAsNTTP2Test.cpp:42 */
+#ifdef INSIGHTS_USE_TEMPLATE
+static constexpr A A_2_{2};
+template<>
+void Fun<A_2_>()
+{
+  printf("prim\n");
+}
+#endif
+
+
+static constexpr A A_3_{3};
+template<>
+void Fun<A_3_>()
+{
+  printf("for 3\n");
+}
+
+template<A a>
+bool varTmplTest = static_cast<bool>(a.x);
+
+static constexpr A A_4_{4};
+template<>
+bool varTmplTest<A_4_> = static_cast<bool>(A_4_.x);
+template<>
+bool varTmplTest<A_3_> = static_cast<bool>(A_3_.x);
+
+template<bool , A a>
+struct ClsTmplTest
+{
+};
+
+/* First instantiated from: Cpp20ClassAsNTTP2Test.cpp:50 */
+#ifdef INSIGHTS_USE_TEMPLATE
+static constexpr A A_5_{5};
+template<>
+struct ClsTmplTest<true, A_5_>
+{
+};
+
+#endif
+
+template<A a>
+struct ClsTmplTest<true, a>
+{
+};
+
+
+int main()
+{
+  Fun<A{2}>();
+  Fun<A{3}>();
+  bool a = varTmplTest<A_4_>;
+  bool b = varTmplTest<A_3_>;
+  ClsTmplTest<true, A_5_> clstmpl = {};
+  return 0;
+}
