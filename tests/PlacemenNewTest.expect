@@ -1,0 +1,28 @@
+#include <new>
+
+template<typename T>
+struct Apple
+{
+  T x;
+};
+
+/* First instantiated from: PlacemenNewTest.cpp:12 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct Apple<int>
+{
+  int x;
+  // inline Apple() noexcept = default;
+};
+
+#endif
+
+int main()
+{
+  char buffer[4];
+  Apple<int> * f = new (reinterpret_cast<void *>(&buffer))Apple<int>();
+  Apple<int> & r = *f;
+  r.~Apple();
+  f->~Apple();
+  return 0;
+}

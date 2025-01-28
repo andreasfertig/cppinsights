@@ -2111,6 +2111,14 @@ bool CodeGenerator::InsideDecltype() const
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXPseudoDestructorExpr* stmt)
+{
+    InsertArg(stmt->getBase());
+
+    mOutputFormatHelper.Append(ArrowOrDot(stmt->isArrow()), "~", GetName(stmt->getDestroyedType()));
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXMemberCallExpr* stmt)
 {
     CONDITIONAL_LAMBDA_SCOPE_HELPER(MemberCallExpr, not InsideDecltype())
