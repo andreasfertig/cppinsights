@@ -1,0 +1,362 @@
+/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+#include <coroutine>
+#include <exception>
+#include <new>
+#include <utility>
+
+#define INSIGHTS_USE_TEMPLATE
+
+struct ClsAsNTTPToCoro
+{
+  int x;
+  double d;
+};
+
+
+template<typename T>
+struct generator
+{
+  struct promise_type
+  {
+    T current_value{};
+    inline std::suspend_always yield_value(T value)
+    {
+      this->current_value = value;
+      return {};
+    }
+    
+    inline std::suspend_always initial_suspend()
+    {
+      return {};
+    }
+    
+    inline std::suspend_always final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline generator<T> get_return_object()
+    {
+      return generator<T>{{this}};
+    }
+    
+    inline void unhandled_exception()
+    {
+      std::terminate();
+    }
+    
+    inline void return_value(T v)
+    {
+      this->current_value = v;
+    }
+    
+  };
+  
+  inline generator(generator<T> && rhs)
+  : p{std::exchange(rhs.p, nullptr)}
+  {
+  }
+  
+  inline ~generator()
+  {
+    if(this->p) {
+      this->p.destroy();
+    } 
+    
+  }
+  
+  
+  private: 
+  inline explicit generator(promise_type * _p)
+  : p{std::coroutine_handle<promise_type>::from_promise(*_p)}
+  {
+  }
+  
+  std::coroutine_handle<promise_type> p;
+};
+
+/* First instantiated from: EduCoroutineFunctionTemplateTest.cpp:48 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct generator<int>
+{
+  struct promise_type
+  {
+    int current_value{};
+    inline std::suspend_always yield_value(int value);
+    
+    inline std::suspend_always initial_suspend()
+    {
+      return {};
+    }
+    
+    inline std::suspend_always final_suspend() noexcept
+    {
+      return {};
+    }
+    
+    inline generator<int> get_return_object()
+    {
+      return generator<int>{this};
+    }
+    
+    inline void unhandled_exception()
+    {
+      std::terminate();
+    }
+    
+    inline void return_value(int v)
+    {
+      this->current_value = v;
+    }
+    
+    // inline constexpr promise_type() noexcept = default;
+  };
+  
+  inline generator(generator<int> && rhs);
+  
+  inline ~generator() noexcept
+  {
+    if(this->p.operator bool()) {
+      this->p.destroy();
+    } 
+    
+  }
+  
+  
+  private: 
+  inline explicit generator(promise_type * _p)
+  : p{std::coroutine_handle<promise_type>::from_promise(*_p)}
+  {
+  }
+  
+  std::coroutine_handle<promise_type> p;
+  public: 
+  // inline constexpr generator(const generator<int> &) /* noexcept */ = delete;
+  // inline generator<int> & operator=(const generator<int> &) /* noexcept */ = delete;
+};
+
+#endif
+
+template<typename T, typename U, typename V, auto >
+generator<T> fun()
+{
+  co_return 2;
+}
+
+struct __fun_int_char_unsignedint_3_1400000000000001Frame
+{
+  void (*resume_fn)(__fun_int_char_unsignedint_3_1400000000000001Frame *);
+  void (*destroy_fn)(__fun_int_char_unsignedint_3_1400000000000001Frame *);
+  std::__coroutine_traits_sfinae<generator<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  std::suspend_always __suspend_43_14;
+  std::suspend_always __suspend_43_14_1;
+};
+
+/* First instantiated from: EduCoroutineFunctionTemplateTest.cpp:48 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+generator<int> fun<int, char, unsigned int, 3.1400000000000001>()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __fun_int_char_unsignedint_3_1400000000000001Frame * __f = reinterpret_cast<__fun_int_char_unsignedint_3_1400000000000001Frame *>(operator new(sizeof(__fun_int_char_unsignedint_3_1400000000000001Frame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<generator<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __fun_int_char_unsignedint_3_1400000000000001Resume(__fun_int_char_unsignedint_3_1400000000000001Frame * __f);
+  void __fun_int_char_unsignedint_3_1400000000000001Destroy(__fun_int_char_unsignedint_3_1400000000000001Frame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__fun_int_char_unsignedint_3_1400000000000001Resume;
+  __f->destroy_fn = &__fun_int_char_unsignedint_3_1400000000000001Destroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __fun_int_char_unsignedint_3_1400000000000001Resume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __fun_int_char_unsignedint_3_1400000000000001Resume(__fun_int_char_unsignedint_3_1400000000000001Frame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_fun_int_char_unsignedint_3_1400000000000001_1;
+      case 2: goto __resume_fun_int_char_unsignedint_3_1400000000000001_2;
+    }
+    
+    /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
+    __f->__suspend_43_14 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_43_14.await_ready()) {
+      __f->__suspend_43_14.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_fun_int_char_unsignedint_3_1400000000000001_1:
+    __f->__suspend_43_14.await_resume();
+    /* co_return EduCoroutineFunctionTemplateTest.cpp:44 */
+    __f->__promise.return_value(2);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
+  __f->__suspend_43_14_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_43_14_1.await_ready()) {
+    __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    __f->__suspend_index = 2;
+    return;
+  } 
+  
+  __resume_fun_int_char_unsignedint_3_1400000000000001_2:
+  __f->destroy_fn(__f);
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __fun_int_char_unsignedint_3_1400000000000001Destroy(__fun_int_char_unsignedint_3_1400000000000001Frame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__fun_int_char_unsignedint_3_1400000000000001Frame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f), sizeof(__fun_int_char_unsignedint_3_1400000000000001Frame));
+}
+
+#endif
+
+
+struct __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame
+{
+  void (*resume_fn)(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame *);
+  void (*destroy_fn)(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame *);
+  std::__coroutine_traits_sfinae<generator<int> >::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  std::suspend_always __suspend_43_14;
+  std::suspend_always __suspend_43_14_1;
+};
+
+/* First instantiated from: EduCoroutineFunctionTemplateTest.cpp:49 */
+#ifdef INSIGHTS_USE_TEMPLATE
+static constexpr ClsAsNTTPToCoro ClsAsNTTPToCoro_4_n3_000000e_00_{4, -3.000000e+00};
+template<>
+generator<int> fun<int, char, unsigned int, ClsAsNTTPToCoro_4_n3_000000e_00_>()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame * __f = reinterpret_cast<__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame *>(operator new(sizeof(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<generator<int> >::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Resume(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame * __f);
+  void __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Destroy(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Resume;
+  __f->destroy_fn = &__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Destroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Resume(__f);
+  
+  
+  return __f->__promise.get_return_object();
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Resume(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00__1;
+      case 2: goto __resume_fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00__2;
+    }
+    
+    /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
+    __f->__suspend_43_14 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_43_14.await_ready()) {
+      __f->__suspend_43_14.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00__1:
+    __f->__suspend_43_14.await_resume();
+    /* co_return EduCoroutineFunctionTemplateTest.cpp:44 */
+    __f->__promise.return_value(2);
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
+  __f->__suspend_43_14_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_43_14_1.await_ready()) {
+    __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    __f->__suspend_index = 2;
+    return;
+  } 
+  
+  __resume_fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00__2:
+  __f->destroy_fn(__f);
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Destroy(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f), sizeof(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame));
+}
+
+#endif
+
+
+int main()
+{
+  generator<int> dbl = fun<int, char, unsigned int, 3.1400000000000001>();
+  generator<int> stct = fun<int, char, unsigned int, ClsAsNTTPToCoro_4_n3_000000e_00_>();
+  return 0;
+}

@@ -60,11 +60,11 @@ inline std::string Normalize(const APValue& arg)
             ::llvm::raw_string_ostream stream{str};
 
             arg.getFloat().print(stream);
+            str.pop_back();
 
             if(std::string::npos == str.find('.')) {
                 /* in case it is a number like 10.0 toString() seems to leave out the .0. However, as this distinguished
                  * between an integer and a floating point literal we need that dot. */
-                str.pop_back();
                 str.append(".0");
             }
 

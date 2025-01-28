@@ -1139,6 +1139,7 @@ std::string BuildTemplateParamObjectName(std::string name)
     ReplaceAll(name, ","sv, "_"sv);
     ReplaceAll(name, "."sv, "_"sv);
     ReplaceAll(name, "+"sv, "_"sv);
+    ReplaceAll(name, "-"sv, "n"sv);
 
     return name;
 }
