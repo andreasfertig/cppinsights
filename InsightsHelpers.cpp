@@ -309,23 +309,6 @@ const QualType GetDesugarType(const QualType& QT)
 }
 //-----------------------------------------------------------------------------
 
-const std::string EvaluateAsFloat(const FloatingLiteral& expr)
-{
-    // return std::to_string(expr.getValueAsApproximateDouble());
-
-    SmallString<16> str{};
-    expr.getValue().toString(str);
-
-    if(std::string::npos == str.find('.')) {
-        /* in case it is a number like 10.0 toString() seems to leave out the .0. However, as this distinguished
-         * between an integer and a floating point literal we need that dot. */
-        str.append(".0"sv);
-    }
-
-    return std::string{str.str()};
-}
-//-----------------------------------------------------------------------------
-
 static const VarDecl* GetVarDeclFromDeclRefExpr(const DeclRefExpr& declRefExpr)
 {
     const auto* valueDecl = declRefExpr.getDecl();

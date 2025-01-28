@@ -747,8 +747,7 @@ void CodeGenerator::InsertArg(const IntegerLiteral* stmt)
 
 void CodeGenerator::InsertArg(const FloatingLiteral* stmt)
 {
-    // FIXME: not working correctly
-    mOutputFormatHelper.Append(EvaluateAsFloat(*stmt));
+    mOutputFormatHelper.Append(stmt->getValue());
     InsertSuffix(stmt->getType());
 }
 //-----------------------------------------------------------------------------
