@@ -431,12 +431,12 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
             }
         }
 
-        auto& str = ofm.GetString();
+        auto str = std::move(ofm.GetString());
         ReplaceAll(str, "<"sv, ""sv);
         ReplaceAll(str, ":"sv, ""sv);
         ReplaceAll(str, ">"sv, ""sv);
-        ReplaceAll(str, ","sv, ""sv);
-        ReplaceAll(str, " "sv, ""sv);
+
+        str = BuildTemplateParamObjectName(str);
 
         if(fd.isOverloadedOperator()) {
             return StrCat(MakeLineColumnName(ctx.getSourceManager(), stmt->getBeginLoc(), "operator_"sv), str);
@@ -737,7 +737,6 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineBodyStmt* stmt)
     }
 
     if(const auto* coReturnVoid = dyn_cast_or_null<CoreturnStmt>(stmt->getFallthroughHandler())) {
-        coReturnVoid->dump();
         funcBodyStmts.Add(coReturnVoid);
     }
 
@@ -817,10 +816,11 @@ void CoroutinesCodeGenerator::InsertArg(const CallExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-static std::optional<std::string> FindValue(llvm::DenseMap<const Expr*, std::string>& map, const Expr* key)
+static std::optional<std::string>
+FindValue(llvm::DenseMap<const Expr*, std::pair<const DeclRefExpr*, std::string>>& map, const Expr* key)
 {
     if(const auto& s = map.find(key); s != map.end()) {
-        return s->second;
+        return s->second.second;
     }
 
     return {};
@@ -838,18 +838,23 @@ void CoroutinesCodeGenerator::InsertArg(const OpaqueValueExpr* stmt)
         // Needs to be internal because a user can create the same type and it gets put into the stack frame
         std::string name{BuildSuspendVarName(stmt)};
 
+        // In case of a coroutine-template the same suspension point can occur multiple times. But to know when to add
+        // the _1 we must match the one from each instantiation. The DeclRefExpr is what distinguishes the same
+        // OpaqueValueExpr between multiple instantiations.
+        const auto* dref = FindDeclRef(sourceExpr);
+
         // The initial_suspend and final_suspend expressions carry the same location info. If we hit such a case,
         // make up another name.
         // Below is a std::find_if. However, the same code looks unreadable with std::find_if
-        for(const auto lookupName{StrCat(CORO_FRAME_ACCESS, name)}; const auto& [k, v] : mOpaqueValues) {
-            if(v == lookupName) {
+        for(const auto lookupName{StrCat(CORO_FRAME_ACCESS, name)}; const auto& [k, value] : mOpaqueValues) {
+            if(auto [thisDeref, v] = value; (thisDeref == dref) and (v == lookupName)) {
                 name += "_1"sv;
                 break;
             }
         }
 
         const auto accessName{StrCat(CORO_FRAME_ACCESS, name)};
-        mOpaqueValues.insert(std::make_pair(sourceExpr, accessName));
+        mOpaqueValues.insert(std::make_pair(sourceExpr, std::make_pair(dref, accessName)));
 
         OutputFormatHelper      ofm{};
         CoroutinesCodeGenerator codeGenerator{ofm, mPosBeforeFunc, mFSMName, mSuspendsCount, mASTData};

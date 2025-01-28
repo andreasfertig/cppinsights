@@ -591,7 +591,7 @@ private:
     std::string                       mFSMName{};
     CoroutineASTData                  mASTData{};
     llvm::DenseMap<const Stmt*, bool> mBinaryExprs{};
-    static inline llvm::DenseMap<const Expr*, std::string>
+    static inline llvm::DenseMap<const Expr*, std::pair<const DeclRefExpr*, std::string>>
         mOpaqueValues{};  ///! Keeps track of the current set of opaque value
 
     QualType GetFrameType() const { return QualType(mASTData.mFrameType->getTypeForDecl(), 0); }
