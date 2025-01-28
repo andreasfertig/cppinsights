@@ -1,0 +1,66 @@
+#include <new>
+
+namespace Test
+{
+  template<typename T>
+  struct Apple
+  {
+    T x;
+  };
+  
+  /* First instantiated from: PlacemenNew2Test.cpp:23 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  struct Apple<int>
+  {
+    int x;
+    // inline Apple() noexcept = default;
+  };
+  
+  #endif
+  template<typename T>
+  void destroy(T * ptr)
+  {
+    ptr->~T();
+  }
+  
+  /* First instantiated from: PlacemenNew2Test.cpp:30 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  void destroy<Apple<int> >(Apple<int> * ptr)
+  {
+    ptr->~Apple();
+  }
+  #endif
+  
+  
+  /* First instantiated from: PlacemenNew2Test.cpp:33 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  void destroy<int>(int * ptr)
+  {
+    ptr->~int();
+  }
+  #endif
+  
+  
+}
+
+namespace West
+{
+  int y;
+  
+}
+
+int main()
+{
+  char buffer[4];
+  Test::Apple<int> * f = new (reinterpret_cast<void *>(&buffer))Test::Apple<int>();
+  f->~Apple();
+  f->~Apple();
+  Test::destroy(f);
+  int x;
+  Test::destroy(&x);
+  Test::destroy(&West::y);
+  return 0;
+}
