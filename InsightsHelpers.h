@@ -189,7 +189,6 @@ std::string GetDeclContext(const DeclContext*     ctx,
                            WithTemplateParameters withTemplateParameters = WithTemplateParameters::No);
 //-----------------------------------------------------------------------------
 
-const std::string      EvaluateAsFloat(const FloatingLiteral& expr);
 const std::string      GetNoExcept(const FunctionDecl& decl);
 const std::string_view GetConst(const FunctionDecl& decl);
 //-----------------------------------------------------------------------------
