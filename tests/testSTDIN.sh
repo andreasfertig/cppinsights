@@ -20,6 +20,8 @@ echo "" | $1 -stdin $testCppfile -- -std=c++17 > /dev/null
 # Testing an option
 $1 -version
 
+$1 AutoHandler3Test.cpp -output /tmp/output.cpp && [ -f /tmp/output.cpp ]
+
 # close stdin
 exec 0<&-
 
