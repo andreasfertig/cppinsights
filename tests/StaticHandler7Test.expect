@@ -1,0 +1,37 @@
+#include <new> // for thread-safe static's placement new
+#include <stdint.h> // for uint64_t under Linux/GCC
+
+struct Data
+{
+  int i;
+  inline Data(int x)
+  : i{x}
+  {
+  }
+  
+};
+
+
+Data & Fun(int x)
+{
+  static uint64_t __mDataGuard;
+  alignas(Data) static char __mData[sizeof(Data)];
+  
+  if((__mDataGuard & 255) == 0) {
+    if(__cxa_guard_acquire(&__mDataGuard)) {
+      try 
+      {
+        new (&__mData)Data{x};
+        __mDataGuard = true;
+      } catch(...) {
+        __cxa_guard_abort(&__mDataGuard);
+        throw ;
+      }
+      __cxa_guard_release(&__mDataGuard);
+      /* __cxa_atexit(Data::~Data, &__mData, &__dso_handle); */
+    } 
+    
+  } 
+  
+  return *reinterpret_cast<Data*>(__mData);
+}
