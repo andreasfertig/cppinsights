@@ -16,12 +16,12 @@ struct __mptr
 extern struct __mptr* __vtbl_array[];
 
 
-#include <cstdio>
+#include <stdio.h>
 
 typedef struct Fruit
 {
   __mptr * __vptrFruit;
-  double md;
+  double mWeight;
 } Fruit;
 
 inline void Destructor_Fruit(Fruit * __this)
@@ -29,14 +29,15 @@ inline void Destructor_Fruit(Fruit * __this)
   puts("~Fruit");
 }
 
-inline void FunFruit(Fruit * __this)
+inline void PrintFruit(Fruit * __this)
 {
-  puts("Fruit's Fun");
+  puts("Fruit's Print");
 }
 
 inline Fruit * Constructor_Fruit(Fruit * __this)
 {
   __this->__vptrFruit = __vtbl_array[0];
+  __this->mWeight = 0.0;
   return __this;
 }
 
@@ -44,13 +45,13 @@ inline Fruit * Constructor_Fruit(Fruit * __this)
 typedef struct Apple
 {
   __mptr * __vptrFruit;
-  double md;
-  int mX;
+  double mWeight;
+  int mRipeGrade;
 } Apple;
 
-inline void FunApple(Apple * __this)
+inline void PrintApple(Apple * __this)
 {
-  printf("Apple's Fun: %d\n", __this->mX);
+  printf("Apple's Print: %d\n", __this->mRipeGrade);
 }
 
 inline void Destructor_Apple(Apple * __this)
@@ -62,7 +63,7 @@ inline Apple * Constructor_Apple(Apple * __this)
 {
   Constructor_Fruit((Fruit *)__this);
   __this->__vptrFruit = __vtbl_array[1];
-  __this->mX = 5;
+  __this->mRipeGrade = 5;
   return __this;
 }
 
@@ -70,14 +71,14 @@ inline Apple * Constructor_Apple(Apple * __this)
 typedef struct PinkLady
 {
   __mptr * __vptrFruit;
-  double md;
-  int mX;
-  int mApple;
+  double mWeight;
+  int mRipeGrade;
+  int mColorGrade;
 } PinkLady;
 
-inline void FunPinkLady(PinkLady * __this)
+inline void PrintPinkLady(PinkLady * __this)
 {
-  printf("Pink Ladies Fun: %d\n", __this->mApple);
+  printf("Pink Ladies Print: %d\n", __this->mColorGrade);
 }
 
 inline void Destructor_PinkLady(PinkLady * __this)
@@ -89,7 +90,7 @@ inline PinkLady * Constructor_PinkLady(PinkLady * __this)
 {
   Constructor_Apple((Apple *)__this);
   __this->__vptrFruit = __vtbl_array[2];
-  __this->mApple = 8;
+  __this->mColorGrade = 8;
   return __this;
 }
 
@@ -114,9 +115,9 @@ int main(void)
   /* ret // lifetime ends here */
 }
 
-__mptr __vtbl_Fruit[2] = {{0, 0, (__vptp)Destructor_Fruit}, {0, 0, (__vptp)FunFruit}};
-__mptr __vtbl_Apple[2] = {{0, 0, (__vptp)Destructor_Apple}, {0, 0, (__vptp)FunApple}};
-__mptr __vtbl_PinkLady[2] = {{0, 0, (__vptp)Destructor_PinkLady}, {0, 0, (__vptp)FunPinkLady}};
+__mptr __vtbl_Fruit[2] = {{0, 0, (__vptp)Destructor_Fruit}, {0, 0, (__vptp)PrintFruit}};
+__mptr __vtbl_Apple[2] = {{0, 0, (__vptp)Destructor_Apple}, {0, 0, (__vptp)PrintApple}};
+__mptr __vtbl_PinkLady[2] = {{0, 0, (__vptp)Destructor_PinkLady}, {0, 0, (__vptp)PrintPinkLady}};
 
 __mptr * __vtbl_array[3] = {__vtbl_Fruit, __vtbl_Apple, __vtbl_PinkLady};
 
