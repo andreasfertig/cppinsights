@@ -844,6 +844,27 @@ static std::string GetFirstPolymorphicBaseName(const RecordDecl* decl, const Rec
 }
 //-----------------------------------------------------------------------------
 
+///! Find the first polymorphic base class.
+static const CXXRecordDecl* GetFirstPolymorphicBase(const RecordDecl* decl)
+{
+    if(const auto* rdecl = dyn_cast_or_null<CXXRecordDecl>(decl); rdecl->getNumBases() >= 1) {
+        for(const auto& base : rdecl->bases()) {
+            const auto* rd = base.getType()->getAsRecordDecl();
+
+            if(const auto* cxxRd = dyn_cast_or_null<CXXRecordDecl>(rd); not cxxRd or not cxxRd->isPolymorphic()) {
+                continue;
+            } else if(const CXXRecordDecl* ret = GetFirstPolymorphicBase(rd)) {
+                return ret;
+            }
+
+            break;
+        }
+    }
+
+    return dyn_cast_or_null<CXXRecordDecl>(decl);
+}
+//-----------------------------------------------------------------------------
+
 void CfrontCodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 {
     auto* recordDecl = Struct(GetName(*stmt));
@@ -954,6 +975,8 @@ void CfrontCodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
                         mInitExprs.push_back(InitList({thunkOffset, Int32(0), reicast}, vtblData.vtableRecordType));
 
+                        mVirtualFunctions[{md, {stmt, GetFirstPolymorphicBase(stmt)}}] = funIdx;
+
                         ++funIdx;
                         break;
                     }
@@ -1003,27 +1026,6 @@ void CfrontCodeGenerator::InsertArg(const CXXRecordDecl* stmt)
 
         InsertArg(d);
     }
-}
-//-----------------------------------------------------------------------------
-
-///! Find the first polymorphic base class.
-static const CXXRecordDecl* GetFirstPolymorphicBase(const RecordDecl* decl)
-{
-    if(const auto* rdecl = dyn_cast_or_null<CXXRecordDecl>(decl); rdecl->getNumBases() >= 1) {
-        for(const auto& base : rdecl->bases()) {
-            const auto* rd = base.getType()->getAsRecordDecl();
-
-            if(const auto* cxxRd = dyn_cast_or_null<CXXRecordDecl>(rd); not cxxRd or not cxxRd->isPolymorphic()) {
-                continue;
-            } else if(const CXXRecordDecl* ret = GetFirstPolymorphicBase(rd)) {
-                return ret;
-            }
-
-            break;
-        }
-    }
-
-    return dyn_cast_or_null<CXXRecordDecl>(decl);
 }
 //-----------------------------------------------------------------------------
 

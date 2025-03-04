@@ -106,9 +106,9 @@ int __main(void)
 {
   C b;
   Constructor_C((C *)&b);
-  (*((void (*)(C *))((&b)->__vptrA[0]).f))((((C *)(char *)(&b)) + ((&b)->__vptrA[0]).d));
+  (*((void (*)(C *))((&b)->__vptrA[1]).f))((((C *)(char *)(&b)) + ((&b)->__vptrA[1]).d));
   A * a = (A *)&b;
-  (*((void (*)(A *))((a)->__vptrA[0]).f))((((A *)(char *)(a)) + ((a)->__vptrA[0]).d));
+  (*((void (*)(A *))((a)->__vptrA[1]).f))((((A *)(char *)(a)) + ((a)->__vptrA[1]).d));
   return 0;
   (*((void (*)(C *))((&b)->__vptrA[0]).f))((((C *)(char *)(&b)) + ((&b)->__vptrA[0]).d));
 }
