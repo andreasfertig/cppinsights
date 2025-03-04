@@ -30,7 +30,7 @@ jobs:
         # Clang
         - {
             name: "Linux Clang - Format check",
-            os: ubuntu-20.04,
+            os: ubuntu-22.04,
             build_type: Release,
             cformat_name: 'clang-format-19'
           }
