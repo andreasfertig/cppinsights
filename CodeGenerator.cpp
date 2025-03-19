@@ -4127,7 +4127,13 @@ void CodeGenerator::InsertArg(const CXXRecordDecl* stmt)
             if(const auto* value = captures[capturedVar]) {
                 // Since C++20 lambdas can capture structured bindings
                 if(const auto* bindingDecl = dyn_cast_or_null<BindingDecl>(capturedVar)) {
-                    capturedVar = bindingDecl->getHoldingVar();
+                    const auto* decompositionDecl = cast<DecompositionDecl>(bindingDecl->getDecomposedDecl());
+                    addToInits(GetName(*capturedVar),
+                               value,
+                               false,
+                               cinit,
+                               VarDecl::ListInit == decompositionDecl->getInitStyle());
+                    continue;
                 }
 
                 addToInits(GetName(*capturedVar),
