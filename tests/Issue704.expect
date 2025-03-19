@@ -1,0 +1,58 @@
+struct S
+{
+  int x;
+};
+
+
+void foo()
+{
+  S s = {1};
+  S & __s11 = s;
+  int & x = __s11.x;
+    
+  class __lambda_12_17
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    private: 
+    int x;
+    
+    public:
+    __lambda_12_17(int & _x)
+    : x{_x}
+    {}
+    
+  };
+  
+  __lambda_12_17 g = __lambda_12_17{x};
+}
+
+void bar()
+{
+  int arr[2] = {1, 2};
+  int (&__arr18)[2] = arr;
+  int & x = __arr18[0];
+  int & _ = __arr18[1];
+    
+  class __lambda_19_20
+  {
+    public: 
+    inline /*constexpr */ void operator()() const
+    {
+    }
+    
+    private: 
+    int x;
+    
+    public:
+    __lambda_19_20(int & _x)
+    : x{_x}
+    {}
+    
+  };
+  
+  __lambda_19_20 g = __lambda_19_20{x};
+}
