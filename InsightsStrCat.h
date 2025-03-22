@@ -57,7 +57,10 @@ inline std::string Normalize(const llvm::APFloat& arg)
     ::llvm::raw_string_ostream stream{str};
 
     arg.print(stream);
+#if IS_CLANG_NEWER_THAN(19)
+#else
     str.pop_back();
+#endif
 
     if(std::string::npos == str.find('.')) {
         /* in case it is a number like 10.0 toString() seems to leave out the .0. However, as this distinguished
