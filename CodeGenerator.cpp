@@ -2328,9 +2328,9 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
 
                 return false;
         }
-    };
+    }(castKind, hideImplicitCasts, stmt->isXValue() or ShowXValueCasts());
 
-    if(not isMatchingCast(castKind, hideImplicitCasts, stmt->isXValue() or ShowXValueCasts())) {
+    if(not isMatchingCast) {
         if(GetInsightsOptions().UseShow2C and (castKind == CastKind::CK_LValueToRValue) and
            IsReferenceType(dyn_cast_or_null<DeclRefExpr>(subExpr))) {
             mOutputFormatHelper.Append("*"sv);
@@ -2344,7 +2344,19 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
         // If this is part of an explicit cast, for example a CStyleCast or static_cast, ignore it, because it
         // belongs to the cast written by the user.
     } else if(stmt->isPartOfExplicitCast()) {
-        InsertArg(stmt->IgnoreCasts());
+        // For a CStyleCast we get an AST like this:
+        //
+        // CStyleCastExpr 0x13205cdc0 'uint32_t':'unsigned int' <NoOp>
+        // `-ImplicitCastExpr 0x13205cda8 'uint32_t':'unsigned int' <IntegralCast> part_of_explicit_cast
+        //  `-CStyleCastExpr 0x13205cd70 'uint16_t':'unsigned short' <NoOp>
+        //
+        // Without filtering the `uint32_t` cast appears twice. The code below takes that into account and skips the
+        // `ImplicitCastExpr` if the sub-expression is a `CStyleCastExpr`.
+        if(isa<CStyleCastExpr>(subExpr) or isa<CXXNamedCastExpr>(subExpr)) {
+            InsertArg(subExpr);
+        } else {
+            InsertArg(stmt->IgnoreCasts());
+        }
 
     } else {
         auto           castName{GetCastName(castKind)};

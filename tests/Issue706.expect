@@ -1,0 +1,11 @@
+#include <iostream>
+#include <cstdint>
+
+int main()
+{
+  int16_t a = static_cast<short>(32768);
+  std::cout.operator<<(a).operator<<(std::endl);
+  std::cout.operator<<(static_cast<unsigned int>(a)).operator<<(std::endl);
+  std::cout.operator<<(static_cast<unsigned int>(static_cast<unsigned short>(a))).operator<<(std::endl);
+  return 0;
+}
