@@ -1,0 +1,6 @@
+int main()
+{
+  int x = {};
+  unsigned int a = static_cast<unsigned int>(static_cast<unsigned short>(x));
+  return 0;
+}
