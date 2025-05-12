@@ -255,6 +255,7 @@ CXXStaticCastExpr* StaticCast(QualType toType, const Expr* toExpr, bool makePoin
     auto& ctx = GetGlobalAST();
 
     QualType sourceInfoToType = makePointer ? Ptr(toType) : toType;
+    toType                    = toType.getNonReferenceType();
 
     return CXXStaticCastExpr::Create(ctx,
                                      toType,
