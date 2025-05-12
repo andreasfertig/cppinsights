@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-__attribute__((visibility("default"))) __attribute__((returns_nonnull)) __attribute__((alloc_size(1))) void * operator new(std::size_t sz)
+__attribute__((visibility("default"))) __attribute__((returns_nonnull)) __attribute__((alloc_size(1))) void * operator new(unsigned long sz)
 {
   printf("global op new called, size = %zu\n", sz);
   return malloc(sz);

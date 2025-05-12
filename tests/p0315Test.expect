@@ -6,7 +6,7 @@ namespace A
   class __lambda_6_33
   {
     public: 
-    inline /*constexpr */ bool operator()() const
+    inline bool operator()() const
     {
       return true;
     }
@@ -18,7 +18,7 @@ namespace A
     };
     
     private: 
-    static inline /*constexpr */ bool __invoke()
+    static inline bool __invoke()
     {
       return __lambda_6_33{}.operator()();
     }

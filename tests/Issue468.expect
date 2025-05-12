@@ -2,7 +2,7 @@
 class __lambda_3_29
 {
   public: 
-  inline /*constexpr */ auto operator()() const
+  inline auto operator()() const
   {
     return true;
   }
@@ -14,7 +14,7 @@ class __lambda_3_29
   };
   
   private: 
-  static inline /*constexpr */ auto __invoke()
+  static inline auto __invoke()
   {
     return __lambda_3_29{}.operator()();
   }

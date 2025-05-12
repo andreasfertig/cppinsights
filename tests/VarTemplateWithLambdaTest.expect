@@ -6,13 +6,13 @@ class __lambda_8_23
 {
   public: 
   template<class type_parameter_1_0>
-  inline /*constexpr */ auto operator()(type_parameter_1_0 x) const
+  inline auto operator()(type_parameter_1_0 x) const
   {
     return T(x);
   }
   private: 
   template<class type_parameter_1_0>
-  static inline /*constexpr */ auto __invoke(type_parameter_1_0 x)
+  static inline auto __invoke(type_parameter_1_0 x)
   {
     return __lambda_8_23{}.operator()<type_parameter_1_0>(x);
   }
@@ -57,13 +57,13 @@ class __lambda_11_29
 {
   public: 
   template<class type_parameter_1_0>
-  inline /*constexpr */ auto operator()(type_parameter_1_0 x) const
+  inline auto operator()(type_parameter_1_0 x) const
   {
     return T{{x}};
   }
   private: 
   template<class type_parameter_1_0>
-  static inline /*constexpr */ auto __invoke(type_parameter_1_0 x)
+  static inline auto __invoke(type_parameter_1_0 x)
   {
     return __lambda_11_29{}.operator()<type_parameter_1_0>(x);
   }

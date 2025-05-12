@@ -11,9 +11,9 @@
 .tmp.cpp:40:14: error: function '__invoke' with deduced return type cannot be used before it is defined
    40 |       return __invoke;
       |              ^
-.tmp.cpp:44:39: note: '__invoke' declared here
-   44 |     static inline /*constexpr */ auto __invoke()
-      |                                       ^
+.tmp.cpp:44:24: note: '__invoke' declared here
+   44 |     static inline auto __invoke()
+      |                        ^
 .tmp.cpp:38:22: error: no return statement in constexpr function
    38 |     inline constexpr operator retType_9_14 () const noexcept
       |                      ^

@@ -1,4 +1,4 @@
-namespace Test [[deprecated]] {
+namespace [[deprecated]] Test {
     void Fun() {}
 }
 

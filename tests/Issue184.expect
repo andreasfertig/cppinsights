@@ -33,7 +33,7 @@ struct CustomerEq
 
 struct CustomerHash
 {
-  inline std::size_t operator()(const Customer & c) const
+  inline unsigned long operator()(const Customer & c) const
   {
     return static_cast<const std::__string_hash<char, std::allocator<char> >&>(std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >()).operator()(c.getName());
   }
@@ -48,13 +48,12 @@ struct ManyParentsWithOperator : public Bases...
   using Bases::operator()...;
 };
 
-/* First instantiated from: is_empty.h:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, public CustomerEq
 {
   using CustomerHash::operator();
-  // inline std::size_t CustomerHash::operator()(const Customer & c) const;
+  // inline unsigned long CustomerHash::operator()(const Customer & c) const;
   
   using CustomerEq::operator();
   // inline bool CustomerEq::operator()(const Customer & c0, const Customer & c1) const;
@@ -63,7 +62,6 @@ struct ManyParentsWithOperator<CustomerHash, CustomerEq> : public CustomerHash, 
 };
 
 #endif
-/* First instantiated from: is_empty.h:22 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, public CustomerHash
@@ -72,7 +70,7 @@ struct ManyParentsWithOperator<CustomerEq, CustomerHash> : public CustomerEq, pu
   // inline bool CustomerEq::operator()(const Customer & c0, const Customer & c1) const;
   
   using CustomerHash::operator();
-  // inline std::size_t CustomerHash::operator()(const Customer & c) const;
+  // inline unsigned long CustomerHash::operator()(const Customer & c) const;
   
   // inline constexpr ManyParentsWithOperator() noexcept = default;
 };
