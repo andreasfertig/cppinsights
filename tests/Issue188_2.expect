@@ -7,7 +7,7 @@ namespace mstd
   {
   };
   
-  template<std::size_t _Idx, typename _Head, bool _IsEmptyNotFinal>
+  template<unsigned long _Idx, typename _Head, bool _IsEmptyNotFinal>
   struct _Head_base;
   /* First instantiated from: Issue188_2.cpp:52 */
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -43,7 +43,7 @@ namespace mstd
   };
   
   #endif
-  template<std::size_t _Idx, typename _Head>
+  template<unsigned long _Idx, typename _Head>
   struct _Head_base<_Idx, _Head, true> : public _Head
   {
     inline constexpr _Head_base()
@@ -59,7 +59,7 @@ namespace mstd
     inline constexpr _Head_base(const _Head_base &) = default;
   };
   
-  template<std::size_t _Idx, typename _Head>
+  template<unsigned long _Idx, typename _Head>
   struct _Head_base<_Idx, _Head, false>
   {
     inline constexpr _Head_base()
@@ -76,7 +76,7 @@ namespace mstd
     _Head _M_head_impl;
   };
   
-  template<std::size_t _Idx, typename ... _Elements>
+  template<unsigned long _Idx, typename ... _Elements>
   struct _Tuple_impl;
   /* First instantiated from: Issue188_2.cpp:51 */
   #ifdef INSIGHTS_USE_TEMPLATE
@@ -111,7 +111,7 @@ namespace mstd
   template<>
   struct _Tuple_impl<3>
   {
-    template<std::size_t , typename ... type_parameter_0_1>
+    template<unsigned long , typename ... type_parameter_0_1>
     friend class _Tuple_impl;
     inline constexpr _Tuple_impl() noexcept = default;
   };
@@ -138,10 +138,10 @@ namespace mstd
   };
   
   #endif
-  template<std::size_t _Idx>
+  template<unsigned long _Idx>
   struct _Tuple_impl<_Idx>
   {
-    template<std::size_t , typename ... type_parameter_1_1>
+    template<unsigned long , typename ... type_parameter_1_1>
     friend class _Tuple_impl;
     inline _Tuple_impl() = default;
   };
@@ -174,7 +174,7 @@ namespace mstd
   
   template<typename _Tp>
   using __empty_not_final = typename std::conditional<__is_final(_Tp), std::false_type, __is_empty_non_tuple<_Tp> >::type;
-  template<std::size_t _Idx, typename _Head, typename ... _Tail>
+  template<unsigned long _Idx, typename _Head, typename ... _Tail>
   struct _Tuple_impl<_Idx, _Head, _Tail...> : public _Tuple_impl<_Idx + 1, _Tail...>, private _Head_base<_Idx, _Head, __empty_not_final<_Head>::value>
   {
     using _Inherited = _Tuple_impl<_Idx + 1, _Tail...>;

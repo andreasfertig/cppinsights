@@ -4,7 +4,7 @@ namespace Test
   class __lambda_7_5
   {
     public: 
-    inline /*constexpr */ void operator()() const
+    inline void operator()() const
     {
     }
     
@@ -15,7 +15,7 @@ namespace Test
     };
     
     private: 
-    static inline /*constexpr */ void __invoke()
+    static inline void __invoke()
     {
       __lambda_7_5{}.operator()();
     }
@@ -30,7 +30,7 @@ namespace Test
   class __lambda_9_14
   {
     public: 
-    inline /*constexpr */ auto operator()() const
+    inline auto operator()() const
     {
     }
     
@@ -41,7 +41,7 @@ namespace Test
     };
     
     private: 
-    static inline /*constexpr */ auto __invoke()
+    static inline auto __invoke()
     {
       return __lambda_9_14{}.operator()();
     }
