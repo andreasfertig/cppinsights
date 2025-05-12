@@ -9,7 +9,7 @@ struct Iterable
   struct Iterator
   {
     Iterable * m_iterable;
-    std::size_t m_pos;
+    unsigned long m_pos;
     inline bool operator==(const Iterator<access_type> & other)
     {
       return (this->m_iterable == other.m_iterable) && (this->m_pos == other.m_pos);
@@ -40,7 +40,7 @@ struct Iterable
   struct Iterator<int>
   {
     Iterable * m_iterable;
-    std::size_t m_pos;
+    unsigned long m_pos;
     inline bool operator==(const Iterator<int> & other)
     {
       return (this->m_iterable == other.m_iterable) && (this->m_pos == other.m_pos);
@@ -73,7 +73,7 @@ struct Iterable
   struct Iterator<float>
   {
     Iterable * m_iterable;
-    std::size_t m_pos;
+    unsigned long m_pos;
     inline bool operator==(const Iterator<float> & other)
     {
       return (this->m_iterable == other.m_iterable) && (this->m_pos == other.m_pos);

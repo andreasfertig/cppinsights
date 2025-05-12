@@ -3532,11 +3532,11 @@ void CodeGenerator::InsertArg(const NamespaceDecl* stmt)
 
     mOutputFormatHelper.Append(kwNamespace);
 
+    InsertAttributes(stmt);
+
     if(not stmt->isAnonymousNamespace()) {
         mOutputFormatHelper.Append(" "sv, stmt->getName());
     }
-
-    InsertAttributes(stmt);
 
     mOutputFormatHelper.AppendNewLine();
 

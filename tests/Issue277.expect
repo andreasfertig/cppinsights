@@ -6,7 +6,7 @@ struct Point
 };
 
 
-template<std::size_t N>
+template<unsigned long N>
 inline constexpr int & get(Point & p)
 {
   return p.data[N];
@@ -55,7 +55,7 @@ namespace std
   {
   };
   
-  template<size_t N>
+  template<unsigned long N>
   struct tuple_element<N, Point> : public type_t<int>
   {
   };

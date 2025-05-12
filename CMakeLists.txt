@@ -32,7 +32,7 @@ option(INSIGHTS_STATIC              "Use static linking"         Off)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
-set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 19)
+set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 20)
 set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
@@ -779,7 +779,7 @@ if(INSIGHTS_COVERAGE)
 
             add_custom_target(coverage
                 COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir ${GCOV_TOOL} --base-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/insights.dir --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
-                COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/Applications/*" "/usr/*" "/Users/runner/work/cppinsights/cppinsights/current/*" "./current/*" "./build/*" "./cmake*/*" "${CMAKE_CURRENT_BINARY_DIR}" "./cppinsights/docs/*" "./cppinsights/tests/*" -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
+                COMMAND lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info --ignore-errors unused "/Applications/*" "/usr/*" "/Users/runner/work/cppinsights/cppinsights/current/*" "./current/*" "./build/*" "./cmake*/*" "${CMAKE_CURRENT_BINARY_DIR}" "./cppinsights/docs/*" "./cppinsights/tests/*" -o ${CMAKE_CURRENT_BINARY_DIR}/filtered.info
                 DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
                 COMMENT "Running code coverage analysis" VERBATIM
             )

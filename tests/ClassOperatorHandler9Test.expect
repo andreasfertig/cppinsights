@@ -8,27 +8,27 @@ class MyVector
   std::vector<T> v;
   
   public: 
-  inline MyVector(const std::size_t n)
+  inline MyVector(const unsigned long n)
   : v(n)
   {
   }
   
-  inline MyVector(const std::size_t n, const double initialValue)
+  inline MyVector(const unsigned long n, const double initialValue)
   : v(n, initialValue)
   {
   }
   
-  inline std::size_t size() const
+  inline unsigned long size() const
   {
     return this->v.size();
   }
   
-  inline T operator[](const std::size_t i) const
+  inline T operator[](const unsigned long i) const
   {
     return this->v[i];
   }
   
-  inline T & operator[](const std::size_t i)
+  inline T & operator[](const unsigned long i)
   {
     return this->v[i];
   }
@@ -43,27 +43,27 @@ class MyVector<int>
   std::vector<int, std::allocator<int> > v;
   
   public: 
-  inline MyVector(const std::size_t n)
+  inline MyVector(const unsigned long n)
   : v{std::vector<int, std::allocator<int> >(n)}
   {
   }
   
-  inline MyVector(const std::size_t n, const double initialValue)
+  inline MyVector(const unsigned long n, const double initialValue)
   : v{std::vector<int, std::allocator<int> >(n, static_cast<const int>(initialValue))}
   {
   }
   
-  inline std::size_t size() const
+  inline unsigned long size() const
   {
     return this->v.size();
   }
   
-  inline int operator[](const std::size_t i) const
+  inline int operator[](const unsigned long i) const
   {
     return this->v.operator[](i);
   }
   
-  inline int & operator[](const std::size_t i)
+  inline int & operator[](const unsigned long i)
   {
     return this->v.operator[](i);
   }
@@ -79,7 +79,7 @@ using vec_t = MyVector<int>;
 MyVector<int> operator+(const MyVector<int> & a, const MyVector<int> & b)
 {
   MyVector<int> result = MyVector<int>(a.size()) /* NRVO variable */;
-  for(std::size_t s = 0; s <= a.size(); ++s) {
+  for(unsigned long s = 0; s <= a.size(); ++s) {
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
   
@@ -90,7 +90,7 @@ template<typename T>
 MyVector<T> operator*(const MyVector<T> & a, const MyVector<T> & b)
 {
   MyVector<T> result = a.size() /* NRVO variable */;
-  for(std::size_t s = 0; s <= a.size(); ++s) {
+  for(unsigned long s = 0; s <= a.size(); ++s) {
     result[s] = operator+(a[s], b[s]);
   }
   
@@ -103,7 +103,7 @@ template<>
 MyVector<int> operator*<int>(const MyVector<int> & a, const MyVector<int> & b)
 {
   MyVector<int> result = MyVector<int>(a.size()) /* NRVO variable */;
-  for(std::size_t s = 0; s <= a.size(); ++s) {
+  for(unsigned long s = 0; s <= a.size(); ++s) {
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
   
@@ -115,7 +115,7 @@ MyVector<int> operator*<int>(const MyVector<int> & a, const MyVector<int> & b)
 MyVector<int> Foo(const MyVector<int> & a, const MyVector<int> & b)
 {
   MyVector<int> result = MyVector<int>{a.size()} /* NRVO variable */;
-  for(std::size_t s = 0; s <= a.size(); ++s) {
+  for(unsigned long s = 0; s <= a.size(); ++s) {
     result.operator[](s) = (a.operator[](s) + b.operator[](s));
   }
   
