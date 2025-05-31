@@ -83,8 +83,17 @@ void LifetimeTracker::InsertDtorCall(const VarDecl* vd, OutputFormatHelper& ofm)
 
     auto insertDtor = [&](Expr* member) {
         auto* mem = AccessMember(member, dtorDecl, vd->getType()->isPointerType());
-        cg->InsertArg(CallMemberFun(mem, dtorDecl->getType()));
-        ofm.AppendSemiNewLine();
+
+        if(GetInsightsOptions().UseShow2C) {
+            cg->InsertArg(CallMemberFun(mem, dtorDecl->getType()));
+            ofm.AppendSemiNewLine();
+
+        } else {
+            OutputFormatHelper   ofmTmp{};
+            CodeGeneratorVariant cg2{ofmTmp};
+            cg2->InsertArg(CallMemberFun(mem, dtorDecl->getType()));
+            cg->InsertArg(Comment(ofmTmp.GetString()));
+        }
     };
 
     if(const auto* ar = dyn_cast_or_null<ConstantArrayType>(vd->getType()); ar and not GetInsightsOptions().UseShow2C) {
