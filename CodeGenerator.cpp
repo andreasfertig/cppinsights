@@ -797,16 +797,20 @@ void CodeGenerator::InsertArg(const CompoundAssignOperator* stmt)
     }
 
     WrapInParensIfNeeded(needLHSParens, [&] {
-        clang::ExprResult res = stmt->getLHS();
-
-        // This cast is not present in the AST. However, if the LHS type is smaller than RHS there is an implicit cast
-        // to RHS-type and the result is casted back to LHS-type: static_cast<LHSTy>( static_cast<RHSTy>(LHS) + RHS )
-        if(const auto resultingType = GetGlobalCI().getSema().PrepareScalarCast(res, stmt->getComputationLHSType());
-           resultingType != CK_NoOp) {
-            const QualType castDestType = stmt->getComputationLHSType();
-            FormatCast(kwStaticCast, castDestType, stmt->getLHS(), resultingType);
-        } else {
+        if(stmt->getDependence() != ExprDependenceScope::ExprDependence::None) {
             InsertArg(stmt->getLHS());
+        } else {
+            clang::ExprResult res = stmt->getLHS();
+            // This cast is not present in the AST. However, if the LHS type is smaller than RHS there is an implicit
+            // cast to RHS-type and the result is casted back to LHS-type: static_cast<LHSTy>( static_cast<RHSTy>(LHS) +
+            // RHS )
+            if(const auto resultingType = GetGlobalCI().getSema().PrepareScalarCast(res, stmt->getComputationLHSType());
+               resultingType != CK_NoOp) {
+                const QualType castDestType = stmt->getComputationLHSType();
+                FormatCast(kwStaticCast, castDestType, stmt->getLHS(), resultingType);
+            } else {
+                InsertArg(stmt->getLHS());
+            }
         }
     });
 
