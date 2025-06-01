@@ -18,6 +18,6 @@ void Basic()
   int x = {2};
   ++x;
   /* x // lifetime ends here */
-  t[0].~Test();
-  t[1].~Test();
+  /* t[0].~Test() */
+  /* t[1].~Test() */
 }
