@@ -2900,10 +2900,8 @@ void CodeGenerator::InsertArg(const LambdaExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertArg(const CXXThisExpr* stmt)
+void CodeGenerator::InsertArg(const CXXThisExpr*)
 {
-    DPrint("thisExpr: imlicit=%d %s\n", stmt->isImplicit(), GetName(GetDesugarType(stmt->getType())));
-
     mOutputFormatHelper.Append(kwThis);
 }
 //-----------------------------------------------------------------------------
@@ -4601,11 +4599,20 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
 
         break;
         case TemplateArgument::Pack: HandleTemplateParameterPack(arg.pack_elements()); break;
-        case TemplateArgument::Template:
-            mOutputFormatHelper.Append(GetName(*arg.getAsTemplate().getAsTemplateDecl()));
-            break;
+        case TemplateArgument::Template: [[fallthrough]];
         case TemplateArgument::TemplateExpansion:
-            mOutputFormatHelper.Append(GetName(*arg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()));
+            if(const auto* tmplDecl = arg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()) {
+                mOutputFormatHelper.Append(GetName(*tmplDecl));
+
+            } else if(const auto* depName = arg.getAsTemplateOrTemplatePattern().getAsDependentTemplateName();
+                      depName->isIdentifier()) {
+                InsertNamespace(depName->getQualifier());
+
+                mOutputFormatHelper.Append(kwTemplateSpace, depName->getIdentifier()->getName());
+            } else {
+                ToDo(arg, mOutputFormatHelper);
+            }
+
             break;
         case TemplateArgument::Null: mOutputFormatHelper.Append("null"sv); break;
         case TemplateArgument::StructuralValue: mOutputFormatHelper.Append(arg.getAsStructuralValue()); break;
@@ -5245,10 +5252,8 @@ void StructuredBindingsCodeGenerator::InsertArg(const DeclRefExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
-void LambdaCodeGenerator::InsertArg(const CXXThisExpr* stmt)
+void LambdaCodeGenerator::InsertArg(const CXXThisExpr*)
 {
-    DPrint("thisExpr: imlicit=%d %s\n", stmt->isImplicit(), GetName(GetDesugarType(stmt->getType())));
-
     if(mCapturedThisAsCopy) {
         mOutputFormatHelper.Append("(&"sv, kwInternalThis, ")"sv);
 

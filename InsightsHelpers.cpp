@@ -1504,7 +1504,7 @@ static std::optional<bool> EvaluateAsBoolenCondition(const Expr& expr, const Dec
 {
     bool r{false};
 
-    if(expr.EvaluateAsBooleanCondition(r, decl.getASTContext())) {
+    if(not isa<ConceptSpecializationExpr>(expr) and expr.EvaluateAsBooleanCondition(r, decl.getASTContext())) {
         return {r};
     }
 
