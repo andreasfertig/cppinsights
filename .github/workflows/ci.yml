@@ -449,15 +449,17 @@ jobs:
 # BUILD INSIDE DOCKER
 #------------------------------------------------------------------------------
   docker:
-    runs-on: ubuntu-22.04
-    name: ${{ matrix.config.name }} @${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.config.name }} @${{ matrix.os == 'ubuntu-22.04-arm' && 'arm64' || 'amd64' }}
     continue-on-error: false
+    container:
+      image: andreasfertig/cppinsights-builder
     strategy:
       fail-fast: false
       matrix:
-        arch:
-          - arm64
-          - amd64
+        os:
+          - ubuntu-22.04
+          - ubuntu-22.04-arm
 
         config:
         # GCC 14 / LLVM 20
@@ -514,43 +516,20 @@ jobs:
           }
 
     steps:
+    - name: Set environment variable
+      shell: bash
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
+          echo "ARCH=arm64" >> $GITHUB_ENV
+        else
+          echo "ARCH=amd64" >> $GITHUB_ENV
+        fi
     - uses: actions/checkout@v4
       with:
         path: cppinsights
 
-    - name: Create docker shell
-      shell: bash
-      run: |
-          cat > docker-shell << "EOF"
-          #! /bin/bash
-          cp $1 ./__cmd.sh
-
-          docker run \
-            --rm \
-            -v "/var/run/docker.sock":"/var/run/docker.sock" \
-            -v "/home/runner/work/_temp/_github_home":"/github/home" \
-            -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
-            -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
-            -v "/home/runner/work/cppinsights/cppinsights":"/github/workspace" \
-            --workdir /github/workspace \
-            --user $(id -u):$(id -g) \
-            --platform linux/${{ matrix.arch }} \
-            andreasfertig/cppinsights-builder \
-            /bin/bash -e ./__cmd.sh
-          EOF
-
-          sudo mv docker-shell /usr/bin/docker-shell
-          sudo chmod 0755 /usr/bin/docker-shell
-
-    - name: Set up QEMU
-      if:  matrix.arch == 'arm64'
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: arm64
-
     - name: Configure
       id: cmake_configure
-      shell: docker-shell {0}
       run: |
           mkdir build
           cd build
@@ -558,13 +537,12 @@ jobs:
           CXX=${{ matrix.config.cxx }} cmake -G Ninja -DINSIGHTS_STATIC=${{ matrix.config.static }} -DDEBUG=${{ matrix.config.debug }} -DINSIGHTS_COVERAGE=${{ matrix.config.coverage }} -DINSIGHTS_USE_LIBCPP=${{ matrix.config.libcxx }} ../cppinsights
 
     - name: Build
-      shell: docker-shell {0}
       run: |
           cmake --build build
 
     - name: Simple test
       if:  "((matrix.config.coverage != 'Yes') && (matrix.config.run_tests != 'Yes'))"
-      shell: docker-shell {0}
+      shell: bash
       run: |
           ./build/insights cppinsights/tests/SimpleCICompileTest.cpp
           ./build/insights --use-libc++ cppinsights/tests/SimpleCICompileTest.cpp
@@ -572,24 +550,14 @@ jobs:
     - name: Run tests
       if:  matrix.config.run_tests == 'Yes'
       id: run_tests
-      shell: docker-shell {0}
       run: |
           cmake --build build --target tests
 
-    # docker-shell fails building doc with an unknown reason. Use the original container
-    - name: Make docs 1/2
-      if:  "((matrix.arch == 'amd64') && (matrix.config.docs == 'Yes'))"
-      uses: docker://andreasfertig/cppinsights-builder:latest
-      with:
-        args: |
-          /bin/bash -c "cmake --build build --target doc"
-
-    - name: Make docs 2/2
-      if:  "((matrix.arch == 'amd64') && (matrix.config.docs == 'Yes'))"
-      working-directory: ${{ github.workspace }}/build
+    - name: Make docs
       shell: bash
+      if:  "((env.ARCH == 'amd64') && (matrix.config.docs == 'Yes'))"
       run: |
-          sudo chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}/build/
+          cmake --build build --target doc
           ls -l ${GITHUB_WORKSPACE}/build/
           ls -l ${GITHUB_WORKSPACE}/build/html
           mkdir -p ${GITHUB_WORKSPACE}/build/archive
@@ -598,22 +566,34 @@ jobs:
     - name: Run coverage
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage
-      shell: docker-shell {0}
       run: |
           cmake --build build --target coverage
           rm -f build/coverage.info
 
+    - name: Run download codecov
+      if:  matrix.config.coverage == 'Yes'
+      working-directory: ${{ github.workspace }}
+      shell: bash
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-22.04-arm" ]]; then
+          curl -O --retry 5 --retry-delay 2 "https://cli.codecov.io/latest/linux-arm64/codecov"
+        else
+          curl -O --retry 5 --retry-delay 2 "https://cli.codecov.io/latest/linux/codecov"
+        fi
+          chmod +x ./codecov
+
     - name: Upload code coverage info
       if:  matrix.config.coverage == 'Yes'
       id: run_coverage_upload
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
         exclude: build
-        flags: ${{ matrix.config.archive_name }}-${{ matrix.arch }}-libcxx-${{ matrix.config.libcxx }}
+        flags: ${{ matrix.config.archive_name }}-${{ env.ARCH }}-libcxx-${{ matrix.config.libcxx }}
         disable_search: true
         fail_ci_if_error: true
+        binary: ${{ github.workspace }}/codecov # Currently, the docker container comes without gpg
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
@@ -622,13 +602,13 @@ jobs:
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/build/archive
 
-        tar -cvzf ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-${{ matrix.arch }}.tar.gz ${{ matrix.config.bin_name }}
-        sha256sum ${GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }} > ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-${{ matrix.arch }}.sha256
+        tar -cvzf ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-$ARCH.tar.gz ${{ matrix.config.bin_name }}
+        sha256sum ${GITHUB_WORKSPACE}/build/${{ matrix.config.bin_name }} > ${GITHUB_WORKSPACE}/build/archive/${{ matrix.config.archive_name }}-$ARCH.sha256
 
     - uses: actions/upload-artifact@v4
       if:  matrix.config.upload == 'Yes'
       with:
-        name: insights-artifact-ubuntu-${{ matrix.arch }}
+        name: insights-artifact-ubuntu-${{ env.ARCH }}
         if-no-files-found: error
         path: |
             ${{ github.workspace }}/build/archive/*
