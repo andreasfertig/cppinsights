@@ -29,7 +29,6 @@ int main()
   return 0;
 }
 
-
 ```
 [Live view](https://cppinsights.io/lnk?code=I2luY2x1ZGUgPGluaXRpYWxpemVyX2xpc3Q+CgppbnQgbWFpbigpCnsKICAgIGF1dG8gaSA9IDM7ICAgICAgIC8vIGludAogICAgYXV0byBhID0gezQyfTsgICAgLy8gaW5pdGlhbGl6ZXIgbGlzdAogICAgYXV0byBiezQyfTsgICAgICAgLy8gaW50CiAgICBhdXRvIGMgPSB7MSwgMn07ICAvLyBpbml0aWFsaXplciBsaXN0Cn0=&insightsOptions=cpp2a&rev=1.0)
 <!-- transformed-end:auto-uniform-initialization-and-the-equal-sign.cpp -->

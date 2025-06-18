@@ -263,6 +263,16 @@ At least for macOS, you can install C++ Insights via Homebrew thanks to [this fo
 brew install cppinsights
 ```
 
+## Bash autocomplete
+
+There is a bash autocomplete script. It autocompletes the C++ Insights options as well as the Clang options provided after `--`.
+You can download it with the following commands:
+
+```
+cd <YOUR_BASH_COMPLETION.D>
+curl -o insights https://github.com/andreasfertig/cppinsights/tree/main/scripts/bash-autocomplete.sh
+```
+
 
 ## Compatibility
 

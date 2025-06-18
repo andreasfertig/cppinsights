@@ -549,6 +549,7 @@ jobs:
 
     - name: Run tests
       if:  matrix.config.run_tests == 'Yes'
+      shell: bash
       id: run_tests
       run: |
           cmake --build build --target tests

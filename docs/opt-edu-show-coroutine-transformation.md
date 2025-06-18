@@ -6,21 +6,11 @@ __Default:__ Off
 __Examples:__
 
 ```.cpp
-#if __has_include(<coroutine>)
 #include <coroutine>
-#elif __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std {
-using namespace std::experimental;
-}
-#else
-#error "No coroutine header"
-#endif
-
 #include <cstdio>
 #include <exception>
 #include <new>
+#include <utility>
 
 struct generator
 {
@@ -43,7 +33,7 @@ struct generator
 
     generator(generator const&) = delete;
     generator(generator&& rhs)
-    : p{std::exchange(rhs.p, nullptr)}
+    : handle{std::exchange(rhs.handle, nullptr)}
     {
     }
 
@@ -104,21 +94,11 @@ transforms into this:
  * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
  *       Most of it is _not_ present in the AST. What you see is an approximation.   *
  *************************************************************************************/
-#if __has_include(<coroutine>)
 #include <coroutine>
-#elif __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std {
-using namespace std::experimental;
-}
-#else
-#error "No coroutine header"
-#endif
-
 #include <cstdio>
 #include <exception>
 #include <new>
+#include <utility>
 
 struct generator
 {
@@ -165,14 +145,14 @@ struct generator
   
   inline ~generator() noexcept
   {
-    if(/* INSIGHTS-TODO: CodeGenerator.cpp:4287 stmt: RecoveryExpr */) {
+    if(/* INSIGHTS-TODO: CodeGenerator.cpp:4519 stmt: RecoveryExpr */) {
     } 
     
   }
   
   inline void run()
   {
-    if(/* INSIGHTS-TODO: CodeGenerator.cpp:4287 stmt: RecoveryExpr */) {
+    if(/* INSIGHTS-TODO: CodeGenerator.cpp:4519 stmt: RecoveryExpr */) {
     } 
     
   }
@@ -192,13 +172,11 @@ struct generator
 };
 
 
-
 generator fun()
 {
   printf("Hello,");
   printf("C++ Insights.\n");
 }
-
 
 int main()
 {
@@ -209,6 +187,5 @@ int main()
   printf("value: %d\n", s.value());
   return 0;
 }
-
 
 ```

@@ -1,18 +1,8 @@
-#if __has_include(<coroutine>)
 #include <coroutine>
-#elif __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-
-namespace std {
-using namespace std::experimental;
-}
-#else
-#error "No coroutine header"
-#endif
-
 #include <cstdio>
 #include <exception>
 #include <new>
+#include <utility>
 
 struct generator
 {
@@ -35,7 +25,7 @@ struct generator
 
     generator(generator const&) = delete;
     generator(generator&& rhs)
-    : p{std::exchange(rhs.p, nullptr)}
+    : handle{std::exchange(rhs.handle, nullptr)}
     {
     }
 

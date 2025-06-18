@@ -27,5 +27,4 @@ struct Data  /* size: 12, align: 4 */
 };
 
 
-
 ```

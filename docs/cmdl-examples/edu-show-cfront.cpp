@@ -1,5 +1,3 @@
-// cmdlineinsights:-edu-show-cfront
-
 #include <cstdio>
 
 class A

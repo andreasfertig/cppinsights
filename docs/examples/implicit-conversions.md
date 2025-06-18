@@ -38,6 +38,7 @@ int main()
 Here is the transformed code:
 ```{.cpp}
 #include <cstdio>
+
 template<typename U>
 class X
 {
@@ -106,7 +107,6 @@ class X<const int>
 
 #endif
 
-
 int main()
 {
   X<int> arr[2] = {X<int>{}, X<int>{}};
@@ -121,7 +121,6 @@ int main()
   }
   return 0;
 }
-
 
 ```
 [Live view](https://cppinsights.io/lnk?code=I2luY2x1ZGUgPGNzdGRpbz4KdGVtcGxhdGU8dHlwZW5hbWUgVT4KY2xhc3MgWAp7CnB1YmxpYzoKICAgIFgoKSAgICAgICAgICAgPSBkZWZhdWx0OwogICAgWChjb25zdCBYJiB4KSA9IGRlZmF1bHQ7CgogICAgdGVtcGxhdGU8dHlwZW5hbWUgVD4KICAgIFgoVCYmIHgpCiAgICA6IG1Ye30KICAgIHsKICAgIH0KCnByaXZhdGU6CiAgICBVIG1YOwp9OwoKaW50IG1haW4oKQp7CiAgICBYPGludD4gYXJyWzJde307CgogICAgLy8gV2UgdXNlIFg8Y29uc3QgaW50PiBpbnN0ZWFkIG9mIFg8aW50PiBoZXJlLiBUaGlzIHJlc3VsdHMKICAgIC8vIGluIGEgY29uc3RydWN0b3IgY2FsbCB0byBjcmVhdGUgYSBYPGNvbnN0IGludD4gb2JqZWN0IGFzCiAgICAvLyB5b3UgY2FuIHNlZSBpbiB0aGUgdHJhbnNmb3JtYXRpb24uCiAgICBmb3IoY29uc3QgWDxjb25zdCBpbnQ+JiB4IDogYXJyKSB7CiAgICB9Cn0=&insightsOptions=cpp2a&rev=1.0)

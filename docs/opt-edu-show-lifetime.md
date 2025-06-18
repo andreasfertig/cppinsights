@@ -6,29 +6,30 @@ __Default:__ Off
 __Examples:__
 
 ```.cpp
-struct Data {
+struct Data
+{
     int mData[5]{};
 
-const    int* begin() const { return mData; }
-const    int* end() const { return mData + 1;}
+    const int* begin() const { return mData; }
+    const int* end() const { return mData + 1; }
 };
 
+struct Keeper
+{
+    Data data{2, 3, 4};
 
-
-struct Keeper {
-  Data data{2, 3, 4};
-
-  auto& items() const { return data; }
+    auto& items() const { return data; }
 };
 
 Keeper get()
 {
-  return {};
+    return {};
 }
 
 int main()
 {
-  for(auto& item : get().items()) {  }
+    for(auto& item : get().items()) {
+    }
 }
 ```
 
@@ -55,9 +56,6 @@ struct Data
 };
 
 
-
-
-
 struct Keeper
 {
   Data data{{2, 3, 4, 0, 0}};
@@ -69,19 +67,17 @@ struct Keeper
 };
 
 
-
 Keeper get()
 {
   return {{{2, 3, 4, 0, 0}}};
 }
 
-
 int main()
 {
   {
-    Keeper __temporary23_24 = get();
-    const Data & __range1 = static_cast<const Keeper &&>(__temporary23_24).items();
-    /* __temporary23_24 // lifetime ends here */
+    Keeper __temporary23_26 = get();
+    const Data & __range1 = static_cast<const Keeper &&>(__temporary23_26).items();
+    /* __temporary23_26 // lifetime ends here */
     const int * __begin1 = __range1.begin();
     const int * __end1 = __range1.end();
     for(; __begin1 != __end1; ++__begin1) {
@@ -93,6 +89,5 @@ int main()
   }
   return 0;
 }
-
 
 ```

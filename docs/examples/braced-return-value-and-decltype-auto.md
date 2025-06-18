@@ -21,7 +21,6 @@ int & Bar()
   return (x);
 }
 
-
 ```
 [Live view](https://cppinsights.io/lnk?code=ZGVjbHR5cGUoYXV0bykgQmFyKCkKewogICAgaW50IHggPSAyMjsKICAgIC8vIGRvIHNvbWUgZmFuY3kgY2FsY3VsYXRpb24gd2l0aCB4CiAgICByZXR1cm4gKHgpOwp9&insightsOptions=cpp2a&rev=1.0)
 <!-- transformed-end:braced-return-value-and-decltype-auto.cpp -->

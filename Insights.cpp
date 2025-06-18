@@ -55,16 +55,6 @@ static llvm::cl::OptionCategory gInsightEduCategory(
     "This transformations are only for education purposes. The resulting code most likely does not compile."sv);
 //-----------------------------------------------------------------------------
 
-static llvm::cl::opt<bool> gStdinMode("stdin",
-                                      llvm::cl::desc("Read the input from <stdin>."sv),
-                                      llvm::cl::init(false),
-                                      llvm::cl::cat(gInsightCategory));
-//-----------------------------------------------------------------------------
-
-static llvm::cl::opt<bool>
-    gUseLibCpp("use-libc++", llvm::cl::desc("Use libc++."sv), llvm::cl::init(false), llvm::cl::cat(gInsightCategory));
-//-----------------------------------------------------------------------------
-
 #define INSIGHTS_OPT(option, name, deflt, description, category)                                                       \
     static llvm::cl::opt<bool, true> g##name(option,                                                                   \
                                              llvm::cl::desc(std::string_view{description}),                            \
@@ -397,7 +387,17 @@ extern struct __mptr* __vtbl_array[];
     auto opExpected = CommonOptionsParser::create(argc, argv, gInsightCategory);
 
     if(auto err = opExpected.takeError()) {
-        llvm::errs() << toString(std::move(err)) << "\n";
+        if(gAutoComplete) {
+#define INSIGHTS_OPT(option, name, deflt, description, category) llvm::outs() << "--" << option << " ";
+
+#include "InsightsOptions.def"
+
+            return 0;
+        } else {
+
+            llvm::errs() << toString(std::move(err)) << "\n";
+        }
+
         return 1;
     }
 

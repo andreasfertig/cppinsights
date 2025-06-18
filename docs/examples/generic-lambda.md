@@ -61,7 +61,6 @@ int main()
   return 0;
 }
 
-
 ```
 [Live view](https://cppinsights.io/lnk?code=aW50IG1haW4oKQp7CiAgICAvLyBHZW5lcmljIGxhbWJkYXMgaGF2ZSBhIG1ldGhvZCB0ZW1wbGF0ZSBjYWxsIG9wZXJhdG9yLgogICAgYXV0byB4ID0gW10oYXV0byB4KSB7IHJldHVybiB4ICogeDsgfTsKCiAgICB4KDIpOyAgICAvLyBpbnQKICAgIHgoMy4wKTsgIC8vIGRvdWJsZQp9&insightsOptions=cpp2a&rev=1.0)
 <!-- transformed-end:generic-lambda.cpp -->

@@ -48,14 +48,12 @@ struct A
 };
 
 
-
 struct B
 {
   int i;
   int j;
   // inline B() noexcept = default;
 };
-
 
 
 int main()
@@ -66,7 +64,6 @@ int main()
   B b2 = {0, 0};
   return 0;
 }
-
 
 ```
 [Live view](https://cppinsights.io/lnk?code=c3RydWN0IEEKewogICAgLy8gdXNlciBwcm92aWRlZCBjb25zdHJ1Y3RvciBfbWlzc2luZ18gaW5pdGlhbGl6YXRpb24gb2YgYGpgCiAgICBBKCkKICAgIDogaXszfQogICAgewogICAgfQoKICAgIGludCBpOwogICAgaW50IGo7Cn07CgpzdHJ1Y3QgQgp7CiAgICAvLyB1c2VzIHRoZSBkZWZhdWx0IGNvbnN0cnVjdG9yCiAgICBpbnQgaTsKICAgIGludCBqOwp9OwoKaW50IG1haW4oKQp7CiAgICBBIGE7CiAgICBBIGEye307ICAvLyBvbmx5IGkgZ2V0cyBpbml0aWFsaXplZC4KCiAgICBCIGI7CiAgICBCIGIye307ICAvLyBib3RoIGkgYW5kIGogZ2V0IGluaXRpYWxpemVkLgp9&insightsOptions=cpp2a&rev=1.0)
