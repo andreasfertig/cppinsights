@@ -2,6 +2,7 @@
 
 * [alt-syntax-for](@ref alt_syntax_for)
 * [alt-syntax-subscription](@ref alt_syntax_subscription)
+* [autocomplete](@ref autocomplete)
 * [edu-show-cfront](@ref edu_show_cfront)
 * [edu-show-coroutine-transformation](@ref edu_show_coroutine_transformation)
 * [edu-show-initlist](@ref edu_show_initlist)
@@ -10,3 +11,5 @@
 * [edu-show-padding](@ref edu_show_padding)
 * [show-all-callexpr-template-parameters](@ref show_all_callexpr_template_parameters)
 * [show-all-implicit-casts](@ref show_all_implicit_casts)
+* [stdin](@ref stdin)
+* [use-libc++](@ref use_libc++)

@@ -24,5 +24,4 @@ std::pair<int, double> Fun()
   return std::make_pair<int, double>(5, 7.5);
 }
 
-
 ```

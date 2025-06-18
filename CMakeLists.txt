@@ -656,7 +656,8 @@ else()
         ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> --cxx ${CMAKE_CXX_COMPILER} ${TEST_FAILURE_IS_OK} ${TEST_USE_LIBCPP} ${LLVM_PROF_DIR}
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights>
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testInvalidOption.sh ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights>
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/shell/test-bash-completion.sh ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tests/shell ${CMAKE_CURRENT_SOURCE_DIR}/scripts/bash-autocomplete.sh ${TEST_FAILURE_IS_OK}
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:insights> ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/shell/test-bash-completion.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
         COMMENT "Running tests" VERBATIM
     )
@@ -667,7 +668,8 @@ if (NOT WIN32)
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py --insights ${CMAKE_CURRENT_BINARY_DIR}/insights --cxx ${CMAKE_CXX_COMPILER} --update-tests ${TEST_FAILURE_IS_OK}
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testSTDIN.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/testInvalidOption.sh ${CMAKE_CURRENT_BINARY_DIR}/insights
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/shell/test-bash-completion.sh ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tests/shell ${CMAKE_CURRENT_SOURCE_DIR}/scripts/bash-autocomplete.sh
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/insights ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTest.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/shell/test-bash-completion.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
         COMMENT "Running tests" VERBATIM
     )

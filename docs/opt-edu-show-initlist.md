@@ -19,5 +19,4 @@ transforms into this:
 const int __list3_21[2]{40, 2};
 std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >{std::initializer_list<int>{__list3_21, 2}};
 
-
 ```

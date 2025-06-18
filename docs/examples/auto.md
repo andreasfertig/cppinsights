@@ -77,30 +77,25 @@ class CTest
 };
 
 
-
 int Test()
 {
   return 1;
 }
-
 
 int Best()
 {
   return 1;
 }
 
-
 inline constexpr int CEBest()
 {
   return 1;
 }
 
-
 char West()
 {
   return 'c';
 }
-
 
 inline constexpr char CEWest()
 {
@@ -108,10 +103,9 @@ inline constexpr char CEWest()
 }
 
 [[maybe_unused]] inline constexpr char MUCEWest()
-                 {
-                   return 'c';
-                 }
-                 
+{
+  return 'c';
+}
 
 int main()
 {
@@ -136,7 +130,6 @@ int main()
   [[maybe_unused]] unsigned int muu = u;
   return 0;
 }
-
 
 ```
 [Live view](https://cppinsights.io/lnk?code=Y2xhc3MgQ1Rlc3QKewogICAgYXV0byBUZXN0KCkgeyByZXR1cm4gMjI7IH0KfTsKCmF1dG8gVGVzdCgpCnsKICAgIHJldHVybiAxOwp9CgphdXRvIEJlc3QoKSAtPiBpbnQKewogICAgcmV0dXJuIDE7Cn0KCmNvbnN0ZXhwciBhdXRvIENFQmVzdCgpIC0+IGludAp7CiAgICByZXR1cm4gMTsKfQoKZGVjbHR5cGUoYXV0bykgV2VzdCgpCnsKICAgIHJldHVybiAnYyc7Cn0KCmNvbnN0ZXhwciBkZWNsdHlwZShhdXRvKSBDRVdlc3QoKQp7CiAgICByZXR1cm4gJ2MnOwp9CgpbW21heWJlX3VudXNlZF1dIGlubGluZSBjb25zdGV4cHIgZGVjbHR5cGUoYXV0bykgTVVDRVdlc3QoKQp7CiAgICByZXR1cm4gJ2MnOwp9CgppbnQgbWFpbigpCnsKICAgIGludCAgICAgICAgICAgIHggPSAyOwogICAgY29uc3QgY2hhciogICAgcDsKICAgIGNvbnN0ZXhwciBhdXRvIGNlaSAgICAgICA9IDA7CiAgICBhdXRvIGNvbnN0ZXhwciBjZWkyICAgICAgPSAwOwogICAgYXV0byAgICAgICAgICAgICAgICAgaSAgID0gMDsKICAgIGRlY2x0eXBlKGF1dG8pICAgICAgIHhYICA9IChpKTsKICAgIGF1dG8gICAgICAgICAgICAgICAgIGlpICA9ICZpOwogICAgYXV0byYgICAgICAgICAgICAgICAgaXIgID0gaTsKICAgIGF1dG8qICAgICAgICAgICAgICAgIGlwICA9ICZpOwogICAgY29uc3QgYXV0byogICAgICAgICAgY2lwID0gJmk7CiAgICBhdXRvKiAgICAgICAgICAgICAgICBwcCAgPSBwOwogICAgY29uc3QgYXV0byogICAgICAgICAgY3AgID0gcDsKICAgIHZvbGF0aWxlIGNvbnN0IGF1dG8qIHZjcCA9IHA7CiAgICBhdXRvICAgICAgICAgICAgICAgICBmICAgPSAxLjBmOwogICAgYXV0byAgICAgICAgICAgICAgICAgYyAgID0gJ2MnOwogICAgYXV0byAgICAgICAgICAgICAgICAgdSAgID0gMHU7CiAgICBkZWNsdHlwZSh1KSAgICAgICAgICB1dSAgPSB1OwoKICAgIFtbbWF5YmVfdW51c2VkXV0gYXV0byAgICAgICAgbXUgID0gMHU7CiAgICBbW21heWJlX3VudXNlZF1dIGRlY2x0eXBlKHUpIG11dSA9IHU7Cn0=&insightsOptions=cpp2a&rev=1.0)

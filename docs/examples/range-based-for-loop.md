@@ -37,7 +37,6 @@ int main()
   return 0;
 }
 
-
 ```
 [Live view](https://cppinsights.io/lnk?code=I2luY2x1ZGUgPGNzdGRpbz4KCmludCBtYWluKCkKewogICAgY29uc3QgY2hhciBhcnJbXXsyLCA0LCA2LCA4LCAxMH07CgogICAgZm9yKGNvbnN0IGNoYXImIGMgOiBhcnIpIHsKICAgICAgICBwcmludGYoImM9JWNcbiIsIGMpOwogICAgfQp9&insightsOptions=cpp2a&rev=1.0)
 <!-- transformed-end:range-based-for-loop.cpp -->

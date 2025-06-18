@@ -21,6 +21,7 @@ transforms into this:
 
 ```.cpp
 #include <exception> // for noexcept transformation
+
 void Fun() noexcept(true)
 {
   try 
@@ -31,11 +32,9 @@ void Fun() noexcept(true)
   }
 }
 
-
 void Fun2() noexcept(false)
 {
   int i = 3;
 }
-
 
 ```

@@ -31,4 +31,9 @@ INSIGHTS_OPT("edu-show-coroutine-transformation",
              gInsightEduCategory)
 INSIGHTS_OPT("edu-show-cfront", UseShow2C, false, "Show transformation to C", gInsightEduCategory)
 INSIGHTS_OPT("edu-show-lifetime", ShowLifetime, false, "Show lifetime of objects", gInsightEduCategory)
+
+INSIGHTS_OPT("stdin", StdinMode, false, "Read the input from <stdin>.", gInsightCategory)
+INSIGHTS_OPT("use-libc++", UseLibCpp, false, "Use libc++ (LLVM) instead of libstdc++ (GNU).", gInsightCategory)
+INSIGHTS_OPT("autocomplete", AutoComplete, false, "Generate list of options for autocomplete and exit.", gInsightCategory)
+
 #undef INSIGHTS_OPT

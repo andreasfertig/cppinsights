@@ -21,7 +21,6 @@ int main()
   return 0;
 }
 
-
 ```
 [Live view](https://cppinsights.io/lnk?code=aW50IG1haW4oKQp7CiAgICAvLyBUaGUgY29tcGlsZXIgYXV0b21hdGljYWxseSBmaWxscyB0aGUgcmVtYWluaW5nCiAgICAvLyBmaWVsZHMgd2l0aCAwIHRoYW5rcyB0byBicmFjZWQgaW5pdGlhbGl6YXRpb24uCiAgICBpbnQgYXJyWzVdezIsIDMsIDR9Owp9&insightsOptions=cpp2a&rev=1.0)
 <!-- transformed-end:braced-array-initialization.cpp -->
