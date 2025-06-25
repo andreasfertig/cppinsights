@@ -1,0 +1,58 @@
+template<typename ... T>
+inline constexpr T...[0] first_plus_last(T... values)
+{
+  return T...[0](values...[0] + values...[sizeof...(values) - 1]);
+}
+
+/* First instantiated from: p2662Test.cpp:10 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int first_plus_last<int, int, int>(int __values0, int __values1, int __values2)
+{
+  return int(__values0 + __values2);
+}
+#endif
+
+
+/* PASSED: static_assert(first_plus_last(1, 2, 10) == 11); */
+
+
+class __lambda_12_12
+{
+  public: 
+  template<class ... type_parameter_0_0>
+  inline /*constexpr */ auto operator()(type_parameter_0_0... pack) const
+  {
+    decltype(pack...[0]) x5;
+    decltype((pack...[0])) x6 = {x5};
+    return 0;
+  }
+  
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline /*constexpr */ int operator()<int, double, char>(int __pack0, double __pack1, char __pack2) const
+  {
+    int x5;
+    int & x6 = {x5};
+    return 0;
+  }
+  #endif
+  
+  private: 
+  template<class ... type_parameter_0_0>
+  static inline /*constexpr */ auto __invoke(type_parameter_0_0... pack)
+  {
+    return __lambda_12_12{}.operator()<type_parameter_0_0... >(pack...);
+  }
+  
+  public:
+  // /*constexpr */ __lambda_12_12() = default;
+  
+} __lambda_12_12{};
+
+int res = __lambda_12_12.operator()(0, 3.1400000000000001, 'c');
+
+int main()
+{
+  return 0;
+}
