@@ -2112,6 +2112,23 @@ void CodeGenerator::InsertArg(const CXXFoldExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const PackIndexingExpr* stmt)
+{
+    if(stmt->isFullySubstituted()) {
+        const auto* constExpr = dyn_cast_or_null<ConstantExpr>(stmt->getIndexExpr());
+
+        mOutputFormatHelper.Append(BuildInternalVarName(GetName(*stmt->getPackDecl())),
+                                   constExpr->getAPValueResult().getInt());
+
+    } else {
+        mOutputFormatHelper.Append(GetName(*stmt->getPackDecl()), "...[");
+
+        InsertArg(stmt->getIndexExpr());
+        mOutputFormatHelper.Append("]");
+    }
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const CXXInheritedCtorInitExpr* stmt)
 {
     const auto& constructorDecl = *stmt->getConstructor();

@@ -136,6 +136,7 @@ SUPPORTED_STMT(SourceLocExpr)
 SUPPORTED_STMT(CXXParenListInitExpr)
 SUPPORTED_STMT(CppInsightsCommentStmt)
 SUPPORTED_STMT(CXXPseudoDestructorExpr)
+SUPPORTED_STMT(PackIndexingExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT
