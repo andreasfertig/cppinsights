@@ -1389,7 +1389,7 @@ bool IsTrivialStaticClassVarDecl(const VarDecl& varDecl)
     // Should the VarDecl be evaluatable at compile-time, there is no additional guard added by the compiler.
     if(varDecl.isStaticLocal() and not IsEvaluatable(varDecl)) {
         if(const auto* cxxRecordDecl = varDecl.getType()->getAsCXXRecordDecl()) {
-            if(cxxRecordDecl->hasNonTrivialDestructor() or cxxRecordDecl->hasNonTrivialDefaultConstructor()) {
+            if(cxxRecordDecl->hasNonTrivialDestructor() or not cxxRecordDecl->hasTrivialDefaultConstructor()) {
                 return true;
             }
         }
