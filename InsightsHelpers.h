@@ -17,7 +17,6 @@
 #include <functional>
 #include <optional>
 #include <string>
-#include <variant>
 
 #include "InsightsStrongTypes.h"
 #include "StackList.h"
@@ -355,25 +354,32 @@ is(T) -> is<T>;
 const DeclRefExpr* FindDeclRef(const Stmt* stmt);
 //-----------------------------------------------------------------------------
 
+void P0315Visitor_HandleLambdaExpr(class OutputFormatHelper&, const LambdaExpr*);
+void P0315Visitor_HandleLambdaExpr(class CodeGenerator&, const LambdaExpr*);
+//-----------------------------------------------------------------------------
+
 ///! Find a LambdaExpr inside a Decltype
-class P0315Visitor : public RecursiveASTVisitor<P0315Visitor>
+template<typename T>
+    requires(std::derived_from<T, CodeGenerator> or std::same_as<T, OutputFormatHelper>)
+class P0315Visitor : public RecursiveASTVisitor<P0315Visitor<T>>
 {
-    std::variant<std::reference_wrapper<class OutputFormatHelper>, std::reference_wrapper<class CodeGenerator>>
-                      mConsumer;
+    T&                mConsumer;
     const LambdaExpr* mLambdaExpr{};
 
 public:
-    P0315Visitor(class OutputFormatHelper& ofm)
-    : mConsumer{ofm}
+    constexpr P0315Visitor(T& consumer)
+    : mConsumer{consumer}
     {
     }
 
-    P0315Visitor(class CodeGenerator& cg)
-    : mConsumer{cg}
+    bool VisitLambdaExpr(const LambdaExpr* expr)
     {
-    }
+        mLambdaExpr = expr;
 
-    bool VisitLambdaExpr(const LambdaExpr* expr);
+        P0315Visitor_HandleLambdaExpr(mConsumer, expr);
+
+        return false;
+    }
 
     const LambdaExpr* Get() const { return mLambdaExpr; }
 };

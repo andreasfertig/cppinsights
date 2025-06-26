@@ -1619,18 +1619,17 @@ struct overloaded : Ts...
 };
 template<class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
+//-----------------------------------------------------------------------------
 
-bool P0315Visitor::VisitLambdaExpr(const LambdaExpr* expr)
+void P0315Visitor_HandleLambdaExpr(OutputFormatHelper& ofm, const LambdaExpr* expr)
 {
-    mLambdaExpr = expr;
+    ofm.Append(GetLambdaName(*expr));
+}
+//-----------------------------------------------------------------------------
 
-    std::visit(overloaded{
-                   [&](OutputFormatHelper& ofm) { ofm.Append(GetLambdaName(*expr)); },
-                   [&](CodeGenerator& cg) { cg.InsertArg(expr); },
-               },
-               mConsumer);
-
-    return false;
+void P0315Visitor_HandleLambdaExpr(CodeGenerator& cg, const LambdaExpr* expr)
+{
+    cg.InsertArg(expr);
 }
 //-----------------------------------------------------------------------------
 
