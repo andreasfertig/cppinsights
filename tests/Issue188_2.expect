@@ -56,7 +56,7 @@ namespace mstd
     {
     }
     
-    inline constexpr _Head_base(const _Head_base &) = default;
+    inline constexpr _Head_base(const _Head_base<_Idx, _Head, true> &) = default;
   };
   
   template<unsigned long _Idx, typename _Head>
@@ -72,7 +72,7 @@ namespace mstd
     {
     }
     
-    inline constexpr _Head_base(const _Head_base &) = default;
+    inline constexpr _Head_base(const _Head_base<_Idx, _Head, false> &) = default;
     _Head _M_head_impl;
   };
   
@@ -95,13 +95,6 @@ namespace mstd
     
     template<typename ... _UElements>
     inline constexpr _Tuple_impl(const _Tuple_impl<2UL, _UElements...> & __in);
-    
-    
-    #ifdef INSIGHTS_USE_TEMPLATE
-    template<>
-    inline constexpr _Tuple_impl<long>(const _Tuple_impl<2, long> & __in);
-    #endif
-    
     
   };
   

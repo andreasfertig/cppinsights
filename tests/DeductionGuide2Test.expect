@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 template<typename T>
 class Data
 {
@@ -12,7 +9,7 @@ class Data
   
 };
 
-/* First instantiated from: Issue596.cpp:13 */
+/* First instantiated from: DeductionGuide2Test.cpp:11 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 class Data<long>
@@ -29,8 +26,9 @@ class Data<long>
 
 
 
-Data(const char *) -> Data<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
+Data(const char *) -> Data<char *>;
 Data(int) -> Data<long>;
+
 int main()
 {
   Data<long> d1 = Data<long>{5};

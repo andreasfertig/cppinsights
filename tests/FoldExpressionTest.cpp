@@ -1,3 +1,4 @@
+// cmdline:-Wno-parentheses
 // + - * / % ^ & | = < > << >> += -= *= /= %= ^= &= |= <<= >>= == != <= >= && || , .* ->*
 
 // Tests for some of the 32 operators

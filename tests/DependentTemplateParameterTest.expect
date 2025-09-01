@@ -1,0 +1,16 @@
+template<typename T>
+auto Fun(T val)
+{
+  return static_cast<T &&>(val);
+}
+
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int Fun<int>(int val)
+{
+  return static_cast<int &&>(val);
+}
+#endif
+
+
+int x = Fun(3);

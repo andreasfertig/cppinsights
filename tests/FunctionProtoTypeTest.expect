@@ -1,0 +1,11 @@
+template<typename T>
+struct FunctionArgs : public FunctionArgs<decltype(&T::operator())>
+{
+};
+
+
+template<typename R, typename ... Args>
+struct FunctionArgs<R (*)(Args...)>
+{
+};
+

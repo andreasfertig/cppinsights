@@ -108,6 +108,7 @@ std::string GetPlainName(const DeclRefExpr& DRE);
 std::string GetName(const DeclRefExpr& declRefExpr);
 std::string GetName(const VarDecl& VD);
 std::string GetName(const TemplateParamObjectDecl& decl);
+StringRef   GetName(const class DependentTemplateStorage& name);
 //-----------------------------------------------------------------------------
 
 STRONG_BOOL(QualifiedName);

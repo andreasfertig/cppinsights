@@ -1,0 +1,11 @@
+struct PtrToMemTest
+{
+  int value;
+};
+
+
+using MemberVarPtr_7 = int PtrToMemTest::*;
+MemberVarPtr_7 fixed = &PtrToMemTest::value;
+
+using MemberVarPtr_9 = int PtrToMemTest::*;
+MemberVarPtr_9 deduced = &PtrToMemTest::value;
