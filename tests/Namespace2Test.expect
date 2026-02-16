@@ -1,0 +1,32 @@
+class Test
+{
+  
+  public: 
+  template<typename T>
+  class my_array
+  {
+  };
+  
+  template<template <typename> typename C = my_array>
+  class Map
+  {
+  };
+  
+  /* First instantiated from: Namespace2Test.cpp:16 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  class Map<my_array>
+  {
+    public: 
+    // inline constexpr Map() noexcept = default;
+  };
+  
+  #endif
+};
+
+
+int main()
+{
+  Test::Map<Test::my_array> a;
+  return 0;
+}

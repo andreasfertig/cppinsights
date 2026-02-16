@@ -148,6 +148,6 @@ int main()
 {
   Test t;
   t.summ<int, int, int>(1, 2, 3);
-  Test::Map<int, int, my_array> a;
+  Test::Map<int, int, Test::my_array> a;
   return t.sum<1>();
 }
