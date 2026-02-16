@@ -4635,7 +4635,7 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
         case TemplateArgument::Template: [[fallthrough]];
         case TemplateArgument::TemplateExpansion:
             if(const auto* tmplDecl = arg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()) {
-                mOutputFormatHelper.Append(GetName(*tmplDecl));
+                mOutputFormatHelper.Append(GetName(*tmplDecl, QualifiedName::Yes));
 
             } else if(const auto* depName = arg.getAsTemplateOrTemplatePattern().getAsDependentTemplateName();
                       depName->isIdentifier()) {
