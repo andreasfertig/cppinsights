@@ -415,16 +415,16 @@ jobs:
           message(FATAL_ERROR "Bad exit status during coverage")
         endif()
 
-    - name: Upload code coverage info
-      if:  matrix.config.coverage == 'Yes'
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
-        exclude: build
-        flags: ${{ matrix.config.archive_name }}
-        disable_search: true
-        fail_ci_if_error: true
+    # - name: Upload code coverage info
+    #   if:  matrix.config.coverage == 'Yes'
+    #   uses: codecov/codecov-action@v4
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     files: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+    #     exclude: build
+    #     flags: ${{ matrix.config.archive_name }}
+    #     disable_search: true
+    #     fail_ci_if_error: true
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
@@ -583,18 +583,18 @@ jobs:
         fi
           chmod +x ./codecov
 
-    - name: Upload code coverage info
-      if:  matrix.config.coverage == 'Yes'
-      id: run_coverage_upload
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
-        exclude: build
-        flags: ${{ matrix.config.archive_name }}-${{ env.ARCH }}-libcxx-${{ matrix.config.libcxx }}
-        disable_search: true
-        fail_ci_if_error: true
-        binary: ${{ github.workspace }}/codecov # Currently, the docker container comes without gpg
+    # - name: Upload code coverage info
+    #   if:  matrix.config.coverage == 'Yes'
+    #   id: run_coverage_upload
+    #   uses: codecov/codecov-action@v5
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     files: ./build/filtered.info # don't use a absolute path on Windows with gitBash.
+    #     exclude: build
+    #     flags: ${{ matrix.config.archive_name }}-${{ env.ARCH }}-libcxx-${{ matrix.config.libcxx }}
+    #     disable_search: true
+    #     fail_ci_if_error: true
+    #     binary: ${{ github.workspace }}/codecov # Currently, the docker container comes without gpg
 
     - name: Create archive
       if:  matrix.config.upload == 'Yes'
