@@ -26,8 +26,14 @@ typedef struct Fruit
 inline Fruit * Constructor_Fruit(Fruit * __this)
 {
   __this->__vptrFruit = __vtbl_array[0];
-  (*((void (*)(const Fruit *))((__this)->__vptrFruit[0]).f))((((const Fruit *)(char *)(__this)) + ((__this)->__vptrFruit[0]).d));
+  (*((void (*)(const Fruit *))((__this)->__vptrFruit[1]).f))((((const Fruit *)(char *)(__this)) + ((__this)->__vptrFruit[1]).d));
   return __this;
+}
+
+inline void Destructor_Fruit(Fruit * __this)
+{
+  __this->__vptrFruit = __vtbl_array[0];
+  (*((void (*)(const Fruit *))((__this)->__vptrFruit[1]).f))((((const Fruit *)(char *)(__this)) + ((__this)->__vptrFruit[1]).d));
 }
 
 inline void PrintFruit(const Fruit * __this)
@@ -48,6 +54,12 @@ inline Apple * Constructor_Apple(Apple * __this)
   return __this;
 }
 
+inline void Destructor_Apple(Apple * __this)
+{
+  (*((void (*)(const Apple *))((__this)->__vptrFruit[1]).f))((((const Apple *)(char *)(__this)) + ((__this)->__vptrFruit[1]).d));
+  Destructor_Fruit((Fruit *)__this);
+}
+
 inline void PrintApple(const Apple * __this)
 {
   puts("Apple");
@@ -59,7 +71,7 @@ int __main(void)
   Apple x;
   Constructor_Apple((Apple *)&x);
   return 0;
-  /* x // lifetime ends here */
+  (*((void (*)(Apple *))((&x)->__vptrFruit[0]).f))((((Apple *)(char *)(&x)) + ((&x)->__vptrFruit[0]).d));
 }
 
 int main(void)
@@ -71,8 +83,8 @@ int main(void)
   /* ret // lifetime ends here */
 }
 
-__mptr __vtbl_Fruit[1] = {0, 0, (__vptp)PrintFruit};
-__mptr __vtbl_Apple[1] = {0, 0, (__vptp)PrintApple};
+__mptr __vtbl_Fruit[2] = {{0, 0, (__vptp)Destructor_Fruit}, {0, 0, (__vptp)PrintFruit}};
+__mptr __vtbl_Apple[2] = {{0, 0, (__vptp)Destructor_Apple}, {0, 0, (__vptp)PrintApple}};
 
 __mptr * __vtbl_array[2] = {__vtbl_Fruit, __vtbl_Apple};
 

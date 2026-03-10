@@ -48,6 +48,7 @@ typedef struct Base
 
 inline void Destructor_Base(Base * __this)
 {
+  __this->__vptrBase = __vtbl_array[0];
 }
 
 inline Base * Constructor_Base(Base * __this)
@@ -87,6 +88,7 @@ typedef struct BaseThird
 
 inline void Destructor_BaseThird(BaseThird * __this)
 {
+  __this->__vptrBaseThird = __vtbl_array[2];
 }
 
 inline BaseThird * Constructor_BaseThird(BaseThird * __this)
