@@ -664,6 +664,8 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
     } else if(const auto* dtor = dyn_cast_or_null<CXXDestructorDecl>(stmt)) {
         // Based on: https://www.dre.vanderbilt.edu/~schmidt/PDF/C++-translation.pdf
 
+        InsertVtblPtr(stmt, stmt->getParent(), bodyStmts);
+
         if(body) {
             bodyStmts.AddBodyStmts(body);
         }
@@ -682,9 +684,9 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
 
             bodyStmts.Add(
                 Call(GetSpecialMemberName(stmt, GetRecordDeclType(base.getType()->getAsRecordDecl())), {cast}));
-
-            body = mkCompoundStmt({bodyStmts});
         }
+
+        body = mkCompoundStmt({bodyStmts});
     }
 
     params_store params{};

@@ -25,6 +25,7 @@ typedef struct Base
 
 inline void Destructor_Base(Base * __this)
 {
+  __this->__vptrBase = __vtbl_array[0];
   puts("~Base");
 }
 

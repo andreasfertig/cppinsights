@@ -9,6 +9,8 @@ public:
     Print();
   }
 
+  virtual ~Fruit() { Print(); }
+
   virtual void Print() const { puts("Base"); }
 };
 
@@ -18,6 +20,8 @@ public:
   : Fruit{}
   {}
 
+  virtual ~Apple() override { Print(); }
+  
   void Print() const override { puts("Apple"); }
 };
 
