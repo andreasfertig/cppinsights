@@ -626,6 +626,13 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
                 bodyStmts.AddBodyStmts(
                     Call(GetSpecialMemberName(stmt, GetRecordDeclType(ctorType->getAsRecordDecl())), callParams));
             }
+
+            // insert our vtable pointer
+            InsertVtblPtr(stmt, stmt->getParent(), bodyStmts);
+            // in case of multi inheritance insert additional vtable pointers
+            for(const auto& base : parent->bases()) {
+                InsertVtblPtr(stmt, base.getType()->getAsCXXRecordDecl(), bodyStmts);
+            }
         }
 
         if(body) {
