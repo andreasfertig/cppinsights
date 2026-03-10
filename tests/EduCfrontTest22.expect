@@ -1,0 +1,86 @@
+/*************************************************************************************
+ * NOTE: This an educational hand-rolled transformation. Things can be incorrect or  *
+ * buggy.                                                                            *
+ *************************************************************************************/
+void __cxa_start(void);
+void __cxa_atexit(void);
+typedef int (*__vptp)();
+
+struct __mptr
+{
+    short  d;
+    short  i;
+    __vptp f;
+};
+
+extern struct __mptr* __vtbl_array[];
+
+
+#include <cstdio>
+
+typedef struct Fruit
+{
+  __mptr * __vptrFruit;
+} Fruit;
+
+inline Fruit * Constructor_Fruit(Fruit * __this)
+{
+  __this->__vptrFruit = __vtbl_array[0];
+  (*((void (*)(const Fruit *))((__this)->__vptrFruit[0]).f))((((const Fruit *)(char *)(__this)) + ((__this)->__vptrFruit[0]).d));
+  return __this;
+}
+
+inline void PrintFruit(const Fruit * __this)
+{
+  puts("Base");
+}
+
+
+typedef struct Apple
+{
+  __mptr * __vptrFruit;
+} Apple;
+
+inline Apple * Constructor_Apple(Apple * __this)
+{
+  Constructor_Fruit((Fruit *)__this);
+  __this->__vptrFruit = __vtbl_array[1];
+  return __this;
+}
+
+inline void PrintApple(const Apple * __this)
+{
+  puts("Apple");
+}
+
+
+int __main(void)
+{
+  Apple x;
+  Constructor_Apple((Apple *)&x);
+  return 0;
+  /* x // lifetime ends here */
+}
+
+int main(void)
+{
+  __cxa_start();
+  int ret = __main();
+  __cxa_atexit();
+  return ret;
+  /* ret // lifetime ends here */
+}
+
+__mptr __vtbl_Fruit[1] = {0, 0, (__vptp)PrintFruit};
+__mptr __vtbl_Apple[1] = {0, 0, (__vptp)PrintApple};
+
+__mptr * __vtbl_array[2] = {__vtbl_Fruit, __vtbl_Apple};
+
+void __cxa_start(void)
+{
+}
+
+void __cxa_atexit(void)
+{
+}
+
