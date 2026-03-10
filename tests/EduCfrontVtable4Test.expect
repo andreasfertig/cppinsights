@@ -26,6 +26,7 @@ typedef struct A
 
 inline void Destructor_A(A * __this)
 {
+  __this->__vptrA = __vtbl_array[0];
   puts("dtor");
 }
 

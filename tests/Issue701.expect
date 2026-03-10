@@ -26,6 +26,7 @@ typedef struct Fruit
 
 inline void Destructor_Fruit(Fruit * __this)
 {
+  __this->__vptrFruit = __vtbl_array[0];
   puts("~Fruit");
 }
 
