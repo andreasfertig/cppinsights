@@ -134,6 +134,7 @@ inline my_resumable coro(int x) const
       __f->__suspend_29_16.await_resume();
       /* co_return Issue536_2.cpp:30 */
       __f->__promise.return_void();
+      goto __final_suspend;
       /* co_return Issue536_2.cpp:29 */
       __f->__promise.return_void()/* implicit */;
       goto __final_suspend;
