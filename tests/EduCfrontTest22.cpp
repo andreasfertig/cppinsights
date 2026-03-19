@@ -25,8 +25,20 @@ public:
   void Print() const override { puts("Apple"); }
 };
 
+class Orange : public Apple {
+public:
+  Orange()
+  : Apple{}
+  {}
+
+  virtual ~Orange() override { Print(); }
+  
+  void Print() const override { puts("Orange"); }
+};
+
+
 int main()
 {
-  Apple x{};
+  Orange x{};
 }
 

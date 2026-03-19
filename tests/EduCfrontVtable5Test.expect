@@ -43,6 +43,7 @@ typedef struct Derived
 
 inline void Destructor_Derived(Derived * __this)
 {
+  __this->__vptrBase = __vtbl_array[1];
   puts("~Derived");
   Destructor_Base((Base *)__this);
 }

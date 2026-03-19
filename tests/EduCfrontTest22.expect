@@ -56,6 +56,7 @@ inline Apple * Constructor_Apple(Apple * __this)
 
 inline void Destructor_Apple(Apple * __this)
 {
+  __this->__vptrFruit = __vtbl_array[1];
   (*((void (*)(const Apple *))((__this)->__vptrFruit[1]).f))((((const Apple *)(char *)(__this)) + ((__this)->__vptrFruit[1]).d));
   Destructor_Fruit((Fruit *)__this);
 }
@@ -66,12 +67,37 @@ inline void PrintApple(const Apple * __this)
 }
 
 
+typedef struct Orange
+{
+  __mptr * __vptrFruit;
+} Orange;
+
+inline Orange * Constructor_Orange(Orange * __this)
+{
+  Constructor_Apple((Apple *)__this);
+  __this->__vptrFruit = __vtbl_array[2];
+  return __this;
+}
+
+inline void Destructor_Orange(Orange * __this)
+{
+  __this->__vptrFruit = __vtbl_array[2];
+  (*((void (*)(const Orange *))((__this)->__vptrFruit[1]).f))((((const Orange *)(char *)(__this)) + ((__this)->__vptrFruit[1]).d));
+  Destructor_Apple((Apple *)__this);
+}
+
+inline void PrintOrange(const Orange * __this)
+{
+  puts("Orange");
+}
+
+
 int __main(void)
 {
-  Apple x;
-  Constructor_Apple((Apple *)&x);
+  Orange x;
+  Constructor_Orange((Orange *)&x);
   return 0;
-  (*((void (*)(Apple *))((&x)->__vptrFruit[0]).f))((((Apple *)(char *)(&x)) + ((&x)->__vptrFruit[0]).d));
+  (*((void (*)(Orange *))((&x)->__vptrFruit[0]).f))((((Orange *)(char *)(&x)) + ((&x)->__vptrFruit[0]).d));
 }
 
 int main(void)
@@ -85,8 +111,9 @@ int main(void)
 
 __mptr __vtbl_Fruit[2] = {{0, 0, (__vptp)Destructor_Fruit}, {0, 0, (__vptp)PrintFruit}};
 __mptr __vtbl_Apple[2] = {{0, 0, (__vptp)Destructor_Apple}, {0, 0, (__vptp)PrintApple}};
+__mptr __vtbl_Orange[2] = {{0, 0, (__vptp)Destructor_Orange}, {0, 0, (__vptp)PrintOrange}};
 
-__mptr * __vtbl_array[2] = {__vtbl_Fruit, __vtbl_Apple};
+__mptr * __vtbl_array[3] = {__vtbl_Fruit, __vtbl_Apple, __vtbl_Orange};
 
 void __cxa_start(void)
 {
