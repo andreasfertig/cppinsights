@@ -204,8 +204,8 @@ void __fun_int_char_unsignedint_3_1400000000000001Resume(__fun_int_char_unsigned
     /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
     __f->__suspend_43_14 = __f->__promise.initial_suspend();
     if(!__f->__suspend_43_14.await_ready()) {
-      __f->__suspend_43_14.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__suspend_index = 1;
+      __f->__suspend_43_14.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__initial_await_suspend_called = true;
       return;
     } 
@@ -228,8 +228,8 @@ void __fun_int_char_unsignedint_3_1400000000000001Resume(__fun_int_char_unsigned
   /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
   __f->__suspend_43_14_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_43_14_1.await_ready()) {
-    __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     __f->__suspend_index = 2;
+    __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     return;
   } 
   
@@ -308,8 +308,8 @@ void __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Resume(__fun_int
     /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
     __f->__suspend_43_14 = __f->__promise.initial_suspend();
     if(!__f->__suspend_43_14.await_ready()) {
-      __f->__suspend_43_14.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__suspend_index = 1;
+      __f->__suspend_43_14.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__initial_await_suspend_called = true;
       return;
     } 
@@ -332,8 +332,8 @@ void __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Resume(__fun_int
   /* co_await EduCoroutineFunctionTemplateTest.cpp:43 */
   __f->__suspend_43_14_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_43_14_1.await_ready()) {
-    __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     __f->__suspend_index = 2;
+    __f->__suspend_43_14_1.await_suspend(std::coroutine_handle<generator<int>::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     return;
   } 
   

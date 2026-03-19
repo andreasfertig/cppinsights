@@ -135,8 +135,8 @@ void __coroResume(__coroFrame * __f)
     /* co_await Issue536.cpp:37 */
     __f->__suspend_37_14 = __f->__promise.initial_suspend();
     if(!__f->__suspend_37_14.await_ready()) {
-      __f->__suspend_37_14.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__suspend_index = 1;
+      __f->__suspend_37_14.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__initial_await_suspend_called = true;
       return;
     } 
@@ -162,8 +162,8 @@ void __coroResume(__coroFrame * __f)
   /* co_await Issue536.cpp:37 */
   __f->__suspend_37_14_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_37_14_1.await_ready()) {
-    __f->__suspend_37_14_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     __f->__suspend_index = 2;
+    __f->__suspend_37_14_1.await_suspend(std::coroutine_handle<my_resumable::promise_type>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     return;
   } 
   

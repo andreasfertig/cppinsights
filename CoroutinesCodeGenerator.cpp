@@ -932,9 +932,21 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
     StmtsContainer bodyStmts{};
     Expr*          initializeInitialAwaitResume = nullptr;
 
-    auto addInitialAwaitSuspendCalled = [&] {
-        bodyStmts.Add(bop);
+    const bool canThrow{[&] {
+        if(const auto* e = dyn_cast_or_null<ExprWithCleanups>(stmt->getSuspendExpr())) {
+            if(const auto* ce = dyn_cast_or_null<CallExpr>(e->getSubExpr())) {
+                if(const FunctionDecl* fd = ce->getDirectCallee()) {
+                    if(const FunctionProtoType* fpt = fd->getType()->getAs<FunctionProtoType>()) {
+                        return not fpt->isNothrow(/*ResultIfDependent=*/false);
+                    }
+                }
+            }
+        }
 
+        return true;
+    }()};
+
+    auto addInitialAwaitSuspendCalled = [&] {
         if(eState::InitialSuspend == mState) {
             mState = eState::Body;
             // https://timsong-cpp.github.io/cppwp/n4861/dcl.fct.def.coroutine#5.3
@@ -944,8 +956,24 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
         }
     };
 
+    auto insertTryCatchIfNecessary = [&](StmtsContainer& cont) {
+        if(canThrow) {
+            auto* tryBody = mkCompoundStmt(cont);
+
+            StmtsContainer catchBodyStmts{
+                Assign(mASTData.mSuspendIndexAccess, mASTData.mSuspendIndexField, Int32(mSuspendsCount - 1)), Throw()};
+
+            cont.clear();
+            cont.Add(Try(tryBody, Catch(catchBodyStmts)));
+        }
+    };
+
     if(returnsVoid) {
+        bodyStmts.Add(bop);
         bodyStmts.Add(stmt->getSuspendExpr());
+
+        insertTryCatchIfNecessary(bodyStmts);
+
         addInitialAwaitSuspendCalled();
         bodyStmts.Add(Return());
 
@@ -957,7 +985,10 @@ void CoroutinesCodeGenerator::InsertArg(const CoroutineSuspendExpr* stmt)
 
         auto* ifSuspend = If(stmt->getSuspendExpr(), bodyStmts);
 
-        InsertArg(If(Not(stmt->getReadyExpr()), ifSuspend));
+        StmtsContainer innerBodyStmts{bop, ifSuspend};
+        insertTryCatchIfNecessary(innerBodyStmts);
+
+        InsertArg(If(Not(stmt->getReadyExpr()), innerBodyStmts));
     }
 
     if(not returnsVoid and initializeInitialAwaitResume) {
