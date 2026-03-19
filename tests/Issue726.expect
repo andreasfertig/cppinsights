@@ -103,8 +103,8 @@ void __funcAResume(__funcAFrame * __f)
     /* co_await Issue726.cpp:34 */
     __f->__suspend_34_3 = __f->__promise.initial_suspend();
     if(!__f->__suspend_34_3.await_ready()) {
-      __f->__suspend_34_3.await_suspend(std::coroutine_handle<P>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__suspend_index = 1;
+      __f->__suspend_34_3.await_suspend(std::coroutine_handle<P>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
       __f->__initial_await_suspend_called = true;
       return;
     } 
@@ -132,8 +132,8 @@ void __funcAResume(__funcAFrame * __f)
   /* co_await Issue726.cpp:34 */
   __f->__suspend_34_3_1 = __f->__promise.final_suspend();
   if(!__f->__suspend_34_3_1.await_ready()) {
-    __f->__suspend_34_3_1.await_suspend(std::coroutine_handle<P>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     __f->__suspend_index = 2;
+    __f->__suspend_34_3_1.await_suspend(std::coroutine_handle<P>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
     return;
   } 
   
