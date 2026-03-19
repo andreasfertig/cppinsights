@@ -60,6 +60,7 @@ inline void OtherB(B * __this)
 
 inline void Destructor_B(B * __this)
 {
+  __this->__vptrA = __vtbl_array[1];
   Destructor_A((A *)__this);
 }
 
@@ -91,6 +92,7 @@ inline void OtherC(C * __this)
 
 inline void Destructor_C(C * __this)
 {
+  __this->__vptrA = __vtbl_array[2];
   Destructor_B((B *)__this);
 }
 

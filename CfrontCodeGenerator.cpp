@@ -664,14 +664,22 @@ void CfrontCodeGenerator::InsertCXXMethodDecl(const CXXMethodDecl* stmt, SkipBod
     } else if(const auto* dtor = dyn_cast_or_null<CXXDestructorDecl>(stmt)) {
         // Based on: https://www.dre.vanderbilt.edu/~schmidt/PDF/C++-translation.pdf
 
+        if(not HasDtor(GetRecordDeclType(dtor->getParent()))) {
+            return;
+        }
+
         InsertVtblPtr(stmt, stmt->getParent(), bodyStmts);
+
+        for(const auto& base : llvm::reverse(dtor->getParent()->bases())) {
+            if(not dtor->isVirtual()) {
+                continue;
+            }
+
+            InsertVtblPtr(stmt, dyn_cast_or_null<CXXRecordDecl>(base.getType()->getAsRecordDecl()), bodyStmts);
+        }
 
         if(body) {
             bodyStmts.AddBodyStmts(body);
-        }
-
-        if(not HasDtor(GetRecordDeclType(dtor->getParent()))) {
-            return;
         }
 
         for(const auto& base : llvm::reverse(dtor->getParent()->bases())) {

@@ -68,6 +68,7 @@ typedef struct BaseSecond
 
 inline void Destructor_BaseSecond(BaseSecond * __this)
 {
+  __this->__vptrBase = __vtbl_array[1];
   Destructor_Base((Base *)__this);
 }
 
@@ -113,6 +114,8 @@ typedef struct Derived
 
 inline void Destructor_Derived(Derived * __this)
 {
+  __this->__vptrBaseThird = __vtbl_array[4];
+  __this->__vptrBase = __vtbl_array[3];
   __this->mD = 7;
   Destructor_BaseThird((BaseThird *)__this);
   Destructor_BaseSecond((BaseSecond *)__this);
