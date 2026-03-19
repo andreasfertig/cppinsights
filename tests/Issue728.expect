@@ -1,0 +1,167 @@
+/*************************************************************************************
+ * NOTE: The coroutine transformation you've enabled is a hand coded transformation! *
+ *       Most of it is _not_ present in the AST. What you see is an approximation.   *
+ *************************************************************************************/
+#include <cstdio>
+#include <iostream>
+#include <coroutine>
+struct P
+{
+  inline std::suspend_always initial_suspend()
+  {
+    return {};
+  }
+  
+  inline void return_void() const noexcept
+  {
+    std::operator<<(std::cout, "return_void()\n");
+  }
+  
+  inline std::coroutine_handle<void> get_return_object()
+  {
+    return std::coroutine_handle<P>::from_promise(*this).operator std::coroutine_handle<void>();
+  }
+  
+  inline void unhandled_exception()
+  {
+    throw ;
+  }
+  
+  inline std::suspend_never final_suspend() noexcept
+  {
+    return {};
+  }
+  
+  // inline constexpr P() noexcept = default;
+};
+
+
+struct R
+{
+  inline R(std::coroutine_handle<void> d) noexcept
+  : data{std::coroutine_handle<void>(d)}
+  {
+  }
+  
+  std::coroutine_handle<void> data;
+  using promise_type = P;
+};
+
+
+struct __funcAFrame
+{
+  void (*resume_fn)(__funcAFrame *);
+  void (*destroy_fn)(__funcAFrame *);
+  std::__coroutine_traits_sfinae<R>::promise_type __promise;
+  int __suspend_index;
+  bool __initial_await_suspend_called;
+  std::suspend_always __suspend_35_3;
+  std::suspend_never __suspend_36_12;
+  std::suspend_never __suspend_35_3_1;
+};
+
+R funcA()
+{
+  /* Allocate the frame including the promise */
+  /* Note: The actual parameter new is __builtin_coro_size */
+  __funcAFrame * __f = reinterpret_cast<__funcAFrame *>(operator new(sizeof(__funcAFrame)));
+  __f->__suspend_index = 0;
+  __f->__initial_await_suspend_called = false;
+  
+  /* Construct the promise. */
+  new (&__f->__promise)std::__coroutine_traits_sfinae<R>::promise_type{};
+  
+  /* Forward declare the resume and destroy function. */
+  void __funcAResume(__funcAFrame * __f);
+  void __funcADestroy(__funcAFrame * __f);
+  
+  /* Assign the resume and destroy function pointers. */
+  __f->resume_fn = &__funcAResume;
+  __f->destroy_fn = &__funcADestroy;
+  
+  /* Call the made up function with the coroutine body for initial suspend.
+     This function will be called subsequently by coroutine_handle<>::resume()
+     which calls __builtin_coro_resume(__handle_) */
+  __funcAResume(__f);
+  
+  
+  std::coroutine_handle<void> __coro_gro = __f->__promise.get_return_object();
+  return R(std::coroutine_handle<void>(static_cast<std::coroutine_handle<void> &&>(__coro_gro)));
+}
+
+/* This function invoked by coroutine_handle<>::resume() */
+void __funcAResume(__funcAFrame * __f)
+{
+  try 
+  {
+    /* Create a switch to get to the correct resume point */
+    switch(__f->__suspend_index) {
+      case 0: break;
+      case 1: goto __resume_funcA_1;
+      case 2: goto __resume_funcA_2;
+      case 3: goto __resume_funcA_3;
+    }
+    
+    /* co_await Issue728.cpp:35 */
+    __f->__suspend_35_3 = __f->__promise.initial_suspend();
+    if(!__f->__suspend_35_3.await_ready()) {
+      __f->__suspend_35_3.await_suspend(std::coroutine_handle<P>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 1;
+      __f->__initial_await_suspend_called = true;
+      return;
+    } 
+    
+    __resume_funcA_1:
+    __f->__suspend_35_3.await_resume();
+    
+    /* co_await Issue728.cpp:36 */
+    __f->__suspend_36_12 = std::suspend_never{};
+    if(!__f->__suspend_36_12.await_ready()) {
+      __f->__suspend_36_12.await_suspend(std::coroutine_handle<P>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+      __f->__suspend_index = 2;
+      return;
+    } 
+    
+    __resume_funcA_2:
+    __f->__suspend_36_12.await_resume();
+    /* co_return Issue728.cpp:35 */
+    __f->__promise.return_void()/* implicit */;
+    goto __final_suspend;
+  } catch(...) {
+    if(!__f->__initial_await_suspend_called) {
+      throw ;
+    } 
+    
+    __f->__promise.unhandled_exception();
+  }
+  
+  __final_suspend:
+  
+  /* co_await Issue728.cpp:35 */
+  __f->__suspend_35_3_1 = __f->__promise.final_suspend();
+  if(!__f->__suspend_35_3_1.await_ready()) {
+    __f->__suspend_35_3_1.await_suspend(std::coroutine_handle<P>::from_address(static_cast<void *>(__f)).operator std::coroutine_handle<void>());
+    __f->__suspend_index = 3;
+    return;
+  } 
+  
+  __resume_funcA_3:
+  __f->destroy_fn(__f);
+}
+
+/* This function invoked by coroutine_handle<>::destroy() */
+void __funcADestroy(__funcAFrame * __f)
+{
+  /* destroy all variables with dtors */
+  __f->~__funcAFrame();
+  /* Deallocating the coroutine frame */
+  /* Note: The actual argument to delete is __builtin_coro_frame with the promise as parameter */
+  operator delete(static_cast<void *>(__f), sizeof(__funcAFrame));
+}
+
+
+int main()
+{
+  static_cast<const std::coroutine_handle<void> &&>(funcA().data).resume();
+  return 0;
+}

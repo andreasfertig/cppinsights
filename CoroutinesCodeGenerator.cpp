@@ -643,6 +643,7 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mOutputFormatHelper.AppendNewLine();
     mOutputFormatHelper.AppendNewLine();
 
+    InsertArg(stmt->getResultDecl());
     InsertArg(stmt->getReturnStmt());
 
     mOutputFormatHelper.AppendSemiNewLine();
