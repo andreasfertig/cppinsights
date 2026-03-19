@@ -148,6 +148,11 @@ public:
 
             if(not mSkip) {
                 mBodyStmts.Add(child);
+
+                if(const auto* coret = dyn_cast_or_null<CoreturnStmt>(child);
+                   coret and (coret->getOperand() == nullptr)) {
+                    mBodyStmts.Add(Goto(FINAL_SUSPEND_NAME));
+                }
             }
 
             mSkip = false;

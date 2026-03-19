@@ -145,6 +145,7 @@ void __coroResume(__coroFrame * __f)
     __f->__suspend_37_14.await_resume();
     /* co_return Issue536.cpp:38 */
     __f->__promise.return_void();
+    goto __final_suspend;
     /* co_return Issue536.cpp:37 */
     __f->__promise.return_void()/* implicit */;
     goto __final_suspend;
