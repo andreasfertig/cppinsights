@@ -1,0 +1,29 @@
+#define INSIGHTS_USE_TEMPLATE
+
+struct Person
+{
+  int age;
+  inline int Fun(double)
+  {
+    return 2;
+  }
+  
+};
+
+
+template<typename Key, typename POD>
+Key extractKey(Key POD::*pMember);
+
+struct S
+{
+  void f();
+  
+};
+
+
+int main()
+{
+  using MemberVarPtr_16 = int (Person::*)(double);
+  MemberVarPtr_16 p = &Person::Fun;
+  return 0;
+}

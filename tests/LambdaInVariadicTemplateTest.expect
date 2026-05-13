@@ -52,7 +52,7 @@ decltype(auto) test(T && value)
     inline auto operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
     using retType_13_4 = auto (*)(std::string);
@@ -128,10 +128,10 @@ int test<int>(int && value)
     inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = string (*)(std::string);
+    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
@@ -206,10 +206,10 @@ int test<const char (&)[3]>(const char (&value)[3])
     inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = string (*)(std::string);
+    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
@@ -284,10 +284,10 @@ int test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > 
     inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = string (*)(std::string);
+    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
@@ -362,10 +362,10 @@ int test<float>(float && value)
     inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = string (*)(std::string);
+    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;

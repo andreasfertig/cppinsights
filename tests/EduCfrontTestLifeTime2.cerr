@@ -6,13 +6,13 @@
       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:103:20: error: use of undeclared identifier 'tt'
   103 |   Destructor_Test(&tt);
-      |                    ^
+      |                    ^~
 .tmp.cpp:104:20: error: use of undeclared identifier 't'
   104 |   Destructor_Test(&t);
       |                    ^
 .tmp.cpp:105:20: error: use of undeclared identifier 'tt'
   105 |   Destructor_Test(&tt);
-      |                    ^
+      |                    ^~
 .tmp.cpp:106:20: error: use of undeclared identifier 't'
   106 |   Destructor_Test(&t);
       |                    ^

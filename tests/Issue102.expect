@@ -17,7 +17,7 @@ struct FunctionArgs : public FunctionArgs<decltype(&T::operator())>
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
+struct FunctionArgs<std::basic_string<char, std::char_traits<char>, std::allocator<char> > (__lambda_73_4::*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >) const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
 {
 };
 
@@ -33,7 +33,7 @@ struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
+struct FunctionArgs<std::basic_string<char, std::char_traits<char>, std::allocator<char> > (__lambda_73_4::*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >) const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
 {
 };
 
@@ -49,7 +49,7 @@ struct FunctionArgs<int (__lambda_74_4::*)(int) const> : public FunctionArgsBase
 /* First instantiated from: Issue102.cpp:16 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
+struct FunctionArgs<std::basic_string<char, std::char_traits<char>, std::allocator<char> > (__lambda_73_4::*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >) const> : public FunctionArgsBase<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >
 {
 };
 
@@ -57,23 +57,7 @@ struct FunctionArgs<(__lambda_73_4::*)() const> : public FunctionArgsBase<std::b
 /* First instantiated from: Issue102.cpp:53 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() const>
-{
-};
-
-#endif
-/* First instantiated from: Issue102.cpp:53 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
-{
-};
-
-#endif
-/* First instantiated from: Issue102.cpp:53 */
-#ifdef INSIGHTS_USE_TEMPLATE
-template<>
-struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() const>
+struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char, std::char_traits<char>, std::allocator<char> > (__lambda_73_4::*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >) const>
 {
 };
 
@@ -89,7 +73,23 @@ struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(
 /* First instantiated from: Issue102.cpp:53 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
-struct FunctionArgs<__lambda_73_4> : public FunctionArgs<(__lambda_73_4::*)() const>
+struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char, std::char_traits<char>, std::allocator<char> > (__lambda_73_4::*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >) const>
+{
+};
+
+#endif
+/* First instantiated from: Issue102.cpp:53 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<__lambda_74_4> : public FunctionArgs<int (__lambda_74_4::*)(int) const>
+{
+};
+
+#endif
+/* First instantiated from: Issue102.cpp:53 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<__lambda_73_4> : public FunctionArgs<std::basic_string<char, std::char_traits<char>, std::allocator<char> > (__lambda_73_4::*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >) const>
 {
 };
 
@@ -396,7 +396,7 @@ decltype(auto) test(T && value)
     inline auto operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
     using retType_73_4 = auto (*)(std::string);
@@ -472,10 +472,10 @@ int test<int>(int && value)
     inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
-    using retType_73_4 = string (*)(std::string);
+    using retType_73_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
     inline constexpr operator retType_73_4 () const noexcept
     {
       return __invoke;
@@ -550,10 +550,10 @@ int test<const char (&)[3]>(const char (&value)[3])
     inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
-    using retType_73_4 = string (*)(std::string);
+    using retType_73_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
     inline constexpr operator retType_73_4 () const noexcept
     {
       return __invoke;
@@ -638,10 +638,10 @@ std::basic_string<char, std::char_traits<char>, std::allocator<char> > test<std:
     inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator()(std::basic_string<char, std::char_traits<char>, std::allocator<char> > value) const
     {
       std::operator<<(std::cout, "This is string ");
-      return operator+(value, " Hi!");
+      return std::operator+(value, " Hi!");
     }
     
-    using retType_73_4 = string (*)(std::string);
+    using retType_73_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
     inline constexpr operator retType_73_4 () const noexcept
     {
       return __invoke;

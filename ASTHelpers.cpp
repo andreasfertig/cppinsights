@@ -385,7 +385,12 @@ FunctionBase(std::string_view name, QualType returnType, const params_vector& pa
         false,
         false,
         ConstexprSpecKind::Unspecified,
-        nullptr);
+#if IS_CLANG_NEWER_THAN(20)
+        AssociatedConstraint {}
+#else
+        nullptr
+#endif
+    );
     fdd->setImplicit(true);
 
     SmallVector<ParmVarDecl*, 8> paramVarDecls{};
@@ -695,7 +700,11 @@ CXXNewExpr* New(ArrayRef<Expr*> placementArgs, const Expr* expr, QualType t)
                               false,
                               nullptr,
                               nullptr,
+#if IS_CLANG_NEWER_THAN(20)
+                              ImplicitAllocationParameters{AlignedAllocationMode::Yes},
+#else
                               true,
+#endif
                               false,
                               placementArgs,
                               SourceRange{},

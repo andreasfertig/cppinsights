@@ -32,20 +32,6 @@ class function<void ()>
   #endif
   
   
-  
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  inline function<const function<void ()> &>(const function<void ()> & f);
-  #endif
-  
-  
-  
-  #ifdef INSIGHTS_USE_TEMPLATE
-  template<>
-  inline function<function<void ()> >(function<void ()> && f);
-  #endif
-  
-  
 };
 
 #endif

@@ -1,0 +1,54 @@
+template<typename T>
+struct FunctionArgs
+{
+};
+
+/* First instantiated from: FunctionPointerTest.cpp:27 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct FunctionArgs<myString<char> (Test::*)(double) const>
+{
+  // inline constexpr FunctionArgs() noexcept = default;
+};
+
+#endif
+
+template<typename R, typename ... Args>
+struct FunctionArgs<R (*)(Args...)>
+{
+};
+
+
+template<typename R, typename C, typename ... Args>
+struct FunctionArgs<R (C::*)(Args...) const>
+{
+};
+
+
+template<typename T>
+struct myString
+{
+};
+
+/* First instantiated from: FunctionPointerTest.cpp:23 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct myString<char>
+{
+};
+
+#endif
+
+using string = myString<char>;
+
+struct Test
+{
+  inline myString<char> Fun(double) const
+  {
+    return {};
+  }
+  
+};
+
+
+FunctionArgs<myString<char> (Test::*)(double) const> a;

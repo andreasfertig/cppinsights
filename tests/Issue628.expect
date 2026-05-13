@@ -48,7 +48,6 @@ struct mysleep
       std::coroutine_handle<void> h;
       std::chrono::duration<long long, std::ratio<1, 1000> > d;
       public: 
-      // inline /*constexpr */ __lambda_20_25 & operator=(const __lambda_20_25 &) /* noexcept */ = delete;
       // inline /*constexpr */ __lambda_20_25(const __lambda_20_25 &) noexcept = default;
       // inline /*constexpr */ __lambda_20_25(__lambda_20_25 &&) noexcept = default;
       __lambda_20_25(const std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<long long, std::ratio<1, 1000000000> > > & _start, const std::coroutine_handle<void> & _h, const std::chrono::duration<long long, std::ratio<1, 1000> > & _d)

@@ -14,8 +14,8 @@ import subprocess
 def main():
     versionH = open('version.h.in', 'r').read()
 
-    oldClangStable = '19'
-    newClangStable = '20'
+    oldClangStable = '20'
+    newClangStable = '21'
     newInsightsVersion = f'{newClangStable}.1'
     oldInsightsVersion = re.search(r'INSIGHTS_VERSION\s+"(.*?)"', versionH, re.DOTALL | re.MULTILINE).group(1)
 
@@ -63,7 +63,7 @@ def main():
     open(cppInsightsDockerBaseFile, 'w').write(dockerFile)
 
 
-    gitTag = f'v_{oldInsightsVersion}'
+    gitTag = f'v_{newClangStable}'
     print(f'  - Tagging {gitTag}')
 
     cmd = ['git', 'tag', gitTag, 'main']

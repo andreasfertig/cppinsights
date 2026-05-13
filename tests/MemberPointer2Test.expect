@@ -1,0 +1,69 @@
+template<typename T>
+struct myStringView
+{
+};
+
+/* First instantiated from: MemberPointer2Test.cpp:15 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct myStringView<char>
+{
+};
+
+#endif
+
+using string_view = myStringView<char>;
+
+template<typename T>
+struct printer final
+{
+  template<typename R>
+  inline void operator()(R T::*ptr)
+  {
+  }
+};
+
+/* First instantiated from: MemberPointer2Test.cpp:22 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+struct printer<my_type> final
+{
+  template<typename R>
+  inline void operator()(R my_type::*ptr);
+  
+  /* First instantiated from: MemberPointer2Test.cpp:23 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline void operator()<myStringView<char> >(myStringView<char> my_type::*ptr)
+  {
+  }
+  #endif
+  
+  
+  /* First instantiated from: MemberPointer2Test.cpp:24 */
+  #ifdef INSIGHTS_USE_TEMPLATE
+  template<>
+  inline void operator()<int>(int my_type::*ptr)
+  {
+  }
+  #endif
+  
+};
+
+#endif
+
+struct my_type final
+{
+  myStringView<char> b;
+  int i;
+};
+
+
+int main()
+{
+  constexpr const my_type t = {{}, 0};
+  printer<my_type> p = {};
+  p.operator()(&my_type::b);
+  p.operator()(&my_type::i);
+  return 0;
+}

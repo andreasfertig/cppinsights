@@ -133,7 +133,13 @@ struct CppInsightsPrintingPolicy : PrintingPolicy
         Alignof                = true;
         ConstantsAsWritten     = true;
         AnonymousTagLocations  = false;  // does remove filename and line for from lambdas in parameters
-        PrintCanonicalTypes    = InsightsCanonicalTypes::Yes == insightsCanonicalTypes;
+#if IS_CLANG_NEWER_THAN(20)
+        PrintAsCanonical
+#else
+        PrintCanonicalTypes
+
+#endif
+            = InsightsCanonicalTypes::Yes == insightsCanonicalTypes;
 
         CppInsightsUnqualified   = (Unqualified::Yes == unqualified);
         CppInsightsSuppressScope = supressScope;
@@ -162,9 +168,7 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
 {
     RETURN_IF(not stmt);
 
-    if(const auto* prefix = stmt->getPrefix();
-       prefix and not((NestedNameSpecifier::TypeSpecWithTemplate == stmt->getKind()) and
-                      isa<DependentTemplateSpecializationType>(stmt->getAsType()))) {
+    if(const auto* prefix = stmt->getPrefix()) {
         BuildNamespace(fullNamespace, prefix, ignoreNamespace);
     }
 
@@ -178,14 +182,15 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
             break;
 
         case NestedNameSpecifier::NamespaceAlias: fullNamespace.append(stmt->getAsNamespaceAlias()->getName()); break;
-
+#if IS_CLANG_NEWER_THAN(20)
+#else
         case NestedNameSpecifier::TypeSpecWithTemplate:
             if(auto* dependentSpecType = stmt->getAsType()->getAs<DependentTemplateSpecializationType>()) {
                 fullNamespace.append(GetElaboratedTypeKeyword(dependentSpecType->getKeyword()));
             }
 
             [[fallthrough]];
-
+#endif
         case NestedNameSpecifier::TypeSpec:
             fullNamespace.append(GetUnqualifiedScopelessName(stmt->getAsType(), InsightsSuppressScope::Yes));
             // The template parameters are already contained in the type we inserted above.
@@ -448,20 +453,23 @@ private:
     bool mScanningArrayDimension{};  //!< Only the outer most ConstantArrayType handles the array dimensions and size
     std::string mScope{};            //!< A scope coming from an ElaboratedType which is used for a
                                      //!< ClassTemplateSpecializationDecl if there is no other scope
+    bool mTmplParamTypeRes{};        //!< When processing FunctionProtoType parameters we need to get the identifiers
 
     bool HandleType(const TemplateTypeParmType* type)
     {
-        const TemplateTypeParmDecl* decl = type->getDecl();
-
-        if((nullptr == type->getIdentifier()) or
+        if(const TemplateTypeParmDecl* decl = type->getDecl();
+           (nullptr == type->getIdentifier()) or
            (decl and decl->isImplicit()) /* this fixes auto operator()(type_parameter_0_0 container) const */) {
 
             AppendTemplateTypeParamName(mData, decl, true, type);
 
             return true;
+
+        } else if(nullptr != type->getIdentifier()) {
+            mData.Append(type->getIdentifier()->getName());
         }
 
-        return false;
+        return mTmplParamTypeRes;
     }
 
     bool HandleType(const LValueReferenceType* type)
@@ -480,17 +488,32 @@ private:
 
     bool HandleType(const PointerType* type)
     {
-        mDataAfter += " *"sv;
+        const bool ret = HandleType(type->getPointeeType().getTypePtrOrNull());
 
-        return HandleType(type->getPointeeType().getTypePtrOrNull());
+        if(not mData.empty() and (mData.GetString().back() != ' ') and not isa<ParenType>(type->getPointeeType())) {
+            mData.Append(' ');
+        }
+
+        mData.Append("*"sv);
+
+        HandleTypeAfter(type);
+
+        return ret;
     }
 
     bool HandleType(const InjectedClassNameType* type) { return HandleType(type->getInjectedTST()); }
 
     bool HandleType(const RecordType* type)
     {
-        /// In case one of the template parameters is a lambda we need to insert the made up name.
+        OutputFormatHelper ofm{};
+        FinalAction        _{[&] { mData.Append(ofm); }};
+
         if(const auto* tt = dyn_cast_or_null<ClassTemplateSpecializationDecl>(type->getDecl())) {
+            // Always get potential template arguments
+            CodeGenerator codeGenerator{ofm};
+            codeGenerator.InsertTemplateArgs(*tt);
+
+            /// In case one of the template parameters is a lambda we need to insert the made up name.
             if(const auto* identifierName = mType.getBaseTypeIdentifier()) {
                 const auto& scope = GetScope(type->getDecl()->getDeclContext());
 
@@ -502,19 +525,18 @@ private:
                 }
 
                 mData.Append(identifierName->getName());
-                CodeGenerator codeGenerator{mData};
-                codeGenerator.InsertTemplateArgs(*tt);
 
                 return true;
             }
-        } else if(const auto* cxxRecordDecl = type->getAsCXXRecordDecl()) {
+        }
+
+        if(const auto* cxxRecordDecl = type->getAsCXXRecordDecl()) {
             // Special handling for dependent types. For example, ClassOperatorHandler7Test.cpp A<...* >::B.
             if(type->isDependentType()) {
                 std::string context{GetDeclContext(type->getDecl()->getDeclContext())};
 
                 if(not context.empty()) {
-                    mData.Append(std::move(context));
-                    mData.Append(cxxRecordDecl->getName());
+                    mData.Append(std::move(context), cxxRecordDecl->getName());
 
                     return true;
                 }
@@ -527,7 +549,7 @@ private:
             }
 
             // Handle anonymous struct or union.
-            if(IsAnonymousStructOrUnion(cxxRecordDecl)) {
+            else if(IsAnonymousStructOrUnion(cxxRecordDecl)) {
                 mData.Append(GetAnonymStructOrUnionName(*cxxRecordDecl));
 
                 return true;
@@ -564,10 +586,18 @@ private:
 
     bool HandleType(const DependentTemplateSpecializationType* type)
     {
+#if IS_CLANG_NEWER_THAN(20)
+        mData.Append(GetElaboratedTypeKeyword(type->getKeyword()),
+                     GetNestedName(type->getDependentTemplateName().getQualifier()),
+                     kwTemplateSpace,
+                     GetName(type->getDependentTemplateName()));
+#else
         mData.Append(GetElaboratedTypeKeyword(type->getKeyword()),
                      GetNestedName(type->getQualifier()),
                      kwTemplateSpace,
                      type->getIdentifier()->getName());
+
+#endif
 
         CodeGenerator codeGenerator{mData};
         codeGenerator.InsertTemplateArgs(*type);
@@ -590,57 +620,81 @@ private:
             }
         }
 
-        /// This is a specialty discovered with #188_2. In some cases there is a `TemplateTypeParmDecl` which has no
-        /// identifier name. Then it will end up as `type-parameter-...`. At least in #188_2: _Head_base<_Idx,
-        /// type_parameter_0_1, true> the repetition of the template specialization arguments is not required.
-        /// `hasNoName` tries to detect this case and does then print the name of the template only.
-        const bool hasNoName{[&] {
-            for(const auto& arg : type->template_arguments()) {
-                StringStream sstream{};
-                sstream.Print(arg);
-
-                if(Contains(sstream.str(), "type-parameter"sv)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }()};
-
-        if(hasNoName) {
-            StringStream sstream{};
-            sstream.Print(*type);
-
-            mData.Append(sstream.str());
-
-            return true;
-        }
-
         return false;
     }
 
     bool HandleType(const MemberPointerType* type)
     {
-        HandleType(type->getPointeeType().getTypePtrOrNull());
+        const auto* pointeeType{type->getPointeeType().getTypePtrOrNull()};
+        {
+            BackupAndRestore _{mSkipSpace,
+                               (not type->isMemberFunctionPointer() and (isa<TemplateTypeParmType>(pointeeType) or
+                                                                         isa<SubstTemplateTypeParmType>(pointeeType)))};
+            HandleType(pointeeType);
+        }
 
-        mData.Append('(');
+        // Other types seem to add the otherwise missing space after the typename
+        if(not type->isMemberFunctionPointer() and
+           (isa<TemplateTypeParmType>(pointeeType) or isa<SubstTemplateTypeParmType>(pointeeType))) {
+            mData.Append(' ');
+        }
 
-        const bool ret = HandleType(type->getClass());
+        const bool ret =
+#if IS_CLANG_NEWER_THAN(20)
+            true;
+
+        mData.Append(GetNestedName(type->getQualifier()));
+
+        mData.Append("*"sv);
+#else
+            HandleType(type->getClass());
 
         mData.Append("::*)"sv);
+#endif
 
-        HandleTypeAfter(type->getPointeeType().getTypePtrOrNull());
+        HandleTypeAfter(pointeeType);
 
         return ret;
     }
 
-    bool HandleType(const FunctionProtoType* type) { return HandleType(type->getReturnType().getTypePtrOrNull()); }
+    bool HandleType(const FunctionProtoType* type)
+    {
+        BackupAndRestore _{mSkipSpace, true};
+
+        const bool ret = HandleType(type->getReturnType().getTypePtrOrNull());
+        mData.Append(" ("sv);
+
+        return ret;
+    }
+
+    bool HandleType(const ParenType* type)
+    {
+        const bool ret = HandleType(type->getInnerType().getTypePtrOrNull());
+        if(not isa<FunctionType>(type->getInnerType())) {
+            mData.Append('(');
+        }
+
+        return ret;
+    }
+
+    void HandleTypeAfter(const PointerType* type) { HandleTypeAfter(type->getPointeeType().getTypePtrOrNull()); }
+
+    void HandleTypeAfter(const ParenType* type)
+    {
+        if(not isa<FunctionType>(type->getInnerType())) {
+            mData.Append(')');
+        }
+
+        HandleTypeAfter(type->getInnerType().getTypePtrOrNull());
+    }
 
     void HandleTypeAfter(const FunctionProtoType* type)
     {
-        mData.Append('(');
+        BackupAndRestore _{mTmplParamTypeRes, true};
+        BackupAndRestore _1{mSkipSpace, true};
 
-        mSkipSpace = true;
+        mData.Append(")("sv);
+
         for(OnceFalse needsComma{}; const auto& t : type->getParamTypes()) {
             if(needsComma) {
                 mData.Append(", "sv);
@@ -648,8 +702,6 @@ private:
 
             HandleType(t.getTypePtrOrNull());
         }
-
-        mSkipSpace = false;
 
         mData.Append(')');
 
@@ -675,15 +727,6 @@ private:
     bool HandleType(const TypedefType* type)
     {
         if(const auto* decl = type->getDecl()) {
-            /// Another filter place for type-parameter where it is contained in the FQN but leads to none compiling
-            /// code. Remove it to keep the code valid.
-            if(Contains(decl->getQualifiedNameAsString(), "type-parameter"sv)) {
-                auto* identifierInfo = decl->getIdentifier();
-                mData.Append(identifierInfo->getName());
-
-                return true;
-            }
-
             return HandleType(decl->getUnderlyingType().getTypePtrOrNull());
         }
 
@@ -729,12 +772,9 @@ private:
         // A DecltypeType in a template definition is unevaluated and refers ti itself. This check ensures, that in such
         // a situation no expansion is performed.
         if(not isa_and_nonnull<DecltypeType>(type->desugar().getTypePtrOrNull())) {
-            const bool skipSpace{mSkipSpace};
-            mSkipSpace = true;
+            BackupAndRestore _{mSkipSpace, true};
 
             HandleType(type->desugar().getTypePtrOrNull());
-
-            mSkipSpace = skipSpace;
 
             // if we hit a DecltypeType always use the expanded version to support things like a DecltypeType wrapped in
             // an LValueReferenceType
@@ -763,6 +803,7 @@ private:
 
         HANDLE_TYPE(FunctionProtoType);
         HANDLE_TYPE(PointerType);
+        HANDLE_TYPE(ParenType);
         HANDLE_TYPE(LValueReferenceType);
         HANDLE_TYPE(RValueReferenceType);
         HANDLE_TYPE(TemplateTypeParmType);
@@ -793,7 +834,9 @@ private:
     }
 
         if(nullptr != type) {
+            HANDLE_TYPE(PointerType);
             HANDLE_TYPE(FunctionProtoType);
+            HANDLE_TYPE(ParenType);
         }
     }
 
@@ -857,24 +900,24 @@ static std::string GetName(QualType                    t,
                                                    (isa<AutoType>(t.getTypePtrOrNull())) ? InsightsCanonicalTypes::Yes
                                                                                          : InsightsCanonicalTypes::No};
 
-    QualType tt = t;
-
-    if(const auto* et = tt->getAs<ElaboratedType>()) {
-        if((nullptr == et->getQualifier()) and (nullptr == et->getOwnedTagDecl())) {
-            const auto quals = tt.getLocalFastQualifiers();
-            tt               = et->getNamedType();
-            tt.setLocalFastQualifiers(quals);
-        }
-    }
-
     if(SimpleTypePrinter st{t, printingPolicy}; st.GetTypeString()) {
         return ScopeHandler::RemoveCurrentScope(st.GetString());
-
-    } else if(true == printingPolicy.CppInsightsUnqualified) {
-        return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(tt.getUnqualifiedType(), printingPolicy));
     }
 
-    return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(tt, printingPolicy));
+    // To get the namespace handling right we need to look into the ElaboratedType in some cases.
+    // However, only do that, if the type it not a dependent type. A dependent type might cause type-parameter stuff.
+    if(const auto* et = t->getAs<ElaboratedType>();
+       et and (nullptr == et->getQualifier()) and (nullptr == et->getOwnedTagDecl()) and not et->isDependentType()) {
+        const auto quals = t.getLocalFastQualifiers();
+        t                = et->getNamedType();
+        t.setLocalFastQualifiers(quals);
+    }
+
+    if(true == printingPolicy.CppInsightsUnqualified) {
+        t = t.getUnqualifiedType();
+    }
+
+    return ScopeHandler::RemoveCurrentScope(GetAsCPPStyleString(t, printingPolicy));
 }
 }  // namespace details
 //-----------------------------------------------------------------------------
@@ -887,7 +930,11 @@ static bool HasOverload(const FunctionDecl* fd)
     LookupResult result{sema, ncfd->getDeclName(), {}, Sema::LookupOrdinaryName};
 
     if(sema.LookupName(result, sema.getScopeForContext(ncfd->getDeclContext()))) {
+#if IS_CLANG_NEWER_THAN(20)
+        return LookupResultKind::FoundOverloaded == result.getResultKind();
+#else
         return LookupResult::FoundOverloaded == result.getResultKind();
+#endif
     }
 
     return false;
@@ -1090,6 +1137,14 @@ static std::string GetTemplateParameterPackArgumentName(std::string_view name, c
 
     return std::string{name};
 }
+//-----------------------------------------------------------------------------
+
+#if IS_CLANG_NEWER_THAN(20)
+StringRef GetName(const DependentTemplateStorage& name)
+{
+    return name.getName().getIdentifier()->getName();
+}
+#endif
 //-----------------------------------------------------------------------------
 
 std::string GetName(const NamedDecl& nd, const QualifiedName qualifiedName)

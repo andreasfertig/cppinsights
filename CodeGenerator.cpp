@@ -42,8 +42,8 @@ namespace ranges = std::ranges;
 //-----------------------------------------------------------------------------
 namespace clang::insights {
 
-#define BUILD_OPT_AND(name, param) std::function name = [](param t) -> MyOptional<param>
-#define BUILD_OPT_AND_O(name, param, ret) std::function name = [](param t) -> MyOptional<ret>
+#define BUILD_OPT_AND(name, param) std::function name = [](param t)->MyOptional<param>
+#define BUILD_OPT_AND_O(name, param, ret) std::function name = [](param t)->MyOptional<ret>
 
 BUILD_OPT_AND(IsPointer, QualType)
 {
@@ -1412,7 +1412,6 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                 //                }
 
             } else {
-                mProcessingVarDecl = false;
                 BackupAndRestore _{mProcessingVarDecl, true};
 
                 if(MyOptional<const InitListExpr*> initList{dyn_cast_or_null<InitListExpr>(init)};
@@ -2398,18 +2397,20 @@ void CodeGenerator::InsertArg(const ImplicitCastExpr* stmt)
     } else {
         auto           castName{GetCastName(castKind)};
         const QualType castDestType{[&] {
-            const auto type{stmt->getType()};
+            auto type{stmt->getType()};
+
+            // In case of a dependent type the canonical type doesn't know the parameters name.
+            if(not type->isDependentType()) {
+                type = type.getCanonicalType();
+            }
 
             // In at least the case a structured bindings the compiler adds xvalue casts but the && is missing to
             // make it valid C++.
             if(VK_XValue == stmt->getValueKind()) {
-                return GetGlobalAST().getRValueReferenceType(type.getCanonicalType());
-            } else if(type->isDependentType()) {  // In case of a dependent type the canonical type doesn't know the
-                                                  // parameters name.
-                return type;
+                return GetGlobalAST().getRValueReferenceType(type);
             }
 
-            return type.getCanonicalType();
+            return type;
         }()};
 
         FormatCast(castName, castDestType, subExpr, castKind);
@@ -3178,16 +3179,21 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         mOutputFormatHelper.Append(stream.str());
 
         InsertTemplateArgs(*templateSpecializationType);
-    } else if(auto* dependentTemplateSpecializationType =
-                  underlyingType->getAs<DependentTemplateSpecializationType>()) {
 
-        mOutputFormatHelper.Append(GetElaboratedTypeKeyword(dependentTemplateSpecializationType->getKeyword()));
+    } else if(auto* depSpecType = underlyingType->getAs<DependentTemplateSpecializationType>()) {
+        mOutputFormatHelper.Append(GetElaboratedTypeKeyword(depSpecType->getKeyword()));
 
-        InsertNamespace(dependentTemplateSpecializationType->getQualifier());
+#if IS_CLANG_NEWER_THAN(20)
+        InsertNamespace(depSpecType->getDependentTemplateName().getQualifier());
 
-        mOutputFormatHelper.Append(kwTemplateSpace, dependentTemplateSpecializationType->getIdentifier()->getName());
+        mOutputFormatHelper.Append(kwTemplateSpace, GetName(depSpecType->getDependentTemplateName()));
+#else
+        InsertNamespace(depSpecType->getQualifier());
 
-        InsertTemplateArgs(*dependentTemplateSpecializationType);
+        mOutputFormatHelper.Append(kwTemplateSpace, depSpecType->getIdentifier()->getName());
+#endif
+
+        InsertTemplateArgs(*depSpecType);
 
     } else {
         mOutputFormatHelper.Append(GetName(underlyingType));
@@ -3801,6 +3807,11 @@ void CodeGenerator::InsertAttribute(const Attr& attr)
 
     // skip this custom clang attribute
     RETURN_IF(attr::NoInline == attr.getKind());
+
+#if IS_CLANG_NEWER_THAN(20)
+    // skip this custom clang attribute
+    RETURN_IF(attr::InferredNoReturn == attr.getKind());
+#endif
 
     // Clang's printPretty misses the parameter pack ellipsis. Hence treat this special case here.
     if(const auto* alignedAttr = dyn_cast_or_null<AlignedAttr>(&attr)) {
@@ -4460,7 +4471,7 @@ void CodeGenerator::InsertArg(const CXXStdInitializerListExpr* stmt)
         auto internalListName =
             MakeLineColumnName(GetGlobalAST().getSourceManager(), stmt->getBeginLoc(), BuildInternalVarName("list"sv));
 
-        ofm.Append(modifiers, GetTypeNameAsParameter(subExpr->getType(), internalListName));
+        ofm.Append(modifiers, GetTypeNameAsParameter(subExpr->getType().getCanonicalType(), internalListName));
         CodeGeneratorVariant codeGenerator{ofm};
         codeGenerator->InsertArg(subExpr);
         ofm.AppendSemiNewLine();
@@ -4637,11 +4648,19 @@ void CodeGenerator::InsertTemplateArg(const TemplateArgument& arg)
             if(const auto* tmplDecl = arg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()) {
                 mOutputFormatHelper.Append(GetName(*tmplDecl, QualifiedName::Yes));
 
+#if IS_CLANG_NEWER_THAN(20)
+            } else if(const auto* depName = arg.getAsTemplateOrTemplatePattern().getAsDependentTemplateName();
+                      depName->getName().getIdentifier()) {
+                InsertNamespace(depName->getQualifier());
+
+                mOutputFormatHelper.Append(kwTemplateSpace, GetName(*depName));
+#else
             } else if(const auto* depName = arg.getAsTemplateOrTemplatePattern().getAsDependentTemplateName();
                       depName->isIdentifier()) {
                 InsertNamespace(depName->getQualifier());
 
                 mOutputFormatHelper.Append(kwTemplateSpace, depName->getIdentifier()->getName());
+#endif
             } else {
                 ToDo(arg, mOutputFormatHelper);
             }
@@ -4834,7 +4853,17 @@ void CodeGenerator::InsertConceptConstraint(const TemplateParameterList& tmplDec
 void CodeGenerator::InsertConceptConstraint(const FunctionDecl* tmplDecl)
 {
     SmallVector<const Expr*, 5> constraints{};
+
+#if IS_CLANG_NEWER_THAN(20)
+    SmallVector<AssociatedConstraint, 5> assocConstraints{};
+    tmplDecl->getAssociatedConstraints(assocConstraints);
+
+    for(auto& e : assocConstraints) {
+        constraints.push_back(e.ConstraintExpr);
+    }
+#else
     tmplDecl->getAssociatedConstraints(constraints);
+#endif
 
     InsertConceptConstraint(constraints, InsertInline::Yes);
 }

@@ -10,22 +10,22 @@
       |   ^~~
 .tmp.cpp:14:12: error: use of undeclared identifier 'BT'
    14 | inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this)
-      |            ^
+      |            ^~
 .tmp.cpp:14:34: error: use of undeclared identifier 'BT'
    14 | inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this)
-      |                                  ^
+      |                                  ^~
 .tmp.cpp:14:42: error: use of undeclared identifier 'BT'
    14 | inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this)
-      |                                          ^
+      |                                          ^~
 .tmp.cpp:19:12: error: use of undeclared identifier 'BT'
    19 | inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this, BT v)
-      |            ^
+      |            ^~
 .tmp.cpp:19:34: error: use of undeclared identifier 'BT'
    19 | inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this, BT v)
-      |                                  ^
+      |                                  ^~
 .tmp.cpp:19:42: error: use of undeclared identifier 'BT'
    19 | inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this, BT v)
-      |                                          ^
+      |                                          ^~
 .tmp.cpp:19:56: error: unknown type name 'BT'
    19 | inline Foo<BT> * Constructor_Foo<BT>(Foo<BT> * __this, BT v)
       |                                                        ^
