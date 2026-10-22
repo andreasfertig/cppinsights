@@ -233,6 +233,11 @@ public:
             if(isa<LinkageSpecDecl>(d) and d->isImplicit()) {
                 continue;
 
+#if IS_CLANG_NEWER_THAN(22)
+                // An explicit instantiation is not transformed, it must not influence the blank line handling.
+            } else if(isa<ExplicitInstantiationDecl>(d)) {
+                continue;
+#endif
                 // Only handle explicit specializations here. Implicit ones are handled by the `VarTemplateDecl`
                 // itself.
             } else if(const auto* vdspec = dyn_cast_or_null<VarTemplateSpecializationDecl>(d);
@@ -393,7 +398,7 @@ extern struct __mptr* __vtbl_array[];
 // description). This lets every shell completion script reuse clang's parsing
 // and show the description alongside the option. The leading "--" is added here
 // so the bare option name from InsightsOptions.def can be reused directly.
-#define INSIGHTS_OPT(option, name, deflt, description, category) \
+#define INSIGHTS_OPT(option, name, deflt, description, category)                                                       \
     llvm::outs() << "--" << option << "\t" << description << "\n";
 
 #include "InsightsOptions.def"

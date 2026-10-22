@@ -309,9 +309,13 @@ protected:
         }
     }
 
-    void InsertQualifierAndName(const DeclarationName&     declName,
-                                const NestedNameSpecifier* qualifier,
-                                const bool                 hasTemplateKeyword);
+    void InsertQualifierAndName(const DeclarationName& declName,
+                                const NestedNameSpecifier
+#if not IS_CLANG_NEWER_THAN(22)
+                                    *
+#endif
+                                           qualifier,
+                                const bool hasTemplateKeyword);
 
     /// For a special case, when a LambdaExpr occurs in a Constructor from an
     /// in class initializer, there is a need for a more narrow scope for the \c LAMBDA_SCOPE_HELPER.
@@ -326,7 +330,11 @@ protected:
     void InsertTemplateArgsObjectParam(const ArrayRef<TemplateArgument>& array);
     void InsertTemplateArgsObjectParam(const TemplateParamObjectDecl& param);
 
-    void InsertNamespace(const NestedNameSpecifier* namespaceSpecifier);
+    void InsertNamespace(const NestedNameSpecifier
+#if not IS_CLANG_NEWER_THAN(22)
+                             *
+#endif
+                                 namespaceSpecifier);
     void ParseDeclContext(const DeclContext* Ctx);
 
     STRONG_BOOL(SkipBody);
@@ -552,7 +560,15 @@ private:
     static inline llvm::DenseMap<const Expr*, std::pair<const DeclRefExpr*, std::string>>
         mOpaqueValues{};  ///! Keeps track of the current set of opaque value
 
-    QualType GetFrameType() const { return QualType(mASTData.mFrameType->getTypeForDecl(), 0); }
+    QualType GetFrameType() const
+    {
+        return
+#if IS_CLANG_NEWER_THAN(22)
+            mASTData.mFrameType->getASTContext().getCanonicalTagType(mASTData.mFrameType);
+#else
+            QualType(mASTData.mFrameType->getTypeForDecl(), 0);
+#endif
+    }
     QualType GetFramePointerType() const;
 
     std::string BuildResumeLabelName(int) const;

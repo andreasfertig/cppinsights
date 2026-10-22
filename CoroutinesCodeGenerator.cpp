@@ -549,11 +549,15 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     }
 
     auto getNonRefType = [&](auto* var) -> QualType {
+#if IS_CLANG_NEWER_THAN(22)
+        return QualType(var->getType().getNonReferenceType().getCanonicalType().getTypePtrOrNull(), 0);
+#else
         if(const auto* et = var->getType().getNonReferenceType()->template getAs<ElaboratedType>()) {
             return et->getNamedType();
         } else {
             return QualType(var->getType().getNonReferenceType().getTypePtrOrNull(), 0);
         }
+#endif
     };
 
     SmallVector<Expr*, 16> exprs{};
@@ -570,8 +574,8 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
         // as it can only be taken as a reference.
         OnceTrue derefFirstParam{};
 
-        if(not ctor->param_empty() and
-           (getNonRefType(ctor->getParamDecl(0)) == QualType(cxxMethodType.getTypePtrOrNull(), 0))) {
+        if(not ctor->param_empty() and (not cxxMethodType.isNull()) and
+           (getNonRefType(ctor->getParamDecl(0)) == QualType(cxxMethodType.getCanonicalType().getTypePtrOrNull(), 0))) {
             if(0 == mASTData.mThisExprs.size()) {
                 mASTData.mThisExprs.push_back(CXXThisExpr::Create(ctx, {}, Ptr(cxxMethodType), false));
             }
@@ -605,7 +609,15 @@ void CoroutinesCodeGenerator::InsertCoroutine(const FunctionDecl& fd, const Coro
     mOutputFormatHelper.AppendCommentNewLine("Construct the promise."sv);
     auto* me = AccessMember(mASTData.mFrameAccessDeclRef, mASTData.mPromiseField);
 
-    auto* ctorArgs = new(ctx) InitListExpr{ctx, {}, exprs, {}};
+    auto* ctorArgs = new(ctx) InitListExpr{ctx,
+                                           {},
+                                           exprs,
+                                           {}
+#if IS_CLANG_NEWER_THAN(22)
+                                           ,
+                                           false
+#endif
+    };
 
     CXXNewExpr* newFrame = New({AddrOf(me)}, ctorArgs, mASTData.mPromiseField->getType());
 

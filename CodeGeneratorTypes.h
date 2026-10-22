@@ -20,6 +20,9 @@ IGNORED_STMT(OMPParallelForDirective)
 IGNORED_DECL(UsingShadowDecl)
 IGNORED_DECL(UsingPackDecl)
 IGNORED_DECL(EmptyDecl)  // stray semicolon?
+#if IS_CLANG_NEWER_THAN(22)
+IGNORED_DECL(ExplicitInstantiationDecl)
+#endif
 
 SUPPORTED_DECL(BindingDecl)
 SUPPORTED_DECL(CXXDeductionGuideDecl)

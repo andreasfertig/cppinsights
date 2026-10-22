@@ -20,6 +20,8 @@
 
 #include "InsightsStrongTypes.h"
 #include "StackList.h"
+
+#include "ClangCompat.h"
 //-----------------------------------------------------------------------------
 
 namespace clang::insights {
@@ -88,7 +90,7 @@ inline const LangOptions& GetLangOpts(const Decl& decl)
 /// \brief Get the evaluated APValue from a `VarDecl`
 ///
 /// Returns `nullptr` is the \c VarDecl is not evaluatable.
-APValue* GetEvaluatedValue(const VarDecl& varDecl);
+const APValue* GetEvaluatedValue(const VarDecl& varDecl);
 //-----------------------------------------------------------------------------
 
 /// \brief Check whether a `VarDecl`s initialization can be done a compile-time.
@@ -184,7 +186,12 @@ GetTypeNameAsParameter(const QualType& t, std::string_view varName, const Unqual
 STRONG_BOOL(WithTemplateParameters);
 STRONG_BOOL(IgnoreNamespace);
 
-std::string GetNestedName(const NestedNameSpecifier* nns, const IgnoreNamespace ignoreNamespace = IgnoreNamespace::No);
+std::string GetNestedName(const NestedNameSpecifier
+#if not IS_CLANG_NEWER_THAN(22)
+                              *
+#endif
+                                                nns,
+                          const IgnoreNamespace ignoreNamespace = IgnoreNamespace::No);
 std::string GetDeclContext(const DeclContext*     ctx,
                            WithTemplateParameters withTemplateParameters = WithTemplateParameters::No);
 //-----------------------------------------------------------------------------

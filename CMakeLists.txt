@@ -117,8 +117,8 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         endif()
     endfunction(check_compiler)
 
-    check_compiler("GNU" 7.3)
-    check_compiler("Clang" 6.0)
+    check_compiler("GNU" 15.1)
+    check_compiler("Clang" 20.0)
     check_compiler("MSVC" 19.25.0.0)
 
     if(NOT HAVE_COMPILER)
@@ -392,6 +392,19 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         )
     endif()
 
+    if(${LLVM_PACKAGE_VERSION_PLAIN} VERSION_GREATER_EQUAL "22.0.0")
+        set(ADDITIONAL_LIBS
+            ${ADDITIONAL_LIBS}
+            clangScalableStaticAnalysisSourceTransformation
+            clangScalableStaticAnalysisAnalyses
+            clangScalableStaticAnalysisCore
+            clangUnifiedSymbolResolution
+            clangAnalysisLifetimeSafety
+            clangDependencyScanning
+            clangOptions
+        )
+    endif()
+
     set(ADDITIONAL_LIBS
         ${ADDITIONAL_LIBS}
         clangFrontend
@@ -406,6 +419,7 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
         clangBasic
         clangRewrite
         clangSupport
+        ${CLANG23_LIBS}
         ${LLVM_LIBS}
         ${LLVM_SYSTEM_LIBS}
     )
@@ -548,12 +562,20 @@ if(CLANG_LINK_CLANG_DYLIB)
     target_link_libraries(insights PRIVATE clang-cpp)
 else()
     # general include also provided by clang-build
-    target_link_libraries(insights
-        PRIVATE
-        ${ADDITIONAL_LIBS}
-        clangTooling
-        clangASTMatchers
-    )
+    #if(CMAKE_CXX_LINK_GROUP_USING_RESCAN_SUPPORTED)
+    if(NOT APPLE)
+        target_link_libraries(insights
+            PRIVATE
+            "$<LINK_GROUP:RESCAN,${ADDITIONAL_LIBS};clangTooling;clangASTMatchers>"
+        )
+    else()
+        target_link_libraries(insights
+            PRIVATE
+            ${ADDITIONAL_LIBS}
+            clangTooling
+            clangASTMatchers
+        )
+    endif()
 endif()
 
 if(LLVM_LINK_LLVM_DYLIB)

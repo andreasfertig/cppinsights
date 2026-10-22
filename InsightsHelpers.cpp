@@ -132,7 +132,12 @@ struct CppInsightsPrintingPolicy : PrintingPolicy
         SuppressUnwrittenScope = true;
         Alignof                = true;
         ConstantsAsWritten     = true;
-        AnonymousTagLocations  = false;  // does remove filename and line for from lambdas in parameters
+#if IS_CLANG_NEWER_THAN(22)
+        AnonymousTagNameStyle = llvm::to_underlying(
+            AnonymousTagMode::Plain);  // does remove filename and line for from lambdas in parameters
+#else
+        AnonymousTagLocations = false;  // does remove filename and line for from lambdas in parameters
+#endif
 #if IS_CLANG_NEWER_THAN(20)
         PrintAsCanonical
 #else
@@ -163,11 +168,17 @@ void ReplaceAll(std::string& str, std::string_view from, std::string_view to)
 //-----------------------------------------------------------------------------
 
 namespace details {
-static void
-BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, const IgnoreNamespace ignoreNamespace)
+static void BuildNamespace(std::string& fullNamespace,
+                           const NestedNameSpecifier
+#if not IS_CLANG_NEWER_THAN(22)
+                               *
+#endif
+                                                 stmt,
+                           const IgnoreNamespace ignoreNamespace)
 {
     RETURN_IF(not stmt);
 
+#if not IS_CLANG_NEWER_THAN(22)
     if(const auto* prefix = stmt->getPrefix()) {
         BuildNamespace(fullNamespace, prefix, ignoreNamespace);
     }
@@ -193,6 +204,22 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
 #endif
         case NestedNameSpecifier::TypeSpec:
             fullNamespace.append(GetUnqualifiedScopelessName(stmt->getAsType(), InsightsSuppressScope::Yes));
+#else
+    switch(stmt.getKind()) {
+        case NestedNameSpecifier::Kind::Namespace: {
+            const auto [ns, prefix] = stmt.getAsNamespaceAndPrefix();
+
+            BuildNamespace(fullNamespace, prefix, ignoreNamespace);
+
+            RETURN_IF((IgnoreNamespace::Yes == ignoreNamespace) or
+                      (isa<NamespaceDecl>(ns) and cast<NamespaceDecl>(ns)->isAnonymousNamespace()));
+
+            fullNamespace.append(ns->getName());
+        } break;
+
+        case NestedNameSpecifier::Kind::Type:
+            fullNamespace.append(GetUnqualifiedScopelessName(stmt.getAsType(), InsightsSuppressScope::Yes));
+#endif
             // The template parameters are already contained in the type we inserted above.
             break;
 
@@ -204,7 +231,12 @@ BuildNamespace(std::string& fullNamespace, const NestedNameSpecifier* stmt, cons
 //-----------------------------------------------------------------------------
 }  // namespace details
 
-std::string GetNestedName(const NestedNameSpecifier* nns, const IgnoreNamespace ignoreNamespace)
+std::string GetNestedName(const NestedNameSpecifier
+#if not IS_CLANG_NEWER_THAN(22)
+                              *
+#endif
+                                                nns,
+                          const IgnoreNamespace ignoreNamespace)
 {
     std::string ret{};
 
@@ -300,11 +332,15 @@ const QualType GetDesugarType(const QualType& QT)
         if(const auto* autoType = QT->getAs<clang::AutoType>(); autoType and autoType->isSugared()) {
             const auto dt = autoType->getDeducedType();
 
+#if IS_CLANG_NEWER_THAN(22)
+            return dt;
+#else
             if(const auto* et = dt->getAs<ElaboratedType>()) {
                 return et->getNamedType();
             } else {
                 return dt;
             }
+#endif
 
         } else if(auto declType = QT->getAs<clang::DecltypeType>()) {
             return declType->desugar();
@@ -501,7 +537,15 @@ private:
         return ret;
     }
 
-    bool HandleType(const InjectedClassNameType* type) { return HandleType(type->getInjectedTST()); }
+    bool HandleType(const InjectedClassNameType* type)
+    {
+        return
+#if IS_CLANG_NEWER_THAN(22)
+            HandleType(type->getDecl()->getCanonicalTemplateSpecializationType(GetGlobalAST()).getTypePtr());
+#else
+            HandleType(type->getInjectedTST());
+#endif
+    }
 
     bool HandleType(const RecordType* type)
     {
@@ -556,6 +600,39 @@ private:
             }
 
             // we need a name here, as DecltypeType always says true
+#if IS_CLANG_NEWER_THAN(22)
+            // A deduced type carries no written scope, so Clang's printer drops it. Add it here.
+            if(not type->getQualifier()) {
+                if(const auto scope = GetScope(cxxRecordDecl->getDeclContext(), RemoveCurrentScope::No);
+                   cxxRecordDecl->getDeclContext()->isNamespace() and not scope.empty()) {
+                    mData.Append(ScopeHandler::RemoveCurrentScope(scope + std::string{cxxRecordDecl->getName()}));
+
+                    return true;
+                }
+
+                // A member class of a class template specialization, for example `task<int>::promise_type`.
+                std::string          memberPath{cxxRecordDecl->getName().str()};
+                const CXXRecordDecl* ctx = dyn_cast_or_null<CXXRecordDecl>(cxxRecordDecl->getDeclContext());
+
+                while(ctx and not isa<ClassTemplateSpecializationDecl>(ctx)) {
+                    memberPath.insert(0, ctx->getName().str() + "::");
+                    ctx = dyn_cast_or_null<CXXRecordDecl>(ctx->getDeclContext());
+                }
+
+                if(ctx) {
+                    mData.Append(ScopeHandler::RemoveCurrentScope(
+                        QualType{GetGlobalAST().getCanonicalTagType(ctx)}.getAsString(mPrintingPolicy) +
+                        "::" + memberPath));
+
+                    return true;
+                }
+            }
+            // A scope as written, for example `task<int>::awaiter`.
+            if(const auto qualifier = type->getQualifier(); qualifier) {
+                mData.Append(GetNestedName(qualifier));
+            }
+#endif
+
             mData.Append(GetName(*cxxRecordDecl));
         }
 
@@ -569,6 +646,7 @@ private:
         return HandleType(type->getReplacementType().getTypePtrOrNull());
     }
 
+#if not IS_CLANG_NEWER_THAN(22)
     bool HandleType(const ElaboratedType* type)
     {
         const IgnoreNamespace ignoreNamespace = (mPrintingPolicy.CppInsightsSuppressScope == InsightsSuppressScope::Yes)
@@ -586,24 +664,17 @@ private:
 
     bool HandleType(const DependentTemplateSpecializationType* type)
     {
-#if IS_CLANG_NEWER_THAN(20)
         mData.Append(GetElaboratedTypeKeyword(type->getKeyword()),
                      GetNestedName(type->getDependentTemplateName().getQualifier()),
                      kwTemplateSpace,
                      GetName(type->getDependentTemplateName()));
-#else
-        mData.Append(GetElaboratedTypeKeyword(type->getKeyword()),
-                     GetNestedName(type->getQualifier()),
-                     kwTemplateSpace,
-                     type->getIdentifier()->getName());
-
-#endif
 
         CodeGenerator codeGenerator{mData};
         codeGenerator.InsertTemplateArgs(*type);
 
         return true;
     }
+#endif
 
     bool HandleType(const DeducedTemplateSpecializationType* type)
     {
@@ -613,8 +684,22 @@ private:
     bool HandleType(const TemplateSpecializationType* type)
     {
         if(type->getAsRecordDecl()) {
+#if IS_CLANG_NEWER_THAN(22)
+            // A scope written in front of the template name is not part of the canonical record type.
+            const IgnoreNamespace ignoreNamespace =
+                (mPrintingPolicy.CppInsightsSuppressScope == InsightsSuppressScope::Yes) ? IgnoreNamespace::No
+                                                                                         : IgnoreNamespace::Yes;
+            BackupAndRestore _{mScope, GetNestedName(type->getTemplateName().getQualifier(), ignoreNamespace)};
+#endif
+
             // Only if it was some sort of "used" `RecordType` we continue here.
-            if(HandleType(type->getAsRecordDecl()->getTypeForDecl())) {
+            if(HandleType(
+#if IS_CLANG_NEWER_THAN(22)
+                   GetGlobalAST().getCanonicalTagType(type->getAsRecordDecl()).getTypePtr()
+#else
+                   type->getAsRecordDecl()->getTypeForDecl()
+#endif
+                       )) {
                 HandleType(type->getPointeeType().getTypePtrOrNull());
                 return true;
             }
@@ -724,14 +809,66 @@ private:
         return false;
     }
 
+#if IS_CLANG_NEWER_THAN(22)
+    bool HandleType(const PredefinedSugarType* type)
+    {
+        // Clang prints the sugar as `__size_t`, but we need the builtin type.
+        mData.Append(type->desugar().getCanonicalType().getAsString(mPrintingPolicy));
+
+        return true;
+    }
+#endif
+
     bool HandleType(const TypedefType* type)
     {
+#if IS_CLANG_NEWER_THAN(22)
+        // Clang adds a type suffix like `UL` to integral template arguments whose parameter type is a sugar like
+        // `size_t`. Print such a member typedef of a template specialization ourselves.
+        if(const auto* tt = dyn_cast_or_null<ClassTemplateSpecializationDecl>(type->getDecl()->getDeclContext());
+           tt and not mPrintingPolicy.PrintAsCanonical and
+           (NestedNameSpecifier::Kind::Type == type->getQualifier().getKind()) and
+           llvm::any_of(tt->getTemplateArgs().asArray(),
+                        [](const auto& arg) { return TemplateArgument::Integral == arg.getKind(); })) {
+            OutputFormatHelper ofm{};
+            CodeGenerator      codeGenerator{ofm};
+            codeGenerator.InsertTemplateArgs(tt->getTemplateArgs().asArray());
+
+            // Qualifiers derived from the canonical type are not part of the typedef.
+            mData.GetString().clear();
+            mData.Append(GetScope(tt->getDeclContext(), RemoveCurrentScope::No),
+                         tt->getName(),
+                         ofm,
+                         "::"sv,
+                         type->getDecl()->getName());
+
+            return true;
+        }
+#endif
+
         if(const auto* decl = type->getDecl()) {
             return HandleType(decl->getUnderlyingType().getTypePtrOrNull());
         }
 
         return HandleType(type->getPointeeType().getTypePtrOrNull());
     }
+
+#if IS_CLANG_NEWER_THAN(22)
+    bool HandleType(const UsingType* type)
+    {
+        const auto* target = type->getDecl()->getTargetDecl();
+
+        // Keep the scope as written, for example the `std::` of `std::jmp_buf`, which is a using-declaration.
+        if(const auto nestedName = GetNestedName(type->getQualifier()); not nestedName.empty()) {
+            mData.Append(nestedName, target->getName());
+
+            return true;
+        }
+
+        mData.Append(GetScope(target->getDeclContext()), target->getName());
+
+        return true;
+    }
+#endif
 
     bool HandleType(const ConstantArrayType* type)
     {
@@ -810,15 +947,25 @@ private:
         HANDLE_TYPE(RecordType);
         HANDLE_TYPE(AutoType);
         HANDLE_TYPE(SubstTemplateTypeParmType);
+#if not IS_CLANG_NEWER_THAN(22)
         HANDLE_TYPE(ElaboratedType);
+#endif
         HANDLE_TYPE(TemplateSpecializationType);
         HANDLE_TYPE(DeducedTemplateSpecializationType);
         HANDLE_TYPE(MemberPointerType);
         HANDLE_TYPE(BuiltinType);
+#if IS_CLANG_NEWER_THAN(22)
+        HANDLE_TYPE(PredefinedSugarType);
+#endif
         HANDLE_TYPE(TypedefType);
+#if IS_CLANG_NEWER_THAN(22)
+        HANDLE_TYPE(UsingType);
+#endif
         HANDLE_TYPE(ConstantArrayType);
         HANDLE_TYPE(InjectedClassNameType);
+#if not IS_CLANG_NEWER_THAN(22)
         HANDLE_TYPE(DependentTemplateSpecializationType);
+#endif
         HANDLE_TYPE(PackExpansionType);
         HANDLE_TYPE(DecltypeType);
 
@@ -906,12 +1053,14 @@ static std::string GetName(QualType                    t,
 
     // To get the namespace handling right we need to look into the ElaboratedType in some cases.
     // However, only do that, if the type it not a dependent type. A dependent type might cause type-parameter stuff.
+#if not IS_CLANG_NEWER_THAN(22)
     if(const auto* et = t->getAs<ElaboratedType>();
        et and (nullptr == et->getQualifier()) and (nullptr == et->getOwnedTagDecl()) and not et->isDependentType()) {
         const auto quals = t.getLocalFastQualifiers();
         t                = et->getNamedType();
         t.setLocalFastQualifiers(quals);
     }
+#endif
 
     if(true == printingPolicy.CppInsightsUnqualified) {
         t = t.getUnqualifiedType();
@@ -1306,8 +1455,11 @@ std::string GetTypeNameAsParameter(const QualType& t, std::string_view varName, 
     const auto pointerToArrayBaseType = isAutoType ? t->getContainedAutoType()->getDeducedType() : t;
     const bool isPointerToArray       = HasTypeWithSubType<PointerType, ArrayType>(pointerToArrayBaseType);
     // Only treat this as an array if it is a top-level arry. Typdef's et all can hide the arrayness.
-    const bool isRawArrayType =
-        t->isArrayType() and not(isa<TypedefType>(t) or isa<ElaboratedType>(t) or isa<UsingType>(t));
+    const bool isRawArrayType = t->isArrayType() and not(isa<TypedefType>(t)
+#if not IS_CLANG_NEWER_THAN(22)
+                                                         or isa<ElaboratedType>(t)
+#endif
+                                                         or isa<UsingType>(t));
 
     std::string typeName = details::GetName(t, unqualified);
 
@@ -1422,7 +1574,7 @@ static bool IsTrivialStaticClassVarDecl(const DeclRefExpr& declRefExpr)
 }
 //-----------------------------------------------------------------------------
 
-APValue* GetEvaluatedValue(const VarDecl& varDecl)
+const APValue* GetEvaluatedValue(const VarDecl& varDecl)
 {
     if((nullptr != varDecl.ensureEvaluatedStmt()) and varDecl.ensureEvaluatedStmt()->Value.isValid() and
        not varDecl.getInit()->isValueDependent()) {

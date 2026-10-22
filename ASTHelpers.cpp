@@ -521,7 +521,12 @@ CXXRecordDecl* Struct(std::string_view name)
         auto& ctx = GetGlobalAST();
 
         return CXXRecordDecl::Create(
-            ctx, TagTypeKind::Struct, ctx.getTranslationUnitDecl(), {}, {}, &ctx.Idents.get(name), nullptr, false);
+            ctx, TagTypeKind::Struct, ctx.getTranslationUnitDecl(), {}, {}, &ctx.Idents.get(name), nullptr
+#if IS_CLANG_NEWER_THAN(22)
+#else
+            ,false
+#endif
+        );
     };
 
     auto* rd = getRecord();
@@ -549,7 +554,15 @@ FieldDecl* mkFieldDecl(DeclContext* dc, std::string_view name, QualType type)
 
 InitListExpr* InitList(ArrayRef<Expr*> initExprs, QualType t)
 {
-    auto* initList = new(GetGlobalAST()) InitListExpr(GetGlobalAST(), SourceLocation{}, initExprs, SourceLocation{});
+    auto* initList = new(GetGlobalAST()) InitListExpr(GetGlobalAST(),
+                                                      SourceLocation{},
+                                                      initExprs,
+                                                      SourceLocation{}
+#if IS_CLANG_NEWER_THAN(22)
+                                                      ,
+                                                      false
+#endif
+    );
     initList->setType(t);
 
     return initList;
@@ -676,19 +689,34 @@ QualType Typedef(std::string_view name, QualType underlayingType)
                                      &ctx.Idents.get(name),
                                      ctx.getTrivialTypeSourceInfo(underlayingType));
 
-    return ctx.getTypeDeclType(type);
+    return
+#if IS_CLANG_NEWER_THAN(22)
+        ctx.getTypedefType(ElaboratedTypeKeyword::None, std::nullopt, type);
+#else
+        ctx.getTypeDeclType(type);
+#endif
 }
 //-----------------------------------------------------------------------------
 
 QualType GetRecordDeclType(const CXXMethodDecl* md)
 {
-    return QualType(md->getParent()->getTypeForDecl(), 0);
+    return
+#if IS_CLANG_NEWER_THAN(22)
+        md->getParent()->getASTContext().getCanonicalTagType(md->getParent());
+#else
+        QualType(md->getParent()->getTypeForDecl(), 0);
+#endif
 }
 //-----------------------------------------------------------------------------
 
 QualType GetRecordDeclType(const RecordDecl* rd)
 {
-    return QualType(rd->getTypeForDecl(), 0);
+    return
+#if IS_CLANG_NEWER_THAN(22)
+        rd->getASTContext().getCanonicalTagType(rd);
+#else
+        QualType(rd->getTypeForDecl(), 0);
+#endif
 }
 //-----------------------------------------------------------------------------
 
