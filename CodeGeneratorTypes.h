@@ -50,6 +50,7 @@ SUPPORTED_DECL(VarTemplateDecl)
 SUPPORTED_DECL(ConceptDecl)
 SUPPORTED_DECL(UnresolvedUsingValueDecl)
 SUPPORTED_DECL(LinkageSpecDecl)
+SUPPORTED_DECL(CXXExpansionStmtDecl)
 
 SUPPORTED_STMT(CXXDeleteExpr)
 SUPPORTED_STMT(CXXDefaultInitExpr)
@@ -140,6 +141,7 @@ SUPPORTED_STMT(CXXParenListInitExpr)
 SUPPORTED_STMT(CppInsightsCommentStmt)
 SUPPORTED_STMT(CXXPseudoDestructorExpr)
 SUPPORTED_STMT(PackIndexingExpr)
+SUPPORTED_STMT(CXXExpansionSelectExpr)
 
 #undef IGNORED_DECL
 #undef IGNORED_STMT

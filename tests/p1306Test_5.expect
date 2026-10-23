@@ -1,0 +1,124 @@
+#define INSIGHTS_USE_TEMPLATE
+
+#include <tuple>
+
+int main()
+{
+  std::tuple<int, char, long> tpl = std::tuple<int, char, long>{1, 'a', 3L};
+  int arr[3] = {4, 5, 6};
+  int res = {};
+  {
+    std::tuple<int, char, long> & __tpl13 = tpl;
+    int & __u0 = std::get<0UL>(__tpl13);
+    char & __u1 = std::get<1UL>(__tpl13);
+    long & __u2 = std::get<2UL>(__tpl13);
+    {
+      std::tuple_element<0, std::tuple<int, char, long> >::type & e = __u0;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    {
+      std::tuple_element<1, std::tuple<int, char, long> >::type & e = __u1;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    {
+      std::tuple_element<2, std::tuple<int, char, long> >::type & e = __u2;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    
+  }
+  {
+    int (&__arr18)[3] = arr;
+    int & __u0 = __arr18[0];
+    int & __u1 = __arr18[1];
+    int & __u2 = __arr18[2];
+    {
+      const int & e = __u0;
+      {
+        res = res + e;
+      }
+    }
+    {
+      const int & e = __u1;
+      {
+        res = res + e;
+      }
+    }
+    {
+      const int & e = __u2;
+      {
+        res = res + e;
+      }
+    }
+    
+  }
+  {
+    {
+      int x = 1;
+      {
+        {
+          {
+            int y = 10;
+            {
+              res = res + (x * y);
+            }
+          }
+          {
+            int y = 20;
+            {
+              res = res + (x * y);
+            }
+          }
+          
+        }
+      }
+    }
+    {
+      int x = 2;
+      {
+        {
+          {
+            int y = 10;
+            {
+              res = res + (x * y);
+            }
+          }
+          {
+            int y = 20;
+            {
+              res = res + (x * y);
+            }
+          }
+          
+        }
+      }
+    }
+    {
+      int x = 3;
+      {
+        {
+          {
+            int y = 10;
+            {
+              res = res + (x * y);
+            }
+          }
+          {
+            int y = 20;
+            {
+              res = res + (x * y);
+            }
+          }
+          
+        }
+      }
+    }
+    
+  }
+  return static_cast<int &&>(res);
+}

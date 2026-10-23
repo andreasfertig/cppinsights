@@ -1,0 +1,237 @@
+#define INSIGHTS_USE_TEMPLATE
+
+#include <tuple>
+
+struct Point
+{
+  int x;
+  char y;
+};
+
+
+template<typename T>
+int Sum(T & range)
+{
+  int sum = {};
+  template for(auto & e : range){
+    sum = sum + static_cast<int>(e);
+  }
+  return static_cast<int &&>(sum);
+}
+
+/* First instantiated from: p1306Test_6.cpp:59 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int Sum<std::tuple<int, char, long> >(std::tuple<int, char, long> & range)
+{
+  int sum = {};
+  {
+    std::tuple<int, char, long> & __range18 = range;
+    int & __u0 = std::get<0UL>(__range18);
+    char & __u1 = std::get<1UL>(__range18);
+    long & __u2 = std::get<2UL>(__range18);
+    {
+      std::tuple_element<0, std::tuple<int, char, long> >::type & e = __u0;
+      {
+        sum = sum + static_cast<int>(e);
+      }
+    }
+    {
+      std::tuple_element<1, std::tuple<int, char, long> >::type & e = __u1;
+      {
+        sum = sum + static_cast<int>(e);
+      }
+    }
+    {
+      std::tuple_element<2, std::tuple<int, char, long> >::type & e = __u2;
+      {
+        sum = sum + static_cast<int>(e);
+      }
+    }
+    
+  }
+  return static_cast<int &&>(sum);
+}
+#endif
+
+
+/* First instantiated from: p1306Test_6.cpp:59 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+int Sum<int[3]>(int (&range)[3])
+{
+  int sum = {};
+  {
+    int (&__range18)[3] = range;
+    int & __u0 = __range18[0];
+    int & __u1 = __range18[1];
+    int & __u2 = __range18[2];
+    {
+      int & e = __u0;
+      {
+        sum = sum + static_cast<int>(e);
+      }
+    }
+    {
+      int & e = __u1;
+      {
+        sum = sum + static_cast<int>(e);
+      }
+    }
+    {
+      int & e = __u2;
+      {
+        sum = sum + static_cast<int>(e);
+      }
+    }
+    
+  }
+  return static_cast<int &&>(sum);
+}
+#endif
+
+
+int main()
+{
+  std::tuple<int, char, long> tpl = std::tuple<int, char, long>{1, 'a', 3L};
+  int arr[3] = {4, 5, 6};
+  Point pt = {7, 'b'};
+  std::tuple<> empty;
+  int res = {};
+  {
+    std::tuple<int, char, long> & __tpl34 = tpl;
+    int & __u0 = std::get<0UL>(__tpl34);
+    char & __u1 = std::get<1UL>(__tpl34);
+    long & __u2 = std::get<2UL>(__tpl34);
+    {
+      std::tuple_element<0, std::tuple<int, char, long> >::type & e = __u0;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    {
+      std::tuple_element<1, std::tuple<int, char, long> >::type & e = __u1;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    {
+      std::tuple_element<2, std::tuple<int, char, long> >::type & e = __u2;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    
+  }
+  {
+    int (&__arr39)[3] = arr;
+    int & __u0 = __arr39[0];
+    int & __u1 = __arr39[1];
+    int & __u2 = __arr39[2];
+    {
+      const int & e = __u0;
+      {
+        res = res + e;
+      }
+    }
+    {
+      const int & e = __u1;
+      {
+        res = res + e;
+      }
+    }
+    {
+      const int & e = __u2;
+      {
+        res = res + e;
+      }
+    }
+    
+  }
+  {
+    Point & __pt44 = pt;
+    int & __u0 = __pt44.x;
+    char & __u1 = __pt44.y;
+    {
+      int & e = __u0;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    {
+      char & e = __u1;
+      {
+        res = res + static_cast<int>(e);
+      }
+    }
+    
+  }
+  {
+    std::tuple<> & __empty49 = empty;
+    
+  }
+  {
+    {
+      int x = 1;
+      {
+        {
+          {
+            int y = 10;
+            {
+              res = res + (x * y);
+            }
+          }
+          {
+            int y = 20;
+            {
+              res = res + (x * y);
+            }
+          }
+          
+        }
+      }
+    }
+    {
+      int x = 2;
+      {
+        {
+          {
+            int y = 10;
+            {
+              res = res + (x * y);
+            }
+          }
+          {
+            int y = 20;
+            {
+              res = res + (x * y);
+            }
+          }
+          
+        }
+      }
+    }
+    {
+      int x = 3;
+      {
+        {
+          {
+            int y = 10;
+            {
+              res = res + (x * y);
+            }
+          }
+          {
+            int y = 20;
+            {
+              res = res + (x * y);
+            }
+          }
+          
+        }
+      }
+    }
+    
+  }
+  return (res + Sum(tpl)) + Sum(arr);
+}

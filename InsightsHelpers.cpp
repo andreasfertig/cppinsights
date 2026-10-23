@@ -486,10 +486,10 @@ private:
     std::string                      mDataAfter{};
     bool                             mHasData{false};
     bool                             mSkipSpace{false};
-    bool mScanningArrayDimension{};  //!< Only the outer most ConstantArrayType handles the array dimensions and size
-    std::string mScope{};            //!< A scope coming from an ElaboratedType which is used for a
-                                     //!< ClassTemplateSpecializationDecl if there is no other scope
-    bool mTmplParamTypeRes{};        //!< When processing FunctionProtoType parameters we need to get the identifiers
+    bool mScanningArrayDimension{};   //!< Only the outer most ConstantArrayType handles the array dimensions and size
+    std::string mScope{};             //!< A scope coming from an ElaboratedType which is used for a
+                                      //!< ClassTemplateSpecializationDecl if there is no other scope
+    bool        mTmplParamTypeRes{};  //!< When processing FunctionProtoType parameters we need to get the identifiers
 
     bool HandleType(const TemplateTypeParmType* type)
     {
