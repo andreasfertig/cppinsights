@@ -12,7 +12,7 @@ int main()
       const std::pair<const int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > & __operator6 = __begin1.operator*();
       const int & k = std::get<0UL>(__operator6);
       const std::basic_string<char, std::char_traits<char>, std::allocator<char> > & v = std::get<1UL>(__operator6);
-      const int a = 1;
+      std::tuple_element<0, const std::pair<const int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::type a = 1;
     }
     
   }

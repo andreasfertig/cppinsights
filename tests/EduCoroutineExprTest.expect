@@ -237,7 +237,7 @@ struct __get_randomFrame
 {
   void (*resume_fn)(__get_randomFrame *);
   void (*destroy_fn)(__get_randomFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_77_11;
@@ -253,7 +253,7 @@ task<int> get_random()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __get_randomResume(__get_randomFrame * __f);
@@ -340,7 +340,7 @@ struct __testVarDeclAndConditionalFrame
 {
   void (*resume_fn)(__testVarDeclAndConditionalFrame *);
   void (*destroy_fn)(__testVarDeclAndConditionalFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -372,7 +372,7 @@ task<int> testVarDeclAndConditional()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testVarDeclAndConditionalResume(__testVarDeclAndConditionalFrame * __f);
@@ -544,7 +544,7 @@ struct __testIfStmtFrame
 {
   void (*resume_fn)(__testIfStmtFrame *);
   void (*destroy_fn)(__testIfStmtFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -571,7 +571,7 @@ task<int> testIfStmt()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testIfStmtResume(__testIfStmtFrame * __f);
@@ -719,7 +719,7 @@ struct __testCallExprFrame
 {
   void (*resume_fn)(__testCallExprFrame *);
   void (*destroy_fn)(__testCallExprFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -738,7 +738,7 @@ task<int> testCallExpr()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testCallExprResume(__testCallExprFrame * __f);
@@ -838,7 +838,7 @@ struct __testSwitchFrame
 {
   void (*resume_fn)(__testSwitchFrame *);
   void (*destroy_fn)(__testSwitchFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -857,7 +857,7 @@ task<int> testSwitch()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testSwitchResume(__testSwitchFrame * __f);
@@ -959,7 +959,7 @@ struct __testWhileFrame
 {
   void (*resume_fn)(__testWhileFrame *);
   void (*destroy_fn)(__testWhileFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -979,7 +979,7 @@ task<int> testWhile()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testWhileResume(__testWhileFrame * __f);
@@ -1082,7 +1082,7 @@ struct __testDoWhileFrame
 {
   void (*resume_fn)(__testDoWhileFrame *);
   void (*destroy_fn)(__testDoWhileFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -1102,7 +1102,7 @@ task<int> testDoWhile()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testDoWhileResume(__testDoWhileFrame * __f);
@@ -1205,7 +1205,7 @@ struct __testForLoopFrame
 {
   void (*resume_fn)(__testForLoopFrame *);
   void (*destroy_fn)(__testForLoopFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -1230,7 +1230,7 @@ task<int> testForLoop()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testForLoopResume(__testForLoopFrame * __f);

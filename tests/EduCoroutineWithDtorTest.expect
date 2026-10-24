@@ -160,7 +160,7 @@ struct __fun_TestFrame
 {
   void (*resume_fn)(__fun_TestFrame *);
   void (*destroy_fn)(__fun_TestFrame *);
-  std::__coroutine_traits_sfinae<generator<Test> >::promise_type __promise;
+  std::coroutine_traits<generator<Test> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_43_14;
@@ -179,7 +179,7 @@ generator<Test> fun<Test>()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator<Test> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator<Test> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __fun_TestResume(__fun_TestFrame * __f);

@@ -91,7 +91,7 @@ struct __GeneratorFrame
 {
   void (*resume_fn)(__GeneratorFrame *);
   void (*destroy_fn)(__GeneratorFrame *);
-  std::__coroutine_traits_sfinae<Future>::promise_type __promise;
+  std::coroutine_traits<Future>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_65_8;
@@ -110,7 +110,7 @@ Future Generator()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<Future>::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<Future>::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __GeneratorResume(__GeneratorFrame * __f);

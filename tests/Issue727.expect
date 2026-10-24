@@ -62,7 +62,7 @@ struct __funcAFrame
 {
   void (*resume_fn)(__funcAFrame *);
   void (*destroy_fn)(__funcAFrame *);
-  std::__coroutine_traits_sfinae<R>::promise_type __promise;
+  std::coroutine_traits<R>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_40_3;
@@ -79,7 +79,7 @@ R funcA()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<R>::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<R>::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __funcAResume(__funcAFrame * __f);

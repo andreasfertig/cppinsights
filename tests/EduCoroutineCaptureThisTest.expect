@@ -71,7 +71,7 @@ struct ClassWithCoro
 {
   void (*resume_fn)(__coroFrame *);
   void (*destroy_fn)(__coroFrame *);
-  std::__coroutine_traits_sfinae<my_resumable>::promise_type __promise;
+  std::coroutine_traits<my_resumable, ClassWithCoro &, int>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   int x;
@@ -91,7 +91,7 @@ inline my_resumable coro(int x)
     __f->__this = this;
     
     /* Construct the promise. */
-    new (&__f->__promise)std::__coroutine_traits_sfinae<my_resumable>::promise_type{*__f->__this, __f->x};
+    new (&__f->__promise)std::coroutine_traits<my_resumable, ClassWithCoro &, int>::promise_type{*__f->__this, __f->x};
     
     /* Forward declare the resume and destroy function. */
     void __coroResume(__coroFrame * __f);

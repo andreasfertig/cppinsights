@@ -4,13 +4,23 @@
 .tmp.cpp:29:5: error: templates cannot be declared inside of a local class
    29 |     template<class type_parameter_0_0>
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from .tmp.cpp:1:
-In file included from ... vector:352:
-In file included from ... algorithm:1859:
-... find_if.h:25:9: error: no matching function for call to object of type '__lambda_12_26'
-   25 |     if (__pred(*__first))
-      |         ^~~~~~
-.tmp.cpp:36:104: note: in instantiation of function template specialization 'std::find_if<std::__wrap_iter<std::string *>, __lambda_12_26>' requested here
-   36 |   std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
+In file included from .tmp.cpp:2:
+In file included from ... algorithm:1909:
+In file included from ... find.h:13:
+... find_if.h:30:9: error: no matching function for call to '__invoke'
+   30 |     if (std::__invoke(__pred, std::__invoke(__proj, *__first)))
+      |         ^~~~~~~~~~~~~
+... find_if.h:38:15: note: in instantiation of function template specialization 'std::__find_if<std::__wrap_iter<std::string *>, std::__wrap_iter<std::string *>, __lambda_12_26 &, std::__identity>' requested here
+   38 |   return std::__find_if(__first, __last, __pred, __identity());
+      |               ^
+.tmp.cpp:37:104: note: in instantiation of function template specialization 'std::find_if<std::__wrap_iter<std::string *>, __lambda_12_26>' requested here
+   37 |   std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});
       |                                                                                                        ^
+... invoke.h:88:69: note: candidate template ignored: substitution failure [with _Args = <__lambda_12_26 &, std::string &>]: no type named 'type' in 'std::__invoke_result_impl<void, __lambda_12_26 &, std::string &>'
+   85 | using __invoke_result_t _LIBCPP_NODEBUG = typename __invoke_result<_Args...>::type;
+      | ~~~~~
+   86 | 
+   87 | template <class... _Args>
+   88 | _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR __invoke_result_t<_Args...> __invoke(_Args&&... __args)
+      |                                                                     ^
 3 errors generated.

@@ -97,7 +97,7 @@ struct __simpleReturnFrame
 {
   void (*resume_fn)(__simpleReturnFrame *);
   void (*destroy_fn)(__simpleReturnFrame *);
-  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::coroutine_traits<generator, int>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   int v;
@@ -120,7 +120,7 @@ generator simpleReturn(int v)
   __f->v = std::forward<int>(v);
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator, int>::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __simpleReturnResume(__simpleReturnFrame * __f);
@@ -202,7 +202,7 @@ struct __additionAwaitReturnFrame
 {
   void (*resume_fn)(__additionAwaitReturnFrame *);
   void (*destroy_fn)(__additionAwaitReturnFrame *);
-  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::coroutine_traits<generator, int>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   int v;
@@ -229,7 +229,7 @@ generator additionAwaitReturn(int v)
   __f->v = std::forward<int>(v);
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator, int>::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __additionAwaitReturnResume(__additionAwaitReturnFrame * __f);
@@ -347,7 +347,7 @@ struct __additionAwaitReturn2Frame
 {
   void (*resume_fn)(__additionAwaitReturn2Frame *);
   void (*destroy_fn)(__additionAwaitReturn2Frame *);
-  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::coroutine_traits<generator, int>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   int v;
@@ -376,7 +376,7 @@ generator additionAwaitReturn2(int v)
   __f->v = std::forward<int>(v);
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator, int>::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __additionAwaitReturn2Resume(__additionAwaitReturn2Frame * __f);
@@ -512,7 +512,7 @@ struct __additionAwaitReturnWithIntFrame
 {
   void (*resume_fn)(__additionAwaitReturnWithIntFrame *);
   void (*destroy_fn)(__additionAwaitReturnWithIntFrame *);
-  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::coroutine_traits<generator, int>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   int v;
@@ -539,7 +539,7 @@ generator additionAwaitReturnWithInt(int v)
   __f->v = std::forward<int>(v);
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator, int>::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __additionAwaitReturnWithIntResume(__additionAwaitReturnWithIntFrame * __f);

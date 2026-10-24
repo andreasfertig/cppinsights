@@ -2,6 +2,6 @@
 
 int main()
 {
-  std::basic_string<char, std::char_traits<char>, std::allocator<char> > s = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"Hello, CI!"};
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > s = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"Hello, CI!", std::allocator<char>()};
   return 1;
 }

@@ -1,7 +1,7 @@
-.tmp.cpp:84:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
+.tmp.cpp:84:14: error: taking the address of a temporary object of type 'Data' (aka 'struct Data') [-Waddress-of-temporary]
    84 |   Data * d = &get(Constructor_Test((Test *)&__temporary43_22, 4));
       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.tmp.cpp:91:14: error: taking the address of a temporary object of type 'Data' [-Waddress-of-temporary]
+.tmp.cpp:91:14: error: taking the address of a temporary object of type 'Data' (aka 'struct Data') [-Waddress-of-temporary]
    91 |   Data * d = &get(Constructor_Test((Test *)&__temporary48_22, 4));
       |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .tmp.cpp:103:20: error: use of undeclared identifier 'tt'

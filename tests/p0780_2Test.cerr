@@ -14,8 +14,8 @@
    38 |     inline constexpr invoke_result_t<void (*const &)(int, int, int, int), const int &, const int &, const int &, const int &> operator()() const
       |                      ^~~~~~~~~~~~~~~
       |                      std::invoke_result_t
-... invoke.h:387:1: note: 'std::invoke_result_t' declared here
-  387 | using invoke_result_t = __invoke_result_t<_Fn, _Args...>;
+... invoke.h:395:1: note: 'std::invoke_result_t' declared here
+  395 | using invoke_result_t = __invoke_result_t<_Fn, _Args...>;
       | ^
 .tmp.cpp:51:10: error: no viable conversion from returned value of type '__lambda_15_12' to function return type 'int'
    51 |   return __lambda_15_12{std::move(f), std::move(__args1), std::move(__args2), std::move(__args3), std::move(__args4)};

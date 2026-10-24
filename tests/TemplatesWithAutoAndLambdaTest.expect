@@ -76,7 +76,7 @@ void print<' ', char[3], double, std::basic_string<char, std::char_traits<char>,
 
 int main()
 {
-  std::basic_string<char, std::char_traits<char>, std::allocator<char> > str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >("world");
+  std::basic_string<char, std::char_traits<char>, std::allocator<char> > str = std::basic_string<char, std::char_traits<char>, std::allocator<char> >("world", std::allocator<char>());
   print("hi", 7.5, str);
   return 0;
 }
