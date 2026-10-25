@@ -54,7 +54,12 @@ CfrontCodeGenerator::CfrontVtableData::CfrontVtableData()
 
     vtableRecorDecl->completeDefinition();
 
-    vtableRecordType = QualType{vtableRecorDecl->getTypeForDecl(), 0u};
+    vtableRecordType =
+#if IS_CLANG_NEWER_THAN(22)
+        vtableRecorDecl->getASTContext().getCanonicalTagType(vtableRecorDecl);
+#else
+        QualType{vtableRecorDecl->getTypeForDecl(), 0u};
+#endif
 }
 //-----------------------------------------------------------------------------
 

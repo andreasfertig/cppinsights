@@ -355,9 +355,13 @@ void CodeGenerator::InsertArg(const CXXForRangeStmt* rangeForStmt)
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertQualifierAndName(const DeclarationName&     declName,
-                                           const NestedNameSpecifier* qualifier,
-                                           const bool                 hasTemplateKeyword)
+void CodeGenerator::InsertQualifierAndName(const DeclarationName& declName,
+                                           const NestedNameSpecifier
+#if not IS_CLANG_NEWER_THAN(22)
+                                               *
+#endif
+                                                      qualifier,
+                                           const bool hasTemplateKeyword)
 {
     mOutputFormatHelper.Append(ScopeHandler::RemoveCurrentScope(GetNestedName(qualifier)),
                                ValueOrDefault(hasTemplateKeyword, kwTemplateSpace),
@@ -365,7 +369,11 @@ void CodeGenerator::InsertQualifierAndName(const DeclarationName&     declName,
 }
 //-----------------------------------------------------------------------------
 
-void CodeGenerator::InsertNamespace(const NestedNameSpecifier* stmt)
+void CodeGenerator::InsertNamespace(const NestedNameSpecifier
+#if not IS_CLANG_NEWER_THAN(22)
+                                        *
+#endif
+                                            stmt)
 {
     mOutputFormatHelper.Append(ScopeHandler::RemoveCurrentScope(GetNestedName(stmt)));
 }
@@ -2406,8 +2414,14 @@ void CodeGenerator::InsertArg(const DeclRefExpr* stmt)
     if(const auto* ctx = stmt->getDecl()->getDeclContext(); not ctx->isFunctionOrMethod() and
                                                             not isa<NonTypeTemplateParmDecl>(stmt->getDecl()) and
                                                             not GetInsightsOptions().UseShow2C) {
-        if(const auto* qualifier = stmt->getQualifier();
-           qualifier and (qualifier->getKind() == NestedNameSpecifier::SpecifierKind::Global)) {
+        if(const auto qualifier = stmt->getQualifier();
+           qualifier and (
+#if IS_CLANG_NEWER_THAN(22)
+                             qualifier.getKind() == NestedNameSpecifier::Kind::Global
+#else
+                             qualifier->getKind() == NestedNameSpecifier::SpecifierKind::Global
+#endif
+                             )) {
             // According to
             // https://clang.llvm.org/doxygen/classclang_1_1NestedNameSpecifier.html#ac707a113605ed4283684b8c05664eb6f
             // the global specifier is not stored.
@@ -3107,20 +3121,33 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
         const bool carriesNamespace{[&] {
             if(const auto tn = templateSpecializationType->getTemplateName();
                (TemplateName::QualifiedTemplate == tn.getKind()) or (TemplateName::DependentTemplate == tn.getKind())) {
-                const auto* qtn = tn.getAsQualifiedTemplateName();
-
-                return qtn->getQualifier() != nullptr;
+                if(const auto* qtn = tn.getAsQualifiedTemplateName()) {
+                    return static_cast<bool>(qtn->getQualifier());
+                }
             }
 
             return false;
         }()};
 
+#if not IS_CLANG_NEWER_THAN(22)
         if(const auto* elaboratedType = underlyingType->getAs<ElaboratedType>()) {
             if(templateSpecializationType->isSugared() and not carriesNamespace) {
                 // do this only if the templateSpecializationType does not carry a nestedns
                 InsertNamespace(elaboratedType->getQualifier());
             }
         }
+#else
+        if(TemplateName::DependentTemplate == templateSpecializationType->getTemplateName().getKind()) {
+            mOutputFormatHelper.Append(GetElaboratedTypeKeyword(templateSpecializationType->getKeyword()));
+        }
+
+        if(templateSpecializationType->isSugared() and not carriesNamespace) {
+            // The scope was written in front of the typedef, for example std::chrono::nanoseconds.
+            if(const auto* typedefType = dyn_cast_or_null<TypedefType>(underlyingType.getTypePtrOrNull())) {
+                InsertNamespace(typedefType->getQualifier());
+            }
+        }
+#endif
 
         StringStream stream{};
         stream.Print(*templateSpecializationType);
@@ -3129,21 +3156,16 @@ void CodeGenerator::InsertArg(const TypeAliasDecl* stmt)
 
         InsertTemplateArgs(*templateSpecializationType);
 
+#if not IS_CLANG_NEWER_THAN(22)
     } else if(auto* depSpecType = underlyingType->getAs<DependentTemplateSpecializationType>()) {
         mOutputFormatHelper.Append(GetElaboratedTypeKeyword(depSpecType->getKeyword()));
 
-#if IS_CLANG_NEWER_THAN(20)
         InsertNamespace(depSpecType->getDependentTemplateName().getQualifier());
 
         mOutputFormatHelper.Append(kwTemplateSpace, GetName(depSpecType->getDependentTemplateName()));
-#else
-        InsertNamespace(depSpecType->getQualifier());
-
-        mOutputFormatHelper.Append(kwTemplateSpace, depSpecType->getIdentifier()->getName());
-#endif
 
         InsertTemplateArgs(*depSpecType);
-
+#endif
     } else {
         mOutputFormatHelper.Append(GetName(underlyingType));
     }
@@ -4313,7 +4335,7 @@ void CodeGenerator::InsertArgWithParensIfNeeded(const Stmt* stmt)
 void CodeGenerator::InsertSuffix(const QualType& type)
 {
     if(const auto* typePtr = type.getTypePtrOrNull(); typePtr and typePtr->isBuiltinType()) {
-        if(const auto* bt = dyn_cast_or_null<BuiltinType>(typePtr)) {
+        if(const auto* bt = type->getAs<clang::BuiltinType>()) {
             const auto kind = bt->getKind();
 
             mOutputFormatHelper.Append(GetBuiltinTypeSuffix(kind));
@@ -4929,7 +4951,13 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
 
     if(decl.isDeleted()) {
         mOutputFormatHelper.Append(kwSpaceEqualsDelete);
-        if(auto* delInfo = decl.getDefalutedOrDeletedInfo()) {
+        if(auto* delInfo =
+#if IS_CLANG_NEWER_THAN(22)
+               decl.getDefaultedOrDeletedInfo()
+#else
+               decl.getDefalutedOrDeletedInfo()
+#endif
+        ) {
             WrapInParens([&]() { InsertArg(delInfo->getDeletedMessage()); }, AddSpaceAtTheEnd::No);
         } else {
             mOutputFormatHelper.AppendSemiNewLine();
@@ -5070,6 +5098,7 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
 
     // Assume that we are looking at a builtin type. We have to construct the variable declaration information.
     auto type = stmt->getType();
+    bool addConstCast{};
 
     // If we have a holding var we are looking at a user defined type like tuple and those the defaults from above
     // are wrong. This type contains the variable declaration so we insert this.
@@ -5083,7 +5112,17 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
         // rvalue reference because then the call is get(std::move(e))
         type = holdingVar->getType().getCanonicalType();
 
+        // The holding variable's type is always a reference. Make sure we do not lose it.
+        if(not type->isReferenceType()) {
+            type = stmt->getASTContext().getRValueReferenceType(type);
+        }
+
         bindingStmt = holdingVar->getAnyInitializer();
+
+        // Newer Clang versions no longer add a NoOp cast to bind a `T&&` with const to a prvalue of a non-class type.
+        addConstCast = type->isRValueReferenceType() and type->getPointeeType().isConstQualified() and
+                       not type->getPointeeType()->isRecordType() and bindingStmt and bindingStmt->isPRValue() and
+                       not isa<CastExpr>(bindingStmt->IgnoreParens());
 
     } else if(not type->isLValueReferenceType()) {
         type = stmt->getASTContext().getLValueReferenceType(type);
@@ -5095,7 +5134,13 @@ void StructuredBindingsCodeGenerator::InsertArg(const BindingDecl* stmt)
                                GetTypeNameAsParameter(type, GetName(*stmt)),
                                hlpAssing);
 
-    InsertArg(bindingStmt);
+    if(addConstCast) {
+        mOutputFormatHelper.Append(kwStaticCast, "<"sv, GetName(type->getPointeeType()), ">"sv);
+        WrapInParens([&] { InsertArg(bindingStmt); });
+
+    } else {
+        InsertArg(bindingStmt);
+    }
 
     mOutputFormatHelper.AppendSemiNewLine();
 }

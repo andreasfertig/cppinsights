@@ -3,6 +3,7 @@
 #include <exception>
 #include <new>
 #include <tuple>
+#include <utility>
 
 template<typename T>
 struct generator
@@ -121,7 +122,7 @@ struct generator
   std::coroutine_handle<promise_type> p;
 };
 
-/* First instantiated from: Issue92.cpp:76 */
+/* First instantiated from: Issue92.cpp:77 */
 #ifdef INSIGHTS_USE_TEMPLATE
 template<>
 struct generator<unsigned int>

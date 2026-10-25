@@ -233,6 +233,11 @@ public:
             if(isa<LinkageSpecDecl>(d) and d->isImplicit()) {
                 continue;
 
+#if IS_CLANG_NEWER_THAN(22)
+                // An explicit instantiation is not transformed, it must not influence the blank line handling.
+            } else if(isa<ExplicitInstantiationDecl>(d)) {
+                continue;
+#endif
                 // Only handle explicit specializations here. Implicit ones are handled by the `VarTemplateDecl`
                 // itself.
             } else if(const auto* vdspec = dyn_cast_or_null<VarTemplateSpecializationDecl>(d);
