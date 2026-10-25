@@ -766,4 +766,14 @@ jobs:
 
     - name: Notify listeners
       run: |
-        curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GH_TRIGGER }}" https://api.github.com/repos/andreasfertig/cppinsights-container/dispatches -d '{"event_type":"rebuild_trigger"}' &> /dev/null
+        status=$(curl --silent --show-error --output response.json --write-out '%{http_code}' \
+                      -X POST \
+                      -H "Accept: application/vnd.github.v3+json" \
+                      -H "Authorization: token ${{ secrets.GH_TRIGGER }}" \
+                      https://api.github.com/repos/andreasfertig/cppinsights-container/dispatches \
+                      -d '{"event_type":"rebuild_trigger"}')
+        if [ "$status" != "204" ]; then
+          echo "::error::Dispatch failed with HTTP $status"
+          cat response.json
+          exit 1
+        fi
