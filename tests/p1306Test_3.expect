@@ -1,0 +1,86 @@
+#define INSIGHTS_USE_TEMPLATE
+
+#include <tuple>
+
+template<typename T>
+void Call(const T &)
+{
+}
+
+/* First instantiated from: p1306Test_3.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Call<int>(const int &)
+{
+}
+#endif
+
+
+/* First instantiated from: p1306Test_3.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Call<long>(const long &)
+{
+}
+#endif
+
+
+/* First instantiated from: p1306Test_3.cpp:17 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Call<unsigned int>(const unsigned int &)
+{
+}
+#endif
+
+
+template<typename T>
+void Fun()
+{
+  std::tuple<T, long, unsigned int> tpl = {1, 2L, 3U};
+  template for(int idx = {}; auto x : tpl){
+    Call(x);
+  }
+}
+
+/* First instantiated from: p1306Test_3.cpp:23 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+void Fun<int>()
+{
+  std::tuple<int, long, unsigned int> tpl = std::tuple<int, long, unsigned int>{1, 2L, 3U};
+  {
+    int idx = {};
+    std::tuple<int, long, unsigned int> & __tpl15 = tpl;
+    int & __u0 = std::get<0UL>(__tpl15);
+    long & __u1 = std::get<1UL>(__tpl15);
+    unsigned int & __u2 = std::get<2UL>(__tpl15);
+    {
+      int x = __u0;
+      {
+        Call(x);
+      }
+    }
+    {
+      long x = __u1;
+      {
+        Call(x);
+      }
+    }
+    {
+      unsigned int x = __u2;
+      {
+        Call(x);
+      }
+    }
+    
+  }
+}
+#endif
+
+
+int main()
+{
+  Fun<int>();
+  return 0;
+}

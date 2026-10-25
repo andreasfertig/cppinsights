@@ -1,0 +1,60 @@
+#include <cstdio>
+
+int main()
+{
+  int res = {};
+  {
+    {
+      int x = 1;
+      {
+        res = res + x;
+        if(x == 2) {
+          goto __continue_9_3_0;
+        } 
+        
+        if(x == 3) {
+          goto __break_9_3;
+        } 
+        
+        printf("%d\n", x);
+      }
+    }
+    __continue_9_3_0:
+    {
+      int x = 2;
+      {
+        res = res + x;
+        if(x == 2) {
+          goto __continue_9_3_1;
+        } 
+        
+        if(x == 3) {
+          goto __break_9_3;
+        } 
+        
+        printf("%d\n", x);
+      }
+    }
+    __continue_9_3_1:
+    {
+      int x = 3;
+      {
+        res = res + x;
+        if(x == 2) {
+          goto __continue_9_3_2;
+        } 
+        
+        if(x == 3) {
+          goto __break_9_3;
+        } 
+        
+        printf("%d\n", x);
+      }
+    }
+    __continue_9_3_2:
+    __break_9_3:
+    
+  }
+  printf("end\n");
+  return 0;
+}

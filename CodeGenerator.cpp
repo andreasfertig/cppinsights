@@ -211,6 +211,97 @@ public:
 };
 //-----------------------------------------------------------------------------
 
+/// Transforms `break` and `continue` in the instantiations of a `template for` into `goto`.
+class ExpansionStmtCodeGenerator final : public CodeGenerator
+{
+    std::string mLabelId{};
+    size_t      mIndex{};
+    size_t      mBreakCaptured{};     //!< Nesting depth of loops and switches capturing `break`.
+    size_t      mContinueCaptured{};  //!< Nesting depth of loops capturing `continue`.
+    bool        mBreakUsed{};
+    bool        mContinueUsed{};  //!< A `switch` has no `continue`
+
+    std::string BreakLabel() const { return StrCat(BuildInternalVarName(kwBreak), mLabelId); }
+    std::string ContinueLabel() const { return StrCat(BuildInternalVarName(kwContinue), mLabelId, "_"sv, mIndex); }
+
+    void InsertCapturing(const Stmt* stmt, bool capturesContinue)
+    {
+        ++mBreakCaptured;
+        if(capturesContinue) {
+            ++mContinueCaptured;
+        }
+
+        CodeGenerator::InsertArg(stmt);
+
+        --mBreakCaptured;
+        if(capturesContinue) {
+            --mContinueCaptured;
+        }
+    }
+
+public:
+    ExpansionStmtCodeGenerator(const CXXExpansionStmtDecl* decl,
+                               OutputFormatHelper&         outputFormatHelper,
+                               LambdaStackType&            lambdaStack)
+    : CodeGenerator{outputFormatHelper, lambdaStack, ProcessingPrimaryTemplate::No}
+    , mLabelId{MakeLineColumnName(GetSM(*decl), decl->getBeginLoc(), "_"sv)}
+    {
+    }
+
+    using CodeGenerator::InsertArg;
+
+    void InsertInstantiations(const CXXExpansionStmtInstantiation& inst)
+    {
+        for(const auto& e : inst.getPreambleStmts()) {
+            InsertArg(e);
+        }
+
+        for(const auto e : inst.getInstantiations()) {
+            mContinueUsed = false;
+
+            InsertArg(e);
+            mOutputFormatHelper.AppendNewLine();
+
+            if(mContinueUsed) {
+                mOutputFormatHelper.AppendNewLine(ContinueLabel(), ":"sv);
+            }
+
+            ++mIndex;
+        }
+
+        if(mBreakUsed) {
+            mOutputFormatHelper.AppendNewLine(BreakLabel(), ":"sv);
+        }
+    }
+
+    void InsertArg(const BreakStmt* stmt) override
+    {
+        if(mBreakCaptured) {
+            CodeGenerator::InsertArg(stmt);
+        } else {
+            mBreakUsed = true;
+            mOutputFormatHelper.Append(kwGotoSpace, BreakLabel());
+        }
+    }
+
+    void InsertArg(const ContinueStmt* stmt) override
+    {
+        if(mContinueCaptured) {
+            CodeGenerator::InsertArg(stmt);
+        } else {
+            mContinueUsed = true;
+            mOutputFormatHelper.Append(kwGotoSpace, ContinueLabel());
+        }
+    }
+
+    void InsertArg(const ForStmt* stmt) override { InsertCapturing(stmt, true); }
+    void InsertArg(const CXXForRangeStmt* stmt) override { InsertCapturing(stmt, true); }
+    void InsertArg(const WhileStmt* stmt) override { InsertCapturing(stmt, true); }
+    void InsertArg(const DoStmt* stmt) override { InsertCapturing(stmt, true); }
+    void InsertArg(const SwitchStmt* stmt) override { InsertCapturing(stmt, false); }
+};
+//-----------------------------------------------------------------------------
+
 CodeGenerator::LambdaScopeHandler::LambdaScopeHandler(LambdaStackType&       stack,
                                                       OutputFormatHelper&    outputFormatHelper,
                                                       const LambdaCallerType lambdaCallerType)
@@ -825,7 +916,8 @@ static std::string_view GetStorageClassAsString(const StorageClass& sc)
 
 static std::string GetStorageClassAsStringWithSpace(const StorageClass& sc)
 {
-    std::string ret{GetStorageClassAsString(sc)};
+    // `auto` as a storage class specifier is not valid C++. Expansion statements synthesize such declarations.
+    std::string ret{SC_Auto == sc ? ""sv : GetStorageClassAsString(sc)};
 
     if(not ret.empty()) {
         ret.append(" "sv);
@@ -945,11 +1037,11 @@ public:
             // XXX hack. Our normal VarDecl is at TU level. It then appears in cxa_start...
             auto& ctx = GetGlobalAST();
             auto* vd  = ImplicitParamDecl::Create(const_cast<ASTContext&>(ctx),
-                                                 ctx.getTranslationUnitDecl(),
+                                                  ctx.getTranslationUnitDecl(),
                                                   {},
-                                                 &ctx.Idents.get(mTempName),
-                                                 expr->getType(),
-                                                 ImplicitParamKind::Other);
+                                                  &ctx.Idents.get(mTempName),
+                                                  expr->getType(),
+                                                  ImplicitParamKind::Other);
 
 #endif
 
@@ -1425,7 +1517,11 @@ void CodeGenerator::InsertArg(const VarDecl* stmt)
                             IsPrimaryTemplatePackExpansionExpr(dyn_cast_or_null<ParenListExpr>(init))};
 
                         if(not isa<CXXParenListInitExpr>(init) and not isPrimaryTemplatePackExpansionExpr) {
-                            mOutputFormatHelper.Append(hlpAssing);
+                            if(ReplaceAssignWithColon::No == mReplaceAssignWithColon) {
+                                mOutputFormatHelper.Append(hlpAssing);
+                            } else {
+                                mOutputFormatHelper.Append(" : ");
+                            }
                         }
 
                         WrapInParensIfNeeded(isPrimaryTemplatePackExpansionExpr, [&] {
@@ -2085,6 +2181,52 @@ void CodeGenerator::InsertArg(const CXXFoldExpr* stmt)
 }
 //-----------------------------------------------------------------------------
 
+void CodeGenerator::InsertArg(const CXXExpansionSelectExpr* stmt)
+{
+    InsertArg(stmt->getRangeExpr());
+}
+//-----------------------------------------------------------------------------
+
+void CodeGenerator::InsertArg(const CXXExpansionStmtDecl* stmt)
+{
+    if(const auto* inst = stmt->getInstantiations()) {
+        mOutputFormatHelper.OpenScope();
+
+        ExpansionStmtCodeGenerator codeGenerator{stmt, mOutputFormatHelper, mLambdaStack};
+        codeGenerator.InsertInstantiations(*inst);
+
+        mOutputFormatHelper.CloseScope();
+
+    } else if(const auto* pattern = stmt->getExpansionPattern()) {
+        mOutputFormatHelper.Append(kwTemplate, " for"sv);
+
+        WrapInParens([&] {
+            if(const auto* init = pattern->getInit()) {
+                MultiStmtDeclCodeGenerator codeGenerator{mOutputFormatHelper, mLambdaStack, true};
+                codeGenerator.InsertArg(init);
+            }
+
+            MultiStmtDeclCodeGenerator codeGenerator{
+                mOutputFormatHelper, mLambdaStack, MultiStmtDeclCodeGenerator::SkipFinalSemi::Yes};
+
+            {
+                BackupAndRestore _{codeGenerator.mReplaceAssignWithColon, ReplaceAssignWithColon::Yes};
+                codeGenerator.InsertArg(pattern->getExpansionVarStmt());
+            }
+
+            if(pattern->isDependent()) {
+                mOutputFormatHelper.Append(" : "sv);
+                InsertArg(pattern->getExpansionInitializer());
+            }
+        });
+
+        InsertArg(pattern->getBody());
+    }
+
+    mOutputFormatHelper.AppendNewLine();
+}
+//-----------------------------------------------------------------------------
+
 void CodeGenerator::InsertArg(const PackIndexingExpr* stmt)
 {
     if(stmt->isFullySubstituted()) {
@@ -2498,9 +2640,12 @@ void CodeGenerator::HandleCompoundStmt(const CompoundStmt* stmt)
                                CXXForRangeStmt,
                                SwitchStmt,
                                CXXTryStmt,
+                               CompoundStmt,
                                CppInsightsCommentStmt>(item) and
            InsertSemi() and not skipSemiForLambda and not mSkipSemi) {
             mOutputFormatHelper.AppendSemiNewLine();
+        } else if(isa<CompoundStmt>(item)) {
+            mOutputFormatHelper.AppendNewLine();
         }
 
         mSkipSemi = false;
@@ -4306,7 +4451,7 @@ void CodeGenerator::FormatCast(const std::string_view castName,
                                const CastKind&        castKind)
 {
     const bool        isCastToBase{is{castKind}.any_of(CK_DerivedToBase, CK_UncheckedDerivedToBase) and
-                            castDestType->isRecordType()};
+                                   castDestType->isRecordType()};
     const std::string castDestTypeText{
         StrCat(GetName(castDestType), ((isCastToBase and not castDestType->isAnyPointerType()) ? "&"sv : ""sv))};
 
@@ -4724,7 +4869,7 @@ void CodeGenerator::InsertFunctionNameWithReturnType(const FunctionDecl&       d
     bool        isCXXMethodDecl{nullptr != methodDecl};
     const bool  isClassTemplateSpec{isCXXMethodDecl and isa<ClassTemplateSpecializationDecl>(methodDecl->getParent())};
     const bool  requiresComment{isCXXMethodDecl and not methodDecl->isUserProvided() and
-                               not methodDecl->isExplicitlyDefaulted()};
+                                not methodDecl->isExplicitlyDefaulted()};
     // [expr.prim.lambda.closure] p7 consteval/constexpr are obtained from the call operator
     const bool isLambdaStaticInvoker{isCXXMethodDecl and methodDecl->isLambdaStaticInvoker()};
     const auto desugaredReturnType = GetType(GetDesugarReturnType(decl));

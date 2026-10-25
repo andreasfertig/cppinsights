@@ -1,0 +1,79 @@
+#define INSIGHTS_USE_TEMPLATE
+
+template<typename T, typename ... Args>
+inline constexpr T min(const T & x, const T & y, const Args &... vals)
+{
+  auto m = x < y ? x : y /* NRVO variable */;
+  template for(int init = {3}; const auto & e : {vals... }){
+    if(e < m) {
+      m = e;
+    } 
+    
+  }
+  return m;
+}
+
+/* First instantiated from: p1306Test_2.cpp:22 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int min<int>(const int & x, const int & y)
+{
+  int m = x < y ? x : y;
+  {
+    int init = {3};
+    
+  }
+  return static_cast<int &&>(m);
+}
+#endif
+
+
+/* First instantiated from: p1306Test_2.cpp:23 */
+#ifdef INSIGHTS_USE_TEMPLATE
+template<>
+inline constexpr int min<int, int, int, int>(const int & x, const int & y, const int & __vals2, const int & __vals3, const int & __vals4)
+{
+  int m = x < y ? x : y;
+  {
+    int init = {3};
+    {
+      int const & e = __vals2;
+      {
+        if(e < m) {
+          m = e;
+        } 
+        
+      }
+    }
+    {
+      int const & e = __vals3;
+      {
+        if(e < m) {
+          m = e;
+        } 
+        
+      }
+    }
+    {
+      int const & e = __vals4;
+      {
+        if(e < m) {
+          m = e;
+        } 
+        
+      }
+    }
+    
+  }
+  return static_cast<int &&>(m);
+}
+#endif
+
+
+/* PASSED: static_assert(min(3, 2) == 2); */
+/* PASSED: static_assert(min(3, 2, 3, 4, 5) == 2); */
+
+int main()
+{
+  return 0;
+}

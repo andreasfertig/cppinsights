@@ -1,0 +1,7 @@
+#include <string_view>
+
+int main()
+{
+  static constexpr const std::basic_string_view<char, std::char_traits<char> > foo = std::basic_string_view<char, std::char_traits<char> >("abcd");
+  return 0;
+}

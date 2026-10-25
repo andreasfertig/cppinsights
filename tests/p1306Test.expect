@@ -1,0 +1,26 @@
+int main()
+{
+  int res = {};
+  {
+    {
+      int x = 1;
+      {
+        res = res + x;
+      }
+    }
+    {
+      int x = 2;
+      {
+        res = res + x;
+      }
+    }
+    {
+      int x = 3;
+      {
+        res = res + x;
+      }
+    }
+    
+  }
+  return 0;
+}

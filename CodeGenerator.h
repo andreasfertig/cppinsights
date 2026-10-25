@@ -412,6 +412,7 @@ protected:
     STRONG_BOOL(UseCommaInsteadOfSemi);
     STRONG_BOOL(NoEmptyInitList);
     STRONG_BOOL(ShowConstantExprValue);
+    STRONG_BOOL(ReplaceAssignWithColon);
 
     ShowConstantExprValue mShowConstantExprValue{ShowConstantExprValue::No};
     SkipVarDecl           mSkipVarDecl{SkipVarDecl::No};
@@ -430,11 +431,12 @@ protected:
                                                   //!< potential std::initializer_list expansion must be inserted.
     std::optional<size_t> mCurrentFieldPos{};     //!< The position in mOutputFormatHelper in a class where where a
                                                   //!< potential std::initializer_list expansion must be inserted.
-    OutputFormatHelper* mOutputFormatHelperOutside{
+    OutputFormatHelper*   mOutputFormatHelperOutside{
         nullptr};                        //!< Helper output buffer for std::initializer_list expansion.
     bool mRequiresImplicitReturnZero{};  //!< Track whether this is a function with an imlpicit return 0.
     bool mSkipSemi{};
     ProcessingPrimaryTemplate                 mProcessingPrimaryTemplate{};
+    ReplaceAssignWithColon                    mReplaceAssignWithColon{};  //!< Special case for `for template`.
     static inline std::map<std::string, bool> mSeenDecls{};
 };
 //-----------------------------------------------------------------------------
@@ -460,15 +462,33 @@ public:
     {
     }
 
+    STRONG_BOOL(SkipFinalSemi);
+
+    explicit MultiStmtDeclCodeGenerator(OutputFormatHelper& _outputFormatHelper,
+                                        LambdaStackType&    lambdaStack,
+                                        SkipFinalSemi       skipFinalSemi)
+    : CodeGenerator{_outputFormatHelper, lambdaStack, ProcessingPrimaryTemplate::No}
+    , mInsertVarDecl{true}
+    , mInsertComma{}
+    , mSkipFinalSemi{skipFinalSemi}
+    {
+    }
+
     // Insert the semi after the last declaration. This implies that this class always requires its own scope.
-    ~MultiStmtDeclCodeGenerator() { mOutputFormatHelper.Append("; "sv); }
+    ~MultiStmtDeclCodeGenerator()
+    {
+        if(SkipFinalSemi::No == mSkipFinalSemi) {
+            mOutputFormatHelper.Append("; "sv);
+        }
+    }
 
     using CodeGenerator::InsertArg;
 
 protected:
-    OnceTrue  mInsertVarDecl{};  //! Insert the \c VarDecl only once.
-    OnceFalse mInsertComma{};    //! Insert the comma after we have generated the first \c VarDecl and we are about to
-                                 //! insert another one.
+    OnceTrue      mInsertVarDecl{};  //! Insert the \c VarDecl only once.
+    OnceFalse     mInsertComma{};  //! Insert the comma after we have generated the first \c VarDecl and we are about to
+                                   //! insert another one.
+    SkipFinalSemi mSkipFinalSemi{SkipFinalSemi::No};  //! Skip inserting the semi colon once the object gets destroyed.
 
     bool InsertVarDecl(const VarDecl*) override { return mInsertVarDecl; }
     bool InsertComma() override { return mInsertComma; }
