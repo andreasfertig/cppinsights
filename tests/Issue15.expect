@@ -10,7 +10,7 @@ std::chrono::duration<long long, std::ratio<1, 1> > operator""_s(unsigned long l
 
 std::basic_string<char, std::char_traits<char>, std::allocator<char> > operator""_str(const char * s, unsigned long len)
 {
-  return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(s, len);
+  return std::basic_string<char, std::char_traits<char>, std::allocator<char> >(s, len, std::allocator<char>());
 }
 
 template<char ..._Digits>

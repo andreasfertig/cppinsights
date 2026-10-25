@@ -22,7 +22,7 @@ namespace tnt
             ((__this->data[I] = std::exchange(rhs.data[I], U(0))) , ...);
           }
           // private: 
-          vector<T, N> * __this;
+          tnt::vector<T, N> * __this;
           auto rhs;
         };
         

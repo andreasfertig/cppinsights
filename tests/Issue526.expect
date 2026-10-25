@@ -25,7 +25,7 @@ struct executable<hello_logic, hello_world>
 {
   void (*resume_fn)(__executeFrame *);
   void (*destroy_fn)(__executeFrame *);
-  std::__coroutine_traits_sfinae<hello_world>::promise_type __promise;
+  std::coroutine_traits<hello_world>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_never __suspend_9_30;
@@ -42,7 +42,7 @@ static inline hello_world execute()
     __f->__initial_await_suspend_called = false;
     
     /* Construct the promise. */
-    new (&__f->__promise)std::__coroutine_traits_sfinae<hello_world>::promise_type{};
+    new (&__f->__promise)std::coroutine_traits<hello_world>::promise_type{};
     
     /* Forward declare the resume and destroy function. */
     void __executeResume(__executeFrame * __f);

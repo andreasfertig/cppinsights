@@ -103,7 +103,7 @@ void SyncAwait<std::suspend_always>(std::suspend_always && a)
 {
   void (*resume_fn)(__operator_45_43Frame *);
   void (*destroy_fn)(__operator_45_43Frame *);
-  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::coroutine_traits<generator, const (lambda) &>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_45_24;
@@ -120,7 +120,7 @@ inline generator operator()() const
       __f->__initial_await_suspend_called = false;
       
       /* Construct the promise. */
-      new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
+      new (&__f->__promise)std::coroutine_traits<generator, const (lambda) &>::promise_type{};
       
       /* Forward declare the resume and destroy function. */
       void __operator_45_43Resume(__operator_45_43Frame * __f);

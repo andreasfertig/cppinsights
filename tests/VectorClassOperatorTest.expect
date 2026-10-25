@@ -3,10 +3,10 @@
 int main()
 {
   std::vector<int, std::allocator<int> > vec = std::vector<int, std::allocator<int> >();
-  for(std::__wrap_iter<int *> it = vec.begin(); std::operator!=(it, vec.end()); it.operator++()) {
+  for(std::__wrap_iter<int *> it = vec.begin(); operator!=(it, vec.end()); it.operator++()) {
   }
   
-  for(std::__wrap_iter<int *> it1 = vec.begin(); std::operator!=(it1, vec.end()); it1.operator++()) {
+  for(std::__wrap_iter<int *> it1 = vec.begin(); operator!=(it1, vec.end()); it1.operator++()) {
   }
   
   return 0;

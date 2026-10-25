@@ -76,7 +76,7 @@ struct __seqFrame
 {
   void (*resume_fn)(__seqFrame *);
   void (*destroy_fn)(__seqFrame *);
-  std::__coroutine_traits_sfinae<generator>::promise_type __promise;
+  std::coroutine_traits<generator, const int &>::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   const int & start;
@@ -103,7 +103,7 @@ generator seq(const int & start)
   __f->start = std::forward<const int &>(start);
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator>::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator, const int &>::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __seqResume(__seqFrame * __f);

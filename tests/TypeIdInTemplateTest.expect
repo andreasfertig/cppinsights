@@ -10,7 +10,7 @@ class Foo
   public: 
   inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > Get()
   {
-    std::basic_string<char, std::char_traits<char>, std::allocator<char> > typeId = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{typeid(T).name()} /* NRVO variable */;
+    std::basic_string<char, std::char_traits<char>, std::allocator<char> > typeId = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{typeid(T).name(), std::allocator<char>()} /* NRVO variable */;
     return typeId;
   }
   
@@ -25,7 +25,7 @@ class Foo<int>
   public: 
   inline std::basic_string<char, std::char_traits<char>, std::allocator<char> > Get()
   {
-    std::basic_string<char, std::char_traits<char>, std::allocator<char> > typeId = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{typeid(int).name()} /* NRVO variable */;
+    std::basic_string<char, std::char_traits<char>, std::allocator<char> > typeId = std::basic_string<char, std::char_traits<char>, std::allocator<char> >{typeid(int).name(), std::allocator<char>()} /* NRVO variable */;
     return typeId;
   }
   

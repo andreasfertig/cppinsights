@@ -32,7 +32,7 @@ option(INSIGHTS_STATIC              "Use static linking"         Off)
 
 set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
 
-set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 21)
+set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 23)
 set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
@@ -250,6 +250,10 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
     llvm_config(LLVM_INCLUDE_DIR "--includedir")
 
     llvm_config(LLVM_SYSTEM_LIBS2 "--system-libs")
+    # C++ Insights doesn't use the part which required libz3 support
+    string(REPLACE "-lm /usr/lib/x86_64-linux-gnu/libz3.so" "" LLVM_SYSTEM_LIBS2 "${LLVM_SYSTEM_LIBS2}")
+    string(REPLACE "-lm /usr/lib/aarch64-linux-gnu/libz3.so" "" LLVM_SYSTEM_LIBS2 "${LLVM_SYSTEM_LIBS2}")
+
     if(WIN32)
         string(REPLACE ".lib " ".lib;" LLVM_SYSTEM_LIBS "${LLVM_SYSTEM_LIBS2}")
         # For Win10 (?) some Win API things moved to Mincore.lib.
@@ -903,6 +907,7 @@ message(STATUS "CMAKE_GENERATOR       : ${CMAKE_GENERATOR}")
 message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
 message(STATUS "CMAKE_LINKER          : ${CMAKE_LINKER}")
 message(STATUS "CMAKE_OSX_ARCHITECTURES : ${CMAKE_OSX_ARCHITECTURES}")
+message(STATUS "LLVM_SYSTEM_LIBS      : ${LLVM_SYSTEM_LIBS}")
 message(STATUS "Compiler ID           : ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Compiler version      : ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "Compiler path         : ${CMAKE_CXX_COMPILER}")

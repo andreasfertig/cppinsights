@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-  std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > v = std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >{std::initializer_list<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >{std::basic_string<char, std::char_traits<char>, std::allocator<char> >("aaa"), std::basic_string<char, std::char_traits<char>, std::allocator<char> >("bbb"), std::basic_string<char, std::char_traits<char>, std::allocator<char> >("ccc")}};
+  std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > v = std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >{std::initializer_list<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >{std::basic_string<char, std::char_traits<char>, std::allocator<char> >("aaa", std::allocator<char>()), std::basic_string<char, std::char_traits<char>, std::allocator<char> >("bbb", std::allocator<char>()), std::basic_string<char, std::char_traits<char>, std::allocator<char> >("ccc", std::allocator<char>())}};
       
   class __lambda_12_26
   {
@@ -31,6 +31,7 @@ int main()
     {
       return __lambda_12_26{}.operator()<type_parameter_0_0>(str);
     }
+    public: 
   };
   
   std::__wrap_iter<std::basic_string<char, std::char_traits<char>, std::allocator<char> > *> it = std::find_if(std::begin(v), std::end(v), __lambda_12_26{});

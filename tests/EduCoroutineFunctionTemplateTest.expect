@@ -151,7 +151,7 @@ struct __fun_int_char_unsignedint_3_1400000000000001Frame
 {
   void (*resume_fn)(__fun_int_char_unsignedint_3_1400000000000001Frame *);
   void (*destroy_fn)(__fun_int_char_unsignedint_3_1400000000000001Frame *);
-  std::__coroutine_traits_sfinae<generator<int> >::promise_type __promise;
+  std::coroutine_traits<generator<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_43_14;
@@ -170,7 +170,7 @@ generator<int> fun<int, char, unsigned int, 3.1400000000000001>()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __fun_int_char_unsignedint_3_1400000000000001Resume(__fun_int_char_unsignedint_3_1400000000000001Frame * __f);
@@ -254,7 +254,7 @@ struct __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame
 {
   void (*resume_fn)(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame *);
   void (*destroy_fn)(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame *);
-  std::__coroutine_traits_sfinae<generator<int> >::promise_type __promise;
+  std::coroutine_traits<generator<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_43_14;
@@ -274,7 +274,7 @@ generator<int> fun<int, char, unsigned int, ClsAsNTTPToCoro_4_n3_000000e_00_>()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<generator<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<generator<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Resume(__fun_int_char_unsignedint_ClsAsNTTPToCoro_4_n3_000000e_00_Frame * __f);

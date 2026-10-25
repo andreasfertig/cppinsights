@@ -128,7 +128,7 @@ int test<int>(int && value)
       return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
+    using retType_13_4 = std::basic_string<char, std::char_traits<char>, std::allocator<char> > ( *)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
@@ -203,7 +203,7 @@ int test<const char (&)[3]>(const char (&value)[3])
       return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
+    using retType_13_4 = std::basic_string<char, std::char_traits<char>, std::allocator<char> > ( *)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
@@ -278,7 +278,7 @@ int test<std::basic_string<char, std::char_traits<char>, std::allocator<char> > 
       return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
+    using retType_13_4 = std::basic_string<char, std::char_traits<char>, std::allocator<char> > ( *)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
@@ -353,7 +353,7 @@ int test<float>(float && value)
       return std::operator+(value, " Hi!");
     }
     
-    using retType_13_4 = basic_string<char, std::char_traits<char>, std::allocator<char> > (*)(std::string);
+    using retType_13_4 = std::basic_string<char, std::char_traits<char>, std::allocator<char> > ( *)(std::basic_string<char, std::char_traits<char>, std::allocator<char> >);
     inline constexpr operator retType_13_4 () const noexcept
     {
       return __invoke;
@@ -418,7 +418,7 @@ int main()
 {
   std::cout.operator<<(test(200)).operator<<(std::endl);
   std::cout.operator<<(test("RR")).operator<<(std::endl);
-  std::cout.operator<<(test(std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"ARR"})).operator<<(std::endl);
+  std::cout.operator<<(test(std::basic_string<char, std::char_traits<char>, std::allocator<char> >{"ARR", std::allocator<char>()})).operator<<(std::endl);
   std::cout.operator<<(test(2.0F)).operator<<(std::endl);
   return 0;
 }

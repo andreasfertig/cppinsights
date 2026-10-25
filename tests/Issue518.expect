@@ -241,7 +241,7 @@ struct __get_randomFrame
 {
   void (*resume_fn)(__get_randomFrame *);
   void (*destroy_fn)(__get_randomFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_77_11;
@@ -257,7 +257,7 @@ task<int> get_random()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __get_randomResume(__get_randomFrame * __f);
@@ -342,7 +342,7 @@ struct __testFrame
 {
   void (*resume_fn)(__testFrame *);
   void (*destroy_fn)(__testFrame *);
-  std::__coroutine_traits_sfinae<task<int> >::promise_type __promise;
+  std::coroutine_traits<task<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   task<int> v;
@@ -365,7 +365,7 @@ task<int> test()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<task<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<task<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __testResume(__testFrame * __f);

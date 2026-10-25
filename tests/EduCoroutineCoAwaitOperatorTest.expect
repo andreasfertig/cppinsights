@@ -160,7 +160,7 @@ struct __gFrame
 {
   void (*resume_fn)(__gFrame *);
   void (*destroy_fn)(__gFrame *);
-  std::__coroutine_traits_sfinae<my_future<int> >::promise_type __promise;
+  std::coroutine_traits<my_future<int> >::promise_type __promise;
   int __suspend_index;
   bool __initial_await_suspend_called;
   std::suspend_always __suspend_51_16;
@@ -179,7 +179,7 @@ my_future<int> g()
   __f->__initial_await_suspend_called = false;
   
   /* Construct the promise. */
-  new (&__f->__promise)std::__coroutine_traits_sfinae<my_future<int> >::promise_type{};
+  new (&__f->__promise)std::coroutine_traits<my_future<int> >::promise_type{};
   
   /* Forward declare the resume and destroy function. */
   void __gResume(__gFrame * __f);
