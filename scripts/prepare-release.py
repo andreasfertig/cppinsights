@@ -34,11 +34,12 @@ def main():
     travis = re.sub(r'(clang|llvm|clang\+\+|llvm-config|llvm-toolchain-bionic|clang-format|clang-tidy|llvm-toolchain-trusty)(-%s)' %(oldClangStable), '\\1-%s' %(newClangStable) , travis)
     travis = re.sub('(clang|Clang|llvm|LLVM) (%s)' %(oldClangStable), '\\1 %s' %(newClangStable) , travis)
     travis = re.sub(r"(LLVM_VERSION=)('%s)" %(oldClangStable), r"\1'%s" %(newClangStable) , travis)
-    travis = re.sub(r"(LLVM_VERSION:)\s*(%s.0.0)" %(oldClangStable), r"\1 %s.0.0" %(newClangStable) , travis)
-    travis = re.sub(r'(llvm_version:\s*)("%s)(.0.0",)' %(oldClangStable), '\\1"%s.0.0",' %(newClangStable), travis)
+    travis = re.sub(r"(LLVM_VERSION:)\s*(%s.1.0)" %(oldClangStable), r"\1 %s.0.0" %(newClangStable) , travis)
+    travis = re.sub(r'(llvm_version:\s*)("%s)(.1.0",)' %(oldClangStable), '\\1"%s.0.0",' %(newClangStable), travis)
     travis = re.sub(r"clang(%s)0" %(oldClangStable), r"clang%s0" %(newClangStable) , travis)
     travis = re.sub(r"(llvm-toolchain-xenial)-(%s)" %(oldClangStable), r"\1-%s" %(newClangStable) , travis)
     travis = re.sub(r"(./llvm.sh) (%s)" %(oldClangStable), r"\1 %s" %(newClangStable) , travis)
+
 
     open('.github/workflows/ci.yml', 'w').write(travis)
 
